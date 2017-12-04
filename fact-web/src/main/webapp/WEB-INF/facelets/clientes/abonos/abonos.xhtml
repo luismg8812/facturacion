@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="abonosForm" style="font-size:12px">
+		<table width="80%" align="center">
+			<tr>
+				<td><p:outputLabel value="Proveedor:" /></td>
+				<td><p:selectOneMenu value="#{abonos.proveedorId}"
+						id="proveedor">
+						<f:selectItem itemLabel="Seccionar Proveedor" itemValue="0" />
+						<f:selectItems value="#{proveedores.proveedores}" var="prov"
+							itemLabel="#{prov.nombre}" itemValue="#{prov.proveedorId}" />
+					</p:selectOneMenu></td>
+				<td><p:outputLabel value="Tipo Facturas:" /></td>
+				<td><p:selectOneMenu value="#{abonos.tipoFacturas}"
+						id="tipoFacturas">
+						<f:selectItem itemLabel="Seleccione un tipo de Factura"
+							itemValue="0" />
+						<f:selectItem itemLabel="Pagadas" itemValue="1" />
+						<f:selectItem itemLabel="Sin Pagar" itemValue="2" />
+						<f:selectItem itemLabel="Con Abonos" itemValue="3" />
+						<f:selectItem itemLabel="Todas" itemValue="4" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial" value="#{abonos.fechaInicio}"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal" value="#{abonos.fechafin}"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Detalle: " /></td>
+				<td><p:inputText value="#{abonos.detalle}" /></td>
+			</tr>
+
+
+		</table>
+		<table width="80%" align="center">
+			<tr>
+				<td><p:commandButton value="Buscar" process="@form"
+						update="documentos,total,totalSaldos" id="buscar"
+						actionListener="#{abonos.buscar}" /> <p:commandButton
+						onclick="PF('abonos2').hide();" value="Salir" /> <p:commandButton
+						value="Crear Documento" title="Crear Documento"
+						update="crearDocument" onclick="PF('crearDocumento').show();" />
+				</td>
+			</tr>
+		</table>
+		<p:dataTable id="documentos" var="docu" value="#{abonos.documentos}"
+			rows="5" paginator="true"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="5,10,15"
+			emptyMessage="No hay facturas disponibles para El proveedor seleccionado">
+			<f:facet name="header">
+            Documentos
+        </f:facet>
+			<p:column style="width:10%;text-align: center">
+
+				<p:commandButton icon="ui-icon-search" title="View"
+					action="#{abonos.consultarAbonos(docu)}" update="consultar">
+
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-contact" title="Crear Abono"
+					update="crear" action="#{abonos.abrirPopupAbono(docu)}">
+
+				</p:commandButton>
+			</p:column>
+			<p:column headerText="Detalle">
+				<h:outputText value="#{docu.detalleEntrada}" />
+			</p:column>
+
+			<p:column headerText="Valor">
+				<h:outputText value="#{docu.total}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Saldo">
+				<h:outputText value="#{docu.saldo}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="No. Abonos">
+				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
+			</p:column>
+			<p:column headerText="Proveedor">
+				<h:outputText value="#{docu.proveedorId.nombre}" />
+			</p:column>
+			<p:column headerText="Fecha">
+				<h:outputText value="#{docu.fechaRegistro}" />
+			</p:column>
+		</p:dataTable>
+		<table>
+			<tr>
+				<td><p:outputLabel value="Total: " /></td>
+				<td><p:outputLabel value="#{abonos.total}" id="total">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Total Saldos: " /></td>
+				<td><p:outputLabel value="#{abonos.saldoTotal}"
+						id="totalSaldos">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+			</tr>
+		</table>
+	</h:form>
+	<p:blockUI block="abonosForm:documentos" trigger="abonosForm:buscar">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	<p:dialog widgetVar="crearAbono" header="Crear Abono"
+		closeOnEscape="true" showEffect="fade" resizable="false">
+		<div>
+			<ui:include src="/WEB-INF/facelets/clientes/abonos/crearAbono.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="consultarAbono" header="Consultar Abonos"
+		closeOnEscape="true" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/clientes/abonos/consultarAbonos.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="crearDocumento" header="Crear Documento"
+		closeOnEscape="true" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/clientes/abonos/crearDocumento.xhtml" />
+		</div>
+	</p:dialog>
+</ui:composition>

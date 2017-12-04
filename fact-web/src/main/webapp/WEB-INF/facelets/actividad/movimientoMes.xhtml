@@ -1,0 +1,494 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+		function controlTeclasMM(e,element){
+			if(e.keyCode==79){
+				document.getElementById('movMesForm:Opc_movi_mes_menuButton').click();
+				//alert("tecla o")		movimiento mes		
+			}
+			if(e.keyCode==85){
+				document.getElementById('movMesForm:Ult_movi_mes').click();
+				//alert("tecla u")		movimiento mes		
+			}
+			if(e.keyCode==77){
+				document.getElementById('movMesForm:Mod_movi_mes').click();
+				//alert("tecla m")		movimiento mes		
+			}
+			if(e.keyCode==73){
+				document.getElementById('movMesForm:Imp_movi_mes').click();
+				//alert("tecla i")		movimiento mes		
+			}
+			
+			if(e.keyCode==66){
+				document.getElementById('movimiento_mes_bor').click();
+				//alert("tecla b")		movimiento mes		
+			}
+
+			if(e.keyCode==65){
+				document.getElementById('movMesForm:Ant_movi_mes').click();
+				//alert("tecla a")		movimiento mes		
+			}
+
+			if(e.keyCode==83){
+				document.getElementById('movMesForm:Sig_movi_mes').click();
+				//alert("tecla s")		movimiento mes		
+			}
+		}	
+	
+	   function selectTipoDoc(e){
+			if(e.keyCode==13){
+				document.getElementById('tipo_1').focus();	
+				pagina="tipoDocumento";
+				}
+	   }
+	   function sum(e,element){
+		   var elec = element.getAttribute('id'); //
+		   //alert("entra:"+elec);
+		   if(elec=='art_1'){
+			   if(e.keyCode==13){
+				   
+				  // document.getElementById(elec).submit();
+				   //summit();
+			   }
+			   } 
+		   
+		   
+	   }
+	   function ciclo(e,element){
+		   var elec = element.getAttribute('id'); 
+		   if(e.keyCode==13 ){
+			   if(elec=='codBarras_input' ){
+				   if(document.getElementById('codBarras_input').value==''){
+					   document.getElementById('art_1_input').focus();
+					   document.getElementById('art_1_input').value='';
+				    }
+			   }
+			   if(elec=='art_1_input'){
+				   document.getElementById('cod__input').focus();
+				   document.getElementById('cod__input').value='';
+			   }
+			   if(elec=='cod__input'){
+				   
+				   document.getElementById('busquedaCodBarras').style.display='inline';
+				   document.getElementById('codBarras_input').value=''
+				   document.getElementById('codBarras_input').focus();
+			   }
+			   if(elec=='detalleEntrada'){
+				   document.getElementById('nombreProveedor').style.display='inline';
+				   document.getElementById('nombreProveedor_input').value=''
+				   document.getElementById('nombreProveedor_input').focus();
+				}
+			    if(elec=='nombreProveedor_input'){
+			    	entrarFactura();
+				}
+		   }
+		}
+		
+		function ocultarCodBarras(){
+			document.getElementById('busquedaCodBarras').style.display='none';
+		}
+
+		function focoCantidad(){
+			document.getElementById('cantidad_in').focus();
+			document.getElementById('cantidad_in').select();
+			document.getElementById('cantidad_in').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';
+			//focoCantidad="foco";
+			//alert("despues de procesar");
+		}
+		function enterCantidad(e){
+			var  valor = document.getElementById('cantidad_in').value.toString() ;
+			if(e.keyCode==13){
+				if(valor!=''){
+					//alert(valor)
+					document.getElementById('busquedaCodBarras').style.display='inline';
+					document.getElementById('prodList').style.display='inline';
+					document.getElementById('codBarras_input').value=null;
+					document.getElementById('codBarras_input').select();		
+				}		
+// 				}else{
+// 					document.getElementById('busquedaCodBarras').style.display='inline';
+// 					document.getElementById('codBarras_input').focus();
+// 					}
+				
+			}
+		}
+		
+		function listaProductos(){			
+			document.getElementById('prodList').style.display='inline';
+		}
+		
+		function crearProd(e){
+			var  valor = document.getElementById('cod__input').value.toString() ;
+			if(valor=='99999'){
+				document.getElementById('table_crearProd').style.display='inline';
+				document.getElementById('crar_input').value="N";	
+				document.getElementById('crar_input').focus();	
+				document.getElementById('crar_input').select();						
+			}			
+		}
+		
+		function ocultarCrear(){
+			document.getElementById("table_crearProd").style.display='none';
+		}
+		
+		function focusNombre(){
+			if(document.getElementById("crar_input").value.toString()=="N")	{
+				document.getElementById('art_1_input').focus();
+			}else{		
+				 var  bloq= document.getElementById('op_mov_mes_content').style.display.toString();
+	             //if(bloq!='none'){
+	            	 //alert("entra");
+	               	document.getElementById('nuevoProducto').style= 'font-size: 11px; width: auto; height: auto; display: inline; z-index: 1021; left: 565px; top: 128px;';
+	               	//document.getElementById('articuloNew').focus();
+	               	document.getElementById('articuloNew').value=null;	
+	               	document.getElementById('costoNew').value=null;	
+	               	document.getElementById('publicoNew').value=null;	
+	               	document.getElementById('ivaNew').value=null;	
+	               	document.getElementById('stockMinNew').value=null;	
+	               	document.getElementById('stockMaxNew').value=null;	
+	               	document.getElementById('grupoNew').value=null;	
+	               	document.getElementById('codigoBarrasNew').value=null;	
+	               	document.getElementById('pesoKgNew').value=null;	
+	               	document.getElementById('unidadNew').value=null;	
+	               	document.getElementById('valanzaNew').value=null;	
+	               	document.getElementById('marcaNew').value=null;	
+	               	pagina="crearProducto";
+				 // }
+			}
+			document.getElementById('crar_input').value='N';
+						
+		}
+		function poput(e,element){
+			if(e.keyCode==78){
+			    PF('tipo_documento').show();
+		     	document.getElementById('tipo_1').focus();
+			    pagina='tipoDocumento';
+			}
+		}
+		function entrarFactura(){
+			
+			document.getElementById('busquedaCodBarras').style.display='inline';
+			   document.getElementById('codBarras_input').value=''
+			   document.getElementById('codBarras_input').focus();
+			   document.getElementById('prod').style.display='inline'; // campos
+			}
+		function newDocumentoMM(){
+			PF('tipo_documento').show();
+			 if('movimiento_mes'==ruta){
+             	bloq= document.getElementById('op_mov_mes_content').style.display.toString();
+                 if(bloq!='none'){
+                    //alert(ruta)
+                    document.getElementById('tipo_1').focus();	
+                    pagina="tipoDocumento";
+                 }
+             }
+		}
+		
+		function borradoMM(e,element){
+			var elec = element.getAttribute('id'); 
+			var res = elec.split(":");
+			ruta2=parseInt(res[2]);
+			//alert(""+ruta);
+			if(e.keyCode==38){
+				var resta=ruta2-1;
+				var obj= "borrarTablaMM:checkboxDT:"+resta+":rowDelete_";
+				//alert(""+obj);
+				document.getElementById(obj).focus();
+				//document.getElementById(obj).select();
+			}	
+			if(e.keyCode==40){
+				var suma=ruta2+1;
+				var obj2= "borrarTablaMM:checkboxDT:"+suma+":rowDelete_";
+				//alert(""+obj2);
+				document.getElementById(obj2).focus();
+				//document.getElementById(obj2).select();
+			}		
+		}
+	</script>
+	<style>
+items {
+	font-size: 11px;
+}
+#art_1_panel {
+	font-size: 11px;
+	width: 75%;
+	font-weight: bold
+}
+</style>
+	<p:growl id="growl" life="7000" />
+	<p:panel id="basic" style="font-size: 16px;width:100% ">
+		<table width="80%" id="dat">
+			<tr>
+				<td><p:outputLabel value="Documento: " /></td>
+				<td><p:outputLabel value="#{movimientoMes.documento.documentoId}" id="codig"/></td>
+
+				<td><p:outputLabel value="Fecha: " /></td>
+				<td><p:outputLabel value=" #{movimientoMes.fechaCreacion}" id="fechaDoc">
+					 <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+				</p:outputLabel> </td>
+
+				<td><p:outputLabel value="Codigo: " /></td>
+				<td><p:outputLabel value="#{movimientoMes.codigoProveedor}" id="codProveedor" /></td>
+
+				<td><p:outputLabel value=" tipo Documento: " /></td>
+				<td><p:outputLabel value=" #{movimientoMes.tipoDocumentoEntrada}" 
+								   id="nombc" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Detalle: " /></td>
+				<td><p:inputText value="#{movimientoMes.detalle}" id="detalleEntrada"  style="display: none"
+								 onkeydown="ciclo(event,this)">
+								 <p:ajax event="keydown" partialSubmit="true" listener="#{movimientoMes.detalleEnDocumento}"/>
+								 </p:inputText> </td>
+
+				<td><p:outputLabel value="Cargo: " /></td>
+				<td><p:outputLabel value=" " /></td>
+			</tr>
+			<tr>
+				<td>
+					<p:outputLabel value="Nombre: " />
+				</td>
+				<td>
+					<p:autoComplete id="nombreProveedor" value="#{movimientoMes.proveedor}" style="display:none" size="20" onkeydown="ciclo(event,this)" 
+									completeMethod="#{movimientoMes.completeTextProveedor}" maxResults="10"  forceSelection="true" minQueryLength="2" onclick="entrarFactura"
+									 var="name" itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{proveedorConverter}">
+									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProveedor}" process="detalleEntrada,@this" 
+									 update="fechaDoc,codProveedor,nombc,identProveedor,art_1,codBarras_input" onsuccess="entrarFactura"
+									  />
+					</p:autoComplete>
+				</td>
+				<td><p:outputLabel value="CC: " /></td>
+				<td><p:outputLabel value="#{movimientoMes.identificacionProveedor}" id="identProveedor" /></td>
+				<td><p:outputLabel value="Ven: " /></td>
+				<td><p:outputLabel value=" " /></td>
+			</tr>
+		</table>
+	</p:panel>
+	
+	<p:panel style="font-size: 16px;width:100% " id="op_mov_mes">
+	<h:form id="movMesForm">
+		<table width="100%">
+			<tr>
+				<td><p:commandButton value="Sig" id="Sig_movi_mes" onkeydown="poput(event,this),controlTeclasMM(event,this)" actionListener="#{movimientoMes.siguienteFactura()}" 
+									 update="growl, dataList,codig" >					
+				   		  <p:hotkey bind="f" partialSubmit="true" onstart="PF('movimiento_mes').hide();limpiarRuta;" />
+				    </p:commandButton> 
+					<p:commandButton value="Ant" id="Ant_movi_mes" update="growl, dataList,codig" actionListener="#{movimientoMes.anteriorFactura()}"/> 
+					<p:commandButton value="Pri" id="Pri_movi_mes" />
+					<p:commandButton value="Ult" id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
+									 actionListener="#{movimientoMes.buscarUltimaFactura()}" update="growl"/> 
+					<p:commandButton value="Bus"
+						id="Bus_movi_mes" /> <p:commandButton value="..."
+						id="P1_movi_mes" /> 
+					<p:commandButton value="Mod" id="Mod_movi_mes" onkeydown="controlTeclasMM(event,this)" actionListener="#{movimientoMes.modificarUltimaFactura()}" /> 
+					<p:commandButton value="Gat"
+						id="Gat_movi_mes" /> <p:commandButton value="..."
+						id="P2_movi_mes" /> <p:commandButton value="New"
+						id="New_movi_mes" onkeyup="selectTipoDoc(event)"
+						onclick="newDocumentoMM()" /> <p:commandButton
+						value="..." id="P3_movi_mes" /> 
+					<p:commandButton value="Imp" id="Imp_movi_mes" actionListener="#{movimientoMes.popupImprimir()}" update="growl"/> 
+					<p:commandButton value="..."
+						id="P4_movi_mes" /> 
+							
+						<p:splitButton value="Opc" id="Opc_movi_mes" disabled="false" icon="ui-icon-document" >
+								<c:forEach items="#{menuPrincipal.getOpcionUsuariosByRuta('opcion')}" var="ou">
+									<p:menuitem value="#{ou.subMenuId.nombre}" id="#{ou.subMenuId.bar}"
+									 onclick="opcion(this),limpiarEditar(this),#{ou.subMenuId.url}"  
+									 update="cuadreDiario:docNoImpresos,cuadreDiario:totalfact,cuadreDiario:totalIngresos,cuadreDiario:abonoDia,
+										    cuadreDiario:vales1,cuadreDiario:avance"/>
+							    </c:forEach>							  
+						</p:splitButton>
+						 
+						<p:commandButton value="Fin"
+						id="Fin_movi_mes" /></td>
+			</tr>
+		</table>
+		</h:form>
+	</p:panel>
+	
+	<p:panel style="font-size: 16px;width:100% "  id="productos">
+		<table width="50%" style="display: none" id="busquedaCodBarras" >
+			<tr>
+				<td><p:outputLabel value="Codigo Barras" /></td>
+				<td><p:inputText value="#{movimientoMes.codigoBarras}" id="codBarras_input" onblur="ocultarCodBarras()" onkeyup="ciclo(event,this)" >
+				 <p:ajax event="keyup" partialSubmit="true" listener="#{movimientoMes.buscarProductoCodBarras}"/>
+				</p:inputText> </td>
+			</tr>
+		</table>
+		<table width="50%" style="display: none" id="table_crearProd" >
+			<tr>
+				<td><p:outputLabel value="El lote no existe, Desea crearlo?: " /></td>
+				<td>
+					<p:inputText value="#{movimientoMes.crear}" id="crar_input" size="3" onblur="ocultarCrear()"  >
+					  <p:ajax event="keydown" partialSubmit="true"  listener="#{movimientoMes.crearProducto}" delay="30" process="@this"/>
+					</p:inputText>
+				</td>
+			</tr>
+		</table>
+		<table width="100%">
+			<tr>
+				<td width="15%">
+					<p:outputLabel value= "Codigo" style="font-size: 16px;font-weight:bold"/>
+				</td>
+				<td width="44%">
+					<p:outputLabel value= "Artículo" style="font-size: 16px;font-weight:bold"/>
+				</td>
+				<td width="10%">
+					<p:outputLabel value= "Cant" style="font-size: 16px;font-weight:bold"/>
+				</td>
+				<td width="15%">
+					<p:outputLabel value= "Unitario" style="font-size: 16px;font-weight:bold"/>
+				</td>
+				<td width="15%">
+					<p:outputLabel value= "Parcial" style="font-size: 16px;font-weight:bold"/>
+				</td>
+			</tr>
+		</table>
+		
+		<div id="prodList" style="display: none;">
+		<p:scrollPanel mode="native" style="height:150px">
+			 <p:dataList value="#{movimientoMes.productos}" style="font-size: 9px" id="dataList" var="prod1" type="definition">
+				 <table width="100%" >
+		 			<tr>
+						<td width="10%"><p:outputLabel value="#{prod1.productoId.productoId}" size="10" /></td>
+						<td width="40%"><p:outputLabel value="#{prod1.productoId.nombre}" size="38"/></td>
+						<td width="15%"><p:outputLabel value="#{prod1.cantidad}" size="10" /></td>
+						<td width="10%"><p:outputLabel value="#{prod1.productoId.costo}" size="10" /></td>
+						<td width="15%"><p:outputLabel value="#{prod1.parcial}" size="10" /></td>
+					</tr>
+				</table>
+			 </p:dataList>	
+			 <h:form id="borrarTablaMM">
+					<p:dataTable id="checkboxDT" var="prod11"
+						emptyMessage=" "
+						value="#{movimientoMes.productosBorrarList}">
+						<p:column width="10%">
+							<p:commandButton id="rowDelete_#{rowIndex}" value="Borrar"
+								actionListener="#{movimientoMes.borrarFacturaSelect(prod11)}"
+								onkeyup="borradoMM(event,this)"
+								update="checkboxDT,excento,iva,total">
+								<p:focus for="borrarTablaMM:checkboxDT:0:rowDelete_" />
+							</p:commandButton>
+						</p:column>
+
+						<p:column width="45%">
+							<h:outputLabel value="#{prod11.productoId.nombre}" />
+						</p:column>
+						<p:column width="10%">
+							<h:outputLabel value="#{prod11.cantidad}" />
+						</p:column>
+						<p:column width="10%">
+							<h:outputLabel value="#{prod11.parcial}" />
+						</p:column>
+
+					</p:dataTable>
+				</h:form>	
+		 </p:scrollPanel> 
+		</div>
+		<table width="100%" style="display: none;" id="prod" >		
+			<tr>
+				<td width="14%">
+					<p:autoComplete value= "#{movimientoMes.codigoInterno}"  id="cod_" size="12" onkeyup="ciclo(event,this),crearProd(event)" 
+					completeMethod="#{movimientoMes.completeCodigo}" >
+							<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProductoCodigo}"  oncomplete="focoCantidad()" />
+									
+					</p:autoComplete>
+				</td>
+				<td width="50%">
+					
+				
+					<p:autoComplete id="art_1" value="#{movimientoMes.articulo}"  onkeyup="ciclo(event,this)"  minQueryLength="2"
+									completeMethod="#{movimientoMes.completeText}" maxResults="11"  var="name" size="38"
+									itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{productoConverter}">
+									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProducto}" process="@this,art_1" immediate="true"
+									 onstart="focoCantidad()" 
+									  />
+						<p:column >
+							<p:outputLabel value="#{name.nombre}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Cod. Producto: #{name.productoId}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Existencia: #{name.cantidad}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Costo: #{name.costo}" >
+								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+							</p:outputLabel>
+						</p:column>
+					</p:autoComplete>
+				
+					
+				</td>
+				<td width="15%">
+					<p:inputText value= "#{movimientoMes.cantidad}" onselect="focoCantidad" onfocus="focoCantidad"  size="10" onblur="listaProductos()"   id="cantidad_in" onkeyup="enterCantidad(event)">
+						<p:ajax event="blur"  partialSubmit="true"
+					        listener="#{movimientoMes.cantidadEnter}" update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact,totalFact"/> 
+					        
+					</p:inputText>
+				</td>
+				<td width="15%">
+					<p:inputText value= "#{movimientoMes.unidad}" size="12" id="unidad_" disabled="true"/>
+				</td>
+				<td width="15%">
+					<p:inputText value= "#{movimientoMes.parcial}" size="12" disabled="true"/>
+				</td>
+			</tr>
+		</table>
+	</p:panel>
+
+	<p:layout style="font-size: 25px;width:100% ">
+		<p:layoutUnit position="west" resizable="true" style="width:50%"
+			minSize="400" maxSize="800">
+			<table width="100%">
+				<tr>
+					<td><p:outputLabel value="Peso: " /></td>
+					<td><p:outputLabel value="" /></td>
+				</tr>
+				<tr>
+					<td><p:outputLabel id="titulo_opc" style="font-size: 16px" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+					</td>
+				</tr>
+			</table>
+			<table width="100%" align="center" id="confir_mm" style="display: none">
+				<tr>
+					<td><p:outputLabel value="[C] Cambia" /><br /></td>
+					<td><p:commandButton value="[B] Borra"  actionListener="#{movimientoMes.borrarFactura()}" id="movimiento_mes_bor" 
+					         onstart="verificarBorrado()" update="borrarTablaMM:checkboxDT"/><br /></td>
+					<td><p:commandButton value="[I] Inserta" actionListener="#{movimientoMes.popupImprimir()}"/><br /></td>
+				</tr>
+			</table>
+		</p:layoutUnit>
+		<p:layoutUnit position="center" style="width:50%">
+			<table width="100%">
+				<tr>
+					<td><p:outputLabel value="Vr. Excento: " /></td>
+					<td><p:inputNumber value="#{movimientoMes.execento}" id="execentoFact" disabled="true"/></td>
+				</tr>
+				<tr>
+					<td><p:outputLabel value="Vr. Gravado" /></td>
+					<td><p:inputNumber value="0" disabled="true"/></td>
+				</tr>
+				<tr>
+					<td><p:outputLabel value="Vr. Iva" /></td>
+					<td><p:inputNumber value="#{movimientoMes.iva}" disabled="true" id="ivaFact" /></td>
+				</tr>
+				<tr>
+					<td><p:outputLabel value="Total" /></td>
+					<td><p:inputNumber value="#{movimientoMes.total}" id="totalFact" disabled="true"/></td>
+				</tr>
+			</table>
+		</p:layoutUnit>
+	</p:layout>
+</ui:composition>

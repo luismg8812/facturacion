@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+		</script>
+	<h:form>
+	 <p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial"
+						value="#{infoVentas.fechaInicio}" pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal" value="#{infoVentas.fechafin}"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+
+			</tr>
+			
+		</table>
+		<br/>
+		<table width="100%" align="center">
+			<tr>
+				<p:commandButton value="Buscar" process="@form" actionListener="#{infoVentas.buscar}" 
+				update="documentos,total,growl1"/>
+				<p:commandButton value="Salir" />
+			</tr>
+		</table>
+		<p:dataTable id="documentos" var="docu"
+			value="#{infoVentas.documentos}" scrollable="true"
+			scrollHeight="250" emptyMessage="No hay registros disponibles">
+			<f:facet name="header">
+            Ventas 
+        </f:facet>
+        	<p:column headerText="Opciones">
+        		<p:commandButton icon="ui-icon-print" value="Ventas x Cajero" title="Ventas x Cajero"  action="#{cuadreCaja.ventasIndividualesXcajero(docu)}"
+        						  />
+        		<p:commandButton icon="ui-icon-print" value="Acumulado Ventas" title="Acumulado de ventas"  action="#{cuadreCaja.acumuladoventas(docu)}"
+        						  />				  
+        	</p:column>
+			<p:column headerText="Fecha">
+				<h:outputText value="#{docu.fecha}">
+					<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Ventas">
+				<p:inputNumber readonly="true" value="#{docu.cantidadOriginal}" />
+			</p:column>
+			<p:column headerText="Cajero">
+				<h:outputText
+					value="#{docu.usuarioId.nombre} #{docu.usuarioId.apellido} (#{docu.usuarioId.login})" />
+			</p:column>
+		</p:dataTable>
+		<table width="70%" align="left">
+			<tr>
+				<td><p:outputLabel value="Total Ventas" style="font-size: 25px"/></td>
+				<td><p:inputNumber style="font-size: 25px" value="#{infoVentas.totalVentas}" id="total"/></td>
+			</tr>
+		</table>
+	</h:form>
+</ui:composition>

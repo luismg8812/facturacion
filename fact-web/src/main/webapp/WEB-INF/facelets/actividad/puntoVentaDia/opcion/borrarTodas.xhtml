@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="borrarFaturasForm">
+		<p:growl id="growl1" life="7000" />
+		<p:commandButton value="Acturalizar" update="@form"/>
+		<p:dataTable id="checkboxDT" var="fact" value="#{borrarFacturas.documentosVo}" selection="#{borrarFacturas.documentosVoSelect}"  rowKey="#{fact.documentoId2}" style="margin-bottom:0">
+        <f:facet name="header">
+            BorrarFacturas
+        </f:facet>
+        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+         <p:column headerText="Opc">
+          <p:commandButton  value="Imprimir en Pantalla" title="Imprimir en Pantalla"  update="checkboxDT,growl1" 
+           					action="#{borrarFacturas.imprimirPantalla(fact)}" />
+        </p:column>
+        <p:column headerText="Id">
+            <h:outputText value="#{fact.documentoId2}" />
+        </p:column>
+        <p:column headerText="Total">
+            <h:outputText value="#{fact.documentoId.total}" />
+        </p:column>
+        <f:facet name="footer">
+            <p:commandButton process="checkboxDT"  icon="ui-icon-search" value="Borrar"  actionListener="#{borrarFacturas.barrarTodas()}" update="growl1,checkboxDT"/>
+        </f:facet>
+    </p:dataTable>	
+	</h:form>
+	
+
+</ui:composition>

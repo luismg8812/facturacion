@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function confirmacion(){
+		PF('codBodeguero').hide();
+			
+	}
+	function TeclasConfirmar(evento,element){
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)
+		if( evento.keyCode==39){ //cuando se presiona la tacla abajo 			
+			if(elec=='codBodegueroForm:confirmarSi'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('codBodegueroForm:confirmarNo').focus();
+				return "";				
+			}
+		}
+		if( evento.keyCode==37){ //cuando se presiona la tacla abajo 				
+			if(elec=='codBodegueroForm:confirmarNo'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('codBodegueroForm:confirmarSi').focus();
+				return "";				
+			}
+		}
+	}	
+
+	function TeclasConfirmarRetencion(evento,element){
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)
+		if( evento.keyCode==39){ //cuando se presiona la tacla abajo 			
+			if(elec=='codBodegueroForm:confirmarSiAdmin'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('codBodegueroForm:confirmarNoAdmin').focus();
+				return "";				
+			}
+		}
+		if( evento.keyCode==37){ //cuando se presiona la tacla abajo 				
+			if(elec=='codBodegueroForm:confirmarNoAdmin'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('codBodegueroForm:confirmarSiAdmin').focus();
+				return "";				
+			}
+		}
+	}	
+	
+	</script>
+	<h:form id="codBodegueroForm">
+		<p:growl id="message" showDetail="true" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Cod. Bodeguero" /></td>
+				<td><p:inputText id="cod_bodeguero"
+						value="#{entregaMercancias.codigoBodeguero}">
+						<p:ajax event="keyup" partialSubmit="true"
+							listener="#{entregaMercancias.buscarBodegueroCodBarras()}" />
+					</p:inputText></td>
+			</tr>
+		</table>
+
+		
+
+		<p:dialog  showEffect="fade" hideEffect="fade" header="Confirmar entrega de mercancia" onShow="document.getElementById('codBodegueroForm:confirmarSi').focus();" widgetVar="confir">
+			<p:outputLabel value="Confirma la entrega de mercancia?"></p:outputLabel>
+			<br/>
+			<p:commandButton value="Si" type="button" id="confirmarSi" onkeyup="TeclasConfirmar(event,this)" onclick="confirmacion()"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" >
+				<p:ajax event="click" partialSubmit="true" update="entregaMercanciaForm,codBodegueroForm"
+							listener="#{entregaMercancias.confirmarEntrega}" />	
+			</p:commandButton>
+			<p:commandButton value="No" type="button" id="confirmarNo" onclick="confirmacion()" onkeyup="TeclasConfirmar(event,this)"
+				styleClass="ui-confirmdialog-no"  
+				action="#{entregaMercancias.limpiarTodo()}"
+				icon="ui-icon-close" >
+				<p:ajax event="click" partialSubmit="true" update="entregaMercanciaForm,codBodegueroForm"
+							listener="#{entregaMercancias.limpiarTodo()}" />
+				</p:commandButton>
+		</p:dialog>
+		<p:dialog  showEffect="fade" hideEffect="fade" header="Retener Documento" onShow="document.getElementById('codBodegueroForm:confirmarSiAdmin').focus();" widgetVar="retener">
+			<p:outputLabel value="Confirma la retención del documento?"></p:outputLabel>
+			<br/>
+			<p:commandButton value="Si" type="button" id="confirmarSiAdmin" onkeyup="TeclasConfirmarRetencion(event,this)" onclick="confirmacion()"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" >
+				<p:ajax event="click" partialSubmit="true" update="entregaMercanciaForm,codBodegueroForm"
+							listener="#{entregaMercancias.retenerDocumento()}" />	
+			</p:commandButton>
+			<p:commandButton value="No" type="button" id="confirmarNoAdmin" onclick="confirmacion()" onkeyup="TeclasConfirmarRetencion(event,this)"
+				styleClass="ui-confirmdialog-no"  
+				action="#{entregaMercancias.limpiarTodo()}"
+				icon="ui-icon-close" >
+				<p:ajax event="click" partialSubmit="true" update="entregaMercanciaForm,codBodegueroForm"
+							listener="#{entregaMercancias.limpiarTodo()}" />
+				</p:commandButton>
+		</p:dialog>
+	</h:form>
+
+
+</ui:composition>

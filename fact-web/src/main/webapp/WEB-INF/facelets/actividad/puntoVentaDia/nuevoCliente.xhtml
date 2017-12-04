@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function teclasNewCliente(evento,element){	
+		/////////////////////TECLA ENTER y TECLA ABAJO ///////////////////////////////////////////////
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)
+		if( evento.keyCode==13||evento.keyCode==40){ //cuando se presiona la tacla abajo
+			if(elec=='nuevoClienteForm:nombreNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:documentoNew').focus();
+				document.getElementById('nuevoClienteForm:documentoNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:documentoNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:barrioNew').focus();
+				document.getElementById('nuevoClienteForm:barrioNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:barrioNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:direccionNew').focus();
+				document.getElementById('nuevoClienteForm:direccionNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:direccionNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:celularNew_input').focus();
+				document.getElementById('nuevoClienteForm:celularNew_input').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:celularNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:fijoNew_input').focus();
+				document.getElementById('nuevoClienteForm:fijoNew_input').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:fijoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:cupoCreditoNew_input').focus();
+				document.getElementById('nuevoClienteForm:cupoCreditoNew_input').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:cupoCreditoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:creditoActivoNew').focus();
+				document.getElementById('nuevoClienteForm:creditoActivoNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:creditoActivoNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:retencionNew').focus();
+				document.getElementById('nuevoClienteForm:retencionNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:retencionNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:guiaTransporteNew').focus();
+				document.getElementById('nuevoClienteForm:guiaTransporteNew').select();
+				return "";			
+			}
+		}
+
+		 /////////////////////TECLA ARRIBA///////////////////////////////////////////////
+		if(evento.keyCode==38){ //cuando se presiona la tacla ARRIBA 	
+			if(elec=='nuevoClienteForm:documentoNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:nombreNew').focus();
+				document.getElementById('nuevoClienteForm:nombreNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:barrioNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:documentoNew').focus();
+				document.getElementById('nuevoClienteForm:documentoNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:direccionNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:barrioNew').focus();
+				document.getElementById('nuevoClienteForm:barrioNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:celularNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:direccionNew').focus();
+				document.getElementById('nuevoClienteForm:direccionNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:fijoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:celularNew_input').focus();
+				document.getElementById('nuevoClienteForm:celularNew_input').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:cupoCreditoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:fijoNew_input').focus();
+				document.getElementById('nuevoClienteForm:fijoNew_input').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:creditoActivoNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:cupoCreditoNew_input').focus();
+				document.getElementById('nuevoClienteForm:cupoCreditoNew_input').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:retencionNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:creditoActivoNew').focus();
+				document.getElementById('nuevoClienteForm:creditoActivoNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:guiaTransporteNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:retencionNew').focus();
+				document.getElementById('nuevoClienteForm:retencionNew').select();
+				return "";			
+			}
+		}	
+	}
+	
+	</script>
+	<h:form id="nuevoClienteForm">
+	<p:growl id="growl1" life="7000" />
+	<table width="100%" align="left">
+		<tr>
+			<td><p:outputLabel value="Codigo: " /></td>
+			<td  ><p:spacer width="200px" height="0px"></p:spacer> <p:outputLabel value="Fecha Ing.:" />
+			 </td>
+					<td  >
+					<p:outputLabel value="#{puntoVentaDia.fechaIngresoClienteNew}"
+					 id="fechaIngreso" >
+					 <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+					</p:outputLabel>
+					</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Nombre:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.nombreClienteNew}" size="30" 
+					maxlength="30" onkeyup="teclasNewCliente(event,this)" id="nombreNew">
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Documento:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.documentoClienteNew}" size="15" maxlength="20"
+					onkeyup="teclasNewCliente(event,this)" id="documentoNew" >
+					</p:inputText> </td>
+		</tr>
+		<tr >
+			<td width="20%">
+			<p:outputLabel value="Barrio: "  /></td>
+			<td width="20">
+			<p:inputText value="#{puntoVentaDia.barrioClienteNew}" size="15" maxlength="20"
+					onkeyup="teclasNewCliente(event,this)" id="barrioNew" >
+				</p:inputText>	</td>
+			
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Dirección:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.direcionClienteNew}" size="15" maxlength="40"
+					onkeyup="teclasNewCliente(event,this)" id="direccionNew" >
+				</p:inputText>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Celular:" /></td>
+			<td><p:inputNumber value="#{puntoVentaDia.celularClienteNew}" size="15" maxlength="5"
+					onkeyup="teclasNewCliente(event,this)" id="celularNew" >
+				</p:inputNumber>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Fijo:" /></td>
+			<td><p:inputNumber value="#{puntoVentaDia.fijoClienteNew}" size="15" maxlength="10"
+					onkeyup="teclasNewCliente(event,this)" id="fijoNew" >
+				</p:inputNumber>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Cupo credito:" /></td>
+			<td><p:inputNumber  size="15" maxlength="10"
+					onkeyup="teclasNewCliente(event,this)" id="cupoCreditoNew" >
+					</p:inputNumber> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Credito Activo:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.creditoActivoClienteNew}" size="1" maxlength="1"
+					onkeyup="teclasNewCliente(event,this)" id="creditoActivoNew">
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Retención:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.retencionClienteNew}" size="1" maxlength="1" 
+					onkeyup="teclasNewCliente(event,this)" id="retencionNew">
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Guía. transporte:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.guiaTransporteClienteNew}" size="1" maxlength="1" 
+					onkeyup="teclasNewCliente(event,this)" id="guiaTransporteNew">
+				</p:inputText></td>
+		</tr>
+	</table>
+	<table width="100%" align="left" style="display: none;"
+		id="deseaGuardarCliente">
+		<tr>
+			<td><p:outputLabel value="Desea Guardar el Cliente: " /></td>
+			<td><p:inputText value="#{puntoVentaDia.crearNew}" maxlength="1"
+					id="guardar_input" size="2" >
+					<p:ajax event="keydown" partialSubmit="true" delay="30" process="@form" 
+						listener="#{puntoVentaDia.crearNewCliente}"
+						update="growl1,art_11,codBarras_input1,nombc1,nombreCliente2" />
+				</p:inputText></td>
+
+		</tr>
+	</table>
+</h:form>
+
+</ui:composition>

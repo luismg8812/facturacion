@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="crearVale">
+	<p:growl id="growl1" life="7000" />
+		<table width="80%" align="left">
+				<tr>
+				<td><p:outputLabel value="Cliente: " /></td>
+				<td><p:selectOneMenu value="#{abonos.clienteId}"
+						id="proveedor">
+						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
+						<f:selectItems value="#{abonos.clientes}" var="cli"
+							itemLabel="#{cli.nombre}" itemValue="#{cli.clienteId}" />
+					</p:selectOneMenu></td>
+				<td><p:outputLabel value="Tipo Facturas:" /></td>
+				<td><p:selectOneMenu value="#{abonos.tipoFacturas}"
+						id="tipoFacturas">
+						<f:selectItem itemLabel="Seleccione un tipo de Factura"
+							itemValue="0" />
+						<f:selectItem itemLabel="Pagadas" itemValue="1" />
+						<f:selectItem itemLabel="Sin Pagar" itemValue="2" />
+						<f:selectItem itemLabel="Con Abonos" itemValue="3" />
+						<f:selectItem itemLabel="Todas" itemValue="4" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+			<td><p:outputLabel value="Total Vale: "/>
+				</td>
+				<td><p:inputNumber value="#{abonos.cantidadTotal}"/>
+				</td>
+				<td><p:outputLabel value="Factura: "/>
+				</td>
+				<td><p:inputText value="#{abonos.detalleNew}"/></td>
+				
+			</tr>
+				
+			<tr>
+				<td><p:commandButton value="Guardar" id="guardar" process="@form"  update="growl1,crearDocument" onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
+				actionListener="#{abonos.crearVale}" />
+				</td>
+				<td><p:commandButton value="Salir"/></td>
+			</tr>		
+		</table>
+		<p:blockUI block="guardar"
+		widgetVar="bui">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	</h:form>
+	
+
+</ui:composition>

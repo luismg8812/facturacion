@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function teclasEditProducto(evento,element){
+		
+		/////////////////////TECLA ENTER y TECLA ABAJO ///////////////////////////////////////////////
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)
+		if(evento.keyCode==40){
+			if(elec=='edit_articulo_input'){//cuendo esta seleccionando el tipo documento
+	 			   document.getElementById('costoEdit_input').focus();
+	 			   document.getElementById('costoEdit_input').select();
+	 			  return "";	
+	 		    }
+		}
+		if( evento.keyCode==13||evento.keyCode==40){ //cuando se presiona la tacla abajo 				
+		    if(elec=='costoEdit_input'){//cuendo esta seleccionando el tipo documento
+		       document.getElementById('publicoEdit_input').focus();
+		       document.getElementById('publicoEdit_input').select();
+		      return "";			
+	        }
+	        
+	        if(document.activeElement.name=="publicoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('ivaEdit_input').focus();
+				document.getElementById('ivaEdit_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="ivaEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('hipoconsumoEdit_input').focus();
+				document.getElementById('hipoconsumoEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="hipoconsumoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('stockMinEdit_input').focus();
+				document.getElementById('stockMinEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="stockMinEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('stockMaxEdit_input').focus();
+				document.getElementById('stockMaxEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="stockMaxEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('grupoEdit_input').focus();
+				document.getElementById('grupoEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="grupoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('marcaEdit').focus();
+				document.getElementById('marcaEdit').select();
+				return "";
+			}
+			if(elec=="marcaEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('proveedorEdit').focus();
+				document.getElementById('proveedorEdit').select();
+				return "";
+			}
+			if(document.activeElement.name=="proveedorEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('codigoBarrasEdit_input').focus();
+				document.getElementById('codigoBarrasEdit_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="codigoBarrasEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('pesoEdit_input').focus();
+				document.getElementById('pesoEdit_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="pesoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('unidadEdit').focus();
+				document.getElementById('unidadEdit').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="unidadEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('valanzaEdit').focus();
+				document.getElementById('valanzaEdit').select();
+				return "";
+			}
+
+			if(document.activeElement.name=="valanzaEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('variosEdit').focus();
+				document.getElementById('variosEdit').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="variosEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('editar_input').focus();
+				document.getElementById('editar_input').select();
+				return "";
+			}
+		}
+/////////////////////FIN TECLA ENTER///////////////////////////////////////////////
+
+	 /////////////////////TECLA ARRIBA///////////////////////////////////////////////
+	if(evento.keyCode==38){ //cuando se presiona la tacla ARRIBA 		
+		if(elec=='publicoEdit_input'){//cuendo esta seleccionando el tipo documento
+		       document.getElementById('costoEdit_input').focus();
+		       document.getElementById('costoEdit_input').select();
+		      return "";			
+	        }
+	        
+	        if(document.activeElement.name=="ivaEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('publicoEdit_input').focus();
+				document.getElementById('publicoEdit_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="stockMinEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('ivaEdit_input').focus();
+				document.getElementById('ivaEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="stockMaxEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('stockMinEdit_input').focus();
+				document.getElementById('stockMinEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="grupoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('stockMaxEdit_input').focus();
+				document.getElementById('stockMaxEdit_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="marcaEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('grupoEdit_input').focus();
+				document.getElementById('grupoEdit_input').select();
+				return "";
+			}
+			if(elec=="proveedorEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('marcaEdit').focus();
+				document.getElementById('marcaEdit').select();
+				return "";
+			}
+			if(document.activeElement.name=="codigoBarrasEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('proveedorEdit').focus();
+				document.getElementById('proveedorEdit').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="pesoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('codigoBarrasEdit_input').focus();
+				document.getElementById('codigoBarrasEdit_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="unidadEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('pesoEdit_input').focus();
+				document.getElementById('pesoEdit_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="valanzaEdit"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('unidadEdit').focus();
+				document.getElementById('unidadEdit').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="editar_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('valanzaEdit').focus();
+				document.getElementById('valanzaEdit').select();
+				return "";
+			}
+			if(document.activeElement.name=="costoEdit_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('edit_articulo_input').focus();
+				document.getElementById('edit_articulo_input').select();
+				return "";
+			}
+	}
+/////////////////////FIN TECLA arriba///////////////////////////////////////////////		
+	}
+	function focoCosto(){
+		 document.getElementById('costoEdit_input').focus();
+		   document.getElementById('costoEdit_input').select();
+	}
+	</script>
+	<p:growl id="growl3" life="7000" />
+	<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="Articulo:" /></td>
+			<td width="50%">
+					<p:autoComplete id="edit_articulo" value="#{movimientoMes.productoEdict}"  size="40" onkeydown="teclasEditProducto(event,this)" 
+									completeMethod="#{puntoVentaDia.completeText}" maxResults="10"  var="name"
+									itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{productoConverter}">
+									<p:ajax event="itemSelect" listener="#{movimientoMes.editarProducto}" 
+									 update="codigoEdit,fechaEdit,costoEdit,publicoEdit,ivaEdit,stockMinEdit,
+									 stockMaxEdit,grupoEdit,marcaEdit,proveedorEdit,codigoBarrasEdit,pesoEdit,
+									 unidadEdit,valanzaEdit,editar_input,variosEdit" 
+									  onstart="focoCosto" 
+									  />
+						<f:facet name="itemtip"  >
+							<table width="200px">
+								<tr>
+									<td><p:outputLabel
+											value="Cod. Producto: #{name.productoId}" /></td>
+								</tr>
+								<tr>
+									<td><p:outputLabel value="Existencia: #{name.cantidad}" />
+									</td>
+								</tr>
+								<tr>
+									<td><p:outputLabel value="Publico: #{name.costoPublico}" />
+									</td>
+								</tr>
+							</table>
+						</f:facet>
+					</p:autoComplete>
+					
+				</td>
+		</tr>		
+		<tr>
+			<td><p:outputLabel value="Codigo: #{movimientoMes.codigoEdit}" id="codigoEdit"/></td>			 
+			<td><p:spacer width="40px" height="0px"></p:spacer>
+			<p:outputLabel value="Fecha ing: #{movimientoMes.fechaEdit}" id="fechaEdit"/></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Costo:" /></td>
+			<td><p:inputNumber value="#{movimientoMes.costoNew}" size="15" maxlength="20"
+					onkeydown="teclasEditProducto(event,this)" id="costoEdit" >
+					<p:ajax event="keyup" partialSubmit="true"/>
+					</p:inputNumber> </td>
+		</tr>
+		<tr >
+			<td width="20%">
+			<p:outputLabel value="Publico: "  /></td>
+			<td width="20">
+			<p:inputNumber value="#{movimientoMes.publicoNew}" size="15" maxlength="20"
+					onkeydown="teclasEditProducto(event,this)" id="publicoEdit" >
+				<p:ajax event="keyup" partialSubmit="true"/>
+				</p:inputNumber>	</td>
+			
+		</tr>
+		<tr>
+			<td><p:outputLabel value="I.V.A.:" /></td>
+			<td><p:inputNumber value="#{movimientoMes.ivaNew}" size="15" maxlength="5"
+					onkeydown="teclasEditProducto(event,this)" id="ivaEdit" >
+				<p:ajax event="keyup" partialSubmit="true"/>
+				</p:inputNumber>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Hipoconsumo:" /></td>
+			<td><p:inputNumber value="#{movimientoMes.hipoconsumo}" size="15" maxlength="5"
+					onkeydown="teclasEditProducto(event,this)" id="hipoconsumoEdit" >
+				<p:ajax event="keyup" partialSubmit="true"/>
+				</p:inputNumber>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Stock Min:" /></td>
+			<td><p:inputNumber value="#{movimientoMes.stockMinNew}" size="15" maxlength="10"
+					onkeydown="teclasEditProducto(event,this)" id="stockMinEdit" >
+				<p:ajax event="keyup" partialSubmit="true"/>
+				</p:inputNumber>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Stock Max:" /></td>
+			<td><p:inputNumber value="#{movimientoMes.stockMaxNew}" size="15" maxlength="10"
+					onkeyup="teclasEditProducto(event,this)" id="stockMaxEdit" >
+					<p:ajax event="keyup" partialSubmit="true"/>
+					</p:inputNumber>
+					</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Grupo:" /></td>
+			<td>
+			<p:autoComplete id="grupoEdit"
+						value="#{movimientoMes.grupoNew}" size="15"
+						onkeyup="teclasEditProducto(event,this)"
+						completeMethod="#{movimientoMes.completeTextGrupo}"
+						maxResults="10" forceSelection="true" minQueryLength="2"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{grupoConverter}">
+						<p:ajax event="itemSelect" process="@this,grupoEdit" listener="#{movimientoMes.asignarGrupo}" />
+					</p:autoComplete>
+			
+			 </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Marca:" /></td>
+			<td><p:inputText  size="15" maxlength="100"
+					onkeyup="teclasEditProducto(event,this)" id="marcaEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Proveedor:" /></td>
+			<td><p:inputText value="#{movimientoMes.proveedorNew}" size="15" maxlength="15"
+					onkeyup="teclasEditProducto(event,this)" id="proveedorEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Cod. Barras:" /></td>
+			<td><p:inputNumber value="#{movimientoMes.codigoBarrasNew}" 
+					size="15" onkeyup="teclasEditProducto(event,this)" id="codigoBarrasEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputNumber></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Peso Kg:" /></td> 
+			<td><p:inputNumber value="#{movimientoMes.pesoKgNew}" size="15" maxlength="3"
+					onkeyup="teclasEditProducto(event,this)" id="pesoEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputNumber></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Unidad:" /></td>
+			<td><p:inputText value="#{movimientoMes.unidadNew}" size="1" maxlength="1"
+					onkeyup="teclasEditProducto(event,this)" id="unidadEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Balanza:" /></td>
+			<td><p:inputText value="#{movimientoMes.valanzaNew}" size="1" maxlength="1" 
+					onkeyup="teclasEditProducto(event,this)" id="valanzaEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputText></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Varios:" /></td>
+			<td><p:inputText value="#{movimientoMes.variosNew}" size="1" maxlength="1" 
+					onkeyup="teclasEditProducto(event,this)" id="variosEdit">
+					<p:ajax event="keyup" partialSubmit="true" />
+				</p:inputText></td>
+		</tr>
+	</table>
+	<table width="100%" align="left" style="display: inline;"
+		id="deseaEditar">
+		<tr>
+			<td><p:outputLabel value="Desea Editar el Producto: " /></td>
+			<td><p:inputText value="#{movimientoMes.editarNew}" maxlength="1"
+					id="editar_input" size="3" onkeyup="">
+					<p:ajax event="keydown" partialSubmit="true" delay="30"
+						listener="#{movimientoMes.editarNewProducto}" update="growl3"
+						/>
+				</p:inputText></td>
+
+		</tr>
+	</table>
+
+</ui:composition>

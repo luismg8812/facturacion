@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="facturasFechaForm">
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Cajero:" /></td>
+				<td><p:selectOneMenu value="#{borrarFacturas.usuarioSelect}"
+						id="cajero">
+						<f:selectItem itemLabel="Seccionar Usuario" itemValue="0" />
+						<f:selectItems value="#{borrarFacturas.usuarioList}" var="usua"
+							itemLabel="#{usua.nombre}" itemValue="#{usua.usuarioId}" />
+					</p:selectOneMenu></td>
+				<td><p:outputLabel value="Id factura:" /></td>
+				<td><p:inputText value="#{borrarFacturas.documentoId}"
+						size="16" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial"
+						value="#{borrarFacturas.fechaIni}" size="16" pattern="dd-MM-yyyy"
+						mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal"
+						value="#{borrarFacturas.fechaFin}" size="16" pattern="dd-MM-yyyy"
+						mask="true" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Cvo. Dian: " /></td>
+				<td><p:inputText value="#{borrarFacturas.conDian}" size="16" /></td>
+				<td><p:outputLabel value="Cliente: " /></td>
+				<td><p:selectOneMenu value="#{borrarFacturas.cliente}"
+						id="cliente">
+						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
+						<f:selectItems value="#{borrarFacturas.clienteList}" var="usua"
+							itemLabel="#{usua.nombre}" itemValue="#{usua.clienteId}" />
+					</p:selectOneMenu></td>
+			</tr>
+		</table>
+		<table width="100%" align="center">
+			<tr>
+				<td><p:commandButton value="Buscar" process="@form"
+						update="documentosCliente" id="buscar"
+						actionListener="#{borrarFacturas.buscarFacturas}" /> <p:commandButton
+						value="Salir" /></td>
+			</tr>
+		</table>
+		<p:dataTable id="documentosCliente" var="docu"
+			value="#{borrarFacturas.documentosCliente}" scrollable="true"
+			scrollHeight="290"
+			emptyMessage="No hay facturas disponibles para El rango seleccionado">
+			<f:facet name="header">
+            Facturas
+        </f:facet>
+			<p:column style="width:25%;text-align: center" headerText="Opción">
+				<p:commandButton icon="ui-icon-search" title="View"
+					action="#{borrarFacturas.consultarDetalle(docu)}"
+					update="consultarDetalle" />
+				<p:commandButton icon="ui-icon-print"
+					style="display:#{puntoVentaDia.copiaFacuta}"
+					action="#{borrarFacturas.imprimirFactura(docu)}" />
+			</p:column>
+			<p:column headerText="No. Documento">
+				<h:outputText value="#{docu.consecutivoDian}" />
+			</p:column>
+			<p:column headerText="Valor Total">
+				<p:outputLabel value="#{docu.total}"  > 
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Saldo ">
+				<p:outputLabel value="#{docu.saldo}" >
+				<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="No. Abonos" style="width:10%;text-align: center">
+				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
+			</p:column>
+
+		</p:dataTable>
+	</h:form>
+	<p:blockUI block="facturasFechaForm" trigger="facturasFechaForm:buscar">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	<p:dialog widgetVar="consultarDetalle" header="Consultar Detalle"
+		width="40%" closeOnEscape="true" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/buscarFactura/consultarDetalle.xhtml" />
+		</div>
+	</p:dialog>
+</ui:composition>

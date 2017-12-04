@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+<!-- 	<h:outputStylesheet library="css" name="./css/menuPrincipal.css"/> -->
+	
+</h:head>
+<body >
+	<div id="page" style="width: 100%;">
+		<div id="header">
+			<ui:insert>
+				<ui:include src="/pages/administracion/login/imagenEmpresa.xhtml" />
+			</ui:insert>
+		</div>
+		<div id="content">
+			<ui:insert name="header">
+				<ui:include src="/WEB-INF/facelets/menu/menuPrincipal.xhtml" />
+			</ui:insert>
+		</div>
+		<div id="footer">
+			<ui:insert>
+				<ui:include src="/pages/administracion/login/footer.xhtml" />
+			</ui:insert>
+		</div>
+	</div>
+</body>
+</html>

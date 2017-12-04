@@ -1,0 +1,21 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	</script>
+	<h:form id="liberarCuadreForm">
+		<p:commandButton value="Guardar" action="#{cuadreCaja.guardarLiberacion()}" process="@form" ></p:commandButton>
+		<p:dataTable var="usu" value="#{cuadreCaja.cajerosList}" id="cuadres">
+			<p:column headerText="Liberar cuadre">
+				<p:selectBooleanButton id="value2" value="#{usu.liberarCuadre}"  onLabel="Si" offLabel="No" style="width:60px" />
+			</p:column>
+			<p:column headerText="Cajero">
+				<h:outputText value="#{usu.nombreBodeguero} " />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>

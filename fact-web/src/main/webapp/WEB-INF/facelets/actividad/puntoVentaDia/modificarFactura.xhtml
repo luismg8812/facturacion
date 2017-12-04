@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function enterBorrar(e){
+		var  valor = document.getElementById('cantidad_in1').value.toString() ;
+		if(e.keyCode==13){
+			if(valor!=''){
+				
+			    document.getElementById('label').focus();		
+			}		
+		}
+	}
+	function limpidarVal(){
+		//alert("entra");
+		 document.getElementById('modFacturaForm:passInput').value='';
+		}
+	</script>
+
+<h:form id="modFacturaForm">
+	<p:growl id="growl" life="7000" />
+	<table width="100%" align="center" id="passBorrado">
+		<tr>
+			<td><p:outputLabel value="Digete Password:" id="label"/><br /></td>
+		</tr>
+		<tr>
+			<td><p:password value="#{puntoVentaDia.modFactura}" onblur="limpidarVal()"
+					id="passInput" />
+					
+				</td>
+		</tr>
+		<tr>
+			<td><p:commandButton process="@form"  value="Borrar" update="growl"
+			 actionListener="#{puntoVentaDia.verificarClaveBorrado()}" /> </td>
+			</tr>
+	</table>
+</h:form>
+</ui:composition>

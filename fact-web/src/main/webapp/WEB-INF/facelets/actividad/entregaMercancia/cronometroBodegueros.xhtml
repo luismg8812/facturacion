@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="cronometroForm">
+		<table width="100%" align="center">
+			<tr>
+				<td><p:commandButton value="Actualizar" update="tiempos"></p:commandButton>
+					<p:commandButton value="Reporte" oncomplete="PF('reporte').show();"/>
+				</td>
+
+			</tr>
+		</table>
+		<p:dataTable var="bode" value="#{entregaMercancias.bodeguerosList}"
+			id="tiempos">
+			<p:column headerText="Nombre Bodeguero">
+				<h:outputText value="#{bode.nombreBodeguero}" />
+			</p:column>
+			<p:column headerText="Código">
+				<h:outputText value="#{bode.codigo}" />
+			</p:column>
+
+			<p:column headerText="Cantidad facturas ">
+				<h:outputText value="#{bode.cantidadFacturas}" />
+			</p:column>
+
+			<p:column headerText="Tiempo">
+				<h:outputText value="#{bode.tiempo}" />
+			</p:column>
+
+			<p:column headerText="Factura">
+				<h:outputText value="#{bode.factura}" />
+			</p:column>
+			<p:column headerText="Cliente">
+				<h:outputText value="#{bode.nombreCliente}" />
+			</p:column>
+			<p:column style="width:32px;text-align: center">
+				<p:commandButton update="cronometroForm:detalleDocumentoForm:consecutivo,cronometroForm:detalleDocumentoForm:total1,
+				cronometroForm:detalleDocumentoForm:det" 
+					action="#{entregaMercancias.detalle(bode)}" icon="ui-icon-search"
+					title="Detalle">
+
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+		<p:dialog widgetVar="detalle" header="Detaller de Factura" id="dialo"
+			style="font-size:12px" width="70%" closeOnEscape="true"
+			showEffect="fade" resizable="false">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/actividad/entregaMercancia/detalleDocumento.xhtml" />
+			</div>
+		</p:dialog>
+		<p:dialog widgetVar="reporte" header="Reporte de bodegueros" id="reporte"
+			style="font-size:12px" width="70%" closeOnEscape="true"
+			showEffect="fade" resizable="false">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/actividad/entregaMercancia/entregasBodegueros.xhtml" />
+			</div>
+		</p:dialog>
+	</h:form>
+
+</ui:composition>

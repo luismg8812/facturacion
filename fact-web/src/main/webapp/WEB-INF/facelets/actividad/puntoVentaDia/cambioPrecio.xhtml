@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function cambioPrecio1(e){
+		//var  valor = document.getElementById('px01_input_input').value.toString() ;
+		if(e.keyCode==13){
+			PF('cambioPrecio').hide();
+			document.getElementById('art_11_input').focus();
+         	document.getElementById('art_11_input').select();
+         	document.getElementById('art_11_input').value='';
+			//alert("Cerrar popup");	
+		}
+	}
+	</script>
+	<h:form id="cambioPrecioForm">
+	<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="Precio:" /></td>
+			<td><p:inputNumber value="#{puntoVentaDia.cambioTemp}"  size="10"  onkeydown="cambioPrecio1(event)" >
+				<p:ajax event="blur"  partialSubmit="true" 
+					        listener="#{puntoVentaDia.recalcularPrecio}" update="dataList1,excento,gravado,iva,total"/> 
+			</p:inputNumber> </td>
+		</tr>		
+	</table>
+	</h:form>
+</ui:composition>

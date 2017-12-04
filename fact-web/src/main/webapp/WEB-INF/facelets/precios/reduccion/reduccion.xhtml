@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="reduccionForm" style="font-size: 12px">
+		<p:growl id="growl1" life="7000" />
+		<p:panel>
+			<table width="30%" align="left">
+				<tr>
+					<td><p:outputLabel value="Desde: " /></td>
+					<td><p:calendar id="fechaInicial"
+							value="#{reduccion.fechaInicio}" pattern="dd-MM-yyyy" mask="true" /></td>
+					<td><p:outputLabel value="Hasta: " /></td>
+					<td><p:calendar id="fechaFzinal" value="#{reduccion.fechafin}"
+							pattern="dd-MM-yyyy" mask="true" /></td>
+				</tr>
+				<tr>
+					<h:panelGrid columns="1" style="margin-bottom: 10px"
+						id="botonesPropietario" rendered="#{login.propietario}">
+						<td><p:outputLabel value="% : " /></td>
+						<td><h:panelGrid columns="1" style="margin-bottom: 10px">
+								<h:outputText id="output" value="#{reduccion.reduccion}%" />
+								<h:inputHidden id="txt2" value="#{reduccion.reduccion}" />
+								<p:slider for="txt2" display="output" style="width: 200px"
+									displayTemplate="{value}%">
+
+								</p:slider>
+							</h:panelGrid></td>
+						<td><p:commandButton value="Reducir/Buscar" process="@form"
+								update="growl1,documentos,total,totalIva,totalIva19,totalIva5,base5,base19,excento"
+								id="reducirButon" actionListener="#{reduccion.reducir()}" /></td>
+						<td><p:commandButton value="Guardar" process="@form"
+								actionListener="#{reduccion.guardar}" update="growl1,documentos"
+								id="guardarButon" /></td>
+					</h:panelGrid>
+					<h:panelGrid columns="1" style="margin-bottom: 10px" id="botones"
+						rendered="#{!login.propietario}">
+						<td><p:commandButton value="Buscar" process="@form"
+								update="growl1,documentos,total,totalIva19,totalIva5,totalIva,base5,base19,excento"
+								id="buscarButon" actionListener="#{reduccion.buscar}" /></td>
+
+					</h:panelGrid>
+
+				</tr>
+				<tr>
+					<td>
+						<p:commandButton value="Ir a relación entradas/salidas" action="#{reduccion.entadasSalidas}" update="entradasSalidasG" process="@form"></p:commandButton>
+					</td>
+				</tr>
+			</table>
+
+		</p:panel>
+		<br />
+		<br />
+		<p:panel>
+			<table>
+				<tr>
+					<td><p:outputLabel value="Total:"></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.total}" id="total"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva}" id="totalIva"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva19}"
+							id="totalIva19" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Total Iva 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva5}"
+							id="totalIva5" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase5}" id="base5"
+							size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase19}"
+							id="base19" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Excento: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalExcento}"
+							id="excento" size="10"></p:inputNumber></td>
+				</tr>
+			</table>
+			<p:dataTable id="documentos" var="docu" scrollWidth="100%"
+				style="width: 170%" value="#{reduccion.reduccionList}"
+				scrollable="true" scrollHeight="200"
+				emptyMessage="No hay registros disponibles">
+				<f:facet name="header">
+            Informe diario
+        </f:facet>
+				<p:column headerText="op" width="10%">
+					<p:commandButton value="Exportar" title="Exportar" ajax="false">
+						<p:fileDownload value="#{reduccion.getFileXls(docu)}" />
+					</p:commandButton>
+					<p:commandButton value="Detalle" title="Detalle"
+						update="detallesForm"
+						actionListener="#{reduccion.detalleInforme(docu)}" />
+					<p:commandButton value="Imprimir" title="Imprimir"
+						actionListener="#{reduccion.imprimirinforme(docu)}" />
+				</p:column>
+				<p:column headerText="Info. propietario" width="8%"
+					visible="#{login.propietario}">
+					<p:commandButton value="Imprimir" title="Imprimir"
+						actionListener="#{reduccion.imprimirinformePropietario(docu)}" />
+				</p:column>
+				<p:column headerText="Fecha" width="8%">
+					<h:outputText value="#{docu.fechaInforme}">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</h:outputText>
+				</p:column>
+				<p:column
+					headerText="#{login.propietario?'Total Reducción':'Total ventas'}">
+					<p:inputNumber readonly="true" value="#{docu.totalReducido}" />
+				</p:column>
+				<p:column headerText="Total Original" visible="#{login.propietario}">
+					<p:inputNumber readonly="true" value="#{docu.totalOriginal}" />
+				</p:column>
+				<p:column headerText="Remisiones" visible="#{login.propietario}">
+					<p:inputNumber readonly="true" value="#{docu.totalRemisiones}" />
+				</p:column>
+				<p:column headerText="Iva Original" visible="#{login.propietario}">
+					<p:inputNumber readonly="true" value="#{docu.ivaOriginal}" />
+				</p:column>
+				<p:column headerText="#{login.propietario?'Iva Reducido':'Iva'}">
+					<p:inputNumber readonly="true" value="#{docu.ivaReducido}" />
+				</p:column>
+				<p:column headerText="Iva 5%">
+					<p:inputNumber readonly="true" value="#{docu.iva5}" />
+				</p:column>
+				<p:column headerText="Iva 19%">
+					<p:inputNumber readonly="true" value="#{docu.iva19}" />
+				</p:column>
+				<p:column headerText="Exento">
+					<p:inputNumber readonly="true" value="#{docu.excento}" />
+				</p:column>
+				<p:column headerText="Guardado" visible="#{login.propietario}"
+					width="5%">
+					<p:outputLabel value="#{docu.infoDiarioId==null?'No':'Si'}" />
+				</p:column>
+				<p:column headerText="Avance efectivo" width="5%"
+					visible="#{login.propietario}">
+					<p:outputLabel value="#{docu.avanceEfectivo}" />
+				</p:column>
+			</p:dataTable>
+		</p:panel>
+	</h:form>
+	<p:blockUI block="reduccionForm:documentos"
+		trigger="reduccionForm:reducirButon">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	<p:blockUI block="reduccionForm:documentos"
+		trigger="reduccionForm:guardarButon">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	<p:blockUI block="reduccionForm:documentos"
+		trigger="reduccionForm:buscarButon">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+
+	<p:dialog widgetVar="detalles" id="detalles" closeOnEscape="true"
+		style="font-size: 11px">
+		<div style="width: 550px; height: 350px">
+			<ui:include src="/WEB-INF/facelets/precios/reduccion/detalles.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="entradasSG" id="entradasSalidasG" closeOnEscape="true" header="entadas y salidas"
+		style="font-size: 11px">
+		<div style="width: 1050px; height: 350px">
+			<ui:include src="/WEB-INF/facelets/precios/reduccion/entradasSalidas.xhtml" />
+		</div>
+	</p:dialog>
+</ui:composition>

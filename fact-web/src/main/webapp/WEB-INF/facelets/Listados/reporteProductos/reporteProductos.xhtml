@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">	
+	</script>
+	<h:form>
+		<p:panelGrid columns="2" layout="grid">
+			<h:commandLink value="Exportar">
+						<p:dataExporter type="xls" target="productos" fileName="Productos" />
+					</h:commandLink>
+		 	<p:commandButton  value="Imprimir" action="#{inventarioFisico.imprimirInventario()}"/>
+		 </p:panelGrid>
+		 
+				
+		<p:dataTable var="pro" value="#{movimientoMes.productosAll}" id="productos" rows="10"
+					 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					  paginator="true" rowsPerPageTemplate="10,20,30">
+			
+			<p:column headerText="Nombre" width="40%">
+				<h:outputText value="#{pro.nombre}" />
+			</p:column>
+			<p:column headerText="costo Publico">
+				<h:outputText value="#{pro.costoPublico}" />
+			</p:column>
+
+			<p:column headerText="Costo Compra">
+				<h:outputText value="#{pro.costo}" />
+			</p:column>
+
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{pro.cantidad}" />
+			</p:column>
+			<p:column headerText="Iva">
+				<h:outputText value="#{pro.iva}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+
+</ui:composition>

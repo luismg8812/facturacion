@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function llenarcampos(){
+	 var q=1;
+	}
+	function teclas(e){
+/////////////////////TECLA ABAJO///////////////////////////////////////////////
+		if(e.keyCode==13){
+ 			//document.getElementById("prod").style.display="inline";  	    
+//     	    pagina="submenu";
+// 			
+			}
+		if(e.keyCode==40){ //cuando se presiona la tacla abajo 	
+		    if(document.activeElement.name=="tipo_1"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('tipo_2').focus();
+				return "";
+			}
+			if(document.activeElement.name=="tipo_2"){
+				document.getElementById('tipo_6').focus();
+				return "";
+			}
+		 
+		}
+/////////////////////fin TECLA ABAJO///////////////////////////////////////////////
+
+/////////////////////TECLA ARRIBA///////////////////////////////////////////////
+		if(e.keyCode==38){ //cuando se presiona la tacla abajo 	
+		    if(document.activeElement.name=="tipo_2"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('tipo_1').focus();
+				return "";
+			}
+			
+			if(document.activeElement.name=="tipo_6"){
+				document.getElementById('tipo_2').focus();
+				return "";
+		    }
+			
+		}
+/////////////////////fin TECLA ABAJO///////////////////////////////////////////////
+	}
+	</script>
+
+	<table width="100%" align="center">
+
+		<c:forEach items="#{movimientoMes.tipoDocumentos}" var="documentos">
+			<tr>
+				<td><p:commandButton style="font-size:16px;" 
+				action="#{movimientoMes.selectedTipoDoc(documentos)}" onclick="llenarcampos()" 
+						onkeyup="teclas(event)" id="tipo_#{documentos.tipoDocumentoId}"
+						value="#{documentos.nombreCorto} - #{documentos.codigo} -
+		 #{documentos.nombre}"  />
+		 
+				</td>
+			</tr>
+		</c:forEach>
+
+	</table>
+
+</ui:composition>

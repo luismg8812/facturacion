@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="impresionPantallaForm">
+	<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="--------------------------------------------------------------------" /></td>			
+		</tr>	
+		<tr><td><p:outputLabel value="............. #{cuadreCaja.empresa.nombre} ..........." /></td></tr>	
+		<tr><td><p:outputLabel value="............. #{cuadreCaja.empresa.representante} ..........." /></td></tr>
+		<tr><td><p:outputLabel value="..........NIT. #{cuadreCaja.empresa.nit} #{cuadreCaja.empresa.regimen}......." /></td></tr>
+		<tr><td><p:outputLabel value="......... #{cuadreCaja.empresa.direccion} Cel #{cuadreCaja.empresa.cel}......." /></td></tr>		
+		<tr><td><p:outputLabel value=".............#{cuadreCaja.empresa.barrio} ........" /></td></tr>		
+		<tr><td><p:outputLabel value="................#{cuadreCaja.empresa.ciudad} - #{cuadreCaja.empresa.departamento} ............." /></td></tr>
+		<tr><td><p:outputLabel value="#{login.usuario }" /></td></tr>
+		<tr><td><p:outputLabel value="#{cuadreCaja.fechaHoy}" /></td></tr>
+		<tr><td><p:outputLabel value="ENTREGO:__________________________________" /></td></tr>
+		<tr><td><p:outputLabel value="Factura inicial: #{cuadreCaja.primeraFact}" /></td></tr>
+		<tr><td><p:outputLabel value="Factura final: #{cuadreCaja.ultimaFact}" /></td></tr>
+		<tr><td><p:outputLabel value="--------------------------------------------------------------------" /></td></tr>	
+		<tr><td><p:outputLabel value="Cantidad...........Descripción...........Valor" /></td></tr>
+		<tr><td><p:outputLabel value="--------------------------------------------------------------------" /></td></tr>
+		<tr><td><p:outputLabel value="Total Facturas:.............#{cuadreCaja.totalFaturasToDay} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="Base:.......................#{cuadreCaja.base} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="Abonos:.....................#{cuadreCaja.abonosDia} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="Recargas:...................#{cuadreCaja.recargas} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="TOTAL MOV. DEL DIA:..#{cuadreCaja.totalFaturasToDay} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="--------------------------------------------------------------------" /></td></tr>
+		<tr><td><p:outputLabel value="MONEDA: ....................0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="EFECTIVO:....................0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="TARJETA:....................0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="VALES:.........................0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="DEVOLUCIONES:...........0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="AVANCE EFECTIVO:.......0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="NOMINA:.....................#{cuadreCaja.nomina} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="GASTOS:......................0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="TOTAL INGRESOS:.............#{cuadreCaja.diferencias} ( )" /></td></tr>
+		<tr><td><p:outputLabel value="--------------------------------------------------------------------" /></td></tr>
+		<tr><td><p:outputLabel value="FALTANTE..$..................0 ( )" /></td></tr>
+		<tr><td><p:outputLabel value="--------------------------------------------------------------------" /></td></tr>
+	</table>
+</h:form>
+</ui:composition>

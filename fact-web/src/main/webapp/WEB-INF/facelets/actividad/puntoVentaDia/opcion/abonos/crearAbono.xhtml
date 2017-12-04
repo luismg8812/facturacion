@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="crearAbono">
+		<p:growl id="growl1" life="7000" />
+		<table width="30%" align="left">
+			<tr>
+				<td><p:outputLabel value="Documento:" /></td>
+				<td><p:outputLabel
+						value="#{abonos.abonoNew.documentoId.documentoId}" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Fecha: " /></td>
+				<td><p:outputLabel value="#{abonos.abonoNew.fechaRegistro}">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</p:outputLabel></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Total Factura: " /></td>
+				<td>
+				<p:inputNumber value="#{abonos.abonoNew.documentoId.total}" readonly="true"/>
+				</td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Saldo: " /></td>
+				<td> <p:inputNumber value="#{abonos.abonoNew.documentoId.saldo}" readonly="true"/>
+				</td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Tipo de pago: " /></td>
+				<td><p:selectOneMenu value="#{abonos.tipoPago}" id="tipoPago">
+						<f:selectItem itemLabel="Seccionar Tipo de Pago" itemValue="0" />
+						<f:selectItems value="#{abonos.tipoPagos}" var="tipa"
+							itemLabel="#{tipa.nombre}" itemValue="#{tipa.tipoPagoId}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Cantidad Abono: " /></td>
+				<td><p:inputNumber value="#{abonos.cantidadNew}" /></td>
+			</tr>
+			<tr>
+				<td><p:commandButton value="Guardar" id="guardar"
+						process="@form" update="growl1,abonosClientesForm"
+						actionListener="#{abonos.crearAbono()}" /></td>
+				<td><p:commandButton value="Salir" /></td>
+				<p:commandButton value="Actualizar" update="@form" />
+			</tr>
+		</table>
+	</h:form>
+	<p:blockUI block="crearAbono" trigger="crearAbono:guardar">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+
+</ui:composition>

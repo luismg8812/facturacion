@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+ <h:form id="importarForm">
+ <p:growl id="growl1" life="7000" />
+	<table width="100%" align="center">
+		<tr>
+			<td>
+			<p:commandButton value="importar" id="importarInvento" actionListener="#{importar.importarCsv()}" update="tablaInventario,growl1,tablaError">
+			</p:commandButton>
+			<p:commandButton value="Salir" onclick="PF('importar').hide();" >
+			</p:commandButton>
+			</td>
+		</tr>
+	</table>
+	<p:dataTable var="inv" value="#{importar.pVoList}" scrollable="true" id="tablaInventario"
+		scrollHeight="200" emptyMessage="No hay productos disponibles" >
+		 <f:facet name="header">
+            Productos Importados
+        </f:facet>
+		
+			<p:column headerText="Productos Erroneos" style="width:350px;text-align: center" >
+				<h:inputText value="#{inv.nombre}" size="30" maxlength="30"/>
+			</p:column>
+			<p:column headerText="Balanza" style="width:60px;text-align: center">
+				<h:inputText value="#{inv.balanza}" maxlength="1" size="2"/>
+			</p:column>
+			<p:column headerText="Publico" style="width:120px;text-align: center">
+				<h:inputText value="#{inv.publico}" maxlength="15" size="13" />
+			</p:column>
+			<p:column headerText="Promo" style="width:60px;text-align: center">
+				<h:inputText value="#{inv.promo}" maxlength="1" size="2"/>
+			</p:column>
+			<p:column headerText="Pub. Promo" style="width:120px;text-align: center">
+				<h:inputText value="#{inv.pubPromo}" size="13" />
+			</p:column>
+			<p:column headerText="Kg. Promo" style="width:120px;text-align: center">
+				<h:inputText value="#{inv.kGPromo}" style="text-align: left"  size="13"/>
+			</p:column>
+		</p:dataTable>
+		<p:dataTable var="inv" value="#{importar.error}" scrollable="true" id="tablaError" 
+		scrollHeight="200" emptyMessage="No hay productos Erroneos" >
+		 <f:facet name="header">
+            Productos Importados Erroneos
+        </f:facet>
+		<p:column headerText="Descripción Producto" style="width:350px;text-align: center" >
+				<h:inputText value="#{inv.nombre}" size="30" maxlength="30"/>
+			</p:column>
+		</p:dataTable>
+		<table width="100%" align="center">
+		<tr>
+			<td>
+			
+			
+			
+			</td>
+		</tr>
+	</table>
+</h:form>
+<p:blockUI block="importarForm:tablaInventario" trigger="importarForm:importarInvento" >
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif"/>
+					</p:blockUI>
+</ui:composition>

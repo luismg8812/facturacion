@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	  function cicloCuadre(evento,element){
+			//////////////////////TECLA LADO DERECHO///////////////////////////
+// 	        if(evento.keyCode==39){// cuando se presiona la tecla a un lado derecho
+// 	        	//*********control de teclas del menu principal*****************************
+// 	        	if(document.activeElement.name=="Pantalla"){
+// 	        		document.getElementById('Impresora').focus();
+// 	        		return "";
+// 	            	}
+// 	        	if(document.activeElement.name=="Impresora"){
+// 	        		document.getElementById('Regresa').focus();
+// 	        		return "";
+// 	            	}
+// 	        	if(document.activeElement.name=="Regresa"){
+// 	        		document.getElementById('Pantalla').focus();
+// 					return "";
+// 	             	}
+// 	        }
+//////////////////////TECLA LADO izq///////////////////////////
+	        if(evento.keyCode==37){// cuando se presiona la tecla a un lado izq
+	        	//*********control de teclas del menu principal*****************************
+// 	        	if(document.activeElement.name=="Impresora"){
+// 	        		document.getElementById('Pantalla').focus();
+// 	        		return "";
+// 	            	}
+// 	        	if(document.activeElement.name=="Pantalla"){
+// 	        		document.getElementById('Regresa').focus();
+// 	        		return "";
+// 	            	}
+// 	        	if(document.activeElement.name=="Regresa"){
+// 	        		document.getElementById('Impresora').focus();
+// 					return "";
+// 	             	}
+	        }
+	  }
+	  function calcular(){		  
+		  document.getElementById('cuadreDiario:calcular').click();
+	  }
+	  function salirCuadreCaja(){
+		  PF('cuadre_caja').hide();
+		  document.getElementById('opciones:Sig_movi_mes1').focus();
+		  pagina='submenu';		
+	  }
+	 
+	</script>
+	<style>
+		.ui-inputtext{
+			text-align: right !important;
+		}
+	</style>
+	<h:form id="cuadreDiario">
+		<p:growl id="growl2" life="7000" />
+		<p:panelGrid columns="4" style="with: 100%" >
+			<p:outputLabel value="Total facturas" />
+			<p:inputNumber value="#{cuadreCaja.totalFaturasToDay}" symbol="$"
+				decimalPlaces="0" rendered="true" size="12" readonly="true"
+				style="text-align: right" id="totalfact" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Doc. No impresos" />
+			<p:outputLabel value="#{cuadreCaja.totalFaturasNoImp}"
+				rendered="true" size="12" id="docNoImpresos" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Abonos del día" />
+			<p:inputNumber value="#{cuadreCaja.abonosDia}" readonly="true"
+				symbol="$" decimalPlaces="0" size="12" id="abonoDia" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Avance Efectivo" />
+			<p:inputNumber value="#{cuadreCaja.avanceEfectivo}" readonly="true"
+				symbol="$" decimalPlaces="0" size="12" id="avance" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Cheques recogidos" />
+			<p:inputNumber value="#{cuadreCaja.chequesRecogidos}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0"
+				id="chequesRecogidos">
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Otros" />
+			<p:inputNumber value="#{cuadreCaja.otros}" size="12" id="otros"
+				onblur="calcular()" symbol="$" decimalPlaces="0">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Base" />
+			<p:inputNumber value="#{cuadreCaja.base}" size="12" id="base"
+				onblur="calcular()" symbol="$" decimalPlaces="0" maxlength="10">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Recargas" />
+			<p:inputNumber value="#{cuadreCaja.recargas}" maxlength="10"
+				onblur="calcular()" symbol="$" decimalPlaces="0" size="12"
+				id="recargas">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Total Ingresos" />
+			<p:outputLabel value="" />
+			<p:inputNumber value="#{cuadreCaja.totalIngresos}" rendered="true"
+				readonly="true" symbol="$" decimalPlaces="0" size="12"
+				id="totalIngresos" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Vr. en fajos" />
+			<p:inputNumber value="#{cuadreCaja.valorFajos}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" id="valorFajos">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Moneda" />
+			<p:inputNumber value="#{cuadreCaja.monedas}" size="12" id="monedas"
+				onblur="calcular()" symbol="$" decimalPlaces="0">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Efectivo" />
+			<p:inputNumber value="#{cuadreCaja.efectivo}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" id="efectivo1">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Cheques" />
+			<p:inputNumber value="#{cuadreCaja.cheques}" size="12" id="cheques"
+				onblur="calcular()" symbol="$" decimalPlaces="0">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="doc. especiales" />
+			<p:inputNumber value="#{cuadreCaja.documentosEspeciales}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" id="docEspeciales">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Tarjetas crédito y débito" />
+			<p:inputNumber value="#{cuadreCaja.totalTargetas}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" id="totalTargetas">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Varios" />
+			<p:inputNumber value="#{cuadreCaja.varios}" size="12" id="varios"
+				onblur="calcular()" symbol="$" decimalPlaces="0">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Vales" />
+			<p:inputNumber value="#{cuadreCaja.vales}" readonly="true" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" id="vales1">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Cartera" />
+			<p:inputNumber value="#{cuadreCaja.cartera}" readonly="true"
+				size="12" onblur="calcular()" id="cartera" symbol="$"
+				decimalPlaces="0" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Gastado" />
+			<p:inputNumber value="#{cuadreCaja.gastado}" size="12" id="gastado"
+				onblur="calcular()" symbol="$" decimalPlaces="0">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Nomina" />
+			<p:inputNumber value="#{cuadreCaja.nomina}" size="12" id="nomina"
+				onblur="calcular()" symbol="$" decimalPlaces="0">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Descuentos" />
+			<p:inputNumber value="#{cuadreCaja.descuentos}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" id="descuentos">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Propinas" />
+			<p:inputNumber value="#{cuadreCaja.propinas}" size="12"
+				onblur="calcular()" symbol="$" decimalPlaces="0" readonly="true"
+				id="propinas">
+
+			</p:inputNumber>
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Total en Caja" />
+			<p:outputLabel value="" />
+			<p:inputNumber value="#{cuadreCaja.totalEnCaja}" size="12" symbol="$"
+				decimalPlaces="0" id="totalCaja" readonly="true" />
+			<p:outputLabel value="" />
+
+			<p:outputLabel value="Dif
+			erencia" />
+			<p:outputLabel value="" />
+			<p:outputLabel value="" />
+			<p:inputNumber value="#{cuadreCaja.diferencias}" size="12" symbol="$"
+				decimalPlaces="0" id="diferencia" readonly="true" />
+
+		</p:panelGrid>
+		<p:panel>
+			<table>
+				<tr>
+					<td><p:commandButton value="Pantalla" id="Pantalla"
+							disabled="true" action="#{cuadreCaja.pantalla}"
+							update="impresionPantallaForm"
+							onkeydown="cicloCuadre(event,this)"
+							onfocus="actualizarTodo(event,this)" /> <p:commandButton
+							value="Imprimir" id="Impresora" update="growl2"
+							action="#{cuadreCaja.imprimirCuadre}"
+							onkeydown="cicloCuadre(event,this)" /> <p:commandButton
+							value="Salir" id="Regresa" onkeydown="cicloCuadre(event,this)"
+							onclick="salirCuadreCaja()" /> <p:commandButton value="Calcular"
+							id="calcular" style="display:none"
+							process="chequesRecogidos,otros,base,recargas,valorFajos,monedas,efectivo1,cheques,
+								docEspeciales,totalTargetas,varios,gastado,nomina,descuentos,propinas"
+							update="totalIngresos,diferencia,totalCaja,docNoImpresos" /> <p:commandButton
+							update="@form" id="updateTodo" style="display:none" /> <p:commandButton
+							value="Limpiar" id="limpiar"
+							update="totalIngresos,diferencia,totalCaja,chequesRecogidos,otros,base,recargas,valorFajos,monedas,efectivo1,cheques,
+								docEspeciales,totalTargetas,varios,gastado,nomina,descuentos,propinas"
+							action="#{cuadreCaja.limpiar()}" /></td>
+				</tr>
+			</table>
+		</p:panel>
+	</h:form>
+</ui:composition>

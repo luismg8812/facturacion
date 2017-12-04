@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="consultarDetalle">
+		<p:panelGrid columns="2" layout="grid">
+		<p:outputLabel value="Cvo. Dian:" />
+		<p:outputLabel value="#{borrarFacturas.docuConsulta.consecutivoDian}" />
+		
+		<p:outputLabel value="Total iva: " />
+		<p:inputNumber value="#{borrarFacturas.docuConsulta.iva}" readonly="true"/>
+		
+			<p:outputLabel value="Fecha registro: " />
+				<h:outputText  value="#{borrarFacturas.docuConsulta.fechaRegistro}" >
+					<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+				</h:outputText>
+				<p:commandButton value="Salir" />
+				<p:spacer></p:spacer>
+		</p:panelGrid>
+		<p:dataTable id="documentos" var="docu" 
+			value="#{borrarFacturas.documentoDetallesList}" scrollable="true" scrollHeight="200"
+			emptyMessage="No hay Detalles disponibles para La factura seleccionada">
+			<f:facet name="header">
+            Detalle Factura
+        </f:facet>
+			<p:column headerText="Artículo">
+				<h:outputText  value="#{docu.productoId.nombre}" />
+			</p:column>
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{docu.cantidad}"/>
+			</p:column>
+			<p:column headerText="Parcial">
+				<h:outputText value="#{docu.parcial}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>

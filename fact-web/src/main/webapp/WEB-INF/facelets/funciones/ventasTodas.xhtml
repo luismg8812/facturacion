@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="ventasTodasForm">
+	 <p:growl id="growl1" life="7000" />
+		
+		  <p:dataTable id="eventsDT" var="ventas" value="#{ventasTodas.cuadrePorCajeroVos}" selectionMode="single"
+		    rowKey="#{ventas.usuarioId2}"  emptyMessage="No hay Cajeros disponibles" style="width:100%">
+        <f:facet name="header">
+           Ventas Por Usuario
+        </f:facet>
+        <p:ajax event="rowSelect"   />
+        <p:ajax event="rowUnselect"  />
+        <p:column headerText="Cajero">
+            <h:outputText value="#{ventas.usuarioId.nombre} #{ventas.usuarioId.apellido} (#{ventas.usuarioId.login})" />
+        </p:column>
+         <p:column headerText="Total  Facturas">
+            <h:outputText value="#{ventas.totalFacturas}" />
+        </p:column>
+        <p:column headerText="Cod. Cajero">
+            <h:outputText value="#{ventas.usuarioId2}" />
+        </p:column>
+    </p:dataTable>
+		
+	</h:form>
+</ui:composition>

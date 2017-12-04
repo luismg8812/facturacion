@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="detallesForm">
+		<table>
+			<tr>
+				<td><p:commandButton value="Exportar" ajax="false"
+						>
+						<p:dataExporter type="xls" target="documentos"
+							fileName="DetalleInformeDiario" pageOnly="true" />
+					</p:commandButton></td>
+			</tr>
+		</table>
+		<p:dataTable id="documentos" var="docu"
+			value="#{reduccion.documentosReduccionList}" scrollable="true"
+			scrollHeight="250" emptyMessage="No hay registros disponibles">
+			<f:facet name="header">
+            Detalle facturas Informe diario
+        </f:facet>
+			<p:column headerText="Fecha" width="20%">
+				<h:outputText value="#{docu.documentoId.fechaRegistro}">
+					<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="#{login.propietario?'Total Reducido':'Total'}">
+				<p:inputNumber readonly="true" value="#{docu.totalReducido}" />
+			</p:column>
+			<p:column headerText="Total Original" visible="#{login.propietario}"
+				exportable="#{login.propietario}">
+				<p:inputNumber readonly="true" value="#{docu.totalOriginal}" />
+			</p:column>
+			<p:column headerText="No. Factura">
+				<p:outputLabel value="#{docu.documentoId.consecutivoDian}" />
+			</p:column>
+			<p:column headerText="Cliente">
+				<p:outputLabel value="#{docu.documentoId.clienteId.nombre}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>

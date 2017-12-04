@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="consultar">
+		<p:panelGrid columns="2" layout="grid">
+		<p:outputLabel value="Documento:" />
+		<p:outputLabel value="#{abonos.abonoNew.documentoId.documentoId}" />
+		
+		<p:outputLabel value="Total Factura: " />
+		<p:inputNumber value="#{abonos.abonoNew.documentoId.total}" readonly="true"/>
+		
+			<p:outputLabel value="Saldo: " />
+				<p:inputNumber value="#{abonos.abonoNew.documentoId.saldo}" readonly="true"/>
+				<p:commandButton value="Salir" onclick="PF('consultarAbono').hide();"/>
+				<p:spacer></p:spacer>
+		</p:panelGrid>
+		
+		
+		<p:dataTable id="documentos" var="docu" 
+			value="#{abonos.abonosByDocumento}"
+			emptyMessage="No hay Abonos disponibles para La factura seleccionada">
+			<f:facet name="header">
+            Abonos
+        </f:facet>
+			<p:column headerText="Cantidad Abono">
+				<p:inputNumber value="#{docu.cantidadAbono}" readonly="true"/>
+			</p:column>
+			<p:column headerText="Fecha">
+				<h:outputText value="#{docu.fechaRegistro}">
+					<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Tipo de Pago">
+				<h:outputText value="#{docu.tipoPagoId.nombre}" />
+			</p:column>
+			<p:column headerText="No. Documento">
+				<h:outputText value="#{docu.documentoId.documentoId}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+
+
+</ui:composition>

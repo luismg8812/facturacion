@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="inventarioFisicoForm">
+		<p:growl id="growl1" life="7000" />
+
+		<table width="80%" align="left">
+			<tr>
+				<td><p:outputLabel value="Codigo: " /></td>
+				<td><p:inputText value="#{inventarioFisico.codigo}" /></td>
+				<td><p:outputLabel value="Proveedor: " /></td>
+				<td width="35%"> <p:selectCheckboxMenu id="menu" style="width:100%"
+						value="#{inventarioFisico.proveedorFilter}" label="Seleccione"
+						filter="true" filterMatchMode="contains"
+						panelStyle="width:35%">
+						<f:selectItems value="#{inventarioFisico.proveedorList}" var="pro"
+							itemLabel="#{pro.nombre}" itemValue="#{pro.proveedorId}" />
+					</p:selectCheckboxMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Iva " /></td>
+				<td><p:inputText value="#{inventarioFisico.iva}" /></td>
+				<td><p:outputLabel value="Marca:" /></td>
+				<td width="35%"> <p:selectCheckboxMenu id="marca" style="width:100%"
+						value="#{inventarioFisico.marcaFilter}" label="Seleccione"
+						filter="true" filterMatchMode="contains"
+						panelStyle="width:35%">
+						<f:selectItems value="#{inventarioFisico.marcaList}" var="pro"
+							itemLabel="#{pro.nombre}" itemValue="#{pro.marcaId}" />
+					</p:selectCheckboxMenu></td>
+			</tr>
+			<tr>
+				
+				<td><p:outputLabel value="Grupo" /></td>
+				<td width="35%"> <p:selectCheckboxMenu id="grupo" style="width:100%"
+						value="#{inventarioFisico.grupoFilter}" label="Seleccione"
+						filter="true" filterMatchMode="contains"
+						panelStyle="width:35%">
+						<f:selectItems value="#{inventarioFisico.grupoList}" var="pro"
+							itemLabel="#{pro.nombre}" itemValue="#{pro.grupoId}" />
+					</p:selectCheckboxMenu></td>
+					<td><p:outputLabel value=" " /></td>
+				<td><p:outputLabel value="" /></td>
+			</tr>
+		</table>
+		<br />
+		<table width="40%">
+			<tr>
+				<td><p:commandButton value="buscar" onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
+						update="inventarioFisicoForm"
+						actionListener="#{inventarioFisico.actualizar}" id="actualiza" />
+					<p:commandButton value="Guardar" id="guardar" onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
+						action="#{inventarioFisico.guardarInventarioFisico2()}" /> <p:commandButton
+						value="Salir" onclick="PF('inventario_fisico').hide()" /></td>
+			</tr>
+		</table>
+		<br />
+		<p:dataTable id="productos" var="inv" selectionMode="multiple" selection="#{inventarioFisico.selected}"
+			value="#{inventarioFisico.productosAll}" editable="true"
+			editMode="cell" widgetVar="cellCars" scrollable="true" 
+			scrollHeight="350" emptyMessage="No hay productos disponibles"
+			style="width:140%; font-size:12px" scrollWidth="100%"
+			rowKey="#{inv.producto.productoId}">
+			<f:facet name="header">
+			 Productos
+            
+        </f:facet>
+
+			<p:ajax event="cellEdit" listener="#{inventarioFisico.onCellEdit}"
+				process="@this" />
+
+			<p:column headerText="Borrar (B)" width="3%"
+				style="width:3%;text-align: center">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.borrar}"  />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText id="modelInput" value="#{inv.borrar}" maxlength="1"
+							style="width:96%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Producto" style="width:20%;text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.nombre}" style="width:100% ;text-align: center" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.nombre}" style="width:96%"
+							label="Nombre producto" maxlength="30" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Cantidad" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.cantidad}" style="width:100%" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.cantidad}" style="width:96%"
+							label="cantidad" maxlength="15" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Costo" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.costo}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.costo}" style="width:96%" label="Costo" maxlength="10" />
+							
+						
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Publ" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.publico}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.publico}" style="width:96%"
+							label="Publico" maxlength="15" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Iva" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.iva}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol="%" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.iva}" style="width:96%" label="Iva"
+							maxlength="2" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Ipocon" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.hipoconsumo}" style="width:100%" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.hipoconsumo}" style="width:96%"
+							label="hipoconsumo" maxlength="2" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			
+
+			<p:column headerText="Balanza" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.balanza}" style="width:100%" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.balanza}" style="width:96%"
+							label="Utilidad sugerida" maxlength="1" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			
+			<p:column headerText="Utilidad Sugerida" style="text-align: center; " >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.utilidadSugerida}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol=" " />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.utilidadSugerida}" style="width:96%"
+							label="Nombre producto" maxlength="3" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Pub. Sugerido" style="text-align: center; " >
+						<h:outputText value="#{inv.publicoSugerida}" style="width:100%"  >
+								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</h:outputText>			
+			</p:column>
+			<p:column headerText="Utilidad Real" style="text-align: center; " >
+						<h:outputText value="#{inv.utilidadReal}" style="width:100%" >
+								<f:convertNumber pattern="¤#,##0" currencySymbol="%" />
+						</h:outputText>			
+			</p:column>
+			<p:column headerText="Diferencia" style="text-align: center; " >
+						<h:outputText value="#{inv.diferencia}" style="width:100%" >
+								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</h:outputText>			
+			</p:column>
+			<p:column headerText="Costo sugerido" style="text-align: center; " >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.costoSugerida}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol=" " />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.costoSugerida}" style="width:96%"
+							label="Costo sugerido" maxlength="3" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Promo" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.promo}" style="width:100%" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.promo}" style="width:96%" label="promo"
+							maxlength="1" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Pub. Promo" style="text-align: center">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.pubPromo}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</h:outputText>
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.pubPromo}" style="width:96%"
+							label="Publico Promo" maxlength="15" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Kg. Promo" style="text-align: center">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.kGPromo}" style="width:100%" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.kGPromo}" style="width:96%"
+							label="Kilogramos promo" maxlength="15" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			<p:column headerText="Activo" style="text-align: center" >
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{inv.activo}" style="width:100%" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{inv.activo}" style="width:96%"
+							label="Nombre producto" maxlength="1" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+		</p:dataTable>
+		<p:blockUI block="productos"
+		widgetVar="bui">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	</h:form>
+	
+</ui:composition>

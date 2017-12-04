@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="detalleDocumentoForm" >
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Documento: " /></td>
+				<td><p:outputLabel
+						value="#{entregaMercancias.bodegueroSelect.entregaMercancia.documentoId.consecutivoDian}"  id="consecutivo"/></td>
+				<td><p:outputLabel value="Total: " /></td>
+				<td><p:outputLabel
+						value="#{entregaMercancias.bodegueroSelect.entregaMercancia.documentoId.total}" id="total1"/></td>
+			</tr>
+		</table>
+		<p:dataTable var="det" value="#{entregaMercancias.documentoDetalleList}" id="det">
+			<p:column headerText="Código">
+				<h:outputText value="#{det.productoId.productoId}" />
+			</p:column>
+
+			<p:column headerText="Articulo">
+				<h:outputText value="#{det.productoId.nombre}" />
+			</p:column>
+
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{det.cantidad}" />
+			</p:column>
+
+			<p:column headerText="Parcial">
+				<h:outputText value="#{det.parcial}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>

@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="avanceEfectivoForm">
+		<p:growl id="growl1" life="7000" />
+		<table width="80%" align="left">
+			<tr>
+				<td><p:outputLabel value="Cliente: " /></td>
+				<td><p:selectOneMenu value="#{abonos.clienteId}" id="cliente">
+						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
+						<f:selectItems value="#{abonos.clientes}" var="cli"
+							itemLabel="#{cli.nombre}" itemValue="#{cli.clienteId}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Total Avance: " /></td>
+				<td><p:inputNumber value="#{abonos.cantidadTotal}" /></td>
+			</tr>
+			<tr>
+				<td><p:commandButton value="Guardar" id="guardar"
+						process="@form" update="growl1,crearDocument"
+						actionListener="#{abonos.crearAvance}" /></td>
+				<td><p:commandButton value="Salir" /></td>
+			</tr>
+		</table>
+	</h:form>
+	<p:blockUI block="crearDocument" trigger="crearDocument:guardar">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+
+</ui:composition>

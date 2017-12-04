@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+		function controlTeclasImp(e,element){
+			 var elec = element.getAttribute('id');
+			// alert(elec);
+			 if(e.keyCode==13 || e.keyCode==40){
+				 if(elec=='pogoTargeta'){//cuando se esta selecionando un valor si o no
+					 	if(document.getElementById('pogoTargeta').value.toUpperCase()=='S'){
+					 		//document.getElementById('valorTargeta_input').disabled = false;
+					 		document.getElementById('valorTargeta_input').focus();
+							document.getElementById('valorTargeta_input').select();
+							return "";					
+					    }else{
+					    	//document.getElementById('valorTargeta_input').disabled = true;
+					    	document.getElementById('efectivo_input').focus();
+							document.getElementById('efectivo_input').select();
+							return "";	
+						}
+					 	document.getElementById('pogoTargeta').value=document.getElementById('pogoTargeta').value;					
+			     }
+				 if(elec=='efectivo_input'){
+					 document.getElementById('campoImp').style.display='inline';
+			    	 document.getElementById('impresion_inp').focus();
+			    	 document.getElementById('impresion_inp').value='S';
+				     document.getElementById('impresion_inp').select();	
+				    // var vefectivo= parseFloat( document.getElementById('efectivo_input').value.replace(",","") );				     
+				    // var vtotal = parseFloat(document.getElementById('total1_input').value.replace(",","") );
+				    // var vvalortarget = parseFloat(document.getElementById('valorTargeta_input').value.replace(",","") );			     
+				    // var vcambio=parseFloat( vefectivo+vvalortarget - vtotal);
+				    // document.getElementById('cambio_input').value=  vcambio;
+				     
+				 }
+			     
+			     if(elec=='valorTargeta_input'){
+			    	 document.getElementById('efectivo_input').focus();
+					 document.getElementById('efectivo_input').select();
+				 }
+
+			     if(elec=='cartera'){
+			    	 document.getElementById('pogoTargeta').focus();
+					 document.getElementById('pogoTargeta').value='N';
+					 document.getElementById('pogoTargeta').select();
+				 }
+
+			     if(elec=='descuento'){
+			    	 document.getElementById('cartera').focus();
+					 document.getElementById('cartera').value='N';
+					 document.getElementById('cartera').select();
+				 }
+			     
+		     }
+
+			
+			 
+		     if(e.keyCode==83  ){
+			     if(elec =='pogoTargeta'){
+			    	// document.getElementById('valorTargeta_input').setAttribute('aria-disabled', false);
+				 	 document.getElementById('valorTargeta_input').focus();
+					 document.getElementById('valorTargeta_input').select();
+					 document.getElementById('pogoTargeta').value='S';
+					 return "";		
+				  }		    		
+			     if(elec =='cartera'){
+				    	// document.getElementById('valorTargeta_input').setAttribute('aria-disabled', false);
+					 	 document.getElementById('pogoTargeta').focus();
+					 	document.getElementById('pogoTargeta').value='N';
+						 document.getElementById('pogoTargeta').select();
+						 document.getElementById('cartera').value='S';
+						 return "";		
+					  }		    		
+		     }
+		     if(e.keyCode==78){
+			     if(elec =='pogoTargeta'){
+			    	// document.getElementById('valorTargeta_input').setAttribute('aria-disabled', true) ;
+				    document.getElementById('efectivo_input').focus();
+				    
+					document.getElementById('efectivo_input').select();
+				    document.getElementById('pogoTargeta').value='N';
+					return "";	
+				 }
+			     if(elec =='cartera'){
+				    	// document.getElementById('valorTargeta_input').setAttribute('aria-disabled', false);
+					 	 document.getElementById('pogoTargeta').focus();
+					 	document.getElementById('pogoTargeta').value='N';
+							 document.getElementById('pogoTargeta').select();
+						 document.getElementById('cartera').value='N';
+						 return "";		
+					  }			    	
+			 }
+		}
+		function imprimirFact(){
+			//document.getElementById('impresionForm:impresion1').style.display='inline';
+			//document.getElementById('impresionForm:impresion1').focus();
+			//document.getElementById('impresion1').value='S';
+			//document.getElementById('impresionForm:impresion1').select();			
+		}
+
+		function ocultarconfirmar(){
+			//document.getElementById('impresionForm:impresion1').style.display='none';
+			//document.getElementById('impresion1').focus();
+			//document.getElementById('impresion1').select();	
+		}
+		function ponerS(){
+			//delay
+			//document.getElementById('impresionForm:impresion1').value='S';
+			//document.getElementById('impresionForm:impresion1').select();
+			
+		}
+	</script>
+	<p:growl id="growl2" life="7000" />
+	<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="Valor Excento:" /></td>
+			<td><p:inputNumber value="#{puntoVentaDia.excento}" readonly="true"  size="10" id="excento_tag" symbol="$" decimalPlaces="0"
+			disabled="true"/> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Valor Gravado:" /></td>
+			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.gravado}" readonly="true" disabled="true" size="10" id="gravado_tag"/> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Iva:" /></td>
+			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.iva}" readonly="true" disabled="true" size="10" id="iva_tag"/> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Total a Pagar:" /></td>
+			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.total}" readonly="true" id="total1" disabled="true" size="10"/> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Descuento:" style="display:#{puntoVentaDia.descuentosActivo}" id="descuentoLabel" /></td>
+			<td><p:inputText value="#{puntoVentaDia.descuento}" id="descuento" size="10" onkeyup="controlTeclasImp(event,this)" 
+							 style="display:#{puntoVentaDia.descuentosActivo}">
+				 <p:focus for="descuento" />
+				 <p:ajax  event="keyup" partialSubmit="true" />
+			</p:inputText> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Cartera:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.cartera}" id="cartera" size="2" onkeyup="controlTeclasImp(event,this)">
+				 <p:focus for="cartera" />
+				 <p:ajax  event="keyup" partialSubmit="true" />
+			</p:inputText> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Pago/Tarjeta:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.tarjeta}" size="2" onkeydown="controlTeclasImp(event,this)" 
+							 id="pogoTargeta" /> 
+							 </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Vr. Tarjeta:" /></td>
+			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.valorTargeta}" size="10"   onkeydown="controlTeclasImp(event,this)"
+								id="valorTargeta">
+								<p:ajax  event="blur" partialSubmit="true" delay="30" update="cambio,efectivo" listener="#{puntoVentaDia.efectivoFactura}"/>
+								</p:inputNumber> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Efectivo:" /></td>
+			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.efectivo}" size="10"  
+								id="efectivo" onkeydown="controlTeclasImp(event,this)">
+			<p:ajax  event="blur" partialSubmit="true"  update="cambio" listener="#{puntoVentaDia.efectivoFactura}"/>
+			</p:inputNumber> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Cambio:" /></td>
+			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.cambio}" size="10" id="cambio" readonly="true" /> </td>
+		</tr>
+		<tr id="campoImp" style="display: none;">
+			<td><p:outputLabel value="Continúa con la Impresión: " /></td>
+			<td><p:inputText value="#{puntoVentaDia.impresion}" size="2" id="impresion_inp">
+				<p:ajax event="keydown"  partialSubmit="true" listener="#{puntoVentaDia.imprimirFactura}" update="growl2" />
+				</p:inputText></td>
+		</tr>
+	</table>
+
+</ui:composition>

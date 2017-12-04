@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="devolucionesForm">
+		<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="No. de Documento:" /></td>
+			<td><p:inputText  value="#{devoluciones.documento}" id="docu"/></td>
+		</tr>
+		<tr>
+			<td><p:commandButton value="Buscar" process="@form" id="buscar" update="productos,growl1" action="#{devoluciones.buscar}"/></td>
+			<td><p:commandButton value="Realizar Devolución" process="@form" update="productos,growl1"
+			actionListener="#{devoluciones.onRowSelect}"/> </td>
+			<td><p:commandButton value="Imprimir" process="@form" id="imprimir" update="productos,growl1" actionListener="#{devoluciones.imprimirFactura}"/></td>
+		</tr>		
+	</table>
+	
+	<p:dataTable id="productos" var="docu" value="#{devoluciones.detalles}"
+			scrollable="true" scrollHeight="300"
+			emptyMessage="No hay registros disponibles">
+			<f:facet name="header">
+            Productos
+        </f:facet>
+		<p:column headerText="Nombre" width="60%">
+				<h:outputText value="#{docu.productoId.nombre}" style="width:100%" />
+		</p:column>					
+		<p:column headerText="Cantidad vendida" width="20%" >
+				<h:outputText value="#{docu.cantidad}" style="width:100%" />
+		</p:column>
+		<p:column headerText="Cantidad devolucion" width="20%">
+				<p:inputNumber value="#{docu.cantidadDevolucion}" size="4"/>
+		</p:column>			
+		</p:dataTable>
+	</h:form>
+	<p:blockUI block="devolucionesForm:productos" trigger="devolucionesForm:buscar">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+</ui:composition>

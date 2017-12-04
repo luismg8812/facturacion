@@ -1,0 +1,938 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+		function controlTeclas(e,element){
+//////////////////////TECLA O///////////////////////////
+			if(e.keyCode==79){
+				document.getElementById('opciones:Opc_movi_mes1_menuButton').click();
+				//alert("tecla o")		punto venta dia		
+				} 
+			if(e.keyCode==83){
+				document.getElementById('opciones:Sig_movi_mes1').click();
+				//alert("tecla s")	punto venta dia			
+				}
+			if(e.keyCode==85){
+				document.getElementById('opciones:Ult_movi_mes1').click();
+				//alert("tecla u")	punto venta dia		
+				}
+			if(e.keyCode==77){
+				document.getElementById('opciones:Mod_movi_mes1').click();
+				//alert("tecla m")	punto venta dia			
+				}
+			if(e.keyCode==65){
+				document.getElementById('opciones:Ant_movi_mes1').click();
+				//alert("tecla a")	punto venta dia			
+				}
+			if(e.keyCode==66){
+				document.getElementById('punto_venta_bor').click();
+				//alert("tecla b")	punto venta dia			
+				}
+			if(e.keyCode==67){
+				document.getElementById('punto_venta_cam').click();
+				//alert("tecla c")	c cambia			
+				}
+			if(e.keyCode==78){
+				document.getElementById('opciones:New_movi_mes1').click();	
+				}
+			
+
+			
+			
+			if(e.keyCode==73){
+				document.getElementById('opciones:Imp_movi_mes1').click();
+				//alert("tecla i")	punto venta dia
+				if(document.activeElement.name=="opciones:Sig_movi_mes1" ){
+				   document.getElementById('pogoTargeta').value='N';
+				   document.getElementById('pogoTargeta').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';
+				   document.getElementById('pogoTargeta').focus();
+				   document.getElementById('pogoTargeta').select();
+				  // alert("imprimir");	
+				   pagina="imprimirFactura";
+				 
+			     //alert("tecla i")	punto venta dia
+				}
+			}	
+			//////////////////////TECLA LADO DERECHO///////////////////////////
+	        if(e.keyCode==39){// cuando se presiona la tecla a un lado derecho
+	        	//*********control de teclas del formulario movimiento mes dependiente de la opcion menu=1 
+	         	//**************lado derecho
+	        	if(document.activeElement.name=="opciones:Sig_movi_mes1"){  //
+	            	document.getElementById('opciones:Ant_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Localiza Anterior Documento';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Ant_movi_mes1"){  //
+	            	document.getElementById('opciones:Pri_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Localiza Primer Documento';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Pri_movi_mes1"){  //
+	            	document.getElementById('opciones:Ult_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Localiza Ultimo Documento';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Ult_movi_mes1"){  //
+	            	document.getElementById('opciones:Bus_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Buscar Por Número Documento';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Bus_movi_mes1"){  //
+	            	document.getElementById('opciones:P1_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = '';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P1_movi_mes1"){  //
+	            	document.getElementById('opciones:Mod_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Modifica El Documento';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Mod_movi_mes1"){  //
+	            	document.getElementById('opciones:Gat_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Modifica Cabecera';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Gat_movi_mes1"){  //
+	            	document.getElementById('opciones:P2_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = '';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P2_movi_mes1"){  //
+	            	document.getElementById('opciones:New_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Crea Nuevos Documentos';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:New_movi_mes1"){  //
+	            	document.getElementById('opciones:P3_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = '';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P3_movi_mes1"){  //
+	            	document.getElementById('opciones:Imp_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Imprimir Documento';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Imp_movi_mes1"){  //
+	            	document.getElementById('opciones:P4_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = '';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P4_movi_mes1"){  //
+	        		//alert(document.activeElement.name);
+	            	document.getElementById('opciones:Opc_movi_mes1_menuButton').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Opciones y Utilidades';
+	    			return "";
+	                }
+// 	        	if(document.activeElement.name=="Opc_movi_mes1_menuButton"){  //
+// 		        	//alert(document.activeElement.name);
+// 	            	document.getElementById('Fin_movi_mes1').focus();
+// 	            	document.getElementById('titulo_opc1').innerHTML = 'Regresar al menú Principal';
+// 	    			return "";
+// 	                }
+	        	if(document.activeElement.name=="opciones:Fin_movi_mes1"){  //
+	            	document.getElementById('opciones:Sig_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Localiza Siguiente Documento';
+	    			return "";
+	                } 
+		    }
+
+	        if(e.keyCode==37){
+	        	//*********control de teclas del formulario movimiento mes dependiente de la opcion menu=1 
+	         	//**************lado izquierdo
+	        	if(document.activeElement.name=="opciones:Sig_movi_mes1"){  //
+	            	document.getElementById('opciones:Fin_movi_mes1').focus();
+	            	document.getElementById('titulo_opc1').innerHTML = 'Regresa Al Menú Principal';
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Ant_movi_mes1"){  //
+	            	document.getElementById('opciones:Sig_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Pri_movi_mes1"){  //
+	            	document.getElementById('opciones:Ant_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Ult_movi_mes1"){  //
+	            	document.getElementById('opciones:Pri_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Bus_movi_mes1"){  //
+	            	document.getElementById('opciones:Ult_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P1_movi_mes1"){  //
+	            	document.getElementById('opciones:Bus_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Mod_movi_mes1"){  //
+	            	document.getElementById('opciones:P1_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Gat_movi_mes1"){  //
+	            	document.getElementById('opciones:Mod_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P2_movi_mes1"){  //
+	            	document.getElementById('opciones:Gat_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:New_movi_mes1"){  //
+	            	document.getElementById('opciones:P2_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P3_movi_mes1"){  //
+	            	document.getElementById('opciones:New_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Imp_movi_mes1"){  //
+	            	document.getElementById('opciones:P3_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:P4_movi_mes1"){  //
+	            	document.getElementById('opciones:Imp_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Opc_movi_mes1_menuButton"){  //
+	            	document.getElementById('opciones:P4_movi_mes1').focus();
+	    			return "";
+	                }
+	        	if(document.activeElement.name=="opciones:Fin_movi_mes1"){  //
+	            	document.getElementById('opciones:Opc_movi_mes1_menuButton').focus();
+	    			return "";
+	                }
+		    }    
+		}
+
+		function ocultarCodBarras1(){
+			document.getElementById('busquedaCodBarras1').style.display='none';
+		}
+
+		function ciclo1(e,element){
+			   var elec = element.getAttribute('id'); 	  
+			   if(e.keyCode==13 ){
+				   if(elec=='codBarras_input1' ){
+					   if(document.getElementById('codBarras_input1').value==''){
+						   document.getElementById('art_11_input').focus();
+						   document.getElementById('art_11_input').value='';
+					    }
+				   }
+				   if(elec=='art_11_input'){
+					   if(document.getElementById('art_11_input').value==''){
+						   document.getElementById('cod_1_input').focus();
+						   document.getElementById('cod_1_input').value='';
+					   }
+				   }
+				   if(elec=='cod_1_input'){
+					   if(codigoBarras==1){
+						   document.getElementById('busquedaCodBarras1').style.display='inline';
+						   document.getElementById('codBarras_input1').value='';
+						   document.getElementById('codBarras_input1').focus();
+						}else{
+							document.getElementById('art_11_input').value='';
+						    document.getElementById('art_11_input').focus();
+						}				   
+				   }
+				   if(elec=='nombreCliente_input'){
+					   if(clienteObligatorio==0){//si el cliente no esobligatorio cambia de campos con la tecla enter
+						   if(document.getElementById('nombreCliente_input').value==''){
+							// document.getElementById('nombreCliente_input').style.display='none';
+							   document.getElementById('nombreCliente2').innerHTML='VARIOS';
+							   }
+							   if( guiaFacturacion==1){
+								   document.getElementById('nombc1').style.display='inline';
+								   document.getElementById('nombc1').value='';
+								   document.getElementById('nombc1').focus();
+								   
+							   }else{
+								   if(codigoBarras==1){
+									   document.getElementById('busquedaCodBarras1').style.display='inline';
+									   document.getElementById('codBarras_input1').value='';
+									   document.getElementById('codBarras_input1').focus();
+									}else{
+										document.getElementById('art_11_input').value='';
+									    document.getElementById('art_11_input').focus();
+									}	
+							   }
+					   }			  			   
+				   }
+				   if(elec=='nombc1'){
+					   if(codigoBarras==1){
+						   document.getElementById('busquedaCodBarras1').style.display='inline';
+						   document.getElementById('codBarras_input1').value='';
+						   document.getElementById('codBarras_input1').focus();
+						}else{
+							document.getElementById('art_11_input').value='';
+						    document.getElementById('art_11_input').focus();
+						}	
+				   }
+				   if(elec=='nombreEmpleado_input' ){
+					   if(  document.getElementById('cod_1_input').value==''){
+						   if(codigoBarras==1){
+							   document.getElementById('busquedaCodBarras1').style.display='inline';
+							   document.getElementById('codBarras_input1').value='';
+							   document.getElementById('codBarras_input1').focus();
+							}else{
+								document.getElementById('art_11_input').value='';
+							    document.getElementById('art_11_input').focus();
+							}	
+						   }
+					
+				   }
+				   
+				   
+			   }
+			}
+			function revisarCodBarras(){
+				if(guiaFacturacion==0){
+					if(codigoBarras==1){
+						   document.getElementById('busquedaCodBarras1').style.display='inline';
+						   document.getElementById('codBarras_input1').value='';
+						   document.getElementById('codBarras_input1').focus();
+						}else{
+							document.getElementById('art_11_input').value='';
+						    document.getElementById('art_11_input').focus();
+						}	
+					}		 
+			}
+			function revisarCodBarras2(){
+				if(asignarEmpleadoFactura==1){
+				//	alert("aqui entra");
+					  document.getElementById('nombreEmpleado_input').style.display='inline';
+					document.getElementById('nombreEmpleado_input').value='';
+			        document.getElementById('nombreEmpleado_input').focus();
+				}else{
+					if(codigoBarras==1){
+						   document.getElementById('busquedaCodBarras1').style.display='inline';
+						   document.getElementById('codBarras_input1').value='';
+						   document.getElementById('codBarras_input1').focus();
+					}else{
+						document.getElementById('art_11_input').value='';
+				        document.getElementById('art_11_input').focus();
+					}	
+				}	
+			}
+			function revisar3(){
+				if( guiaFacturacion==1){
+					//alert("aqui entra");
+					
+					   document.getElementById('nombc1').style.display='inline';
+					   document.getElementById('nombc1').value='';
+					   document.getElementById('nombc1').focus();
+					   //document.getElementById('actualiza').click();
+				   }else{
+					   if(codigoBarras==1){
+						   document.getElementById('busquedaCodBarras1').style.display='inline';
+						   document.getElementById('codBarras_input1').value='';
+						   document.getElementById('codBarras_input1').focus();
+						}else{
+							document.getElementById('art_11_input').value='';
+						    document.getElementById('art_11_input').focus();
+						}	
+				   }
+			}
+		
+		function focoCantidad1(){
+			if(document.getElementById('art_11_input').value!='X01 VARIOS'){
+ 				//document.getElementById('cantidad_in1').focus();
+ 				//document.getElementById('cantidad_in1').select();
+ 				//document.getElementById('cantidad_in1').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';
+				//focoCantidad="foco";
+				//alert("despues de procesar");
+			}else{
+				document.getElementById('px01_input_input').focus();
+				document.getElementById('px01_input_input').select();
+				document.getElementById('px01_input_input').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';
+				//ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all			
+			}
+			
+		}
+
+		function enterCantidad1(e){
+			var  valor = document.getElementById('cantidad_in1').value.toString() ;
+			if(e.keyCode==13){
+				if(valor!=''){
+					//alert(valor)
+					if(codigoBarras==1){
+						document.getElementById('busquedaCodBarras1').style.display='inline';
+						document.getElementById('prodList1').style.display='inline';
+						document.getElementById('codBarras_input1').value=null;
+						document.getElementById('codBarras_input1').select();	
+						}else{
+							document.getElementById('art_11_input').value='';
+						    document.getElementById('art_11_input').focus();
+						}		
+				}		
+			}
+		}
+	 function focusSiguiente(){
+		 document.getElementById('opciones:Sig_movi_mes1').focus();		
+	 }
+	 function imprimir(e){
+		 if(e.keyCode==13){
+			 	document.getElementById('pogoTargeta').value='N';
+				document.getElementById('pogoTargeta').focus();
+				document.getElementById('pogoTargeta').select();
+				//alert("imprimir");	
+				pagina="imprimirFactura";
+ 		 }
+	 }
+	 function nuevaFactura(){
+		//alert("nuevo");
+		document.getElementById('opciones:op_mov_mes1_content').style.display='none';
+		document.getElementById('prod1').style.display='inline';
+        pagina='creando_factura';
+        if(codigoBarras==1){
+        	document.getElementById('busquedaCodBarras1').style.display='inline';	     	
+        	document.getElementById('codBarras_input1').value=='';
+        	document.getElementById('codBarras_input1').focus();
+        	document.getElementById('codBarras_input1').select();
+			}else{
+				document.getElementById('art_11_input').value='';
+			    document.getElementById('art_11_input').focus();
+			}	
+        
+	 }
+	 
+	 function limpiarCod(){
+		 document.getElementById('codBarras_input1').value='';
+		 }
+	 function opcion(e){	//selecciona la ruta de la opcion del opciones 
+			var elec =e.getAttribute('id'); // 
+			var res = elec.split(":");
+			opciones=res[1];
+			//alert(res[1])
+			pagina="opc";	
+		}
+		
+	 function limpiarEditar(e){
+		 var elec =e.getAttribute('id');
+		 var res = elec.split(":");
+		 if('info_articulos'==res[1]){
+			 document.getElementById('edit_articulo_input').value='';
+			 document.getElementById('costoEdit_input').value='';
+			 document.getElementById('publicoEdit_input').value='';
+			 document.getElementById('stockMinEdit_input').value='';
+			 document.getElementById('stockMaxEdit_input').value='';
+			 document.getElementById('grupoEdit').value='';
+			 document.getElementById('marcaEdit').value='';
+			 document.getElementById('proveedorEdit').value='';
+			 document.getElementById('codigoBarrasEdit_input').value='';
+			 document.getElementById('pesoEdit_input').value='';
+			 document.getElementById('unidadEdit').value='';
+			 document.getElementById('ivaEdit_input').value=16;
+			 document.getElementById('valanzaEdit').value='';
+		}
+	}
+
+	function pupupCantidad(){
+		PF('cantidadPopup').show();
+		document.getElementById('facturar').focus();
+		document.getElementById('facturar').select();
+		document.getElementById('facturar').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus ui-state-focus';
+	//	alert("ejecuta")
+		}	
+	function preFoc(){
+		document.getElementById('facturar').focus();
+		document.getElementById('facturar').select();
+		document.getElementById('facturar').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus ui-state-focus';
+		alert("entro2")
+			}
+	
+	function closeDialogos(){//funcion que cierra dialogos del autocompletar
+		document.getElementById('art_11_panel').style.display='none';
+		//document.getElementById('art_11_itemtip').style.display='none';
+	}	
+
+	function focusArticulo(){
+		 //document.getElementById("art_11_panel").style.fontSize = "12px";
+		  // document.getElementById("art_11_panel").style.width = "300px";
+	}
+
+	function teclasBorrar(e){
+		var elec =e.getAttribute('id');
+		alert("borrar teclas:"+elec);
+		//document.getElementById('facturar').select();
+		//checkboxDT:0:j_idt79
+	}
+
+	function verificarBorrado(){
+		document.getElementById('opciones:op_mov_mes1_content').style.display='none';
+        pagina='borrando_factura';
+	}
+
+	function borrado(e,element){
+		var elec = element.getAttribute('id'); 
+		var res = elec.split(":");
+		ruta2=parseInt(res[2]);
+		//alert(""+ruta);
+		if(e.keyCode==38){
+			var resta=ruta2-1;
+			var obj= "borrarTabla:checkboxDT:"+resta+":rowDelete_";
+			//alert(""+obj);
+			document.getElementById(obj).focus();
+			//document.getElementById(obj).select();
+		}	
+		if(e.keyCode==40){
+			var suma=ruta2+1;
+			var obj2= "borrarTabla:checkboxDT:"+suma+":rowDelete_";
+			//alert(""+obj2);
+			document.getElementById(obj2).focus();
+			//document.getElementById(obj2).select();
+		}		
+	}
+
+	function cCambia(e,element){
+		var elec = element.getAttribute('id'); 
+		var res = elec.split(":");
+		ruta2=parseInt(res[2]);
+		//alert(""+ruta);
+		if(e.keyCode==38){
+			var resta=ruta2-1;
+			var obj= "borrarTabla:checkboxDT:"+resta+":rowC_";
+			//alert(""+obj);
+			document.getElementById(obj).focus();
+			//document.getElementById(obj).select();
+		}	
+		if(e.keyCode==40){
+			var suma=ruta2+1;
+			var obj2= "borrarTabla:checkboxDT:"+suma+":rowC_";
+			//alert(""+obj2);
+			document.getElementById(obj2).focus();
+			//document.getElementById(obj2).select();
+		}		
+	}
+
+	function crearCliente(e,element){
+		var  valor = document.getElementById('nombreCliente_input').value.toString() ;
+		
+		if(valor!=''){
+			if(e.keyCode==39){
+				//alert(valor);
+				document.getElementById('nuevoClienteForm:nombreNew').value=valor;	
+				PF('nuevoCliente').show();	
+				pagina='creando_cliente';		
+			}
+						
+		}			
+	}
+	function tipoDocumentoNombre(){
+		document.getElementById('nombc1').style.display='none';
+		if(document.getElementById('nombc1').value==''){
+			document.getElementById('tipoNombre').innerHTML='Factura de venta';
+			}
+				
+		}
+
+	function newProducto(){
+		 if(ruta=='punto_venta'){
+             	if(pagina!='imprimirFactura'){
+             		document.getElementById('excento_input').value='';
+          		    document.getElementById('gravado_input').value='';
+          		    document.getElementById('iva_input').value='';
+          		    document.getElementById('total_input').value='';                		    
+             		document.getElementById('opciones:op_mov_mes1_content').style.display='none';
+                 	document.getElementById('prod1').style.display='inline';
+                 	//alert(""+carteraClientes);
+                 	if(carteraClientes==1){ 
+                 		document.getElementById('nombreCliente').style.display='inline';
+                 		document.getElementById('nombc1').style.display='none';                         		  		
+                 		document.getElementById('nombreCliente_input').focus();
+                     	document.getElementById('nombreCliente_input').select();
+                     	document.getElementById('nombreCliente_input').value='';
+                     	//alert("tiene activo cliente")
+                     }else{
+                     	if(codigoBarras==1){
+                     		document.getElementById('busquedaCodBarras1').style.display='inline';
+                     		document.getElementById('codBarras_input1').focus();
+                         	document.getElementById('codBarras_input1').select();
+                         	document.getElementById('codBarras_input1').value='';
+                         }else{
+                         	document.getElementById('art_11_input').focus();
+                         	document.getElementById('art_11_input').select();
+                         	document.getElementById('art_11_input').value='';
+                         }
+                     }                    	
+                 	 pagina='creando_factura';              		
+             }	
+         }   
+	}
+	
+	</script>
+	<style>
+items {
+	font-size: 11px;
+}
+
+panel1 {
+	font-size: 11px;
+	width: 200px;
+}
+
+panel1 {
+	font-size: 11px;
+	width: 200px;
+}
+
+#art_11_panel {
+	font-size: 11px;
+	width: 75%;
+	font-weight: bold
+}
+#excento_input,#gravado_input,#iva_input,#total_input,#cuadreDiario:totalfact_input{
+	text-align: right !important;
+}
+.rojo{
+	color:red !important;
+}
+</style>
+	<p:growl id="growl1" life="7000" />
+	<p:panel id="basic1" style="font-size: 16px;width:100% ">
+		<table width="90%" id="dat">
+			<tr>
+				<td><p:outputLabel value="Documento: " style="font-weight:bold" /></td>
+				<td><p:outputLabel
+						value="#{puntoVentaDia.documento.documentoId}" id="codig1" /></td>
+
+				<td><p:outputLabel value="Fecha: " style="font-weight:bold" /></td>
+				<td><p:outputLabel value="#{puntoVentaDia.fechaCreacion}"
+						id="fechaIngreso">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="Cliente: " style="font-weight:bold" /></td>
+				<td><p:autoComplete id="nombreCliente"
+						value="#{puntoVentaDia.cliente}" style="display:none" size="20"
+						onkeyup="ciclo1(event,this),crearCliente(event)"
+						completeMethod="#{puntoVentaDia.completeTextCliente}"
+						maxResults="10" forceSelection="true" minQueryLength="3"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{clienteConverter}">
+						<p:ajax event="itemSelect"
+							listener="#{puntoVentaDia.buscarCliente}" process="@this"
+							update="art_11,codBarras_input1,idCliente"
+							oncomplete="setTimeout(revisar3(), 300)" />
+					</p:autoComplete> <p:outputLabel value="#{puntoVentaDia.nombreCliente2}"
+						id="nombreCliente2" /></td>
+
+				<td><p:outputLabel value="CC: " style="font-weight:bold" /></td>
+				<td><p:outputLabel
+						value="#{puntoVentaDia.identificacionCliente}" id="idCliente" /></td>
+				<td><p:outputLabel value=" tipo Documento: "
+						style="font-weight:bold" /></td>
+				<td><p:inputText value="#{puntoVentaDia.tipoDocumentoFactura}"
+						size="2" id="nombc1" style="display: none"
+						onblur="tipoDocumentoNombre()">
+						<p:ajax event="keyup"
+							listener="#{puntoVentaDia.tipoFacturaSelect}"
+							partialSubmit="true" onstart="revisarCodBarras2()"
+							process="@this" update="art_11,codBarras_input1,growl1,nombreEmpleado" />
+					</p:inputText> <p:outputLabel value="#{puntoVentaDia.tipoDocumentoFacturaNombre}"
+						id="tipoNombre" /></td>
+
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Empleado: " style="font-weight:bold" /></td>
+				<td> <p:autoComplete id="nombreEmpleado"
+						value="#{puntoVentaDia.empleado}" style="display:none" size="20"
+						onkeyup="ciclo1(event,this)"
+						completeMethod="#{puntoVentaDia.completeTextEmpleado}"
+						maxResults="10" forceSelection="true" minQueryLength="3"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{empleadoConverter}">
+						<p:ajax event="itemSelect"
+							listener="#{puntoVentaDia.buscarEmpleado}" process="@this"
+							update="art_11,idCliente"
+						/>
+					</p:autoComplete> <p:outputLabel 
+						id="nombreEmpleado2" /></td>
+			</tr>
+		</table>
+	</p:panel>
+	<h:form id="opciones">
+		<p:panel style="font-size: 16px;width:100% " id="op_mov_mes1">
+			<table width="90%">
+				<tr>
+					<td><p:commandButton value="Sig" id="Sig_movi_mes1"
+							onkeydown="controlTeclas(event,this)"
+							action="#{puntoVentaDia.siguienteFactura}"
+							update="growl1, dataList1,codig1">
+							<p:hotkey bind="f" partialSubmit="true"
+								onstart="PF('punto_venta').hide();limpiarRuta(); document.getElementById('prod1').style.display='none';" />
+						</p:commandButton> <p:commandButton value="Ant" id="Ant_movi_mes1"
+							onkeyup="controlTeclas(event,this)"
+							action="#{puntoVentaDia.anteriorFactura()}"
+							update="growl1, dataList1,codig1" /> <p:commandButton
+							value="Pri" id="Pri_movi_mes1"
+							onkeydown="controlTeclas(event,this)" /> <p:commandButton
+							value="Ult" id="Ult_movi_mes1"
+							onkeydown="controlTeclas(event,this)"
+							action="#{puntoVentaDia.buscarUltimaFactura()}"
+							update="growl1, dataList1,codig1" /> <p:commandButton
+							value="Bus" onkeydown="controlTeclas(event,this)"
+							id="Bus_movi_mes1" /> <p:commandButton value="..."
+							onkeydown="controlTeclas(event,this)" id="P1_movi_mes1" /> <p:commandButton
+							value="Mod" onkeydown="controlTeclas(event,this)"
+							id="Mod_movi_mes1"
+							actionListener="#{puntoVentaDia.modificarUltimaFactura()}" /> <p:commandButton
+							value="Gat" onkeydown="controlTeclas(event,this)"
+							id="Gat_movi_mes1" /> <p:commandButton value="..."
+							onkeydown="controlTeclas(event,this)" id="P2_movi_mes1" /> <p:commandButton
+							value="New" onkeydown="controlTeclas(event,this)"
+							id="New_movi_mes1" onkeyup="selectTipoDoc(event)"
+							onclick="nuevaFactura(),newProducto()"
+							actionListener="#{puntoVentaDia.limpiar()}" /> <p:commandButton
+							onkeydown="controlTeclas(event,this)" value="..."
+							id="P3_movi_mes1" /> <p:commandButton value="Imp"
+							update="gravado_tag,excento_tag,iva_tag,total1,descuento,descuentoLabel"
+							action="#{puntoVentaDia.valoresDefectoImp}"
+							onkeydown="controlTeclas(event,this),imprimir(event)"
+							id="Imp_movi_mes1" /> <p:commandButton value="..."
+							onkeydown="controlTeclas(event,this)" id="P4_movi_mes1" /> <p:splitButton
+							value="Opc" id="Opc_movi_mes1" disabled="false"
+							icon="ui-icon-document">
+							<c:forEach
+								items="#{menuPrincipal.getOpcionUsuariosByRuta('opcion')}"
+								var="ou">
+								<p:menuitem value="#{ou.subMenuId.nombre}"
+									id="#{ou.subMenuId.bar}"
+									onclick="opcion(this),limpiarEditar(this),#{ou.subMenuId.url}"
+									update="cuadreDiario:docNoImpresos,cuadreDiario:totalfact,cuadreDiario:totalIngresos,cuadreDiario:abonoDia,
+										    cuadreDiario:vales1,cuadreDiario:avance,cuadreDiario:cartera,cuadreDiario:propinas" />
+
+
+							</c:forEach>
+						</p:splitButton> <p:commandButton value="Fin"
+							onkeydown="controlTeclas(event,this)" id="Fin_movi_mes1"
+							onstart="PF('punto_venta').hide();limpiarRuta(); document.getElementById('prod1').style.display='none';" />
+					</td>
+				</tr>
+			</table>
+		</p:panel>
+	</h:form>
+	<p:panel style="font-size: 16px;width:100% " id="productos1">
+		<table width="50%" style="display: none" id="busquedaCodBarras1">
+			<tr>
+				<td><p:outputLabel value="Codigo Barras" /></td>
+				<td><p:inputText value="#{puntoVentaDia.codigoBarras}"
+						onfocus="setTimeout(limpiarCod(), 3000)" id="codBarras_input1"
+						onblur="ocultarCodBarras1()" onkeyup="ciclo1(event,this)">
+						<p:ajax event="keyup" partialSubmit="true"
+							listener="#{puntoVentaDia.buscarProductoCodBarras}" delay="30" update="excento,gravado,iva,total,pesoTotal" />
+					</p:inputText></td>
+			</tr>
+		</table>
+
+		<table width="100%">
+			<tr>
+				<td width="12%"><p:outputLabel value="Codigo"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="44%"><p:outputLabel value="Artículo"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="12%"><p:outputLabel value="Cant"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="12%" style="text-align: right"><p:outputLabel
+						value="Unitario" style="font-size: 16px;font-weight:bold" /></td>
+				<td width="20%" style="text-align: right"><p:outputLabel
+						value="Parcial" style="font-size: 16px;font-weight:bold" /></td>
+			</tr>
+		</table>
+			<table width="90%" style="display: none;" id="prod1">
+			<tr>
+				<td width="10%"><p:autoComplete
+						value="#{puntoVentaDia.codigoInterno}" id="cod_1" size="10" maxResults="5"
+						onkeyup="ciclo1(event,this)"
+						completeMethod="#{puntoVentaDia.completeCodigo}" effect="fade">
+						<p:ajax event="itemSelect"
+							listener="#{puntoVentaDia.buscarProductoCodigo}"
+							oncomplete="focoCantidad1()" />
+					</p:autoComplete></td>
+				<td width="40%"><p:autoComplete id="art_11"
+						value="#{puntoVentaDia.articulo}"
+						emptyMessage="No se encontró el producto" size="38"
+						onkeyup="ciclo1(event,this)" minQueryLength="2"
+						completeMethod="#{puntoVentaDia.completeText}" maxResults="14"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{productoConverter}">
+						<p:ajax event="itemSelect"
+							listener="#{puntoVentaDia.buscarProducto}" process="@this,art_11"
+							immediate="true"
+							update="cantidad_in1,growl1,facturar,focoFact,valorParcial,nombrePro,cantidadPar"
+							onstart="focoCantidad1()" />
+						<p:column>
+							<p:outputLabel value="#{name.nombre}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Cod. Producto: #{name.productoId}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Existencia: #{name.cantidad}" />
+						</p:column>
+						<p:column style="text-align: right">
+							<p:outputLabel value="#{name.costoPublico}"
+								style="text-align: right">
+								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+							</p:outputLabel>
+						</p:column>
+					</p:autoComplete></td>
+				<td width="10%"><p:inputText value="#{puntoVentaDia.cantidad}"
+						style="width:90%; text-align: center" onblur="" id="cantidad_in1"
+						onkeyup="enterCantidad1(event)">
+						<p:ajax event="blur" partialSubmit="true"
+							listener="#{puntoVentaDia.cantidadEnter}"
+							update="art_11,cod_1,dataList1,excento,gravado,iva,total,pesoTotal" />
+					</p:inputText></td>
+				<td width="12%"><p:inputText value="#{puntoVentaDia.unidad}"
+						style="width:90%; text-align: center" id="unidad_1"
+						disabled="true" /></td>
+				<td width="28%"><p:inputText value="#{puntoVentaDia.parcial}" 
+						style="width:90%; text-align: center" disabled="true" /></td>
+			</tr>
+		</table>
+		<div id="prodList1" style="display: none; width: 90%">
+			<p:scrollPanel mode="native" style="height:150px">
+				<p:dataList value="#{puntoVentaDia.productos}"
+					style="font-size: 9px" emptyMessage=" " id="dataList1" var="prod1"
+					type="definition">
+					<table width="100%">
+						<tr>
+							<td width="7%"><p:outputLabel
+									value="#{prod1.productoId.productoId}" /></td>
+							<td width="30%" style="text-align: left"><p:outputLabel style="text-align: left"
+									value="#{prod1.productoId.nombre}" /></td>
+							<td width="7%" style="text-align: right"><p:outputLabel value="#{prod1.cantidad}" style="text-align: right" >
+												<f:convertNumber pattern="¤#,##0"  />
+											</p:outputLabel> </td>
+							<td width="9%" style="text-align: right" ><p:outputLabel id="unitarioLabel" style="text-align: right"
+									value="#{prod1.unitario}" 
+									rendered="#{!puntoVentaDia.cambioPrecio}">
+									<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+								</p:outputLabel> <p:inputNumber value="#{prod1.unitario}"
+									rendered="#{puntoVentaDia.cambioPrecio}" symbol="$"
+									decimalPlaces="0" id="precioVariable" minValue="0"
+									onfocus="PF('cambioPrecio').show();">
+									<p:ajax event="focus"
+										listener="#{puntoVentaDia.recalcularPrecio(prod1)}"></p:ajax>
+								</p:inputNumber></td>
+							<td width="18%" style="text-align: right"><p:outputLabel
+									value="#{prod1.parcial}">
+									<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+								</p:outputLabel></td>
+						</tr>
+					</table>
+				</p:dataList>
+
+				<h:form id="borrarTabla">
+					<p:dataTable id="checkboxDT" var="prod1"
+						emptyMessage="Factura sin Detalle..."
+						value="#{puntoVentaDia.productosBorrarList}">
+						<p:column width="10%">
+							<p:commandButton id="rowDelete_#{rowIndex}" value="Borrar"
+								onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
+								actionListener="#{puntoVentaDia.borrarFacturaSelect(prod1)}"
+								onkeyup="borrado(event,this)"
+								update="checkboxDT,excento,iva,total,pesoTotal,gravado">
+								<p:focus for="borrarTabla:checkboxDT:0:rowDelete_" />
+							</p:commandButton>
+						</p:column>
+<!-- 						<p:column width="10%"> -->
+<!-- 							<p:commandButton id="rowC_#{rowIndex}" value="Cambiar"> -->
+<!-- 								onstart="PF('bui').show()" oncomplete="PF('bui').hide()" -->
+<!-- 								actionListener="#{puntoVentaDia.cambiarDetalle(prod1)}" -->
+<!-- 								onkeyup="cCambia(event,this)" -->
+<!-- 								update="checkboxDT,excento,iva,total,pesoTotal,gravado,cantidad_in1"> -->
+<!-- 								<p:focus for="borrarTabla:checkboxDT:0:rowC_" /> -->
+<!-- 							</p:commandButton> -->
+<!-- 						</p:column> -->
+
+						<p:column width="45%">
+							<p:outputLabel value="#{prod1.productoId.nombre}" />
+						</p:column>
+						<p:column width="10%" style="text-align: right">
+							<p:outputLabel value="#{prod1.cantidad}" />
+						</p:column>
+						<p:column width="10%" style="text-align: right">
+							<p:outputLabel value="#{prod1.parcial}" />
+						</p:column>
+
+					</p:dataTable>
+					<p:blockUI block="borrarTabla" widgetVar="bui">
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif" />
+					</p:blockUI>
+				</h:form>
+			</p:scrollPanel>
+		</div>
+	
+	</p:panel>
+
+	<p:layout style="font-size: 12px;width:100% ">
+		<p:layoutUnit position="west" resizable="true" style="width:35%"
+			minSize="250" maxSize="300">
+			<table width="100%">
+				<tr>
+					<td><p:outputLabel value="Peso: " /></td>
+					<td><p:inputText readonly="true"
+							value="#{puntoVentaDia.pesoTotal}" disabled="true" id="pesoTotal" /></td>
+					<td><p:outputLabel value="Kgs " /></td>
+				</tr>
+				<tr>
+					<td><p:outputLabel id="titulo_opc1" style="font-size: 13px" />
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+				</tr>
+			</table>
+			<table width="100%" align="center" id="confir" style="display: none">
+				<tr>
+					<td><p:commandButton value="[C] Cambia"/>
+<!-- 							actionListener="#{puntoVentaDia.cCambia()}" -->
+<!-- 							 id="punto_venta_cam" style="font-size: 13px;" -->
+<!-- 							onstart="verificarBorrado()" update="borrarTabla:checkboxDT"  -->
+							
+						</td>
+					<td><p:commandButton value="[B] Borra" style="font-size: 13px;"
+							actionListener="#{puntoVentaDia.borrarFactura()}"
+							id="punto_venta_bor" onstart="verificarBorrado()"
+							update="borrarTabla:checkboxDT" /></td>
+					<td><p:commandButton value="[I] Inserta" style="font-size: 13px;"
+							actionListener="#{puntoVentaDia.valoresDefectoImp()}" /></td>
+				</tr>
+
+			</table>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center" style="width:65%;font-size: 50px"   >
+			<table width="100%" align="right">
+				<tr>
+					<td><p:outputLabel value="Vr. Excento: " style="font-size: 16px;"/></td>
+					<td style="text-align: right;background-color: #e00404;"><p:inputNumber
+							value="#{puntoVentaDia.excento}" placeholder="$" symbol="$"
+							decimalPlaces="0" id="excento" readonly="true"
+							onfocus="focusSiguiente()" size="10" /></td>
+				
+					<td><p:outputLabel value="Vr. Gravado" style="font-size: 16px" /></td>
+					<td style="text-align: right;background-color: #e00404;"><p:inputNumber
+							value="#{puntoVentaDia.gravado}" placeholder="$" symbol="$"
+							style="text-align: right" decimalPlaces="0" id="gravado"
+							readonly="true" size="10" /></td>
+				</tr>
+				<tr>
+					<td><p:outputLabel value="Vr. Iva"  style="font-size: 16px"/></td>
+					<td style="text-align: right;background-color: #e00404;"><p:inputNumber
+							value="#{puntoVentaDia.iva}" id="iva" placeholder="$" symbol="$"
+							style="text-align: right" decimalPlaces="0" readonly="true"
+							size="10" /></td>
+				
+					<td><p:outputLabel value="Total" style="font-size: 16px" /></td>
+					<td style="text-align: right;background-color: #e00404;"><p:inputNumber styleClass="rojo"
+							value="#{puntoVentaDia.total}" symbol="$" decimalPlaces="0"
+							id="total" placeholder="$" readonly="true" size="10" /></td>
+				</tr>
+			</table>
+		</p:layoutUnit>
+	</p:layout>
+</ui:composition>

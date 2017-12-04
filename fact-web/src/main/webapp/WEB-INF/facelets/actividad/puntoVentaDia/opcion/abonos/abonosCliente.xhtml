@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function salirAbonosCliente(){
+		PF('abonos').hide();
+		
+	}
+	</script>
+	<h:form id="abonosClientesForm">
+		<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Cliente:" /></td>
+				<td><p:selectOneMenu value="#{abonos.clienteId}"
+						id="cliente">
+						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
+						<f:selectItems value="#{clientes.clientes}" var="clie"
+							itemLabel="#{clie.nombre}" itemValue="#{clie.clienteId}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial" value="#{abonos.fechaInicio}" size="16" 
+						pattern="dd-MM-yyyy" mask="true" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal" value="#{abonos.fechafin}" size="16" 
+						pattern="dd-MM-yyyy" mask="true" /></td>
+			</tr>
+
+		</table>
+		<table width="100%" align="center">
+			<tr>
+				<td><p:commandButton value="Buscar" process="@form"
+						update="documentosCliente" id="buscar" actionListener="#{abonos.buscarAbonosCliente}" />
+					 <p:commandButton
+						value="Salir" onclick="salirAbonosCliente"/>
+						<p:commandButton value="Crear Vale" onclick="PF('crearVale').show();"/>
+				</td>
+			</tr>
+		</table>
+		<p:dataTable id="documentosCliente" var="docu" value="#{abonos.documentosCliente}"
+			scrollable="true" scrollHeight="290"
+			emptyMessage="No hay facturas disponibles para El proveedor seleccionado">
+			<f:facet name="header">
+            Facturas
+        </f:facet>
+			<p:column headerText="Opción">		
+					<p:commandLink value="Detalle" action="#{abonos.consultarAbonosCliente(docu)}" />
+					<br />				
+				<p:commandLink  value="Crear"  action="#{abonos.abrirPopupAbonoCliente(docu)}"/>
+				<br />				
+				<p:commandLink  value="Eliminar"  action="#{abonos.borrarVale(docu)}" update="documentosCliente,growl1,@form"/>
+				
+									</p:column>
+			<p:column headerText="No. Documento">
+				<h:outputText value="#{docu.consecutivoDian}" />
+			</p:column>
+			<p:column headerText="Valor">
+				<h:outputText value="#{docu.total}" />
+			</p:column>
+			<p:column headerText="Saldo">
+				<h:outputText value="#{docu.saldo}" />
+			</p:column>
+			<p:column headerText="No. Abonos">
+				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
+			</p:column>
+			
+		</p:dataTable>
+	</h:form>
+	<p:blockUI block="abonosClientesForm" trigger="abonosClientesForm:buscar">
+					CARGANDO<br />
+		<p:graphicImage url="/images/bloqBar.gif" />
+	</p:blockUI>
+	<p:dialog widgetVar="crearAbonoCliente" header="Crear Abono"  closeOnEscape="true" showEffect="fade" resizable="false">
+		<div >
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos" width="40%" closeOnEscape="true" showEffect="fade" resizable="false">
+		<div >
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="crearVale" header="Crear Vale" closeOnEscape="false" showEffect="fade" resizable="false">
+		<div >
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearVale.xhtml" />
+		</div>
+	</p:dialog>
+	
+</ui:composition>

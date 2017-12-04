@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function salirEmpleado(){
+		PF('empleados').hide();
+		ruta='';
+		document.getElementById('menuPrincipal:m_1_menuButton').focus();
+	}
+	</script>
+	<h:form id="EmpleadoForm">
+		<p:growl id="growl1" life="7000" />
+		<table align="center">
+			<tr>
+				<td><p:outputLabel value="Nombre: "></p:outputLabel></td>
+				<td><p:inputText value="#{usuarios.nombreEmpleado}" /></td>
+				<td><p:outputLabel value="Apellido: "></p:outputLabel></td>
+				<td><p:inputText value="#{usuarios.aplellidoEmpleado}" /></td>
+
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Correo: "></p:outputLabel></td>
+				<td><p:inputText value="#{usuarios.correoEmpleado}" /></td>
+				<td><p:outputLabel value="Identificacion:  "></p:outputLabel></td>
+				<td><p:inputText value="#{usuarios.identificacionEmpleado}" /></td>
+			</tr>
+			<tr>
+				<td><p:commandButton value="Buscar"
+						action="#{usuarios.buscarEmpleados()}" process="@form"
+						update="empleados"></p:commandButton> <p:commandButton
+						value="Crear" onclick="PF('crearEmpleado').show();"></p:commandButton></td>
+			</tr>
+		</table>
+		<p:dataTable var="car" value="#{usuarios.empleadoList}" id="empleados">
+			<p:column headerText="Opciones">
+				<p:commandButton value="Editar" />
+				<p:commandButton value="Borrar" />
+			</p:column>
+			<p:column headerText="Nombre">
+				<h:outputText value="#{car.nombre}" />
+			</p:column>
+
+			<p:column headerText="Apellido">
+				<h:outputText value="#{car.apellido}" />
+			</p:column>
+
+
+		</p:dataTable>
+		<p:dialog widgetVar="crearEmpleado" header="Crear Empleado"  closeOnEscape="true" showEffect="fade" resizable="false">
+		<div >
+			<ui:include
+				src="/WEB-INF/facelets/clientes/empleados/crearEmpleado.xhtml" />
+		</div>
+	</p:dialog>
+	</h:form>
+</ui:composition>

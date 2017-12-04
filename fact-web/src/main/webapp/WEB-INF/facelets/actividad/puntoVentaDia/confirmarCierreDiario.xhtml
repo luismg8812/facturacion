@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+function teclasCierre(evento,element){		
+		/////////////////////TECLA ENTER y TECLA ABAJO ///////////////////////////////////////////////
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)		
+		if(evento.keyCode==40){ //cuando se presiona la tacla abajo 				
+		    if(elec=='salirCierre1'){//cuendo esta seleccionando el tipo documento
+		       document.getElementById('cierreTotal').focus();
+		       document.getElementById('cierreTotal').select();
+		      return "";			
+	        }
+		    if(elec=='cierreTotal'){//cuendo esta seleccionando el tipo documento
+			       document.getElementById('salirCierre2').focus();
+			       document.getElementById('salirCierre2').select();
+			      return "";			
+		     }
+		}
+		if(evento.keyCode==13){ //cuando se presiona la tacla abajo 
+			document.getElementById('opciones:Sig_movi_mes1').focus();
+		}	
+		
+}
+	</script>
+	<p:growl id="growl5" life="7000" />
+	<table width="100%" align="center">
+		<tr>
+			<td>
+				<p:commandButton value="............" onclick="PF('confirmarCierreDiario').hide();" id="salirCierre1"
+						onkeydown="teclasCierre(event,this)"/>
+				<p:commandButton value="Cierre Total" action="#{cuadreCaja.cierreTotal()}"  update="growl5" id="cierreTotal"
+						onkeydown="teclasCierre(event,this)"/>
+				<p:commandButton value="Salir" onclick="PF('confirmarCierreDiario').hide();" id="salirCierre2"
+						onkeydown="teclasCierre(event,this)"/>
+			 </td>
+		</tr>		
+	</table>
+
+</ui:composition>

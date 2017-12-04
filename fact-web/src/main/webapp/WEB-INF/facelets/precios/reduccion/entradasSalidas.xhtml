@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="EntradasSalidasForm">
+		<p:fieldset legend="Salidas" toggleable="true" toggleSpeed="500">
+			<table>
+				<tr>
+					<td><p:outputLabel value="Total:"></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.total}" id="total"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva}" id="totalIva"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva19}"
+							id="totalIva19" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Total Iva 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva5}"
+							id="totalIva5" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase5}" id="base5"
+							size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase19}"
+							id="base19" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Excento: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalExcento}"
+							id="excento" size="10"></p:inputNumber></td>
+				</tr>
+			</table>
+		</p:fieldset>
+		<p:fieldset legend="Entradas" toggleable="true" toggleSpeed="500">
+			<table>
+				<tr>
+					<td><p:outputLabel value="Total:"></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalEntrada}" id="totalEntrada"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIvaEntrada}" id="totalIvaEntrada"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva19Entrada}"
+							id="totalIva19Entrada" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Total Iva 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva5Entrada}"
+							id="totalIva5Entrada" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase5Entrada}" id="base5Entrada"
+							size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase19Entrada}"
+							id="base19Entrada" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Excento: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalExcentoEntrada}"
+							id="excentoEntrada" size="10"></p:inputNumber></td>
+				</tr>
+			</table>
+		</p:fieldset>
+		<p:fieldset legend="Diferencias" toggleable="true" toggleSpeed="500">
+			<table>
+				<tr>
+					<td><p:outputLabel value="Total:"></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalDiferencia}" id="totalDiferencia"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIvaDiferencia}" id="totalIvaDiferencia"></p:inputNumber>
+					</td>
+					<td><p:outputLabel value="Total Iva 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva19Diferencia}"
+							id="totalIva19Diferencia" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Total Iva 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalIva5Diferencia}"
+							id="totalIva5Diferencia" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 5%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase5Diferencia}" id="base5Diferencia"
+							size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Base 19%: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalbase19Diferencia}"
+							id="base19Diferencia" size="10"></p:inputNumber></td>
+					<td><p:outputLabel value="Excento: "></p:outputLabel></td>
+					<td><p:inputNumber value="#{reduccion.totalExcentoDiferencia}"
+							id="excentoDiferencia" size="10"></p:inputNumber></td>
+				</tr>
+			</table>
+		</p:fieldset>
+
+	</h:form>
+</ui:composition>

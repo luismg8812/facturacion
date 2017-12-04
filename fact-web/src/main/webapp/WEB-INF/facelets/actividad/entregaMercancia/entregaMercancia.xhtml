@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="entregaMercanciaForm">
+		<p:growl id="growl" life="7000" />
+		<p:fieldset legend="Entrada de documento" style="margin-bottom:20px">
+			<h:panelGrid columns="2" cellpadding="5">
+				<p:outputLabel value="N° Documento" />
+				<p:inputText value="#{entregaMercancias.documento}"
+						id="codBarras_input1" >
+						<p:ajax event="keyup" partialSubmit="true"
+							onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
+							listener="#{entregaMercancias.buscarDocumentoCodBarras()}"
+							update="detalles,peso_docu,total_docu,esdato_documento" />
+					</p:inputText>
+			</h:panelGrid>
+		</p:fieldset>
+		<p:fieldset legend="Detalle documento" style="margin-bottom:20px">
+			<h:panelGrid columns="2" cellpadding="5">
+				<h:outputLabel value="Total:" />
+				<h:outputLabel value="#{entregaMercancias.total}"
+						id="total_docu">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</h:outputLabel>
+				<h:outputLabel value="Peso:" />
+				
+				<h:outputLabel value="#{entregaMercancias.peso}"
+						id="peso_docu" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="Kg" />		
+				</h:outputLabel>
+				<h:outputLabel value="Cliente:" />
+				<h:outputLabel value="#{entregaMercancias.cliente}" />
+				<h:outputLabel value="Estado Doc.:" />
+				<h:outputLabel value="#{entregaMercancias.estadoEntrega}" style="color:red"
+						id="esdato_documento" />
+			</h:panelGrid>
+		</p:fieldset>
+
+		<p:dataTable var="docu" id="detalles" scrollable="true" emptyMessage="No existen productos disponibles"
+			scrollHeight="150" value="#{entregaMercancias.documentoDetalleList}">
+			<p:column headerText="Código">
+				<h:outputText value="#{docu.productoId.productoId}" />
+			</p:column>
+
+			<p:column headerText="Artículo">
+				<h:outputText value="#{docu.productoId.nombre}" />
+			</p:column>
+
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{docu.cantidad}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="" />
+				</h:outputText>
+			</p:column>
+
+			<p:column headerText="Unitario">
+				<h:outputText value="#{docu.productoId.costoPublico}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Parcial">
+				<h:outputText value="#{docu.parcial}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+		</p:dataTable>		
+		<p:blockUI block="entregaMercanciaForm" widgetVar="bui">
+					CARGANDO<br />
+			<p:graphicImage url="/images/bloqBar.gif" />
+		</p:blockUI>
+	</h:form>
+	<p:dialog widgetVar="codBodeguero" header="Ingresar Codigo Bodeguero"
+		closeOnEscape="false" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/actividad/entregaMercancia/codBodeguero.xhtml" />
+		</div>
+	</p:dialog>
+</ui:composition>

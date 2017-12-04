@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function teclasNewProducto(evento,element){	
+/////////////////////TECLA ENTER y TECLA ABAJO ///////////////////////////////////////////////
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)
+		if( evento.keyCode==13||evento.keyCode==40){ //cuando se presiona la tacla abajo 		
+			
+			if(elec=='nuevoProductoForm:articuloNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:costoNew_input').focus();
+				document.getElementById('nuevoProductoForm:costoNew_input').select();
+				return "";
+				
+			}
+			if(elec=='nuevoProductoForm:costoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:publicoNew_input').focus();
+				document.getElementById('nuevoProductoForm:publicoNew_input').select();
+				return "";			
+			}
+			if(document.activeElement.name=="nuevoProductoForm:publicoNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:ivaNew_input').focus();
+				document.getElementById('nuevoProductoForm:ivaNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:ivaNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:hipoconsumoNew_input').focus();
+				document.getElementById('nuevoProductoForm:hipoconsumoNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:hipoconsumoNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:stockMinNew_input').focus();
+				document.getElementById('nuevoProductoForm:stockMinNew_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="nuevoProductoForm:stockMinNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:stockMaxNew_input').focus();
+				document.getElementById('nuevoProductoForm:stockMaxNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:stockMaxNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:grupoNew_input').focus();
+				document.getElementById('nuevoProductoForm:grupoNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:grupoNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:marcaNew_input').focus();
+				document.getElementById('nuevoProductoForm:marcaNew_input').select();
+				return "";
+			}
+			if(elec=="nuevoProductoForm:marcaNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:proveedorNew_input').focus();
+				document.getElementById('nuevoProductoForm:proveedorNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:proveedorNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').focus();
+				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:codigoBarrasNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:pesoKgNew_input').focus();
+				document.getElementById('nuevoProductoForm:pesoKgNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:pesoKgNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:unidadNew').focus();
+				document.getElementById('nuevoProductoForm:unidadNew').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:unidadNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:valanzaNew').focus();
+				document.getElementById('nuevoProductoForm:valanzaNew').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:valanzaNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:variosaNew').focus();
+				document.getElementById('nuevoProductoForm:variosaNew').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:variosaNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:subProductoNew').focus();
+				document.getElementById('nuevoProductoForm:subProductoNew').select();
+				return "";
+			}
+			
+			
+		}
+		
+	/////////////////////FIN TECLA ENTER///////////////////////////////////////////////
+	
+			 /////////////////////TECLA ARRIBA///////////////////////////////////////////////
+		if(evento.keyCode==38){ //cuando se presiona la tacla ARRIBA 		
+			if(elec=='nuevoProductoForm:costoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:articuloNew').focus();
+				document.getElementById('nuevoProductoForm:articuloNew').select();
+				return "";
+				
+			}
+			if(elec=='nuevoProductoForm:publicoNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:costoNew_input').focus();
+				document.getElementById('nuevoProductoForm:costoNew_input').select();
+				return "";			
+			}
+			if(document.activeElement.name=="nuevoProductoForm:ivaNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:publicoNew_input').focus();
+				document.getElementById('nuevoProductoForm:publicoNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:stockMinNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:ivaNew_input').focus();
+				document.getElementById('nuevoProductoForm:ivaNew_input').select();
+				return "";
+			}
+			
+			if(document.activeElement.name=="nuevoProductoForm:stockMaxNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:stockMinNew_input').focus();
+				document.getElementById('nuevoProductoForm:stockMinNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:grupoNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:stockMaxNew_input').focus();
+				document.getElementById('nuevoProductoForm:stockMaxNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:marcaNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:grupoNew_input').focus();
+				document.getElementById('nuevoProductoForm:grupoNew_input').select();
+				return "";
+			}
+			if(elec=="nuevoProductoForm:proveedorNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:marcaNew_input').focus();
+				document.getElementById('nuevoProductoForm:marcaNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:codigoBarrasNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:proveedorNew_input').focus();
+				document.getElementById('nuevoProductoForm:proveedorNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:pesoKgNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').focus();
+				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:unidadNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:pesoKgNew_input').focus();
+				document.getElementById('nuevoProductoForm:pesoKgNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:valanzaNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:unidadNew').focus();
+				document.getElementById('nuevoProductoForm:unidadNew').select();
+				return "";
+			}
+				
+			if(document.activeElement.name=="nuevoProductoForm:variosaNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:valanzaNew').focus();
+				document.getElementById('nuevoProductoForm:valanzaNew').select();
+				return "";
+			}
+			
+		}
+	/////////////////////FIN TECLA ABAJO///////////////////////////////////////////////		
+///////////////////// TECLA SCAPE///////////////////////////////////////////////
+		if(evento.keyCode==27){ //cuando se presiona la tacla ARRIBA 		
+			document.getElementById('deseaGuardar').style.display='inline';
+			document.getElementById('nuevoProductoForm:guardar_input').focus();
+			document.getElementById('nuevoProductoForm:guardar_input').select();					
+		}	
+	
+	}
+	function fnomber(element){
+		if(document.getElementById('nuevoProductoForm:articuloNew').value==''){
+			document.getElementById('nuevoProductoForm:articuloNew').focus();
+			document.getElementById('nuevoProductoForm:articuloNew').select();
+			document.getElementById('nuevoProductoForm:articuloNew').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';
+		}			
+	}
+	</script>
+	<!-- 	<p:focus for="nuevoProductoForm:articuloNew" /> -->
+	<h:form id="nuevoProductoForm">
+		<p:growl id="growl1" life="7000" />
+		<table width="100%" align="left">
+			<tr>
+				<td><p:outputLabel value="Codigo: #{movimientoMes.codigoNew}" /></td>
+				<td><p:spacer width="200px" height="0px"></p:spacer> <p:outputLabel
+						value="Fecha Ing.:" /></td>
+				<td><p:outputLabel value="#{movimientoMes.fechaIngreso}"
+						id="fechaIngreso">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</p:outputLabel></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Artículo:" /></td>
+				<td><p:inputText value="#{movimientoMes.articuloNew}" size="30"
+						onselect="fnomber(this)" maxlength="200"
+						onkeyup="teclasNewProducto(event,this)" id="articuloNew">
+						<!-- 					<p:ajax event="blur" partialSubmit="true" /> -->
+					</p:inputText></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Costo:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.costoNew}" size="15"
+						maxlength="20" onkeyup="teclasNewProducto(event,this)"
+						id="costoNew">
+						<!-- 					<p:ajax event="keyup" partialSubmit="true"/> -->
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td width="20%"><p:outputLabel value="Publico: " /></td>
+				<td width="20"><p:inputNumber
+						value="#{movimientoMes.publicoNew}" size="15" maxlength="20"
+						onkeyup="teclasNewProducto(event,this)" id="publicoNew">
+						<!-- 				<p:ajax event="keyup" partialSubmit="true"/> -->
+					</p:inputNumber></td>
+
+			</tr>
+			<tr>
+				<td><p:outputLabel value="I.V.A.:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.ivaNew}" size="15"
+						maxlength="5" onkeyup="teclasNewProducto(event,this)" id="ivaNew">
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Hipoconsumo:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.hipoconsumo}"
+						size="15" maxlength="5" onkeyup="teclasNewProducto(event,this)"
+						id="hipoconsumoNew">
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Stock Min:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.stockMinNew}"
+						size="15" maxlength="10" onkeyup="teclasNewProducto(event,this)"
+						id="stockMinNew">
+						<!-- 				<p:ajax event="keyup" partialSubmit="true"/> -->
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Stock Max:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.stockMaxNew}"
+						size="15" maxlength="10" onkeyup="teclasNewProducto(event,this)"
+						id="stockMaxNew">
+						<!-- 					<p:ajax event="keyup" partialSubmit="true"/> -->
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Grupo:" /></td>
+				<td>
+				<p:autoComplete id="grupoNew"
+						value="#{movimientoMes.grupoNew}" size="15"
+						onkeyup="teclasNewProducto(event,this)"
+						completeMethod="#{movimientoMes.completeTextGrupo}"
+						maxResults="10" forceSelection="true" minQueryLength="2"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{grupoConverter}">
+						<p:ajax event="itemSelect" process="@this,grupoNew" />
+					</p:autoComplete>
+				
+			</td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Marca:" /></td>
+				<td><p:autoComplete id="marcaNew"
+						value="#{movimientoMes.marcaNew}" size="15"
+						onkeyup="teclasNewProducto(event,this)"
+						completeMethod="#{movimientoMes.completeTextMarca}"
+						maxResults="10" forceSelection="true" minQueryLength="2"
+						var="name" itemValue="#{name1}" itemLabel="#{name1.nombre}"
+						converter="#{marcaConverter}">
+						<p:ajax event="itemSelect" process="@this,marcaNew" />
+					</p:autoComplete></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Proveedor:" /></td>
+				<td><p:autoComplete id="proveedorNew"
+						value="#{movimientoMes.proveedorNew}" size="15"
+						onkeyup="teclasNewProducto(event,this)"
+						completeMethod="#{movimientoMes.completeTextProveedor}"
+						maxResults="10" forceSelection="true" minQueryLength="1"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{proveedorConverter}">
+						<p:ajax event="itemSelect" process="@this,proveedorNew" />
+					</p:autoComplete></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Cod. Barras:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.codigoBarrasNew}"
+						size="15" onkeyup="teclasNewProducto(event,this)"
+						id="codigoBarrasNew">
+						<!-- 					<p:ajax event="keyup" partialSubmit="true" /> -->
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Peso Kg:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.pesoKgNew}" size="15"
+						maxlength="3" onkeyup="teclasNewProducto(event,this)"
+						id="pesoKgNew">
+						<!-- 					<p:ajax event="keyup" partialSubmit="true" /> -->
+					</p:inputNumber></td>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<td><p:outputLabel value="Unidad:" /></td>
+				<td><p:inputText value="#{movimientoMes.unidadNew}" size="1"
+						maxlength="1" onkeyup="teclasNewProducto(event,this)"
+						id="unidadNew">
+					</p:inputText></td>
+				<td><p:outputLabel value="Balanza:" /></td>
+				<td><p:inputText value="#{movimientoMes.valanzaNew}" size="1"
+						maxlength="1" onkeyup="teclasNewProducto(event,this)"
+						id="valanzaNew">
+					</p:inputText></td>
+				<td><p:outputLabel value="Varios:" /></td>
+				<td><p:inputText value="#{movimientoMes.variosNew}" size="1"
+						maxlength="1" onkeyup="teclasNewProducto(event,this)"
+						id="variosaNew">
+					</p:inputText></td>
+					<td><p:outputLabel value="Sub-Producto:" /></td>
+				<td><p:inputText value="#{movimientoMes.subProductoNew}" size="1"
+						maxlength="1" onkeyup="teclasNewProducto(event,this)"
+						id="subProductoNew">
+					</p:inputText></td>
+			</tr>
+		</table>
+		<table width="100%" align="left" style="display: none;"
+			id="deseaGuardar">
+			<tr>
+				<td><p:outputLabel value="Desea Guardar el Producto: " /></td>
+				<td><p:inputText value="#{movimientoMes.crearNew}"
+						maxlength="1" id="guardar_input" size="3"
+						onkeyup="teclasNewProducto(event.this)">
+						<p:ajax event="keydown" partialSubmit="true" delay="30"
+							process="@form" listener="#{movimientoMes.crearNewProducto}"
+							update="growl1" />
+					</p:inputText></td>
+
+			</tr>
+		</table>
+	</h:form>
+
+</ui:composition>

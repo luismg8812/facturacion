@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="subProductosForm">
+	<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Producto:" /></td>
+				<td><p:selectOneMenu id="advanced"
+						value="#{subProductos.productoPadre}" panelStyle="width:180px"
+						effect="fade" style="width:160px" filter="true"
+						filterMatchMode="startsWith">
+						<f:selectItem itemLabel="Seleccione" itemValue="" />
+						<f:selectItems value="#{subProductos.productosList}" var="pro"
+							itemLabel="#{pro.nombre}" itemValue="#{pro.productoId}" />
+							<p:ajax event="change" listener="#{subProductos.subProductoPorProducto}" update="subProductos" process="@this"/> 
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Sub-Producto:" /></td>
+				<td><p:selectOneMenu id="hijos"
+						value="#{subProductos.productoHijo}" panelStyle="width:180px"
+						effect="fade" style="width:160px" filter="true"
+						filterMatchMode="startsWith">
+						<f:selectItem itemLabel="Seleccione" itemValue="" />
+						<f:selectItems value="#{subProductos.productosHijoList}" var="pro"
+							itemLabel="#{pro.nombre}" itemValue="#{pro.productoId}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Cantidad:" /></td>
+				<td><p:inputNumber value="#{subProductos.cantidad}"></p:inputNumber> </td>
+			</tr>
+		</table>
+		<table width="100%" align="center">
+			<p:commandButton value="Agregar" process="@form" action="#{subProductos.agregar()}"  update="growl1,subProductos"></p:commandButton>
+			<p:commandButton value="Refrescar"  update="subProductos"></p:commandButton>
+		</table>
+		<p:dataTable var="car" value="#{subProductos.subProductosList}" id="subProductos">
+			<p:column headerText="Opciones">
+				<p:commandButton value="Borrar" action="#{subProductos.borrar(car)}"  update="growl1,subProductos"></p:commandButton>
+			</p:column>
+			<p:column headerText="Producto">
+				<h:outputText value="#{car.productoPadre.nombre}" />
+			</p:column>
+			<p:column headerText="Sub-producto">
+				<h:outputText value="#{car.productoHijo.nombre}" />
+			</p:column>
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{car.cantidad}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+
+
+</ui:composition>

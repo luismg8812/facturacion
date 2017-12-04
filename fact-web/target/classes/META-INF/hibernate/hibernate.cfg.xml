@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory name="oracle">
+        <property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+        <property name="hibernate.connection.password">nuevof</property>
+        <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:xe</property>
+        <property name="hibernate.connection.username">facturacion</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+    	<mapping class="com.fact.model.Usuario" />
+    	<mapping class="com.fact.model.Menu" />
+    	<mapping class="com.fact.model.OpcionUsuario" />
+    	<mapping class="com.fact.model.Rol" />
+    	<mapping class="com.fact.model.SubMenu" />
+    	<mapping class="com.fact.model.TipoDocumento" />
+    	<mapping class="com.fact.model.Documento" />
+    	<mapping class="com.fact.model.Proveedor" />
+    	<mapping class="com.fact.model.Producto" />
+    	<mapping class="com.fact.model.Grupo" />
+    	<mapping class="com.fact.model.DocumentoDetalle" />
+    	<mapping class="com.fact.model.Empresa" />
+    	<mapping class="com.fact.model.Ciudad" />
+    	<mapping class="com.fact.model.Departamento" />
+    	<mapping class="com.fact.model.Abono" />
+    	<mapping class="com.fact.model.TipoPago" />
+    	<mapping class="com.fact.model.Cliente" />
+    	<mapping class="com.fact.model.Cliente" />
+    	<mapping class="com.fact.model.InfoDiario" />
+    	<mapping class="com.fact.model.DocumentoReducido" />
+    	<mapping class="com.fact.model.Configuracion" />
+    	<mapping class="com.fact.model.Marca" />
+    	<mapping class="com.fact.model.Evento" />
+    	<mapping class="com.fact.model.TipoEvento" />
+    	<mapping class="com.fact.model.EntregaMercancia" />
+    	<mapping class="com.fact.model.Empleado" />
+    	<mapping class="com.fact.model.SubProducto" />
+    </session-factory>
+</hibernate-configuration>

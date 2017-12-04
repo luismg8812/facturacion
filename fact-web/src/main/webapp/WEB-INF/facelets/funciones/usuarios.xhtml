@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function salirUsuario(){
+		PF('usuarios_sistema').hide();
+		ruta='';
+		document.getElementById('menuPrincipal:m_1_menuButton').focus();
+	}
+	</script>
+	<h:form id="creacionUsuarios">
+		<p:growl id="growl1" life="7000" />
+		<p:accordionPanel id="acord">
+			<p:tab title="Creación" id="guardarTab">
+			<h:form id="editarForm">
+				<table width="80%" align="center">
+					<tr>
+						<td><p:outputLabel value="Rol:" /></td>
+						<td><p:selectOneMenu value="#{usuarios.rol}">
+								<f:selectItem itemLabel="Seccionar Rol" itemValue="0" />
+								<f:selectItems value="#{usuarios.roles}"
+									noSelectionValue="Seleccione Rol" var="rol"
+									itemLabel="#{rol.nombre}" itemValue="#{rol.rolId}" />
+							</p:selectOneMenu></td>
+						<td><p:outputLabel value="Nombre: " /></td>
+						<td><p:inputText value="#{usuarios.nombre}">
+							</p:inputText></td>
+						<td><p:outputLabel value="Apellido: " /></td>
+						<td><p:inputText value="#{usuarios.apellido}">
+							</p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Correo:" /></td>
+						<td><p:inputText value="#{usuarios.correo}">
+							</p:inputText></td>
+						<td><p:outputLabel value="Clave:" /></td>
+						<td><p:password value="#{usuarios.clave}">
+							</p:password></td>
+						<td><p:outputLabel value="Identificación:" /></td>
+						<td><p:inputNumber value="#{usuarios.identificacion}">
+							</p:inputNumber></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Acvitar usuario: " /></td>
+						<td><p:selectBooleanCheckbox value="#{usuarios.activo}">
+							</p:selectBooleanCheckbox></td>
+						<td><p:outputLabel value="Login: " /></td>
+						<td><p:inputText value="#{usuarios.login}" id="loginGuardar">
+							</p:inputText></td>
+						<td></td>
+						<td><p:commandButton value="Guardar" id="guardarBotton"  process="@form" 
+						update="growl1,creacionUsuarios:acord:guardarForm:usuarioEdictSelect,creacionUsuarios:acord:usuarioSelect" 
+						 actionListener ="#{usuarios.guardarUsuario}">
+							</p:commandButton>
+							<p:commandButton value="Salir" onclick="salirUsuarios" /></td>
+					</tr>
+<!-- 					guardarForm:usuarioEdictSelect, guardarForm:usuarioSelect -->
+				</table>
+			</h:form>
+			<p:blockUI block="guardarTab" trigger="editarForm:guardarBotton" >
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif"/>
+					</p:blockUI>
+			</p:tab>
+			<p:tab title="Edición" id="editarTab">
+			<h:form id="guardarForm">
+				<table width="80%" align="center">
+					<tr>
+						<td><p:selectOneMenu value="#{usuarios.usuarioSelect}" id="usuarioEdictSelect">
+								<f:selectItem itemLabel="Seccionar Usuario" itemValue="0" />
+								<f:selectItems value="#{usuarios.usuarios}" var="usuario"
+									itemLabel="#{usuario.nombre} #{usuario.apellido} - #{usuario.login}"
+									itemValue="#{usuario.usuarioId}" />
+								<p:ajax event="change" partialSubmit="true"
+									listener="#{usuarios.llenarCampos()}"
+									update="growl1,rolEdict,nombreEdict,apellidoEdict,correoEdict,passEdict,identificacionEdict,estadoEdict,loginEdict" />
+							</p:selectOneMenu></td>
+					</tr>
+				</table>
+				<table width="80%" align="center">
+					<tr>
+						<td><p:outputLabel value="Rol:" /></td>
+						<td><p:selectOneMenu value="#{usuarios.rol}" id="rolEdict"
+								onchange="alert(this.value)">
+								<f:selectItem itemLabel="Seccionar Rol" itemValue="0" />
+								<f:selectItems value="#{usuarios.roles}"
+									noSelectionValue="Seleccione Rol" var="rol"
+									itemLabel="#{rol.nombre}" itemValue="#{rol.rolId}" />
+								<p:ajax event="change" partialSubmit="true" />
+							</p:selectOneMenu></td>
+						<td><p:outputLabel value="Nombre: " /></td>
+						<td><p:inputText id="nombreEdict" value="#{usuarios.nombre}">
+								<p:ajax event="keyup" partialSubmit="true" />
+							</p:inputText></td>
+						<td><p:outputLabel value="Apellido: " /></td>
+						<td><p:inputText value="#{usuarios.apellido}"
+								id="apellidoEdict">
+								<p:ajax event="keyup" partialSubmit="true" />
+							</p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Correo:" /></td>
+						<td><p:inputText value="#{usuarios.correo}" id="correoEdict">
+								<p:ajax event="keyup" partialSubmit="true" />
+							</p:inputText></td>
+						<td><p:outputLabel value="Clave:" /></td>
+						<td><p:password value="#{usuarios.clave}" id="passEdict">
+								<p:ajax event="keyup" partialSubmit="true" />
+						 </p:password>	</td>
+						<td><p:outputLabel value="Identificación:" /></td>
+						<td><p:inputNumber value="#{usuarios.identificacion}"
+								id="identificacionEdict">
+								<p:ajax event="keyup" partialSubmit="true" />
+							</p:inputNumber></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Estado: " /></td>
+						<td><p:selectBooleanCheckbox value="#{usuarios.activo}"
+								id="estadoEdict">
+								<p:ajax partialSubmit="true" />
+							</p:selectBooleanCheckbox></td>
+						<td><p:outputLabel value="Login: " /></td>
+						<td><p:inputText value="#{usuarios.login}" id="loginEdict">
+								<p:ajax event="keyup" partialSubmit="true" />
+							</p:inputText></td>
+						<td></td>
+						<td><p:commandButton value="Guardar" id="editarUsuaririoButon" process="@form" 
+											actionListener="#{usuarios.editarUsuario()}" 
+											update="growl1,rolEdict,nombreEdict,apellidoEdict,correoEdict,passEdict,identificacionEdict,estadoEdict,loginEdict" >									
+							</p:commandButton>
+							<p:commandButton value="Salir" onclick="salirUsuarios"/></td>
+					</tr>			
+				</table>			
+			</h:form>
+			<p:blockUI block="editarTab" trigger="guardarForm:editarUsuaririoButon" >
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif"/>
+					</p:blockUI>
+			</p:tab>
+			
+			<p:tab title="Accesos de usuarios" id="accesosTab">
+				<table width="90%" align="left">
+					<tr>
+						<td><p:selectOneMenu value="#{usuarios.usuarioOpcion}" id="usuarioSelect">
+								<f:selectItem itemLabel="Seccionar Usuario" itemValue="0" />
+								<f:selectItems value="#{usuarios.usuarios}" var="usuario"
+									itemLabel="#{usuario.nombre} #{usuario.apellido} - #{usuario.login}"
+									itemValue="#{usuario.usuarioId}" />
+								<p:ajax event="change" partialSubmit="true"
+									listener="#{usuarios.llenarOpciones()}"
+									update="growl1,grid" />
+							</p:selectOneMenu></td>
+					</tr>
+					<tr>
+						<td><p:selectManyCheckbox id="grid"
+								value="#{usuarios.subMenuSelect}" layout="grid" columns="3">
+								<f:selectItems value="#{usuarios.subMenuSource}" var="sub"
+									itemLabel="#{sub.nombre}" itemValue="#{sub.subMenuId}" />
+							</p:selectManyCheckbox></td>
+					</tr>
+					<tr>
+						<td>
+							<p:commandButton value="Guardar" id="accesosButon" action="#{usuarios.guardarOpciones()}" update="growl1">
+							</p:commandButton>
+							<p:commandButton value="Salir" onclick="salirUsuarios"/>
+						</td>
+					</tr>
+					<p:blockUI block="accesosTab" trigger="accesosButon" >
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif"/>
+					</p:blockUI>
+				</table>
+			</p:tab>
+		</p:accordionPanel>
+	</h:form>
+</ui:composition>

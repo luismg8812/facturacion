@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="gruposForm">
+	<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Grupo:" /></td>
+				<td><p:selectOneMenu value="#{grupos.grupoId}" id="grupoId">
+						<f:selectItem itemLabel="Seccionar Grupo" itemValue="" />
+						<f:selectItems value="#{grupos.grupos}" var="gru"
+							itemLabel="#{gru.nombre}" itemValue="#{gru.grupoId}" />
+					</p:selectOneMenu></td>
+			</tr>
+		</table>
+		<table width="100%" align="center">
+			<p:commandButton value="Crear Grupo" action="#{grupos.crearGrupo()}" update="grupos,growl1,gruposForm:crearGrupo1" />
+			<p:commandButton value="Buscar" action="#{grupos.buscar}" update="grupos" />
+		</table>
+		<p:dataTable var="gru" value="#{grupos.gruposList}" id="grupos"
+			emptyMessage="No se encontraron grupos">
+			<p:column headerText="Opciones">
+				<p:commandButton value="Editar" action="#{grupos.editarGrupo(gru)}" update="gruposForm:crearGrupo1"/>
+				<p:commandButton value="Eliminar" action="#{grupos.eliminar(gru)}" update="grupos">
+					<p:confirm header="Confirmation" message="Si elimina el grupo se desvinculara todos los productos los cuales esten asociados a este grupo, Esta seguro de querer eliminarlo?" icon="ui-icon-alert" />
+				</p:commandButton>
+			</p:column>
+			<p:column headerText="nombre">
+				<h:outputText value="#{gru.nombre}" />
+			</p:column>
+			<p:column headerText="Código">
+				<h:outputText value="#{gru.codigo}" />
+			</p:column>
+		</p:dataTable>
+		<p:dialog widgetVar="crearGrupo" header="Crear Grupo" id="crearGrupo1"
+			closeOnEscape="true" showEffect="fade" resizable="false">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/clientes/grupos/crearGrupo.xhtml" />
+			</div>
+		</p:dialog>
+		 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+    </p:confirmDialog>
+	</h:form>
+
+</ui:composition>

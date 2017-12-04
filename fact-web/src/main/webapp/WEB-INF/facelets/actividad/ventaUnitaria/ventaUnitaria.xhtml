@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+<h:form id="ventaUnitariaId">
+	<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="Producto:" /></td>
+			<td>
+				<p:autoComplete id="art_11"
+						value="#{ventaUnitaria.articulo}"
+						emptyMessage="No se encontró el producto" size="38"
+						minQueryLength="3"
+						completeMethod="#{puntoVentaDia.completeText}" maxResults="11"
+						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
+						converter="#{productoConverter}">
+						<p:ajax event="itemSelect"
+							listener="#{puntoVentaDia.buscarProducto}" process="@this,art_11"
+							immediate="true"
+							/>
+						<p:column>
+							<p:outputLabel value="#{name.nombre}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Cod. Producto: #{name.productoId}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="Existencia: #{name.cantidad}" />
+						</p:column>
+						<p:column>
+							<p:outputLabel value="#{name.costoPublico}" />
+						</p:column>
+					</p:autoComplete>
+			</td>
+			<td><p:outputLabel value="Detalle:" /></td>
+			<td><p:inputText /></td>
+		</tr>	
+		<tr>
+			<td><p:outputLabel value="Cliente: " /></td>
+			<td> <p:selectOneMenu id="cliente" value="#{ventaUnitaria.cliente}" converter="#{clienteConverter}" panelStyle="width:280px"
+                         effect="fade" var="t" style="width:160px" filter="true" filterMatchMode="startsWith">
+            <f:selectItems value="#{clientes.clientes}" var="theme" itemLabel="#{theme.nombre}" itemValue="#{theme}" />
+ 
+            <p:column >
+                <h:outputText value="#{t.nombre}" />
+            </p:column>
+ 
+            <p:column>
+                <h:outputText value="#{t.documento}" />
+            </p:column>
+        </p:selectOneMenu></td>
+		</tr>	
+	</table>
+</h:form>
+</ui:composition>

@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function salirCliente(){
+		PF('clientes').hide();
+		ruta='';
+		document.getElementById('menuPrincipal:m_1_menuButton').focus();
+	}
+	</script>
+	<h:form id="clientesForm">
+		<p:growl id="growl1" life="7000" />
+		<p:accordionPanel id="acord">
+			<p:tab title="Creación" id="guardarTab">
+			<h:form id="editarForm">
+				<table width="80%" align="center">
+					<tr>
+						<td><p:outputLabel value="Nombre:" /></td>
+						<td><p:inputText value="#{clientes.nombre}"/></td>
+						<td><p:outputLabel value="Documento: " /></td>
+						<td><p:inputNumber value="#{clientes.documento}" /></td>
+						<td><p:outputLabel value="Departamento " /></td>
+						<td><p:selectOneMenu value="#{clientes.departamento}"  >
+								<p:ajax event="change" listener="#{clientes.ciudadByDepartamento}" update="ciudad"/> 
+								<f:selectItem itemLabel="Seccionar Departamento" itemValue="0" />
+								<f:selectItems value="#{clientes.departamentos}"
+									noSelectionValue="Seleccione Departamento" var="dep"
+									itemLabel="#{dep.nombre}" itemValue="#{dep.departamentoId}" />
+							</p:selectOneMenu></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Ciudad:" /></td>
+						<td><p:selectOneMenu value="#{clientes.ciudad}" id="ciudad">
+								<f:selectItem itemLabel="Seccionar Ciudad" itemValue="0" />
+								<f:selectItems value="#{clientes.ciudades}"
+									noSelectionValue="Seleccione Ciudad" var="ciudad"
+									itemLabel="#{ciudad.nombre}" itemValue="#{ciudad.ciudadId}" />
+							</p:selectOneMenu></td>
+						<td><p:outputLabel value="Barrio:" /></td>
+						<td><p:inputText value="#{clientes.barrio}">
+							</p:inputText></td>
+						<td><p:outputLabel value="Dirección:" /></td>
+						<td><p:inputText value="#{clientes.direccion}">
+							</p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Celular:" /></td>
+						<td><p:inputNumber value="#{clientes.celular}"/></td>
+						<td><p:outputLabel value="Fijo: " /></td>
+						<td><p:inputNumber value="#{clientes.fijo}" /></td>
+						<td><p:outputLabel value="Cumpleaños:" /></td>
+						<td><p:calendar id="mask" value="#{clientes.cumpleaños}" pattern="dd-MM-yyyy" mask="true" /></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Credito Activo: " /></td>
+						<td><p:selectBooleanButton id="value1" value="#{clientes.creditoActivo}"
+						 onLabel="Si" offLabel="No"  />
+ 						</td>
+						<td><p:outputLabel value="Cupo Credito: " /></td>
+						<td><p:inputNumber value="#{clientes.cupoCredito}"/></td>
+						<td><p:outputLabel value="retención" /></td>
+						<td><p:inputNumber value="#{clientes.retencion}" />
+							</td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Guia Trans.: " /></td>
+						<td><p:selectBooleanButton id="guiaNew" value="#{clientes.guiaTrasnsporte}"
+						 onLabel="Si" offLabel="No"  />
+ 						</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><p:commandButton value="Guardar" id="guardarBotton"  process="@form" 
+						update="@form,growl1,clientesForm:acord:guardarForm:clienteEdictSelect" 
+						 actionListener ="#{clientes.guardarCliente}">
+							</p:commandButton>
+							<p:commandButton value="Salir" onclick="salirUsuarios" /></td>
+					</tr>
+<!-- 					guardarForm:usuarioEdictSelect, guardarForm:usuarioSelect -->
+				</table>
+			</h:form>
+			<p:blockUI block="guardarTab" trigger="editarForm:guardarBotton" >
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif"/>
+					</p:blockUI>
+			</p:tab>
+			<p:tab title="Edición" id="editarTab">
+			<h:form id="guardarForm">
+				<table width="80%" align="center">
+					<tr>
+						<td><p:selectOneMenu value="#{clientes.clienteId}" id="clienteEdictSelect">
+								<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
+								<f:selectItems value="#{clientes.clientes}" var="prov"
+									itemLabel="#{prov.nombre}"
+									itemValue="#{prov.clienteId}" />
+								<p:ajax event="change" partialSubmit="true"
+									listener="#{clientes.llenarCampos()}"
+									update="growl1,nombreEdit,documentoEdit,departamentoEdit,ciudadEdit,barrioEdit,
+									celularIdit,fijoEdit,mask,creditoActivoEdit,cupoCreditoEdit,retencionEdit,direccionEdit,guiaEdit" />
+							</p:selectOneMenu></td>
+					</tr>
+				</table>
+				<table width="80%" align="center">
+					<tr>
+						<td><p:outputLabel value="Nombre:" /></td>
+						<td><p:inputText value="#{clientes.nombre}" id="nombreEdit"/></td>
+						<td><p:outputLabel value="Documento: " /></td>
+						<td><p:inputText value="#{clientes.documento}" id="documentoEdit"/></td>
+						<td><p:outputLabel value="Departamento " /></td>
+						<td><p:selectOneMenu value="#{clientes.departamento}"  id="departamentoEdit">
+								<p:ajax event="change" listener="#{clientes.ciudadByDepartamento}" update="ciudadEdit"/> 
+								<f:selectItem itemLabel="Seccionar Departamento" itemValue="0" />
+								<f:selectItems value="#{clientes.departamentos}"
+									noSelectionValue="Seleccione Departamento" var="dep"
+									itemLabel="#{dep.nombre}" itemValue="#{dep.departamentoId}" />
+							</p:selectOneMenu></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Ciudad:" /></td>
+						<td><p:selectOneMenu value="#{clientes.ciudad}" id="ciudadEdit">
+								<f:selectItem itemLabel="Seccionar Ciudad" itemValue="0" />
+								<f:selectItems value="#{clientes.ciudades}"
+									noSelectionValue="Seleccione Ciudad" var="ciudad"
+									itemLabel="#{ciudad.nombre}" itemValue="#{ciudad.ciudadId}" />
+							</p:selectOneMenu></td>
+						<td><p:outputLabel value="Barrio:" /></td>
+						<td><p:inputText value="#{clientes.barrio}" id="barrioEdit">
+							</p:inputText></td>
+						<td><p:outputLabel value="Dirección:" /></td>
+						<td><p:inputText value="#{clientes.direccion}" id="direccionEdit">
+							</p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Celular:" /></td>
+						<td><p:inputNumber value="#{clientes.celular}" id="celularIdit"/></td>
+						<td><p:outputLabel value="Fijo: " /></td>
+						<td><p:inputNumber value="#{clientes.fijo}" id="fijoEdit"/></td>
+						<td><p:outputLabel value="Cumpleaños:" /></td>
+						<td><p:calendar id="mask" value="#{clientes.cumpleaños}" pattern="dd-MM-yyyy" mask="true" /></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Credito Activo: " /></td>
+						<td><p:selectBooleanButton id="creditoActivoEdit" value="#{clientes.creditoActivo}"
+						 onLabel="Si" offLabel="No"  />
+ 						</td>
+						<td><p:outputLabel value="Cupo Credito: " /></td>
+						<td><p:inputNumber value="#{clientes.cupoCredito}" id="cupoCreditoEdit"/></td>
+						<td><p:outputLabel value="retención" /></td>
+						<td><p:inputNumber value="#{clientes.retencion}"  id="retencionEdit"/>
+							</td>
+					</tr>
+					<tr>
+					<td><p:outputLabel value="Guia Trans.: " /></td>
+						<td><p:selectBooleanButton id="guiaEdit" value="#{clientes.guiaTrasnsporte}"
+						 onLabel="Si" offLabel="No"  />
+ 						</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><p:commandButton value="Guardar" id="editarUsuaririoButon"  process="@form" 
+						update="@form,growl1" 
+						 actionListener ="#{clientes.editarCliente}">
+							</p:commandButton>
+							<p:commandButton value="Salir" onclick="salirUsuarios" /></td>
+					</tr>
+<!-- 					guardarForm:usuarioEdictSelect, guardarForm:usuarioSelect -->
+				</table>			
+			</h:form>
+			<p:blockUI block="editarTab" trigger="guardarForm:editarUsuaririoButon" >
+					CARGANDO<br />
+						<p:graphicImage url="/images/bloqBar.gif"/>
+					</p:blockUI>
+			</p:tab>
+			
+			
+		</p:accordionPanel>
+	</h:form>
+</ui:composition>

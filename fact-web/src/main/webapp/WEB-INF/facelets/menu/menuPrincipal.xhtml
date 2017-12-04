@@ -1,0 +1,494 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<script type="text/javascript">
+	
+	var pagina="";
+	var con = 0;
+	var ruta =""; //esta variable controla la ruta de la opciones de submenu seleccionada
+	var focoCantidad = ""; //controla el foco de la input de cantidad en movimiento mes
+	var codigoBarras =0; //variable que controla si esta activo la busqueda por codigo de barras
+	var carteraClientes =0; //variable que controla si esta activo la cartera de clientes
+	var guiaFacturacion =0; //variable que controla si esta activo la facturacion, por remision, cotizacion y factura
+	var claveBorrado =0; //variable que controla si esta activo la solicitud de clave de borrado
+	var descuentos = 0; // variable que controla si esta activo los descuentos
+	var copiaFactura = 0; // variable que controla si esta activo los descuentos
+	var stock = 0; // variable que controla la activacion de stock max y min
+	var preciosSugeridos = 0;//variable que controlo pre suge en el inventario fisico 
+	var clienteObligatorio = 0;//variable que controlo pre suge en el inventario fisico 
+	var cambioPrecio=0; //variable que controla la activacion de cambio de precio
+	var descuentoEnFactura=0; //variable que controla si se visualiza el descuento o la factura o no
+	var bloqCuadreCaja=0; //variable que controla el bloq del cuadre de caja para los cajeros
+	var asignarEmpleadoFactura=0; //variable que controla la asignacion de los empleados a la factura
+	function info(elEvento) {
+		var texto = document.getElementById('menuPrincipal') //acceso al sitio de escritura
+        var evento = elEvento || window.event // definir objeto event
+        if(evento.keyCode==78){
+            if(pagina=="submenu"){
+                var  bloq= "";                                            	   	
+            }      	     
+        }
+/////////////////////TECLA ESCAPE///////////////////////////////////////////////
+        if(evento.keyCode==27){ //evento que controla la tecla es   
+        	 //alert(pagina); 
+        	//response.sendRedirect(request.getContextPath() + "/jsp/login.jsp")
+        	 if(ruta==""){
+ 	        	goIndex();    
+ 		    }   
+            if(pagina=="submenu"){//si pagina es igual sugmenu es por que esta activo el submenu 
+            	   // location.reload();	  
+            	    //ruta="";
+	        }
+	        //if(pagina=="tipoDocumento"){//si esta en tipo documento se cierra el popop		       
+	        //	document.getElementById("tipo_documento").style.display="none";
+	        //	document.getElementById('prod').style.display='none';
+        	//    document.getElementById('Sig_movi_mes').focus();
+        	//    pagina="submenu";
+	        //}
+	        if(pagina=="opcNuevo"){
+	        	  
+	        	document.getElementById('busquedaCodBarras').style.display='none';
+	        	document.getElementById('op_mov_mes_content').style.display='inline';
+	        	document.getElementById('prod').style.display='none';
+	        	document.getElementById('prodList').style.display='none';
+	        	document.getElementById('movMesForm:Sig_movi_mes').focus();
+	        	pagina="submenu";
+			}
+	        if(pagina=="creando_factura"){
+	        	document.getElementById('opciones:op_mov_mes1_content').style.display='inline';
+	        	document.getElementById('opciones:Sig_movi_mes1').focus();
+	        	document.getElementById('nuevoProducto').style.display='none';
+	        	pagina="submenu";
+		    }
+	        if(pagina=="borrando_factura"){
+	        	document.getElementById('opciones:op_mov_mes1_content').style.display='inline';
+	        	document.getElementById('opciones:Sig_movi_mes1').focus();
+	        	document.getElementById('nuevoProducto').style.display='none';
+	        	pagina="submenu";
+		    }
+	        if(pagina=="creando_facturaMM"){
+	        	document.getElementById('op_mov_mes_content').style.display='inline';
+	        	document.getElementById('movMesForm:Sig_movi_mes').focus();
+	        	document.getElementById('nuevoProducto').style.display='none';
+	        	pagina="submenu";
+		    }
+	        if(pagina=="borrando_facturaMM"){
+	        	document.getElementById('op_mov_mes_content').style.display='inline';
+	        	document.getElementById('movMesForm:Sig_movi_mes').focus();
+	        	document.getElementById('nuevoProducto').style.display='none';
+	        	pagina="submenu";
+		    }
+	        if(pagina=="imprimirFactura"){
+	        	document.getElementById('imprimir').style.display='none';  
+	        	document.getElementById('opciones:op_mov_mes1_content').style.display='none';
+	        	document.getElementById('busquedaCodBarras1').style.display='inline';
+				   document.getElementById('codBarras_input1').value=''
+				   document.getElementById('codBarras_input1').focus();        	
+	        	pagina="creando_factura";
+		    }
+	        if(pagina=="opc"){
+	        	document.getElementById('opciones:Sig_movi_mes1').focus();
+	    		pagina="submenu";      	
+		    }
+	        if(pagina=="creando_cliente"){
+	        	document.getElementById('deseaGuardarCliente').style.display='inline';
+				document.getElementById('nuevoClienteForm:guardar_input').focus();
+				document.getElementById('nuevoClienteForm:guardar_input').select();	
+				pagina="creando_factura";
+		    }    
+	    }
+/////////////////////FIN TECLA ESCAPE///////////////////////////////////////////////
+
+/////////////////////TECLA ENTER///////////////////////////////////////////////
+        if(evento.keyCode==13){  //evento que controlo cuando se preciona la tacla enter
+        	
+        	if(document.activeElement.name=="menuPrincipal:m_1_menuButton"){//deben agregarce todas las opciones del primer boton
+        		if(ruta=='movimiento_mes'){ //
+                	document.getElementById('movMesForm:Sig_movi_mes').focus();
+                	document.getElementById('titulo_opc').innerHTML = 'Localiza Siguiente Documento';
+                }
+                if(ruta=='punto_venta'){
+                    
+                   document.getElementById('opciones:Sig_movi_mes1').focus(); 
+                   document.getElementById("titulo_opc1").innerHTML='Localiza Siguiente Documento';
+                }
+                //... seguir asi con todas las opciones
+            }           
+        }
+        /////////////////////TECLA ABAJO///////////////////////////////////////////////
+		if(evento.keyCode==40){ //cuando se presiona la tacla abajo 		
+
+		}
+		/////////////////////FIN TECLA ABAJO///////////////////////////////////////////////
+		
+			//////////////////////TECLA LADO DERECHO///////////////////////////
+        if(evento.keyCode==39){// cuando se presiona la tecla a un lado derecho
+        	//*********control de teclas del menu principal*****************************
+        	if(document.activeElement.name=="menuPrincipal:m_1_menuButton"){
+        		document.getElementById('menuPrincipal:m_2_menuButton').focus();
+        		return "";
+            	}
+        	if(document.activeElement.name=="menuPrincipal:m_2_menuButton"){
+        		document.getElementById('menuPrincipal:m_3_menuButton').focus();
+        		return "";
+            	}
+        	if(document.activeElement.name=="menuPrincipal:m_3_menuButton"){
+        		document.getElementById('menuPrincipal:m_4_menuButton').focus();
+				return "";
+             	}
+        	if(document.activeElement.name=="menuPrincipal:m_4_menuButton"){
+        		document.getElementById('menuPrincipal:m_5_menuButton').focus();
+				return "";
+             	}
+        	if(document.activeElement.name=="menuPrincipal:m_5_menuButton"){
+        		document.getElementById('menuPrincipal:m_6_menuButton').focus();
+				return "";
+             	}
+         	//*********control de teclas del formulario movimiento mes dependiente de la opcion menu=1 
+         	//**************lado derecho
+        	if(document.activeElement.name=="movMesForm:Sig_movi_mes"){  //
+            	document.getElementById('movMesForm:Ant_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Localiza Anterior Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Ant_movi_mes"){  //
+            	document.getElementById('movMesForm:Pri_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Localiza Primer Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Pri_movi_mes"){  //
+            	document.getElementById('movMesForm:Ult_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Localiza Ultimo Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Ult_movi_mes"){  //
+            	document.getElementById('movMesForm:Bus_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Buscar Por Número Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Bus_movi_mes"){  //
+            	document.getElementById('movMesForm:P1_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = '';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P1_movi_mes"){  //
+            	document.getElementById('movMesForm:Mod_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Modifica El Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Mod_movi_mes"){  //
+            	document.getElementById('movMesForm:Gat_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Modifica Cabecera';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Gat_movi_mes"){  //
+            	document.getElementById('movMesForm:P2_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = '';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P2_movi_mes"){  //
+            	document.getElementById('movMesForm:New_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Crea Nuevos Documentos';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:New_movi_mes"){  //
+            	document.getElementById('movMesForm:P3_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = '';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P3_movi_mes"){  //
+            	document.getElementById('movMesForm:Imp_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Imprimir Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Imp_movi_mes"){  //
+            	document.getElementById('movMesForm:P4_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = '';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P4_movi_mes"){  //
+            	document.getElementById('movMesForm:Opc_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Opciones y Utilidades';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Opc_movi_mes"){  //
+            	document.getElementById('movMesForm:Fin_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Regresar al menú Principal';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Fin_movi_mes"){  //
+            	document.getElementById('movMesForm:Sig_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Localiza Siguiente Documento';
+    			return "";
+                }
+        	if(document.activeElement.name=="opciones:Opc_movi_mes1_menuButton"){  //
+	        	//alert(document.activeElement.name);
+            	document.getElementById('opciones:Fin_movi_mes1').focus();
+            	document.getElementById('titulo_opc1').innerHTML = 'Regresar al menú Principal';
+    			return "";
+                }
+            }
+        
+        
+		if(evento.keyCode==37){
+        	if(document.activeElement.name=="menuPrincipal:m_2_menuButton"){
+        		document.getElementById('menuPrincipal:m_1_menuButton').focus();
+        		return "";
+            	}
+        	if(document.activeElement.name=="menuPrincipal:m_3_menuButton"){
+        		document.getElementById('menuPrincipal:m_2_menuButton').focus();
+        		return "";
+            	}
+        	if(document.activeElement.name=="menuPrincipal:m_4_menuButton"){
+        		document.getElementById('menuPrincipal:m_3_menuButton').focus();
+				return "";
+             	}
+        	if(document.activeElement.name=="menuPrincipal:m_5_menuButton"){
+        		document.getElementById('menuPrincipal:m_4_menuButton').focus();
+				return "";
+             	}
+        	if(document.activeElement.name=="menuPrincipal:m_6_menuButton"){
+        		document.getElementById('menuPrincipal:m_5_menuButton').focus();
+				return "";
+             	}
+        	//*********control de teclas del formulario movimiento mes dependiente de la opcion menu=1 
+         	//**************lado izquierdo
+        	if(document.activeElement.name=="movMesForm:Sig_movi_mes"){  //
+            	document.getElementById('movMesForm:Fin_movi_mes').focus();
+            	document.getElementById('titulo_opc').innerHTML = 'Regresa Al Menú Principal';
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Ant_movi_mes"){  //
+            	document.getElementById('movMesForm:Sig_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Pri_movi_mes"){  //
+            	document.getElementById('movMesForm:Ant_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Ult_movi_mes"){  //
+            	document.getElementById('movMesForm:Pri_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Bus_movi_mes"){  //
+            	document.getElementById('movMesForm:Ult_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P1_movi_mes"){  //
+            	document.getElementById('movMesForm:Bus_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Mod_movi_mes"){  //
+            	document.getElementById('movMesForm:P1_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Gat_movi_mes"){  //
+            	document.getElementById('movMesForm:Mod_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P2_movi_mes"){  //
+            	document.getElementById('movMesForm:Gat_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:New_movi_mes"){  //
+            	document.getElementById('movMesForm:P2_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P3_movi_mes"){  //
+            	document.getElementById('movMesForm:New_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Imp_movi_mes"){  //
+            	document.getElementById('movMesForm:P3_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:P4_movi_mes"){  //
+            	document.getElementById('movMesForm:Imp_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Opc_movi_mes"){  //
+            	document.getElementById('movMesForm:P4_movi_mes').focus();
+    			return "";
+                }
+        	if(document.activeElement.name=="movMesForm:Fin_movi_mes"){  //
+            	document.getElementById('movMesForm:Opc_movi_mes').focus();
+    			return "";
+                }
+            //teclas de punto de venta dia, hay que meterlas aqui por que falla el keyup del boton
+        	
+        	
+            }    
+	}
+	window.onload = function() {
+		//alert("1"+document.activeElement.name)
+	   if(document.activeElement.name==undefined){
+		 document.getElementById('menuPrincipal:m_1_menuButton').focus();
+		   }
+	    document.onkeydown = info;
+	};
+	function cambioAbajo(e){
+	
+	}
+	function submenu(e){	//selecciona la ruta del submenu
+		
+		var elec =e.getAttribute('id'); // 
+		var res = elec.split(":");
+		ruta=res[1];
+		//alert(ruta)
+		pagina="submenu";	
+	}
+	function goIndex() {
+		var puerto=window.location.port.toString();
+		var host= window.location.hostname.toString();
+		var path = window.location.pathname.substring(0, window.location.pathname.indexOf("/",2));
+		var url = "http://"+host+":"+puerto+path+"/index.jsf";	
+		location.href=""+url;
+		}
+	
+	function opcClose(){
+		alert("cerrado");
+		document.getElementById('opciones:Sig_movi_mes1').focus();
+		pagina="submenu";
+	}	
+	function focusOpcion(element,e){
+		    var we= e.toString();
+			if(we=='cuadre_caja'){
+				document.getElementById('cuadreDiario:updateTodo').click();
+			}
+	 		//alert(we);
+			
+		
+	}
+	function limpiarRuta(){
+		PF('tipo_documento').hide();
+		ruta='';
+		document.getElementById('menuPrincipal:m_1_menuButton').focus();
+		
+	}
+	function focusModFactura(){
+		document.getElementById('modFactura').focus();
+		document.getElementById('modFactura').select();
+		document.getElementById('modFactura').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus ui-state-focus';
+	}
+
+	
+</script>
+	<h:form id="menuPrincipal">
+		<p:growl id="growl" life="7000" />
+		<table width="80%" align="center">
+			<tr>
+				<td align="center"><p:outputLabel
+						value="SISTEMA DE INFORMACIÓN PARA INVENTARIOS" /></td>
+			</tr>
+			<tr>
+				<td align="center">
+				     <c:forEach items="#{menuPrincipal.menus}" var="menu">
+						<p:splitButton value="#{menu.nombre}" id="m_#{menu.menuId}"  onkeydown="cambioAbajo(event)">
+							<c:forEach items="#{menuPrincipal.getOpcionUsuarios(menu.menuId)}" var="ou">
+								<p:menuitem value="#{ou.subMenuId.nombre}" id="#{ou.subMenuId.bar}" action="#{puntoVentaDia.preAccion(ou.subMenuId.bar)}"
+								onclick="submenu(this),#{ou.subMenuId.url}" />
+							</c:forEach>
+						</p:splitButton>
+					</c:forEach></td>
+			</tr>
+		</table>
+	</h:form>
+	
+	<c:forEach items="#{menuPrincipal.menus}" var="menu">
+		<c:forEach items="#{menuPrincipal.getOpcionUsuarios(menu.menuId)}"
+			var="ou">
+			<p:dialog header="#{ou.subMenuId.nombre}" width="90%" height="550px" onHide="document.getElementById('menuPrincipal:m_1_menuButton').focus();"
+				widgetVar="#{ou.subMenuId.bar}" id="men_#{ou.subMenuId.bar}">
+				<div >
+					<ui:include src="#{ou.subMenuId.ruta}" />
+				</div>
+			</p:dialog>
+		</c:forEach>
+	</c:forEach>	
+	<c:forEach items="#{menuPrincipal.getOpcionUsuariosByRuta('opcion')}"
+			 var="ou1" >
+			<p:dialog header="#{ou1.subMenuId.nombre}"   closeOnEscape="true" style="font-size: 12px" onHide="salirCuadreCaja()"
+				widgetVar="#{ou1.subMenuId.bar}" id="men_#{ou1.subMenuId.bar}"  onShow="focusOpcion(this,'#{ou1.subMenuId.bar}')">
+				<div style="width: 400px; height: 520px" >
+					<ui:include src="#{ou1.subMenuId.ruta}" />
+				</div>
+			</p:dialog>
+	</c:forEach>
+	<p:dialog widgetVar="tipo_documento" id="tipo_documento" onHide="document.getElementById('movMesForm:Sig_movi_mes').focus();" closeOnEscape="true"
+		style="font-size: 11px" header="Tipo Documento">
+		<div style="width: 400px; height: 140px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/selectTipoDocumento.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="nuevoProducto" id="nuevoProducto" focus="nuevoProductoForm:articuloNew" 
+		style="font-size: 16px" header="Nuevo Producto">
+		<div style="width: 528px; height: 430px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/nuevoProducto.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="imprimir" id="imprimir"  onShow="document.getElementById('pogoTargeta').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';"
+		style="font-size: 16px" header="Valor a cacelar">
+		<div style="width: 250px; height: 330px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/imprimir.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="px01" id="px01"  focus="px01_input" closeOnEscape="true"
+		style="font-size: 16px">
+		<div style="width: 200px; height: 50px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/px01.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="pantallaOpc" id="pantallaOpc"  closeOnEscape="true"
+		style="font-size: 12px">
+		<div style="width: 290px; height: 545px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/pantallaOpc.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="confirmarCierreDiario" id="confirmarCierreDiario"  header="Cierre Diario" focus="salirCierre1"
+		style="font-size: 16px">
+		<div style="width: 200px; height: 100px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/confirmarCierreDiario.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="cantidadPopup" id="cantidadPopup"  focus="facturar" 
+		style="font-size: 26px">
+		<div style="width: 730px; height: 500px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/cantidad.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="modificarFactura" id="modificarFactura"   
+	header="Modificar Factura" onHide="focusModFactura"
+		   closeOnEscape="true" style="font-size: 26px">
+		<div style="width: 320px; height: 140px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/modificarFactura.xhtml" />
+		</div>
+	</p:dialog>	
+	<p:dialog widgetVar="nuevoCliente" id="nuevoCliente"  
+		style="font-size: 16px" header="Nuevo Cliente">
+		<div style="width: 528px; height: 390px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/nuevoCliente.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="cambioPrecio" id="cambiopre"  
+		style="font-size: 16px" header="Cambio de precio">
+		<div style="width: 300px; ">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/cambioPrecio.xhtml" />
+		</div>
+	</p:dialog>
+</ui:composition>
