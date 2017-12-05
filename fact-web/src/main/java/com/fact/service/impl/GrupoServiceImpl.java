@@ -9,11 +9,8 @@ import javax.ejb.Stateless;
 
 import com.fact.api.FactException;
 import com.fact.dao.GrupoDao;
-import com.fact.dao.RolDao;
 import com.fact.model.Grupo;
-import com.fact.model.Rol;
 import com.fact.service.GrupoService;
-import com.fact.service.RolService;
 
 @Stateless
 public class GrupoServiceImpl implements GrupoService{

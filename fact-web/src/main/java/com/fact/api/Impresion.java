@@ -140,8 +140,7 @@ public class Impresion {
 		if (descuentoEnFactura != null) {
 			execto = Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13);
 			gravado = Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 21);
-			iva = Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13);
-			Double descuento = documentoImp.getDescuento() == null ? 0.0 : documentoImp.getDescuento();
+			iva = Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13);			
 			//total = Calculos.cortarCantidades(formatea.format(documentoImp.getTotal() + descuento), 16);
 			total = Calculos.cortarCantidades(formatea.format(documentoImp.getTotal()), 16);
 		} else {

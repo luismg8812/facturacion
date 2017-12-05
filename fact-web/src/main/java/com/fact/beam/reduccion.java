@@ -13,7 +13,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,13 +43,11 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.hibernate.transform.ToListResultTransformer;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import com.fact.api.Calculos;
-import com.fact.api.Impresion;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
@@ -873,8 +870,6 @@ public class reduccion implements Serializable {
 	}
 	
 	public void entadasSalidas() throws ParseException{
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		Map<String, Object> sessionMap = externalContext.getSessionMap();
 		//String userPropietario = (String) sessionMap.get("userPropietario");	
 		if (validarfiltros()) {
 			setReduccionEntradasList(null);
@@ -888,10 +883,7 @@ public class reduccion implements Serializable {
 			for (Long i = hoy; i <= hoyfin; i++) {
 				InfoDiario rvo = new InfoDiario();
 				Double porcenta = (double) ((getReduccion() == null ? 0.0 : getReduccion()) / 100);
-				Double cantidadOriginal = 0.0;
-				Double cantidadReducida = 0.0;
-				Double totalRemisiones = 0.0;
-				Double totalAvanceEfectivo = 0.0;
+				Double cantidadOriginal = 0.0;				
 				Boolean conCierre = Boolean.FALSE;
 				ivaTotalEntrada = 0.0;
 				iva19Entrada=0.0;

@@ -86,8 +86,7 @@ public class infoVentas  implements Serializable{
 		if(validarfiltros()){
 			setDocumentos(null);
 			Double total =0.0;
-			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");			
 			String fhoyIni = df.format(getFechaInicio());
 			String fhoyFin = df.format(getFechafin());
 			Long hoy = Long.valueOf(fhoyIni);

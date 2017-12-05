@@ -51,7 +51,6 @@ public class EntregaMercancias implements Serializable {
 	//cronometro de bodegueros
 	private List<BodegueroVo> bodeguerosList;
 	private List<BodegueroVo> bodeguerosFechasList;
-	private List<DocumentoDetalle> DocumentoDetalleList;
 	private BodegueroVo bodegueroSelect;
 	private Date fechaIni;
 	private Date fechaFin;

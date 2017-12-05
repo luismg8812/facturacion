@@ -667,6 +667,7 @@ public class DocumentoDaoImpl implements DocumentoDao{
 			return documentoList;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public List<DocumentoDetalle> getByGrupo(List<Long> tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId,
 				Boolean conCierre, Long server, Long grupoId) throws FactException {
@@ -703,6 +704,7 @@ public class DocumentoDaoImpl implements DocumentoDao{
 			return documentoList;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public List<Documento> getByCliente(Long clienteId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin)
 				throws FactException {

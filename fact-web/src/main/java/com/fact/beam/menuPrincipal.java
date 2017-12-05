@@ -74,7 +74,6 @@ public class menuPrincipal implements Serializable {
 	public List<OpcionUsuario> getOpcionUsuariosByRuta(String ruta) {
 		
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		OpcionUsuario cuadreCaja = (OpcionUsuario) sessionMap.get("bloqCuadreCaja"); 
 		opcionUsuarios= opcionUsuarioService.getByRuta(ruta.toUpperCase(),usuario.getUsuarioId());
 		return opcionUsuarios;
 	}

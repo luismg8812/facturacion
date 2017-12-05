@@ -12,7 +12,6 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1253,8 +1252,8 @@ public class PuntoVentaDia implements Serializable {
 		// Double totalTemp = getDocumento().getTotal() +
 		// (getDocumento().getTotal() * des);
 		Double totalTemp = getDocumento().getTotal();
-		Long tem = Long.valueOf(
-				totalTemp.toString().substring(totalTemp.toString().length() - 4, totalTemp.toString().length() - 2));
+		//Long tem = Long.valueOf(
+		//		totalTemp.toString().substring(totalTemp.toString().length() - 4, totalTemp.toString().length() - 2));
 		// if (tem < 50) {
 		// totalTemp = totalTemp + (50 - tem);
 		// } else {
@@ -1824,7 +1823,6 @@ public class PuntoVentaDia implements Serializable {
 		Usuario usuario = usuario();
 		Long idFactura = 10l; // id de tipo documento factura
 		List<DocumentoDetalle> dd = new ArrayList<>();
-		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
 		ultimoFactura = documentoService.getByLastAndTipo(idFactura, usuario.getUsuarioId());
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
@@ -1841,8 +1839,6 @@ public class PuntoVentaDia implements Serializable {
 	public void siguienteFactura() throws ParseException {
 		System.out.println("siguiente_factura");
 		List<DocumentoDetalle> dd = new ArrayList<>();
-		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
-		Usuario usuario = usuario();
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
 		if (getDocumentoActual() == null) {
@@ -1873,7 +1869,6 @@ public class PuntoVentaDia implements Serializable {
 	public void anteriorFactura() throws ParseException {
 		System.out.println("anterior_factura");
 		List<DocumentoDetalle> dd = new ArrayList<>();
-		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
 		if (getDocumentoActual() == null) {
@@ -2730,21 +2725,7 @@ public class PuntoVentaDia implements Serializable {
 			tipoDocumentoId.add(4l); // tipo documento cotizacion
 			tipoDocumentoId.add(9l); // numero de guia
 			// se agrega al anterior siguiente cotizaciones y remisiones por que
-			// zohan dijo que lo tenia que hacer
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String fhoyIni = df.format(new Date());
-			String fhoyFin = df.format(new Date());
-			Date hoy = df.parse(fhoyIni);
-			Date hoyfin = df.parse(fhoyFin);
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(Calendar.HOUR_OF_DAY, 0);
-			calendar.set(Calendar.MINUTE, 0);
-			calendar.set(Calendar.SECOND, 0);
-			hoy = calendar.getTime();
-			calendar.set(Calendar.HOUR_OF_DAY, 23);
-			calendar.set(Calendar.MINUTE, 59);
-			calendar.set(Calendar.SECOND, 59);
-			hoyfin = calendar.getTime();
+			// zohan dijo que lo tenia que hacer		
 			Usuario usuario = usuario();
 			Configuracion configuracion = configuracion();
 			Long server = configuracion.getServer();

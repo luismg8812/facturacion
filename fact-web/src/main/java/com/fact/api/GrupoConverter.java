@@ -11,9 +11,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 import com.fact.model.Grupo;
-import com.fact.model.Marca;
 import com.fact.service.GrupoService;
-import com.fact.service.MarcaService;
 
 
 @FacesConverter("grupoConverter")

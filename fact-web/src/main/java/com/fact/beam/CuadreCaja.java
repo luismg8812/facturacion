@@ -524,10 +524,7 @@ public void limpiar(){
 		return "";
 	}
 
-	private String imprimirCuadreTemporal() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	private String imprimirCuadreTxt() throws IOException, ParseException {
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
@@ -835,7 +832,6 @@ public Double getAvanceEfectivo() throws ParseException {
 	
 	List<Long> tipoDocumentoId =new ArrayList<>();
 	tipoDocumentoId.add(5l); //bisqieda qie avance efectivo
-	Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 	Long server=1l;
 	Boolean conCierre=Boolean.TRUE;
 	Date hoy = Calculos.fechaInicial(new Date());
@@ -1077,7 +1073,6 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
     }
     Empresa e = Login.getEmpresaLogin();
 	SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-	SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 	String fhoyname = df.format(hoyfin);
 	String carpeta = "C:\\facturas\\AcumuladoVentas";
 	
@@ -1136,7 +1131,7 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 		int tamañoEntradas =0, maxTamañoEntradas=3;
 		String salidas = "0   ";
 		int tamañoSalidas =0, maxTamañoSalidas=3;
-		Double entrdaSum = 0.0,salidaSum=0.0, inicialSum=0.0;
+		Double entrdaSum = 0.0,salidaSum=0.0;
 		//descripcion
 		String nombre = "";
 		int  maxTamañoNombre=25;
@@ -1194,7 +1189,6 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 		
 		//inicial
 		inicial =  String.valueOf((p.getCantidad()==null?0.0:p.getCantidad())+(salidaSum==null?0.0:salidaSum)-(entrdaSum==null?0.0:entrdaSum));
-		inicialSum =p.getCantidad();
 		inicial= inicial.replace(".0", "");
 		try {				
 			inicial=inicial.substring(0, maxTamañoInicial);				
@@ -1289,7 +1283,6 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
    
 	Empresa e = Login.getEmpresaLogin();
 	SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-	SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 	String fhoyname = df.format(hoyfin);
 	String carpeta = "C:\\facturas\\productosXcajero";
 	String pdf = "\\productosXcajero_" + fhoyname + "_"+redu.getUsuarioId().getUsuarioId()+".pdf";
@@ -1327,10 +1320,8 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 	documento.add(new Paragraph(new Phrase(lineSpacing, "Producto                Cantidad " ,
 			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize))));
 	for(ProductoVo vo: cantidades){
-		String nombre="";
-		String cantidad="";
-		int tamañoNombre = 0;
-		int tamañoCantidad =0;
+		String nombre="";	
+		int tamañoNombre = 0;	
 		try {
 			nombre = "" + vo.getProducto().getNombre().substring(0, 23);
 		} catch (Exception e2) {

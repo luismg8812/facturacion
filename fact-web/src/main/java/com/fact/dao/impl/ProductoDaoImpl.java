@@ -174,6 +174,7 @@ public class ProductoDaoImpl implements ProductoDao{
 		return productoList;
 	}
 		
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Producto> getByList(List<Producto> nombProductos, Long server) {
 		Session session ;
@@ -271,6 +272,7 @@ public class ProductoDaoImpl implements ProductoDao{
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Producto getByCodigoBarras(Long codigoBarrasNew) throws FactException {
 		Session session = HibernateUtil.getSessionFactory().openSession();

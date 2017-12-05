@@ -58,8 +58,7 @@ public class importar  implements Serializable{
         
 		try {
 			CsvReader usuarios_import = new CsvReader(ruta);
-			usuarios_import.readHeaders();
-			int contador=0;
+			usuarios_import.readHeaders();			
 			while (usuarios_import.readRecord()){
 				Producto p = new Producto();
 				ProductoVo pVo = new ProductoVo();
