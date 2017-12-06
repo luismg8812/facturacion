@@ -33,5 +33,9 @@
 		<mapping class="com.fact.model.Evento" />
 		<mapping class="com.fact.model.TipoEvento" />
 		<mapping class="com.fact.model.Empleado" />
+		<mapping class="com.fact.model.TransferenciaEmpresa" />
+		<mapping class="com.fact.model.ProductoEmpresa" />
+		<mapping class="com.fact.model.TransferenciaEmpresaDetalle" />
+		<mapping class="com.fact.model.TipoEmpresa" />
 	</session-factory>
 </hibernate-configuration>

@@ -22,7 +22,7 @@
 	</servlet-mapping>
 	<context-param>
 		<param-name>primefaces.THEME</param-name>
-		<param-value>cupertino</param-value>
+		<param-value>start</param-value>
 	</context-param>
 	<session-config>
 		<session-timeout>300</session-timeout>

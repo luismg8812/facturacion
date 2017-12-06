@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -21,6 +23,10 @@ public class Empresa {
 	@NotNull
 	@Column(name="EMPRESA_ID")
 	private Long empresaId;
+	
+	@ManyToOne
+	@JoinColumn(name="TIPO_EMPRESA_ID")
+	private TipoEmpresa tipoEmpresaId;
 	
 	@Column(name="NOMBRE")
 	private String nombre;
@@ -237,6 +243,14 @@ public class Empresa {
 
 	public void setImpuesto(String impuesto) {
 		this.impuesto = impuesto;
+	}
+
+	public TipoEmpresa getTipoEmpresaId() {
+		return tipoEmpresaId;
+	}
+
+	public void setTipoEmpresaId(TipoEmpresa tipoEmpresaId) {
+		this.tipoEmpresaId = tipoEmpresaId;
 	}
 	
 }

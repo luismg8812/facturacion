@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+
+	</script>
+	<h:form>
+		<p:tabView orientation="left">
+			<p:tab title="Godfather Part I">
+				<table width="100%" align="center">
+					<tr>
+						<td><p:outputLabel value="Sucursales" /></td>
+						<td><p:inputText></p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Nombre" /></td>
+						<td><p:inputText></p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Grupo" /></td>
+						<td><p:inputText></p:inputText></td>
+					</tr>
+					<tr>
+						<td><p:outputLabel value="Marca" /></td>
+						<td><p:inputText></p:inputText></td>
+					</tr>
+				</table>
+			</p:tab>
+			<p:tab title="Godfather Part II">
+				<h:panelGrid columns="2" cellpadding="10">
+					<p:graphicImage name="demo/images/godfather/godfather2.jpg" />
+					<h:outputText value="Francis Ford Coppola's legendary..." />
+				</h:panelGrid>
+			</p:tab>
+			<p:tab title="Godfather Part III">
+				<h:panelGrid columns="2" cellpadding="10">
+					<p:graphicImage name="demo/images/godfather/godfather3.jpg" />
+					<h:outputText value="After a break of more than 15 years..." />
+				</h:panelGrid>
+			</p:tab>
+		</p:tabView>
+	</h:form>
+</ui:composition>

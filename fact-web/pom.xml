@@ -57,7 +57,7 @@
 
 		<dependency>
 			<groupId>org.primefaces.themes</groupId>
-			<artifactId>cupertino</artifactId>
+			<artifactId>start</artifactId>
 			<version>1.0.8</version>
 		</dependency>
 
