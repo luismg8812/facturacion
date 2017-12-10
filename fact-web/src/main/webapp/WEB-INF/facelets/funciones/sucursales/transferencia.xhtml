@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form>
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="desde:" /></td>
+				<td><p:selectOneMenu value="#{sucursales.desde}">
+						<f:selectItem itemLabel="Seccionar Sucursal" itemValue="" />
+						<f:selectItems value="#{sucursales.sucursalesList}" var="sucu"
+							itemLabel="#{sucu.nombre}" itemValue="#{sucu.empresaId}" />
+					</p:selectOneMenu></td>
+
+				<td><p:outputLabel value="Hasta:" /></td>
+				<td><p:selectOneMenu value="#{sucursales.hasta}">
+						<f:selectItem itemLabel="Seccionar Sucursal" itemValue="" />
+						<f:selectItems value="#{sucursales.sucursalesList}" var="sucu"
+							itemLabel="#{sucu.nombre}" itemValue="#{sucu.empresaId}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Producto: " /></td>
+				<td><p:selectOneMenu value="#{sucursales.productoNew}">
+						<f:selectItem itemLabel="Seccionar Producto" itemValue="" />
+						<f:selectItems value="#{puntoVentaDia.productosAll}" var="sucu"
+							itemLabel="#{sucu.nombre}" itemValue="#{sucu.productoId}" />
+					</p:selectOneMenu></td>
+				<td><p:outputLabel value="cantidad: " /></td>
+				<td><p:inputNumber value="#{sucursales.cantidad}"></p:inputNumber> </td>
+			</tr>
+			<tr>
+				<td><p:commandButton value="Agregar" action="#{sucursales.agregar()}" update="detalles,growl1"></p:commandButton></td>
+				<td><p:commandButton value="Confirmar"></p:commandButton></td>
+			</tr>
+		</table>
+		<p:dataTable var="car" value="#{sucursales.productosList}" id="detalles">
+			<p:column headerText="Nombre " width="60%">
+				<h:outputText value="#{car.productoId.nombre}" />
+			</p:column>
+			<p:column headerText="Cantidad" width="20%">
+				<h:outputText value="#{car.cantidad}" />
+			</p:column>
+			<p:column headerText="Opciones">
+				<p:commandButton value="Borrar"></p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+	</h:form>
+
+
+</ui:composition>

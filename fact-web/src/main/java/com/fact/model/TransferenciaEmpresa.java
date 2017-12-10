@@ -24,7 +24,7 @@ public class TransferenciaEmpresa {
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="S_TRANSFERENCIA_EMPRESA")
 	@NotNull
 	@Column(name="TRANSFERENCIA_EMPRESA_ID")
-	private Long productoEmpresaId;
+	private Long transferenciaEmpresaId;
 	
 	@ManyToOne
 	@JoinColumn(name="EMPRESA_DESDE")
@@ -41,12 +41,14 @@ public class TransferenciaEmpresa {
 	@Column(name="FECHA_REGISTRO")
 	private Date fechaRegistro;
 
-	public Long getProductoEmpresaId() {
-		return productoEmpresaId;
+	
+	
+	public Long getTransferenciaEmpresaId() {
+		return transferenciaEmpresaId;
 	}
 
-	public void setProductoEmpresaId(Long productoEmpresaId) {
-		this.productoEmpresaId = productoEmpresaId;
+	public void setTransferenciaEmpresaId(Long transferenciaEmpresaId) {
+		this.transferenciaEmpresaId = transferenciaEmpresaId;
 	}
 
 	public Empresa getEmpresaDesde() {

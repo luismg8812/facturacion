@@ -24,15 +24,15 @@ public class TransferenciaEmpresaDetalle {
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="S_TRANSFERENCIA_EMPRESA_DETALLE")
 	@NotNull
 	@Column(name="TRANSFERENCIA_EMPR_DETAL_ID")
-	private Long productoEmpresaId;
+	private Long transferenciaEmprDetalId;
 	
 	@ManyToOne
 	@JoinColumn(name="TRANSFERENCIA_EMPRESA_ID")
-	private Empresa empresaDesde;
+	private TransferenciaEmpresa transferenciaEmpresaId;
 	
 	@ManyToOne
 	@JoinColumn(name="PRODUCTO_ID")
-	private Empresa empresaHasta;
+	private Producto productoId;
 	
 	@Column(name="FECHA_REGISTRO")
 	private Date fechaRegistro;
@@ -40,28 +40,32 @@ public class TransferenciaEmpresaDetalle {
 	@Column(name="CANTIDAD")
 	private Double cantidad;
 
-	public Long getProductoEmpresaId() {
-		return productoEmpresaId;
+	
+
+	public Long getTransferenciaEmprDetalId() {
+		return transferenciaEmprDetalId;
 	}
 
-	public void setProductoEmpresaId(Long productoEmpresaId) {
-		this.productoEmpresaId = productoEmpresaId;
+	public void setTransferenciaEmprDetalId(Long transferenciaEmprDetalId) {
+		this.transferenciaEmprDetalId = transferenciaEmprDetalId;
 	}
 
-	public Empresa getEmpresaDesde() {
-		return empresaDesde;
+	
+
+	public TransferenciaEmpresa getTransferenciaEmpresaId() {
+		return transferenciaEmpresaId;
 	}
 
-	public void setEmpresaDesde(Empresa empresaDesde) {
-		this.empresaDesde = empresaDesde;
+	public void setTransferenciaEmpresaId(TransferenciaEmpresa transferenciaEmpresaId) {
+		this.transferenciaEmpresaId = transferenciaEmpresaId;
 	}
 
-	public Empresa getEmpresaHasta() {
-		return empresaHasta;
+	public Producto getProductoId() {
+		return productoId;
 	}
 
-	public void setEmpresaHasta(Empresa empresaHasta) {
-		this.empresaHasta = empresaHasta;
+	public void setProductoId(Producto productoId) {
+		this.productoId = productoId;
 	}
 
 	public Date getFechaRegistro() {

@@ -72,6 +72,11 @@ public class UsuarioServiceImpl implements UsuarioService{
 	public List<Usuario> getByAll() throws FactException {
 		return usuarioDao.getByAll();
 	}
+	
+	@Override
+	public List<Empresa> getByAllEmpresa() throws FactException {
+		return usuarioDao.getByAllEmpresa();
+	}
 
 	@Override
 	public Empresa getByEmpresa() throws FactException {

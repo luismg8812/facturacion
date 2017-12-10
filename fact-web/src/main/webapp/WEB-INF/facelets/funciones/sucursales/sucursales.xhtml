@@ -8,33 +8,16 @@
 	<script type="text/javascript">
 
 	</script>
-	<h:form>
-		<p:tabView orientation="left">
-			<p:tab title="Godfather Part I">
-				<table width="100%" align="center">
-					<tr>
-						<td><p:outputLabel value="Sucursales" /></td>
-						<td><p:inputText></p:inputText></td>
-					</tr>
-					<tr>
-						<td><p:outputLabel value="Nombre" /></td>
-						<td><p:inputText></p:inputText></td>
-					</tr>
-					<tr>
-						<td><p:outputLabel value="Grupo" /></td>
-						<td><p:inputText></p:inputText></td>
-					</tr>
-					<tr>
-						<td><p:outputLabel value="Marca" /></td>
-						<td><p:inputText></p:inputText></td>
-					</tr>
-				</table>
+	<h:form id="sucursalForm">
+		<p:tabView orientation="left" id="tabs">
+			<p:tab title="Productos por sucursal" id="empr">
+				<ui:include
+				src="/WEB-INF/facelets/funciones/sucursales/productosXEmpresa.xhtml" />
+				
 			</p:tab>
-			<p:tab title="Godfather Part II">
-				<h:panelGrid columns="2" cellpadding="10">
-					<p:graphicImage name="demo/images/godfather/godfather2.jpg" />
-					<h:outputText value="Francis Ford Coppola's legendary..." />
-				</h:panelGrid>
+			<p:tab title="Transferencia de productos">
+				<ui:include
+				src="/WEB-INF/facelets/funciones/sucursales/transferencia.xhtml" />
 			</p:tab>
 			<p:tab title="Godfather Part III">
 				<h:panelGrid columns="2" cellpadding="10">
@@ -43,5 +26,12 @@
 				</h:panelGrid>
 			</p:tab>
 		</p:tabView>
+		<p:dialog widgetVar="confirmarBusqueda" header="Confirmar creación de productos"
+		closeOnEscape="false" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/funciones/sucursales/confirCrearProducEmpr.xhtml" />
+		</div>
+	</p:dialog>
 	</h:form>
 </ui:composition>

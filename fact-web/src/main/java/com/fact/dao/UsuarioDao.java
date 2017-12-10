@@ -22,6 +22,7 @@ public interface UsuarioDao {
 	Usuario getById(Long usuarioId)throws FactException;
 	Usuario getByName(String nombre) throws FactException;
 	List<Usuario> getByAll() throws FactException;
+	List<Empresa> getByAllEmpresa() throws FactException;
 	Empresa getByEmpresa()throws FactException;
 	List<Usuario> getByRol(Long rol)throws FactException;
 	Configuracion getConfiguracion() throws FactException;

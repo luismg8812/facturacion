@@ -153,6 +153,22 @@ public class UsuarioDaoImpl implements UsuarioDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
+	public List<Empresa> getByAllEmpresa() throws FactException {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Empresa> UsuarioList = new ArrayList<>(); 
+		try {
+			String sql = "select m from Empresa m";
+			Query query = session.createQuery(sql);			
+			UsuarioList=  query.list(); 
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return UsuarioList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<Empleado> getByEmpleadosAll() throws FactException {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Empleado> UsuarioList = new ArrayList<>(); 

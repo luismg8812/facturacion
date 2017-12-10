@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+
+	<p:growl id="growl1" life="7000" />
+	<table width="80%" align="center">
+		<tr>
+			<td><p:outputLabel value="Sucursales" /></td>
+			<td><p:selectOneMenu value="#{sucursales.empresaId}">
+					<f:selectItem itemLabel="Seccionar Sucursal" itemValue="" />
+					<f:selectItems value="#{sucursales.sucursalesList}"
+						 var="sucu"
+						itemLabel="#{sucu.nombre}" itemValue="#{sucu.empresaId}" />
+				</p:selectOneMenu></td>
+		</tr>
+
+		<tr>
+			<td><p:commandButton value="Buscar" action="#{sucursales.buscarProductosXSucursal()}" update="productos,growl1"></p:commandButton></td>
+
+		</tr>
+	</table>
+	<p:dataTable id="productos" var="pro" value="#{sucursales.productoEmpresaList}" emptyMessage="No hay productos configurados para esta sucursal"
+		editable="true" style="margin-bottom:20px">
+		<f:facet name="header">
+          Producto por Sucursal
+       </f:facet>
+
+		<p:ajax event="rowEdit" listener="#{sucursales.onRowEdit}" />
+		<p:ajax event="rowEditCancel" listener="#{sucursales.onRowCancel}" />
+		<p:column headerText="Nombre" width="40%">
+		<p:cellEditor>
+		<f:facet name="output">
+			<h:outputText value="#{pro.productoId.nombre}" />
+		</f:facet>
+		<f:facet name="input">
+				<p:inputText value="#{pro.productoId.nombre}" style="width:100%" label="nombre" />
+		</f:facet>
+		</p:cellEditor>
+				
+		</p:column>
+		<p:column headerText="Cantidad">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{pro.cantidad}" />
+				</f:facet>
+				<f:facet name="input">
+					<p:inputText value="#{pro.cantidad}" style="width:100%" label="Cantidad" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column headerText="Precio">
+			<p:cellEditor>
+				<f:facet name="output">
+					<h:outputText value="#{pro.precio}" >
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</h:outputText>
+				</f:facet>
+				<f:facet name="input">
+						<p:inputText value="#{pro.precio}" style="width:100%" label="Year" />
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column style="width:32px">
+			<p:rowEditor />
+		</p:column>
+	</p:dataTable>
+</ui:composition>
