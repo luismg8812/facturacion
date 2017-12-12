@@ -16,7 +16,9 @@
 		</tr>
 		<tr>
 			<td> 
-				<p:commandButton value="Aceptar" action="#{sucursales.confirmarBusqueda()}" update="sucursalForm:tabs:productos,growl1" ></p:commandButton>
+				<p:commandButton value="Aceptar" action="#{sucursales.confirmarBusqueda}" update="sucursalForm:tabs:productos,growl1" process="@form" >
+				<p:ajax event="click" listener="#{sucursales.confirmarBusqueda}"></p:ajax>
+				</p:commandButton>
 				<p:commandButton value="Cancelar" onclick="PF('confirmarBusqueda').hide();"></p:commandButton>
 			</td>
 		</tr>		

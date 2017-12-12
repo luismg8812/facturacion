@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.context.RequestContext;
@@ -19,8 +21,10 @@ import com.fact.model.Producto;
 import com.fact.model.ProductoEmpresa;
 import com.fact.model.TransferenciaEmpresa;
 import com.fact.model.TransferenciaEmpresaDetalle;
+import com.fact.model.Usuario;
 import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
+import com.fact.service.TransferenciaEmpresaDetalleService;
 import com.fact.service.TransferenciaEmpresaService;
 import com.fact.service.UsuarioService;
 
@@ -46,6 +50,9 @@ public class Sucursales implements Serializable {
 	
 	@EJB
 	private TransferenciaEmpresaService transferenciaEmpresaService;
+	
+	@EJB
+	private TransferenciaEmpresaDetalleService transferenciaEmpresaDetalleService;
 
 	//producto por sucursal
 	private Long empresaId;
@@ -59,8 +66,27 @@ public class Sucursales implements Serializable {
 	private Double cantidad;
 	private List<TransferenciaEmpresaDetalle>productosList= new ArrayList<>();
 	
+	//reporte
+	private Date fechaIni;
+	private Date fechaFin;
+	private Long desdeReporte;
+	private Long hastaReporte;
+	private List<TransferenciaEmpresa> TransferenciaEmpresaList;
+	private List<TransferenciaEmpresaDetalle>DetalleReporteList= new ArrayList<>();
 	
+	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+	Map<String, Object> sessionMap = externalContext.getSessionMap();
+	
+	private Usuario usuario() {
+		Usuario yourVariable = (Usuario) sessionMap.get("userLogin");
+		return yourVariable;
+	}
+
 	public void confirmar(){
+		if(getProductosList().isEmpty()){
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay productos agregados para transferir"));
+			return;
+		}
 		TransferenciaEmpresa te = new TransferenciaEmpresa();
 		Empresa ed= new Empresa();
 		ed.setEmpresaId(getDesde());
@@ -68,7 +94,38 @@ public class Sucursales implements Serializable {
 		eh.setEmpresaId(getHasta());
 		te.setEmpresaDesde(ed);
 		te.setEmpresaHasta(eh);
+		te.setFechaRegistro(new Date());
+		te.setUsuarioId(usuario());
 		transferenciaEmpresaService.save(te);
+		for(TransferenciaEmpresaDetalle td: getProductosList()){
+			ProductoEmpresa productoEmpDesde = productoEmpresaService.getByProductoAndEmpresa(ed,td.getProductoId().getProductoId());
+			ProductoEmpresa productoEmpHasta = productoEmpresaService.getByProductoAndEmpresa(eh,td.getProductoId().getProductoId());
+			if(productoEmpDesde==null ||productoEmpHasta==null){
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Una de las sucursales no tiene productos configurados"));
+				return;
+			}
+			
+			Double cantidadActual =productoEmpDesde.getCantidad();
+			productoEmpDesde.setCantidad(cantidadActual-getCantidad());
+			cantidadActual =productoEmpHasta.getCantidad();
+			productoEmpHasta.setCantidad(cantidadActual+getCantidad());
+			td.setTransferenciaEmpresaId(te);
+			productoEmpresaService.update(productoEmpHasta);
+			productoEmpresaService.update(productoEmpDesde);
+			transferenciaEmpresaDetalleService.save(td);
+		}
+		setProductosList(new ArrayList<>());
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Transacción exitosa"));
+	}
+	
+	public void eliminar(TransferenciaEmpresaDetalle dt){
+		getProductosList().remove(dt);
+	}
+	
+	public void detalleReporte(TransferenciaEmpresa te){
+		setDetalleReporteList(transferenciaEmpresaDetalleService.getByTrasferenciaId(te.getTransferenciaEmpresaId()));
+		RequestContext.getCurrentInstance().execute("PF('detalleTrans').show();");
+		
 	}
 	
 	public void agregar(){
@@ -112,6 +169,10 @@ public class Sucursales implements Serializable {
       
     }
 	
+	public void buscarReporte(){
+		setTransferenciaEmpresaList(transferenciaEmpresaService.find(getFechaIni(),getFechaFin(),getDesdeReporte(),getHastaReporte()));
+	}
+	
 	/**
 	 * Metodo encargado de buscar los productos configurados para una determinada empresa
 	 */
@@ -130,6 +191,7 @@ public class Sucursales implements Serializable {
 	 * si se confirma la busqueda se crean los registros de Productos por empresa
 	 */
 	public void confirmarBusqueda(){
+		System.out.println("entra a crear productos empresa");
 		List<Producto> productos=productoService.getByAll();
 		for(Producto p: productos){
 			ProductoEmpresa proEmpr = new ProductoEmpresa();
@@ -213,5 +275,52 @@ public class Sucursales implements Serializable {
 		this.productosList = productosList;
 	}
 
+	public Date getFechaIni() {
+		return fechaIni;
+	}
+
+	public void setFechaIni(Date fechaIni) {
+		this.fechaIni = fechaIni;
+	}
+
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+	}
+
+	public Long getDesdeReporte() {
+		return desdeReporte;
+	}
+
+	public void setDesdeReporte(Long desdeReporte) {
+		this.desdeReporte = desdeReporte;
+	}
+
+	public Long getHastaReporte() {
+		return hastaReporte;
+	}
+
+	public void setHastaReporte(Long hastaReporte) {
+		this.hastaReporte = hastaReporte;
+	}
+
+	public List<TransferenciaEmpresa> getTransferenciaEmpresaList() {
+		return TransferenciaEmpresaList;
+	}
+
+	public void setTransferenciaEmpresaList(List<TransferenciaEmpresa> transferenciaEmpresaList) {
+		TransferenciaEmpresaList = transferenciaEmpresaList;
+	}
+
+	public List<TransferenciaEmpresaDetalle> getDetalleReporteList() {
+		return DetalleReporteList;
+	}
+
+	public void setDetalleReporteList(List<TransferenciaEmpresaDetalle> detalleReporteList) {
+		DetalleReporteList = detalleReporteList;
+	}
 	
 }

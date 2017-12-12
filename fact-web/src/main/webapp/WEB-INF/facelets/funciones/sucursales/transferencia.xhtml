@@ -33,11 +33,11 @@
 							itemLabel="#{sucu.nombre}" itemValue="#{sucu.productoId}" />
 					</p:selectOneMenu></td>
 				<td><p:outputLabel value="cantidad: " /></td>
-				<td><p:inputNumber value="#{sucursales.cantidad}"></p:inputNumber> </td>
+				<td><p:inputNumber value="#{sucursales.cantidad}" size="10"></p:inputNumber> </td>
 			</tr>
 			<tr>
 				<td><p:commandButton value="Agregar" action="#{sucursales.agregar()}" update="detalles,growl1"></p:commandButton></td>
-				<td><p:commandButton value="Confirmar"></p:commandButton></td>
+				<td><p:commandButton value="Confirmar" action="#{sucursales.confirmar}" update="growl1,detalles"></p:commandButton></td>
 			</tr>
 		</table>
 		<p:dataTable var="car" value="#{sucursales.productosList}" id="detalles">
@@ -48,7 +48,7 @@
 				<h:outputText value="#{car.cantidad}" />
 			</p:column>
 			<p:column headerText="Opciones">
-				<p:commandButton value="Borrar"></p:commandButton>
+				<p:commandButton value="Borrar" action="#{sucursales.eliminar(car)}" update="detalles"></p:commandButton>
 			</p:column>
 		</p:dataTable>
 

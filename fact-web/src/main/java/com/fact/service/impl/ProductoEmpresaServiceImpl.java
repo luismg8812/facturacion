@@ -9,6 +9,7 @@ import javax.ejb.Stateless;
 
 import com.fact.api.FactException;
 import com.fact.dao.ProductoEmpresaDao;
+import com.fact.model.Empresa;
 import com.fact.model.ProductoEmpresa;
 import com.fact.service.ProductoEmpresaService;
 
@@ -50,5 +51,10 @@ public class ProductoEmpresaServiceImpl implements ProductoEmpresaService{
 	@Override
 	public List<ProductoEmpresa> getByEmpresa(Long empresaId) throws FactException {
 		return productoEmpresaDao.getByEmpresa(empresaId);		
+	}
+
+	@Override
+	public ProductoEmpresa getByProductoAndEmpresa(Empresa ed, Long productoId) throws FactException {
+		return productoEmpresaDao.getByProductoAndEmpresa(ed,productoId);
 	}
 }

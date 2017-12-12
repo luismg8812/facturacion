@@ -19,11 +19,9 @@
 				<ui:include
 				src="/WEB-INF/facelets/funciones/sucursales/transferencia.xhtml" />
 			</p:tab>
-			<p:tab title="Godfather Part III">
-				<h:panelGrid columns="2" cellpadding="10">
-					<p:graphicImage name="demo/images/godfather/godfather3.jpg" />
-					<h:outputText value="After a break of more than 15 years..." />
-				</h:panelGrid>
+			<p:tab title="Reportes">
+				<ui:include
+				src="/WEB-INF/facelets/funciones/sucursales/reportes.xhtml" />
 			</p:tab>
 		</p:tabView>
 		<p:dialog widgetVar="confirmarBusqueda" header="Confirmar creación de productos"
@@ -31,6 +29,13 @@
 		<div>
 			<ui:include
 				src="/WEB-INF/facelets/funciones/sucursales/confirCrearProducEmpr.xhtml" />
+		</div>
+	</p:dialog>
+		<p:dialog widgetVar="detalleTrans" header="Detalle transferencia" id="detalleTrans"
+		closeOnEscape="false" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/funciones/sucursales/detalleTransferencia.xhtml" />
 		</div>
 	</p:dialog>
 	</h:form>

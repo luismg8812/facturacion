@@ -2,6 +2,9 @@ package com.fact.service.impl;
 
 
 
+import java.util.Date;
+import java.util.List;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
@@ -43,6 +46,12 @@ public class TransferenciaEmpresaServiceImpl implements TransferenciaEmpresaServ
 			throw new FactException("El documento es obligatorio");
 		}
 		return transferenciaEmpresaDao.getById(id);
+	}
+
+	@Override
+	public List<TransferenciaEmpresa> find(Date fechaIni, Date fechaFin, Long desdeReporte, Long hastaReporte)
+			throws FactException {		
+		return transferenciaEmpresaDao.find(fechaIni,fechaFin,desdeReporte,hastaReporte);
 	}
 	
 

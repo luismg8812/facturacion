@@ -14,6 +14,7 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fact.api.FactException;
 import com.fact.dao.ProductoEmpresaDao;
+import com.fact.model.Empresa;
 import com.fact.model.ProductoEmpresa;
 import com.fact.utils.HibernateUtil;
 
@@ -108,6 +109,27 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 			}
 		}
 		return documentoList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ProductoEmpresa getByProductoAndEmpresa(Empresa empresaId, Long productoId) throws FactException {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<ProductoEmpresa> documentoList = new ArrayList<>(); 
+		try {
+			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
+			detached.add(Restrictions.eq("empresaId.empresaId", empresaId.getEmpresaId()));
+			detached.add(Restrictions.eq("productoId.productoId", productoId));
+			Criteria criteria =  detached.getExecutableCriteria(session);
+			documentoList =criteria.list(); 
+		} catch (FactException e) {
+			throw e;
+		}finally{
+			if (session!=null) {
+				session.close();
+			}
+		}
+		return documentoList.isEmpty()?null:documentoList.get(0);
 	}
 		
 }

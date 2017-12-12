@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	</script>
+
+	<p:dataTable var="car" value="#{sucursales.detalleReporteList}"
+		id="detalles">
+		<p:column headerText="Fecha Transacción " width="20%">
+			<h:outputText value="#{car.fechaRegistro}" />
+		</p:column>
+		<p:column headerText="Producto" width="60%">
+			<h:outputText value="#{car.productoId.nombre}" />
+		</p:column>
+		<p:column headerText="Cantidad" width="20%">
+			<h:outputText value="#{car.cantidad}" />
+		</p:column>
+		
+	</p:dataTable>
+
+</ui:composition>

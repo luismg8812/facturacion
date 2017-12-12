@@ -20,8 +20,8 @@ import javax.validation.constraints.NotNull;
 public class TransferenciaEmpresaDetalle {
 
 	@Id
-	@SequenceGenerator(name="S_TRANSFERENCIA_EMPRESA_DETALLE", sequenceName="S_TRANSFERENCIA_EMPRESA_DETALLE", allocationSize = 1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="S_TRANSFERENCIA_EMPRESA_DETALLE")
+	@SequenceGenerator(name="S_TRANSFERENCIA_EMPRESA_DETA", sequenceName="S_TRANSFERENCIA_EMPRESA_DETA", allocationSize = 1)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="S_TRANSFERENCIA_EMPRESA_DETA")
 	@NotNull
 	@Column(name="TRANSFERENCIA_EMPR_DETAL_ID")
 	private Long transferenciaEmprDetalId;

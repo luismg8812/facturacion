@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+
+	<table width="100%" align="center">
+		<tr>
+			<td><p:outputLabel value="Desde: " /></td>
+			<td><p:calendar id="fechaInicial" value="#{sucursales.fechaIni}"
+					size="16" pattern="dd-MM-yyyy" mask="true" /></td>
+			<td><p:outputLabel value="Hasta: " /></td>
+			<td><p:calendar id="fechaFinal" value="#{sucursales.fechaFin}"
+					size="16" pattern="dd-MM-yyyy" mask="true" /></td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="desde:" /></td>
+			<td><p:selectOneMenu value="#{sucursales.desdeReporte}">
+					<f:selectItem itemLabel="Seccionar Sucursal" itemValue="" />
+					<f:selectItems value="#{sucursales.sucursalesList}" var="sucu"
+						itemLabel="#{sucu.nombre}" itemValue="#{sucu.empresaId}" />
+				</p:selectOneMenu></td>
+
+			<td><p:outputLabel value="Hasta:" /></td>
+			<td><p:selectOneMenu value="#{sucursales.hastaReporte}">
+					<f:selectItem itemLabel="Seccionar Sucursal" itemValue="" />
+					<f:selectItems value="#{sucursales.sucursalesList}" var="sucu"
+						itemLabel="#{sucu.nombre}" itemValue="#{sucu.empresaId}" />
+				</p:selectOneMenu></td>
+		</tr>
+		<tr>
+			<td><p:commandButton value="Buscar"
+					action="#{sucursales.buscarReporte}" update="reportes"></p:commandButton></td>
+			<td><h:commandLink value="Exportar">
+					<p:dataExporter type="xls" target="reportes" fileName="Reporte" />
+				</h:commandLink></td>
+		</tr>
+	</table>
+	<p:dataTable var="car" value="#{sucursales.transferenciaEmpresaList}"
+		id="reportes">
+		<p:column headerText="Fecha Transacción " width="10%">
+			<h:outputText value="#{car.fechaRegistro}" />
+		</p:column>
+		<p:column headerText="Sucursal Origen" width="30%">
+			<h:outputText value="#{car.empresaDesde.nombre}" />
+		</p:column>
+		<p:column headerText="Sucursal Destino" width="30%">
+			<h:outputText value="#{car.empresaHasta.nombre}" />
+		</p:column>
+		<p:column headerText="Usuario" width="20%">
+			<h:outputText
+				value="#{car.usuarioId.nombre} #{car.usuarioId.apellido}" />
+		</p:column>
+		<p:column headerText="Opciones" width="10%" exportable="false">
+			<p:commandButton value="Detalle"
+				action="#{sucursales.detalleReporte(car)}" update="sucursalForm:detalleTrans"></p:commandButton>
+		</p:column>
+	</p:dataTable>
+
+</ui:composition>
