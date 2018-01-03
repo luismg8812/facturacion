@@ -273,6 +273,20 @@ public class PuntoVentaDia implements Serializable {
 					}	
 				}
 			} catch (Exception e) {
+				p = getProductosAllCodigo().get(Long.valueOf(completo));
+				if(p!=null){
+					System.out.println("entra al else");
+					RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
+					setCodigoInterno(p.getProductoId().toString());
+					setArticulo(p);
+					setUnidad(p.getCostoPublico().doubleValue());
+					productoSelect = p;
+					RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
+					RequestContext.getCurrentInstance().update("art_11");
+					RequestContext.getCurrentInstance().update("art_11_input");
+					RequestContext.getCurrentInstance().update("cod_1_input");
+					RequestContext.getCurrentInstance().update("cod_1");
+				}	
 				System.out.println("cod de barras no numerico");
 				e.printStackTrace();
 			}
