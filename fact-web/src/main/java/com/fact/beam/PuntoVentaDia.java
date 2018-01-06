@@ -1842,7 +1842,10 @@ public class PuntoVentaDia implements Serializable {
 		Long server = configuracion.getServer();
 		if (ultimoFactura != null) {
 			setDocumento(ultimoFactura);
-			dd = documentoDetalleService.getByDocumento(ultimoFactura.getDocumentoId(), server);
+			dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
+			if (server == 2l) {
+				dd.addAll(documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server));
+			}
 			setDocumentoActual(ultimoFactura);
 			detalles(dd);
 		} else {
@@ -1860,7 +1863,10 @@ public class PuntoVentaDia implements Serializable {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
 				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
+				if (server == 2l) {
+					dd.addAll(documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server));
+				}
 				detalles(dd);
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1871,7 +1877,10 @@ public class PuntoVentaDia implements Serializable {
 				setDocumentoActual(getListaDocumento().get(pos - 1));
 				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
+				if (server == 2l) {
+					dd.addAll(documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server));
+				}
 				detalles(dd);
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1890,7 +1899,10 @@ public class PuntoVentaDia implements Serializable {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
 				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
+				if (server == 2l) {
+					dd.addAll(documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server));
+				}
 				detalles(dd);
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1901,7 +1913,10 @@ public class PuntoVentaDia implements Serializable {
 				setDocumentoActual(getListaDocumento().get(pos + 1));
 				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
+				if (server == 2l) {
+					dd.addAll(documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), server));
+				}
 				detalles(dd);
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1919,6 +1934,7 @@ public class PuntoVentaDia implements Serializable {
 			vo.setFechaRegistro(d1.getFechaRegistro());
 			vo.setParcial(d1.getParcial());
 			vo.setProductoId(d1.getProductoId());
+			System.out.println("productos:"+d1.getProductoId().getNombre());
 			if (Calculos.validarPromo(d1.getProductoId(), cantidad)) {
 				Double precioPromo = d1.getProductoId().getPubPromo();
 				Double cantidadPromo = d1.getProductoId().getkGPromo();
