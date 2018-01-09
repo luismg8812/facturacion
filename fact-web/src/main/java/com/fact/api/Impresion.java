@@ -367,6 +367,21 @@ public class Impresion {
 		lineSpacing = 10f;
 		PdfWriter.getInstance(documento, archivo);
 		documento.setMargins(10, 1, 1, 1);
+		String TituloFactura = "";
+		switch ("" + documentoImp.getTipoDocumentoId().getTipoDocumentoId()) {
+		case "10":
+			TituloFactura = "FACTURA DE VENTA";
+			break;
+		case "9":
+			TituloFactura = "GUÍA DE REMISIÓN";
+			break;
+		case "4":
+			TituloFactura = "COTIZACIÓN";
+		
+			break;
+		default:
+			break;
+		}
 		documento.open();
 		documento.add(new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
 		if(imagen!=null){
@@ -390,7 +405,7 @@ public class Impresion {
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // ciudad
 		documento.add(new Paragraph(new Phrase(lineSpacing, "TEL: " + e.getTelefonoFijo() + " - " + e.getCel(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
-		documento.add(new Paragraph(new Phrase(lineSpacing, "FACTURA DE VENTA: " + documentoImp.getConsecutivoDian(),
+		documento.add(new Paragraph(new Phrase(lineSpacing, TituloFactura+": " + documentoImp.getConsecutivoDian(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, 11f)))); // numer
 																		// de
 																		// factura

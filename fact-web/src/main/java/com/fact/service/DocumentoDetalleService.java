@@ -24,4 +24,5 @@ public interface DocumentoDetalleService {
 	List<DocumentoDetalle> getPropinasByUsuario(Long tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId,
 			Boolean conCierre, Long server) throws FactException;
 	List<DocumentoDetalle> getbyEmpleado(Long empleadoId, Date hoy, Date hoyfin) throws FactException;
+	List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin) throws FactException;
 }

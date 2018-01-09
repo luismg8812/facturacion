@@ -289,6 +289,7 @@ public class DocumentoDaoImpl implements DocumentoDao{
 			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId =:tipoDocumentoId "
 					+ " and (d.fechaRegistro > :hoy) AND (d.fechaRegistro < :hoyFin) and d.cierreDiario is null "
 					+ " and d.impreso=1"
+					+ " and d.consecutivoDian is not null "
 					+ " order by d.consecutivoDian asc";
 			Query query = session.createQuery(sql);
 			query.setParameter("tipoDocumentoId", Long.valueOf(tipoDocumentoId) );
@@ -653,6 +654,8 @@ public class DocumentoDaoImpl implements DocumentoDao{
 				}
 				detached.add(Restrictions.in("tipoDocumentoId.tipoDocumentoId", tipoDocumentoId));
 				detached.add(Restrictions.eq("mac", mac));
+				detached.add(Restrictions.eq("impreso", 1l));
+				detached.add(Restrictions.isNotNull("consecutivoDian"));
 				detached.add(Restrictions.between("fechaRegistro", hoy, hoyfin));
 				detached.addOrder(org.hibernate.criterion.Order.desc("documentoId"));
 				Criteria criteria =  detached.getExecutableCriteria(session);

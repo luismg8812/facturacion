@@ -224,4 +224,24 @@ public class DocumentoDetalleDaoImpl implements DocumentoDetalleDao {
 		return DocumentoDetalleList;
 	}
 
+	@Override
+	public List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin) throws FactException {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<DocumentoDetalle> DocumentoDetalleList = new ArrayList<>();
+		try {
+			String sql = "select dd from DocumentoDetalle dd "
+					+ " where dd.productoId.productoId=5 "
+				    + " and (dd.documentoId.fechaRegistro >= :hoy) AND (dd.documentoId.fechaRegistro <= :hoyfin) "
+					+ "and dd.estado = 1 ";
+			Query query = session.createQuery(sql);
+			query.setParameter("hoy", hoy);
+			query.setParameter("hoyfin", hoyfin);
+			DocumentoDetalleList = query.list();
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return DocumentoDetalleList;
+	}
+
 }

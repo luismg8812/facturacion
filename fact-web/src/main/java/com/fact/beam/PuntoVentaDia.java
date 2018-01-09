@@ -688,7 +688,7 @@ public class PuntoVentaDia implements Serializable {
 			docDetalleVo.setUnitario(getPx01());
 			// setUnidad(getPx01());
 			docDetalleVo.setParcial(getPx01());
-			getProductos().add(docDetalleVo);
+			getProductos().add(0,docDetalleVo);
 			setDocumento(Calculos.calcularExcento(getDocumento(), getProductos())); // en
 																					// esta
 																					// funcion
@@ -947,7 +947,7 @@ public class PuntoVentaDia implements Serializable {
 				}
 				if (getCantidad() != 0l) {
 
-					getProductos().add(docDetalleVo);
+					getProductos().add(0,docDetalleVo);
 				}
 
 			}
@@ -2050,9 +2050,9 @@ public class PuntoVentaDia implements Serializable {
 
 	public void recalcularPrecio() {
 		System.out.println("cambio de precio:" + getCambioTemp());
-		if (getCambioTemp() < dCambio.getUnitario()) {
-			return;
-		}
+//		if (getCambioTemp() < dCambio.getUnitario()) { //se comenta el pedaso de codigo que hace que se pueda bajar el precio
+//			return;
+//		}
 		int pos = getProductos().indexOf(dCambio);
 		Double descuento = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
 		if (dCambio.getUnitario() > getCambioTemp()) {

@@ -108,30 +108,30 @@ public class reduccion implements Serializable {
 	private Date fechaInicio;
 	private Date fechafin;
 
-	private Double totalDia=0.0;
+	private Double totalDia = 0.0;
 	private Date fechaHoy;
 	private Usuario usuarioDia;
 	public Empresa empresa;
-	private Double ivaTotal=0.0;
-	private Double iva19=0.0;
-	private Double iva5=0.0;
-	private Double base5=0.0;
-	private Double base19=0.0;
-	private Double execento=0.0;
-	//entradas
-	private Double ivaTotalEntrada=0.0;
-	private Double iva19Entrada=0.0;
-	private Double iva5Entrada=0.0;
-	private Double base5Entrada=0.0;
-	private Double base19Entrada=0.0;
-	private Double execentoEntrada=0.0;
+	private Double ivaTotal = 0.0;
+	private Double iva19 = 0.0;
+	private Double iva5 = 0.0;
+	private Double base5 = 0.0;
+	private Double base19 = 0.0;
+	private Double execento = 0.0;
+	// entradas
+	private Double ivaTotalEntrada = 0.0;
+	private Double iva19Entrada = 0.0;
+	private Double iva5Entrada = 0.0;
+	private Double base5Entrada = 0.0;
+	private Double base19Entrada = 0.0;
+	private Double execentoEntrada = 0.0;
 	//
 	private String primeraFactura;
 	private String ultimaFactura;
-	private Double costoTotal=0.0;
+	private Double costoTotal = 0.0;
 	private Double numeroDocumentos;
 	private Double numeroDocumentosMac;
-	
+
 	private Double total;
 	private Double totalIva;
 	private Double totalIva5;
@@ -139,8 +139,8 @@ public class reduccion implements Serializable {
 	private Double totalbase5;
 	private Double totalbase19;
 	private Double totalExcento;
-	
-	//total entradas
+
+	// total entradas
 	private Double totalEntrada;
 	private Double totalIvaEntrada;
 	private Double totalIva5Entrada;
@@ -149,34 +149,34 @@ public class reduccion implements Serializable {
 	private Double totalbase19Entrada;
 	private Double totalExcentoEntrada;
 	//
-	
-	//total diferencia
-		private Double totalDiferencia=0.0;
-		private Double totalIvaDiferencia=0.0;
-		private Double totalIva5Diferencia=0.0;
-		private Double totalIva19Diferencia=0.0;
-		private Double totalbase5Diferencia=0.0;
-		private Double totalbase19Diferencia=0.0;
-		private Double totalExcentoDiferencia=0.0;
-		//
+
+	// total diferencia
+	private Double totalDiferencia = 0.0;
+	private Double totalIvaDiferencia = 0.0;
+	private Double totalIva5Diferencia = 0.0;
+	private Double totalIva19Diferencia = 0.0;
+	private Double totalbase5Diferencia = 0.0;
+	private Double totalbase19Diferencia = 0.0;
+	private Double totalExcentoDiferencia = 0.0;
+	//
 	private List<InfoDiario> reduccionList;
 	private List<InfoDiario> reduccionEntradasList;
 	private List<DocumentoReducido> documentosReduccionList;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
-	
+
 	public void imprimirinforme(InfoDiario id) throws DocumentException, IOException, PrinterException, ParseException {
 		Empresa e = Login.getEmpresaLogin();
 		String imp = e.getImpresion().toUpperCase();
-		int numeroImpresiones=1;
+		int numeroImpresiones = 1;
 		for (int i = 0; i < numeroImpresiones; i++) {
 			switch (imp) {
 			case "TXT":
-				 imprimirBig(id);
+				imprimirBig(id);
 				break;
 			case "BIG":
-				 imprimirBig(id);
+				imprimirBig(id);
 				break;
 			case "PDF":
 				imprimirInfoPDF(id);
@@ -184,17 +184,18 @@ public class reduccion implements Serializable {
 			case "BIG_PDF":
 				imprimirInfoPDF(id);
 				break;
-				
+
 			default:
 				break;
 			}
 		}
-		
+
 		// imprimirTXT(id);
-		
+
 	}
-	
-	public void imprimirinformePropietario(InfoDiario id) throws DocumentException, IOException, PrinterException, ParseException {
+
+	public void imprimirinformePropietario(InfoDiario id)
+			throws DocumentException, IOException, PrinterException, ParseException {
 		Empresa e = Login.getEmpresaLogin();
 		String imp = e.getImpresion().toUpperCase();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
@@ -203,30 +204,30 @@ public class reduccion implements Serializable {
 		List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
 		// los
 		// cajeros
-		int numeroImpresiones=1;
+		int numeroImpresiones = 1;
 		for (int i = 0; i < numeroImpresiones; i++) {
 			switch (imp) {
 			case "TXT":
-				 //imprimirBig(id);
+				// imprimirBig(id);
 				break;
 			case "BIG":
-				 //imprimirBig(id);
+				// imprimirBig(id);
 				break;
 			case "PDF":
 				imprimirInfoPDF(id);
 				break;
 			case "BIG_PDF":
-				imprimirInformePropietarioPDF(id,numeroInforme,usuario,configuracion,uList);
+				imprimirInformePropietarioPDF(id, numeroInforme, usuario, configuracion, uList);
 				break;
-				
+
 			default:
 				break;
 			}
 		}
-			
+
 	}
-	
-	public  String imprimirInformePropietarioPDF(InfoDiario id, String numeroImforme, Usuario usuario,
+
+	public String imprimirInformePropietarioPDF(InfoDiario id, String numeroImforme, Usuario usuario,
 			Configuracion config, List<Usuario> uList) throws DocumentException, FileNotFoundException {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		String fhoyIni = df.format(id.getFechaInforme());
@@ -239,120 +240,196 @@ public class reduccion implements Serializable {
 		Document documento = new Document();
 		float fntSize = 11f, lineSpacing = 15f;
 		PdfWriter.getInstance(documento, archivo);
-		
+
 		List<Long> tipoDocumentoId = new ArrayList<>();
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
 		Date hoy = Calculos.fechaInicial(id.getFechaInforme());
 		Date hoyfin = Calculos.fechaFinal(id.getFechaInforme());
-		Double totalVenasTemp = 0.0,totalFacturasTemp=0.0,totalVentasTemp=0.0,totalRemisionesTemp=0.0, totalFajosTemp=0.0, totalEfectivoTemp=0.0,totalVentasDia=0.0,totalRemisionesDia=0.0;
-				
+		Double totalVenasTemp = 0.0, totalFacturasTemp = 0.0, totalVentasTemp = 0.0, totalRemisionesTemp = 0.0,
+				totalFajosTemp = 0.0, totalEfectivoTemp = 0.0, totalVentasDia = 0.0, totalRemisionesDia = 0.0;
+
 		documento.setMargins(10, 10, 20, 20);
 		documento.open();
-		documento.add(new Paragraph(new Phrase(lineSpacing, "RESUMEN N°: " + numeroImforme + "     FECHA: " + fhoyIni,FontFactory.getFont(FontFactory.COURIER, 20f)))); // numero de informe y fecha
-		documento.add(new Paragraph(new Phrase(lineSpacing,"______________________________________________________________________________",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		documento.add(new Paragraph(new Phrase(lineSpacing, "CAJERO          FACT      VENTAS  REMISIONES      FAJOS   EFECTIVO DIFERENCIA",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-		documento.add(new Paragraph(new Phrase(lineSpacing,"______________________________________________________________________________",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento.add(new Paragraph(new Phrase(lineSpacing, "RESUMEN N°: " + numeroImforme + "     FECHA: " + fhoyIni,
+				FontFactory.getFont(FontFactory.COURIER, 20f)))); // numero de
+																	// informe y
+																	// fecha
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"______________________________________________________________________________",
+				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento.add(new Paragraph(
+				new Phrase(lineSpacing, "CAJERO          FACT      VENTAS  REMISIONES      FAJOS   EFECTIVO DIFERENCIA",
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"______________________________________________________________________________",
+				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 		for (Usuario u : uList) {
 			Double VentasTemp = 0.0;
 			Double RemisionesTemp = 0.0;
-			List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,u.getUsuarioId(), Boolean.FALSE, 1l);
-			List<Documento> remisiList = documentoService.getRemisionesByUsuario(9l, hoy, hoyfin, u.getUsuarioId(), Boolean.FALSE, config.getServer());
-			totalFacturasTemp+=factDia.size();
-			String nombreCajero = Calculos.cortarDescripcion(u.getNombre()+" "+u.getApellido(), 15);
-			String cantidadFacturas = Calculos.cortarCantidades(""+factDia.size(), 4);
-			for(Documento d: factDia){
-				VentasTemp+=d.getTotal();
-				totalVenasTemp+=d.getTotal();
+			List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,
+					u.getUsuarioId(), Boolean.FALSE, 1l);
+			List<Documento> remisiList = documentoService.getRemisionesByUsuario(9l, hoy, hoyfin, u.getUsuarioId(),
+					Boolean.FALSE, config.getServer());
+			totalFacturasTemp += factDia.size();
+			String nombreCajero = Calculos.cortarDescripcion(u.getNombre() + " " + u.getApellido(), 15);
+			String cantidadFacturas = Calculos.cortarCantidades("" + factDia.size(), 4);
+			for (Documento d : factDia) {
+				VentasTemp += d.getTotal();
+				totalVenasTemp += d.getTotal();
 			}
-			for(Documento d: remisiList){
-				RemisionesTemp+=d.getTotal();
-				totalRemisionesTemp+=d.getTotal();
+			for (Documento d : remisiList) {
+				RemisionesTemp += d.getTotal();
+				totalRemisionesTemp += d.getTotal();
 			}
-			String ventas= Calculos.cortarCantidades(formatea.format(VentasTemp), 11);
-			String remisiones =Calculos.cortarCantidades(formatea.format(RemisionesTemp), 11);
-			String fajos =Calculos.cortarCantidades("0.0", 10);
-			String efectivo=Calculos.cortarCantidades("0.0", 10);
-			String diferencia=Calculos.cortarCantidades("0.0", 10);
-			totalVentasDia = totalVentasTemp+totalVentasDia;
-			totalRemisionesDia = totalRemisionesTemp+totalRemisionesDia;
-			documento.add(new Paragraph(new Phrase(lineSpacing,nombreCajero+" "+cantidadFacturas+" "+ventas+" "+remisiones+" "+fajos+" "+efectivo+diferencia,FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan		
+			String ventas = Calculos.cortarCantidades(formatea.format(VentasTemp), 11);
+			String remisiones = Calculos.cortarCantidades(formatea.format(RemisionesTemp), 11);
+			String fajos = Calculos.cortarCantidades("0.0", 10);
+			String efectivo = Calculos.cortarCantidades("0.0", 10);
+			String diferencia = Calculos.cortarCantidades("0.0", 10);
+			totalVentasDia = totalVentasTemp + totalVentasDia;
+			totalRemisionesDia = totalRemisionesTemp + totalRemisionesDia;
+			documento
+					.add(new Paragraph(new Phrase(
+							lineSpacing, nombreCajero + " " + cantidadFacturas + " " + ventas + " " + remisiones + " "
+									+ fajos + " " + efectivo + diferencia,
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
 		String totalVentas = Calculos.cortarCantidades(formatea.format(totalVenasTemp), 11);
 		String totalRemisiones = Calculos.cortarCantidades(formatea.format(totalRemisionesTemp), 11);
-		String totalFacturas = Calculos.cortarCantidades(""+totalFacturasTemp, 4);
-		String totalFajos = Calculos.cortarCantidades(""+totalFajosTemp, 10);
-		String totalEfectivo = Calculos.cortarCantidades(""+totalEfectivoTemp, 10);
-		documento.add(new Paragraph(new Phrase(lineSpacing,"______________________________________________________________________________",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		documento.add(new Paragraph(new Phrase(lineSpacing, "               "+" "+totalFacturas+" "+totalVentas+" "+totalRemisiones+" "+totalFajos+" "+totalEfectivo,FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-		documento.add(new Paragraph(new Phrase(lineSpacing,"______________________________________________________________________________",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		Double totalDia = totalVenasTemp+totalRemisionesTemp;
-		Double porcentajeVentas = (totalVenasTemp*100)/totalDia;
-		Double porcentajeRemisiones=(totalRemisionesTemp*100)/totalDia;
-		documento.add(new Paragraph(new Phrase(lineSpacing,"DÍA      : "+formatea.format(porcentajeVentas)+"%     "+ formatea.format(porcentajeRemisiones)+"%",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		documento.add(new Paragraph(new Phrase(lineSpacing,"ACUMULADO: "+formatea.format(porcentajeVentas)+"%     "+ formatea.format(porcentajeRemisiones)+"%",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		documento.add(new Paragraph(new Phrase(lineSpacing,"______________________________________________________________________________",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		documento.add(new Paragraph(new Phrase(lineSpacing,"",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-		documento.add(new Paragraph(new Phrase(lineSpacing,"REMISIONES",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		String totalFacturas = Calculos.cortarCantidades("" + totalFacturasTemp, 4);
+		String totalFajos = Calculos.cortarCantidades("" + totalFajosTemp, 10);
+		String totalEfectivo = Calculos.cortarCantidades("" + totalEfectivoTemp, 10);
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"______________________________________________________________________________",
+				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento
+				.add(new Paragraph(new Phrase(lineSpacing,
+						"               " + " " + totalFacturas + " " + totalVentas + " " + totalRemisiones + " "
+								+ totalFajos + " " + totalEfectivo,
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"______________________________________________________________________________",
+				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		Double totalDia = totalVenasTemp + totalRemisionesTemp;
+		Double porcentajeVentas = (totalVenasTemp * 100) / totalDia;
+		Double porcentajeRemisiones = (totalRemisionesTemp * 100) / totalDia;
+		documento
+				.add(new Paragraph(new Phrase(lineSpacing,
+						"DÍA      : " + formatea.format(porcentajeVentas) + "%     "
+								+ formatea.format(porcentajeRemisiones) + "%",
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento
+				.add(new Paragraph(new Phrase(lineSpacing,
+						"ACUMULADO: " + formatea.format(porcentajeVentas) + "%     "
+								+ formatea.format(porcentajeRemisiones) + "%",
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"______________________________________________________________________________",
+				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento.add(new Paragraph(
+				new Phrase(lineSpacing, "REMISIONES", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 		for (Usuario u : uList) {
-			List<Documento> remisiList = documentoService.getRemisionesByUsuario(9l, hoy, hoyfin, u.getUsuarioId(), Boolean.FALSE, config.getServer());
-			for(Documento d: remisiList){
-				String nombreCajero = Calculos.cortarDescripcion(u.getNombre()+" "+u.getApellido(), 15);
-				String guia = Calculos.cortarCantidades(""+d.getDocumentoId(),6);
+			List<Documento> remisiList = documentoService.getRemisionesByUsuario(9l, hoy, hoyfin, u.getUsuarioId(),
+					Boolean.FALSE, config.getServer());
+			for (Documento d : remisiList) {
+				String nombreCajero = Calculos.cortarDescripcion(u.getNombre() + " " + u.getApellido(), 15);
+				String guia = Calculos.cortarCantidades("" + d.getDocumentoId(), 6);
 				String cliente = Calculos.cortarCantidades(d.getClienteId().getNombre(), 16);
 				String valor = Calculos.cortarCantidades(formatea.format(d.getTotal()), 11);
-				String descuento = Calculos.cortarCantidades(formatea.format(d.getDescuento()==null?0.0:d.getDescuento()), 11);
-				Double desc = ((d.getDescuento()==null?0.0:d.getDescuento())*100)/d.getTotal();
-				String porcentaje = Calculos.cortarCantidades(""+desc,7);
-				documento.add(new Paragraph(new Phrase(lineSpacing,""+nombreCajero+" "+"N° GUIA CLIENTE               VALOR   DESCUENTO   %DESC",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-				documento.add(new Paragraph(new Phrase(lineSpacing,"                "+guia+" "+cliente+" "+valor+" "+descuento+" "+porcentaje,FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-			}		
+				String descuento = Calculos
+						.cortarCantidades(formatea.format(d.getDescuento() == null ? 0.0 : d.getDescuento()), 11);
+				Double desc = ((d.getDescuento() == null ? 0.0 : d.getDescuento()) * 100) / d.getTotal();
+				String porcentaje = Calculos.cortarCantidades("" + desc, 7);
+				documento.add(new Paragraph(new Phrase(lineSpacing,
+						"" + nombreCajero + " " + "N° GUIA CLIENTE               VALOR   DESCUENTO   %DESC",
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+				documento.add(new Paragraph(new Phrase(lineSpacing,
+						"                " + guia + " " + cliente + " " + valor + " " + descuento + " " + porcentaje,
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+			}
 		}
 		List<TipoEvento> tiposEventos = tipoEventoService.getByAll();
 		int maxTamEvento = 22;
 		for (TipoEvento tipo : tiposEventos) {
 			// Empresa tipos;
-			documento.add(new Paragraph(new Phrase(lineSpacing,"",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-			documento.add(new Paragraph(new Phrase(lineSpacing," ",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
-			documento.add(new Paragraph(new Phrase(lineSpacing,  tipo.getNombre(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+			documento
+					.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+			documento.add(
+					new Paragraph(new Phrase(lineSpacing, " ", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+			documento.add(new Paragraph(
+					new Phrase(lineSpacing, tipo.getNombre(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			List<Evento> evento = eventoService.getByFechaAndTipo(Calculos.fechaInicial(id.getFechaInforme()),
 					Calculos.fechaFinal(id.getFechaInforme()), tipo.getTipoEventoId());
 			for (Evento ev : evento) {
 				switch ("" + ev.getTipoEventoId().getTipoEventoId()) {
-				case "1":						
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Produc. devolución..: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad devolución.: " + ev.getValorActual(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario devolución..: " + Calculos.cortarDescripcion(ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan						
-					documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+				case "1":
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Produc. devolución..: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad devolución.: " + ev.getValorActual(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Usuario devolución..: " + Calculos.cortarDescripcion(
+									ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+									maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(
+							new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 					break;
 				case "3":
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Produc. Cambio preci: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Precio anterior.....: " + ev.getValorAnterior(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Precio actual.......: " + ev.getValorActual(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario realiza camb: " + Calculos.cortarDescripcion(	ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Produc. Cambio preci: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento
+							.add(new Paragraph(new Phrase(lineSpacing, "Precio anterior.....: " + ev.getValorAnterior(),
+									FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing, "Precio actual.......: " + ev.getValorActual(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Usuario realiza camb: " + Calculos.cortarDescripcion(
+									ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+									maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(
+							new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 					break;
 				case "2":
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Produc. Descuento...: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad Descuento..: " + ev.getValorAnterior(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad sin Descuen: " + ev.getValorActual(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan	
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario devolución..: " + Calculos.cortarDescripcion(ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Produc. Descuento...: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento
+							.add(new Paragraph(new Phrase(lineSpacing, "Cantidad Descuento..: " + ev.getValorAnterior(),
+									FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad sin Descuen: " + ev.getValorActual(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Usuario devolución..: " + Calculos.cortarDescripcion(
+									ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+									maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(
+							new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 					break;
 				case "4":
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario copia factur: " + Calculos.cortarDescripcion(ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-					documento.add(new Paragraph(new Phrase(lineSpacing, "Documento: " + ev.getCampo(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan	
-					
-					
-					break;	
+					documento.add(new Paragraph(new Phrase(lineSpacing,
+							"Usuario copia factur: " + Calculos.cortarDescripcion(
+									ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+									maxTamEvento),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					documento.add(new Paragraph(new Phrase(lineSpacing, "Documento: " + ev.getCampo(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+
+					break;
 				default:
 					break;
 				}
 			}
 		}
-		documento.add(new Paragraph(new Phrase(lineSpacing,"",FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 		documento.close();
-		//String impresara = usuario.getImpresora();
-		//printer(impresara, folder + pdf, config);
+		// String impresara = usuario.getImpresora();
+		// printer(impresara, folder + pdf, config);
 		return "";
 	}
 
@@ -454,7 +531,7 @@ public class reduccion implements Serializable {
 				bw.write("TOTAL REMISIONES:...........: "
 						+ Calculos.cortarCantidades(formatea.format(id.getTotalRemisiones()), maxTamaño) + "\n");
 			}
-			Double redu =  (id.getPorcReduccion() == 0 ? 0.0 : id.getPorcReduccion())/100;
+			Double redu = (id.getPorcReduccion() == 0 ? 0.0 : id.getPorcReduccion()) / 100;
 			Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 			Long server = configuracion.getServer();
 			List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
@@ -463,14 +540,22 @@ public class reduccion implements Serializable {
 			for (Usuario u : uList) {
 				bw.write("------------------------------------------------------------------" + "\n");
 				bw.write("CAJERO:.....................: " + u.getNombre() + " " + u.getApellido() + "\n");
-				bw.write("TOTAL VENTAS x CAJERO:......: " + Calculos.cortarCantidades((getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l) - (getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l) * redu)),maxTamaño) + "\n");
+				bw.write(
+						"TOTAL VENTAS x CAJERO:......: " + Calculos.cortarCantidades(
+								(getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l)
+										- (getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l) * redu)),
+								maxTamaño) + "\n");
 				if (userPropietario.equals("true")) {
 					bw.write("TOTAL VENTAS X CAJERO REAL..: " + Calculos.cortarCantidades(
 							formatea.format(getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, server)),
 							maxTamaño) + "\n");
 				}
 				if (userPropietario.equals("true")) {
-					bw.write("TOTAL REMISIONES X CAJERO...: " + Calculos.cortarCantidades(formatea.format(getTotalRemisionesToDay(id.getFechaInforme(), u, conCierre, server)),maxTamaño) + "\n");
+					bw.write(
+							"TOTAL REMISIONES X CAJERO...: " + Calculos.cortarCantidades(
+									formatea.format(
+											getTotalRemisionesToDay(id.getFechaInforme(), u, conCierre, server)),
+									maxTamaño) + "\n");
 				}
 				if (userPropietario.equals("true")) {
 					bw.write(
@@ -571,11 +656,9 @@ public class reduccion implements Serializable {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-		} 
+		}
 
 	}
-
-	
 
 	private void imprimirInfoPDF(InfoDiario id)
 			throws DocumentException, ParseException, IOException, PrinterException {
@@ -725,8 +808,9 @@ public class reduccion implements Serializable {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REMISIONES: " + id.getTotalRemisiones(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
-		List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo los// cajeros
-		Double redu =  (id.getPorcReduccion() / 100.0);
+		List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
+															// los// cajeros
+		Double redu = (id.getPorcReduccion() / 100.0);
 		System.out.println(redu);
 		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 		Long server = configuracion.getServer();
@@ -736,16 +820,16 @@ public class reduccion implements Serializable {
 							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 			documento.add(new Paragraph(new Phrase(lineSpacing, "CAJERO: " + u.getNombre() + " " + u.getApellido(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-			documento
-					.add(new Paragraph(new Phrase(lineSpacing,
-							"TOTAL VENTAS x CAJERO: "
-									+ (getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l) - (getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l) * redu)),
-							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+			documento.add(new Paragraph(new Phrase(lineSpacing,
+					"TOTAL VENTAS x CAJERO: " + (getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l)
+							- (getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l) * redu)),
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			if (userPropietario.equals("true")) {
-				documento.add(new Paragraph(new Phrase(lineSpacing,
-						"TOTAL VENTAS X CAJERO REAL: "
-								+ getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l),
-						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+				documento
+						.add(new Paragraph(new Phrase(lineSpacing,
+								"TOTAL VENTAS X CAJERO REAL: "
+										+ getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l),
+								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			}
 			if (userPropietario.equals("true")) {
 				documento.add(new Paragraph(new Phrase(lineSpacing,
@@ -763,36 +847,96 @@ public class reduccion implements Serializable {
 		}
 		documento.add(new Paragraph(
 				new Phrase(lineSpacing, "------------------------------------------------------------------",
-						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+						FontFactory.getFont(FontFactory.COURIER, fntSize))));
+		List<DocumentoDetalle> bolsas = documentoDetalleService.getByProductoId(5l,
+				Calculos.fechaInicial(id.getFechaInforme()),
+				Calculos.fechaFinal(id.getFechaInforme()));// se busca la
+																// cantidad de
+																// detalles con
+																// producto
+																// 5=bolsas
+		System.out.println("cantidad bolsas:"+bolsas.size());
+		if (bolsas != null && !bolsas.isEmpty()) {
+			Double totalBolsas = 0.0;
+			Double cantidadBolsas = 0.0;
+			for (DocumentoDetalle d : bolsas) {
+				totalBolsas += d.getParcial();
+				cantidadBolsas += d.getCantidad();
+			}
+			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL DE BOLSAS: " + totalBolsas,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+			documento.add(new Paragraph(new Phrase(lineSpacing, "VALOR: " + cantidadBolsas,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+			documento.add(new Paragraph(
+					new Phrase(lineSpacing, "------------------------------------------------------------------",
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
+		}
+
 		// se verifica si se trata del propietario y se imprime los eventos
 		int maxTamEvento = 22;
 		if (userPropietario.equals("true")) {
 			List<TipoEvento> tiposEventos = tipoEventoService.getByAll();
 			for (TipoEvento tipo : tiposEventos) {
 				// Empresa tipos;
-				documento.add(new Paragraph(new Phrase(lineSpacing, "        " + tipo.getNombre(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+				documento.add(new Paragraph(new Phrase(lineSpacing, "        " + tipo.getNombre(),
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 				List<Evento> evento = eventoService.getByFechaAndTipo(Calculos.fechaInicial(id.getFechaInforme()),
 						Calculos.fechaFinal(id.getFechaInforme()), tipo.getTipoEventoId());
 				for (Evento ev : evento) {
 					switch ("" + ev.getTipoEventoId().getTipoEventoId()) {
-					case "1":						
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Produc. devolución..: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad devolución.: " + ev.getValorActual(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario devolución..: " + Calculos.cortarDescripcion(ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan						
-						documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+					case "1":
+						documento
+								.add(new Paragraph(new Phrase(lineSpacing,
+										"Produc. devolución..: "
+												+ Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(
+								new Paragraph(new Phrase(lineSpacing, "Cantidad devolución.: " + ev.getValorActual(),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(new Paragraph(new Phrase(lineSpacing,
+								"Usuario devolución..: " + Calculos.cortarDescripcion(
+										ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+										maxTamEvento),
+								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(new Paragraph(
+								new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 						break;
 					case "3":
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Produc. Cambio preci: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Precio anterior.....: " + ev.getValorAnterior(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Precio actual.......: " + ev.getValorActual(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario realiza camb: " + Calculos.cortarDescripcion(	ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento
+								.add(new Paragraph(new Phrase(lineSpacing,
+										"Produc. Cambio preci: "
+												+ Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(
+								new Paragraph(new Phrase(lineSpacing, "Precio anterior.....: " + ev.getValorAnterior(),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(
+								new Paragraph(new Phrase(lineSpacing, "Precio actual.......: " + ev.getValorActual(),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(new Paragraph(new Phrase(lineSpacing,
+								"Usuario realiza camb: " + Calculos.cortarDescripcion(
+										ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+										maxTamEvento),
+								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(new Paragraph(
+								new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 						break;
 					case "2":
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Produc. devolución..: " + Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Cantidad devolución.: " + ev.getValorActual(), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "Usuario devolución..: " + Calculos.cortarDescripcion(ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(), maxTamEvento), FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-						documento.add(new Paragraph(new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento
+								.add(new Paragraph(new Phrase(lineSpacing,
+										"Produc. devolución..: "
+												+ Calculos.cortarDescripcion(ev.getCampo(), maxTamEvento),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(
+								new Paragraph(new Phrase(lineSpacing, "Cantidad devolución.: " + ev.getValorActual(),
+										FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(new Paragraph(new Phrase(lineSpacing,
+								"Usuario devolución..: " + Calculos.cortarDescripcion(
+										ev.getUsuarioId().getNombre() + " " + ev.getUsuarioId().getApellido(),
+										maxTamEvento),
+								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+						documento.add(new Paragraph(
+								new Phrase(lineSpacing, "", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 						break;
 					default:
 						break;
@@ -868,9 +1012,9 @@ public class reduccion implements Serializable {
 		}
 		RequestContext.getCurrentInstance().execute("PF('detalles').show();");
 	}
-	
-	public void entadasSalidas() throws ParseException{
-		//String userPropietario = (String) sessionMap.get("userPropietario");	
+
+	public void entadasSalidas() throws ParseException {
+		// String userPropietario = (String) sessionMap.get("userPropietario");
 		if (validarfiltros()) {
 			setReduccionEntradasList(null);
 			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
@@ -883,44 +1027,45 @@ public class reduccion implements Serializable {
 			for (Long i = hoy; i <= hoyfin; i++) {
 				InfoDiario rvo = new InfoDiario();
 				Double porcenta = (double) ((getReduccion() == null ? 0.0 : getReduccion()) / 100);
-				Double cantidadOriginal = 0.0;				
+				Double cantidadOriginal = 0.0;
 				Boolean conCierre = Boolean.FALSE;
 				ivaTotalEntrada = 0.0;
-				iva19Entrada=0.0;
-				iva5Entrada=0.0;
-				base5Entrada=0.0;
-				base19Entrada=0.0;
-				execentoEntrada=0.0;
+				iva19Entrada = 0.0;
+				iva5Entrada = 0.0;
+				base5Entrada = 0.0;
+				base19Entrada = 0.0;
+				execentoEntrada = 0.0;
 				for (Usuario u : usu) {
-					cantidadOriginal = getTotalFaturasToDayEntrada(df.parse(i.toString()), u, conCierre, 1l)+ cantidadOriginal;
+					cantidadOriginal = getTotalFaturasToDayEntrada(df.parse(i.toString()), u, conCierre, 1l)
+							+ cantidadOriginal;
 				}
 				rvo.setTotalOriginal(cantidadOriginal);
 				rvo.setFechaInforme(df.parse(i.toString()));
 				rvo.setFechaIngreso(new Date());
 				rvo.setIvaOriginal(ivaTotalEntrada);
-				rvo.setIva19(iva19Entrada- (iva19Entrada * porcenta));
-				rvo.setIva5(iva5Entrada- (iva5Entrada * porcenta));
-				rvo.setBase19(base19Entrada- (base19Entrada * porcenta));
-				rvo.setBase5(base5Entrada- (base5Entrada * porcenta));
-				rvo.setExcento(execentoEntrada- (execentoEntrada * porcenta));
+				rvo.setIva19(iva19Entrada - (iva19Entrada * porcenta));
+				rvo.setIva5(iva5Entrada - (iva5Entrada * porcenta));
+				rvo.setBase19(base19Entrada - (base19Entrada * porcenta));
+				rvo.setBase5(base5Entrada - (base5Entrada * porcenta));
+				rvo.setExcento(execentoEntrada - (execentoEntrada * porcenta));
 				rvo.setIvaReducido(ivaTotalEntrada - (ivaTotalEntrada * porcenta));
 				getReduccionEntradasList().add(rvo);
 			}
-			Double totalTemp= 0.0;
-			Double totalIvaTemp= 0.0;
-			Double totalIva19Temp=0.0;
-			Double totalIva5Temp=0.0;
-			Double totalBase5Temp=0.0;
-			Double totalBase19Temp=0.0;
-			Double totalExcentoTemp=0.0;
-			for(InfoDiario in: getReduccionEntradasList()){
-				totalTemp=totalTemp+(in.getTotalOriginal()==null?0.0:in.getTotalOriginal());
-				totalIvaTemp= totalIvaTemp+(in.getIvaReducido()==null?0.0:in.getIvaReducido());
-				totalIva19Temp = totalIva19Temp+in.getIva19();
-				totalIva5Temp = totalIva5Temp+in.getIva5();
-				totalBase5Temp = totalBase5Temp+in.getBase5();
-				totalBase19Temp = totalBase19Temp+in.getBase19();
-				totalExcentoTemp = totalExcentoTemp+in.getExcento();
+			Double totalTemp = 0.0;
+			Double totalIvaTemp = 0.0;
+			Double totalIva19Temp = 0.0;
+			Double totalIva5Temp = 0.0;
+			Double totalBase5Temp = 0.0;
+			Double totalBase19Temp = 0.0;
+			Double totalExcentoTemp = 0.0;
+			for (InfoDiario in : getReduccionEntradasList()) {
+				totalTemp = totalTemp + (in.getTotalOriginal() == null ? 0.0 : in.getTotalOriginal());
+				totalIvaTemp = totalIvaTemp + (in.getIvaReducido() == null ? 0.0 : in.getIvaReducido());
+				totalIva19Temp = totalIva19Temp + in.getIva19();
+				totalIva5Temp = totalIva5Temp + in.getIva5();
+				totalBase5Temp = totalBase5Temp + in.getBase5();
+				totalBase19Temp = totalBase19Temp + in.getBase19();
+				totalExcentoTemp = totalExcentoTemp + in.getExcento();
 			}
 			setTotalEntrada(totalTemp);
 			setTotalIvaEntrada(totalIvaTemp);
@@ -931,7 +1076,7 @@ public class reduccion implements Serializable {
 			setTotalExcentoEntrada(totalExcentoTemp);
 			RequestContext.getCurrentInstance().execute("PF('entradasSG').show();");
 		}
-		
+
 	}
 
 	public void reducir() throws ParseException {
@@ -948,6 +1093,7 @@ public class reduccion implements Serializable {
 			Long hoyfin = Long.valueOf(fhoyFin);
 			List<InfoDiario> infoList = new ArrayList<>();
 			infoList = documentoService.buscarInfodiarioByFecha(getFechaInicio(), getFechafin());
+			
 			List<Usuario> usu = new ArrayList<>();
 			usu = usuarioService.getByRol(2l);
 			for (Long i = hoy; i <= hoyfin; i++) {
@@ -959,7 +1105,7 @@ public class reduccion implements Serializable {
 					}
 				}
 				if (rvo.getInfoDiarioId() == null) {
-					
+
 					Double porcenta = (double) ((getReduccion() == null ? 0.0 : getReduccion()) / 100);
 					Double cantidadOriginal = 0.0;
 					Double cantidadReducida = 0.0;
@@ -969,17 +1115,17 @@ public class reduccion implements Serializable {
 					Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 					Long server = configuracion.getServer();
 					ivaTotal = 0.0;
-					iva19=0.0;
-					iva5=0.0;
-					base5=0.0;
-					base19=0.0;
-					execento=0.0;
+					iva19 = 0.0;
+					iva5 = 0.0;
+					base5 = 0.0;
+					base19 = 0.0;
+					execento = 0.0;
 					primeraFactura = "";
 					ultimaFactura = "";
 					costoTotal = 0.0;
 					numeroDocumentos = 0.0;
 					for (Usuario u : usu) {
-						//System.out.println(df.parse(i.toString()));
+						// System.out.println(df.parse(i.toString()));
 						cantidadOriginal = getTotalFaturasToDay(df.parse(i.toString()), u, conCierre, 1l)
 								+ cantidadOriginal;
 						totalRemisiones = getTotalRemisionesToDay(df.parse(i.toString()), u, conCierre, server)
@@ -990,16 +1136,24 @@ public class reduccion implements Serializable {
 						// System.out.println(rvo.getCantidadReducida());
 					}
 					cantidadReducida = cantidadOriginal - (cantidadOriginal * porcenta);
+					Date hoy2 = Calculos.fechaInicial(df.parse(i.toString()));
+					Date hoyfin2 = Calculos.fechaFinal(df.parse(i.toString()));
+					List<Documento> totalDoc = documentoService.getByFacturaByDia(10l, hoy2, hoyfin2);
+					if (totalDoc != null && !totalDoc.isEmpty()) {
+						primeraFactura = totalDoc.get(0).getConsecutivoDian();
+						ultimaFactura = totalDoc.get(totalDoc.size() - 1).getConsecutivoDian();
+						numeroDocumentos = (double) totalDoc.size();
+					}
 					rvo.setCostoOriginal(costoTotal);
 					rvo.setCostoReducido(costoTotal - (costoTotal * porcenta));
 					rvo.setFechaInforme(df.parse(i.toString()));
 					rvo.setFechaIngreso(new Date());
 					rvo.setIvaOriginal(ivaTotal);
-					rvo.setIva19(iva19- (iva19 * porcenta));
-					rvo.setIva5(iva5- (iva5 * porcenta));
-					rvo.setBase19(base19- (base19 * porcenta));
-					rvo.setBase5(base5- (base5 * porcenta));
-					rvo.setExcento(execento- (execento * porcenta));
+					rvo.setIva19(iva19 - (iva19 * porcenta));
+					rvo.setIva5(iva5 - (iva5 * porcenta));
+					rvo.setBase19(base19 - (base19 * porcenta));
+					rvo.setBase5(base5 - (base5 * porcenta));
+					rvo.setExcento(execento - (execento * porcenta));
 					rvo.setIvaReducido(ivaTotal - (ivaTotal * porcenta));
 					rvo.setTotalOriginal(cantidadOriginal);
 					rvo.setTotalReducido(cantidadReducida);
@@ -1013,21 +1167,21 @@ public class reduccion implements Serializable {
 				}
 				getReduccionList().add(rvo);
 			}
-			Double totalTemp= 0.0;
-			Double totalIvaTemp= 0.0;
-			Double totalIva19Temp=0.0;
-			Double totalIva5Temp=0.0;
-			Double totalBase5Temp=0.0;
-			Double totalBase19Temp=0.0;
-			Double totalExcentoTemp=0.0;
-			for(InfoDiario in: getReduccionList()){
-				totalTemp=totalTemp+in.getTotalReducido();
-				totalIvaTemp= totalIvaTemp+in.getIvaReducido();
-				totalIva19Temp = totalIva19Temp+in.getIva19();
-				totalIva5Temp = totalIva5Temp+in.getIva5();
-				totalBase5Temp = totalBase5Temp+in.getBase5();
-				totalBase19Temp = totalBase19Temp+in.getBase19();
-				totalExcentoTemp = totalExcentoTemp+in.getExcento();
+			Double totalTemp = 0.0;
+			Double totalIvaTemp = 0.0;
+			Double totalIva19Temp = 0.0;
+			Double totalIva5Temp = 0.0;
+			Double totalBase5Temp = 0.0;
+			Double totalBase19Temp = 0.0;
+			Double totalExcentoTemp = 0.0;
+			for (InfoDiario in : getReduccionList()) {
+				totalTemp = totalTemp + in.getTotalReducido();
+				totalIvaTemp = totalIvaTemp + in.getIvaReducido();
+				totalIva19Temp = totalIva19Temp + in.getIva19();
+				totalIva5Temp = totalIva5Temp + in.getIva5();
+				totalBase5Temp = totalBase5Temp + in.getBase5();
+				totalBase19Temp = totalBase19Temp + in.getBase19();
+				totalExcentoTemp = totalExcentoTemp + in.getExcento();
 			}
 			setTotal(totalTemp);
 			setTotalIva(totalIvaTemp);
@@ -1111,7 +1265,7 @@ public class reduccion implements Serializable {
 
 		List<Long> tipoDocumentoId = new ArrayList<>();
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
-		tipoDocumentoId.add(8l);
+		//tipoDocumentoId.add(8l);
 		Date hoy = Calculos.fechaInicial(dia);
 		Date hoyfin = Calculos.fechaFinal(dia);
 		List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,
@@ -1121,38 +1275,34 @@ public class reduccion implements Serializable {
 			if (d.getTotal() != null) {
 				total = total + d.getTotal().doubleValue();
 			}
-			if (d!=null && d.getIva() != null) {
-				ivaTotal = ivaTotal + (d.getIva()==null?0.0:d.getIva());
+			if (d != null && d.getIva() != null) {
+				ivaTotal = ivaTotal + (d.getIva() == null ? 0.0 : d.getIva());
 			}
-			if (d!=null && d.getIva19() != null) {
-				iva19 = iva19 + (d.getIva19()==null?0.0:d.getIva19());
+			if (d != null && d.getIva19() != null) {
+				iva19 = iva19 + (d.getIva19() == null ? 0.0 : d.getIva19());
 			}
-			if (d!=null && d.getIva5() != null) {
-				iva5 = iva5 + (d.getIva5()==null?0.0:d.getIva5());
+			if (d != null && d.getIva5() != null) {
+				iva5 = iva5 + (d.getIva5() == null ? 0.0 : d.getIva5());
 			}
-			if (d!=null && d.getBase5() != null) {
-				base5 = base5 + (d.getBase5()==null?0.0:d.getBase5());
+			if (d != null && d.getBase5() != null) {
+				base5 = base5 + (d.getBase5() == null ? 0.0 : d.getBase5());
 			}
-			if (d!=null && d.getBase19() != null) {
-				base19 = base19 + (d.getBase19()==null?0.0:d.getBase19());
+			if (d != null && d.getBase19() != null) {
+				base19 = base19 + (d.getBase19() == null ? 0.0 : d.getBase19());
 			}
-			if (d!=null && d.getExcento() != null) {
-				execento = execento + (d.getExcento()==null?0.0:d.getExcento());
+			if (d != null && d.getExcento() != null) {
+				execento = execento + (d.getExcento() == null ? 0.0 : d.getExcento());
 			}
 			List<DocumentoDetalle> dd = new ArrayList<>();
-			dd = documentoDetalleService.getByDocumento(d.getDocumentoId(),1l);
+			dd = documentoDetalleService.getByDocumento(d.getDocumentoId(), 1l);
 			for (DocumentoDetalle dode : dd) {
 				costoTotal = dode.getProductoId().getCosto() + costoTotal;
 			}
 		}
-		if (factDia != null && !factDia.isEmpty()) {
-			primeraFactura = factDia.get(0).getConsecutivoDian();
-			ultimaFactura = factDia.get(factDia.size() - 1).getConsecutivoDian();
-			numeroDocumentos = (double) factDia.size();
-		}
+		
 		return total;
 	}
-	
+
 	public Double getTotalFaturasToDayEntrada(Date dia, Usuario usuario, Boolean conCierre, Long server)
 			throws ParseException {
 
@@ -1165,25 +1315,25 @@ public class reduccion implements Serializable {
 			if (d.getTotal() != null) {
 				total = total + d.getTotal().doubleValue();
 			}
-			if (d!=null && d.getIva() != null) {
-				ivaTotalEntrada = ivaTotalEntrada + (d.getIva()==null?0.0:d.getIva());
+			if (d != null && d.getIva() != null) {
+				ivaTotalEntrada = ivaTotalEntrada + (d.getIva() == null ? 0.0 : d.getIva());
 			}
-			if (d!=null && d.getIva19() != null) {
-				iva19Entrada = iva19Entrada + (d.getIva19()==null?0.0:d.getIva19());
+			if (d != null && d.getIva19() != null) {
+				iva19Entrada = iva19Entrada + (d.getIva19() == null ? 0.0 : d.getIva19());
 			}
-			if (d!=null && d.getIva5() != null) {
-				iva5Entrada = iva5Entrada + (d.getIva5()==null?0.0:d.getIva5());
+			if (d != null && d.getIva5() != null) {
+				iva5Entrada = iva5Entrada + (d.getIva5() == null ? 0.0 : d.getIva5());
 			}
-			if (d!=null && d.getBase5() != null) {
-				base5Entrada = base5Entrada + (d.getBase5()==null?0.0:d.getBase5());
+			if (d != null && d.getBase5() != null) {
+				base5Entrada = base5Entrada + (d.getBase5() == null ? 0.0 : d.getBase5());
 			}
-			if (d!=null && d.getBase19() != null) {
-				base19Entrada = base19Entrada + (d.getBase19()==null?0.0:d.getBase19());
+			if (d != null && d.getBase19() != null) {
+				base19Entrada = base19Entrada + (d.getBase19() == null ? 0.0 : d.getBase19());
 			}
-			if (d!=null && d.getExcento() != null) {
-				execentoEntrada = execentoEntrada + (d.getExcento()==null?0.0:d.getExcento());
+			if (d != null && d.getExcento() != null) {
+				execentoEntrada = execentoEntrada + (d.getExcento() == null ? 0.0 : d.getExcento());
 			}
-			
+
 		}
 		return total;
 	}
@@ -1192,7 +1342,7 @@ public class reduccion implements Serializable {
 
 		List<Long> tipoDocumentoId = new ArrayList<>();
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
-		tipoDocumentoId.add(8l);
+		//tipoDocumentoId.add(8l);
 		Date hoy = Calculos.fechaInicial(dia);
 		Date hoyfin = Calculos.fechaFinal(dia);
 		List<Documento> factDia = documentoService.getByMacAndTipoDocumento(tipoDocumentoId, mac, hoy, hoyfin,
@@ -1200,7 +1350,7 @@ public class reduccion implements Serializable {
 		Double total = 0.0;
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {
-				total = total + d.getTotal().doubleValue();
+				total = total + d.getTotal();
 			}
 		}
 		numeroDocumentosMac = (double) factDia.size();
@@ -1269,7 +1419,7 @@ public class reduccion implements Serializable {
 		tipoDocumentoId.add(10l); // tipo documento factura de salida
 		// tipoDocumentoId.add(4l); // tipo documento cotizacion
 		// tipoDocumentoId.add(9l); // numero de guia
-		List<Documento> factDia = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId,1l);
+		List<Documento> factDia = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, 1l);
 		return (long) (factDia.size());
 	}
 
@@ -1278,12 +1428,18 @@ public class reduccion implements Serializable {
 		return "";
 	}
 
-	public StreamedContent getFileXls(InfoDiario info) {
+	public StreamedContent getFileXls(InfoDiario info) throws DocumentException, IOException, PrinterException, ParseException  {
 		StreamedContent file = null;
-		InputStream stream;
-		stream = this.crearLibro(info);
+		imprimirinforme(info);
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		String fhoyIni = df.format(info.getFechaInforme());
+		String carpeta = "C:\\facturas\\infoDiario";
+		String pdf = "\\informeDiario_" + fhoyIni + ".pdf";
+		File f= new File(carpeta+pdf);
+		InputStream stream = new FileInputStream(f);
+		//stream = this.crearLibro(info);
 		if (stream != null) {
-			file = new DefaultStreamedContent(stream, "application/xls", "InformeDiario.xls");
+			file = new DefaultStreamedContent(stream, "application/pdf", pdf);
 		}
 		return file;
 	}
@@ -1405,7 +1561,8 @@ public class reduccion implements Serializable {
 				Double redu = (double) (info.getPorcReduccion() / 100);
 				Double ventas = userPropietario.equals("true")
 						? getTotalFaturasToDay(info.getFechaInforme(), u, conCierre, 1l)
-						: (getTotalFaturasToDay(info.getFechaInforme(), u, conCierre, 1l) - getTotalFaturasToDay(info.getFechaInforme(), u, conCierre, 1l) * redu);
+						: (getTotalFaturasToDay(info.getFechaInforme(), u, conCierre, 1l)
+								- getTotalFaturasToDay(info.getFechaInforme(), u, conCierre, 1l) * redu);
 				cellBi = row.createCell((short) 1);
 				cellBi.setCellValue("" + ventas);
 
@@ -1584,8 +1741,8 @@ public class reduccion implements Serializable {
 	}
 
 	public List<InfoDiario> getReduccionEntradasList() {
-		if(reduccionEntradasList==null){
-			reduccionEntradasList=new ArrayList<>();
+		if (reduccionEntradasList == null) {
+			reduccionEntradasList = new ArrayList<>();
 		}
 		return reduccionEntradasList;
 	}
@@ -1652,11 +1809,11 @@ public class reduccion implements Serializable {
 
 	public Double getTotalDiferencia() {
 		try {
-			totalDiferencia=getTotal()-getTotalEntrada();
+			totalDiferencia = getTotal() - getTotalEntrada();
 		} catch (Exception e) {
-			totalDiferencia=0.0;
+			totalDiferencia = 0.0;
 		}
-		
+
 		return totalDiferencia;
 	}
 
@@ -1666,11 +1823,11 @@ public class reduccion implements Serializable {
 
 	public Double getTotalIvaDiferencia() {
 		try {
-			totalIvaDiferencia= getTotalIva()-getTotalIvaEntrada();
+			totalIvaDiferencia = getTotalIva() - getTotalIvaEntrada();
 		} catch (Exception e) {
-			totalIvaDiferencia= 0.0;
+			totalIvaDiferencia = 0.0;
 		}
-		
+
 		return totalIvaDiferencia;
 	}
 
@@ -1680,10 +1837,10 @@ public class reduccion implements Serializable {
 
 	public Double getTotalIva5Diferencia() {
 		try {
-			totalIva5Diferencia=getTotalIva5()-getTotalIva5Entrada();
+			totalIva5Diferencia = getTotalIva5() - getTotalIva5Entrada();
 		} catch (Exception e) {
-			totalIva5Diferencia=0.0;
-		}	
+			totalIva5Diferencia = 0.0;
+		}
 		return totalIva5Diferencia;
 	}
 
@@ -1693,11 +1850,11 @@ public class reduccion implements Serializable {
 
 	public Double getTotalIva19Diferencia() {
 		try {
-			totalIva19Diferencia=getTotalIva19()-getTotalIva19Entrada();
+			totalIva19Diferencia = getTotalIva19() - getTotalIva19Entrada();
 		} catch (Exception e) {
-			totalIva19Diferencia=0.0;
+			totalIva19Diferencia = 0.0;
 		}
-		
+
 		return totalIva19Diferencia;
 	}
 
@@ -1707,11 +1864,11 @@ public class reduccion implements Serializable {
 
 	public Double getTotalbase5Diferencia() {
 		try {
-			totalbase5Diferencia= getTotalbase5()-getTotalbase5Entrada();
+			totalbase5Diferencia = getTotalbase5() - getTotalbase5Entrada();
 		} catch (Exception e) {
-			totalbase5Diferencia=0.0;
+			totalbase5Diferencia = 0.0;
 		}
-		
+
 		return totalbase5Diferencia;
 	}
 
@@ -1721,11 +1878,11 @@ public class reduccion implements Serializable {
 
 	public Double getTotalbase19Diferencia() {
 		try {
-			totalbase19Diferencia=getTotalbase19()-getTotalbase19Entrada();
+			totalbase19Diferencia = getTotalbase19() - getTotalbase19Entrada();
 		} catch (Exception e) {
-			totalbase19Diferencia=0.0;
+			totalbase19Diferencia = 0.0;
 		}
-		
+
 		return totalbase19Diferencia;
 	}
 
@@ -1735,17 +1892,15 @@ public class reduccion implements Serializable {
 
 	public Double getTotalExcentoDiferencia() {
 		try {
-			totalExcentoDiferencia=getTotalExcento()-getTotalExcentoEntrada();
+			totalExcentoDiferencia = getTotalExcento() - getTotalExcentoEntrada();
 		} catch (Exception e) {
-			totalExcentoDiferencia=0.0;
-		}		
+			totalExcentoDiferencia = 0.0;
+		}
 		return totalExcentoDiferencia;
 	}
 
 	public void setTotalExcentoDiferencia(Double totalExcentoDiferencia) {
 		this.totalExcentoDiferencia = totalExcentoDiferencia;
-	} 
-	
-	
-	
+	}
+
 }

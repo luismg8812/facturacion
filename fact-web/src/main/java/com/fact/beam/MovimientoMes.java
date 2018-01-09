@@ -673,7 +673,7 @@ public class MovimientoMes implements Serializable {
 				return "";
 				
 			}
-			System.out.println("grupo asignado:"+getGrupoNew().getNombre());
+			//System.out.println("grupo asignado:"+getGrupoNew().getNombre());
 			//se existe un cambio de precio se registra el evento
 			if(!getPublicoNew().equals(getProductoEdict().getCostoPublico())){
 				Evento evento = new Evento();

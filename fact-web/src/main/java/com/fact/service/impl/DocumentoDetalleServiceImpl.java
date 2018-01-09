@@ -79,5 +79,10 @@ public class DocumentoDetalleServiceImpl implements DocumentoDetalleService{
 		}
 		return documentoDetalleDao.getbyEmpleado(empleadoId,  hoy, hoyfin);
 	}
+
+	@Override
+	public List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin) throws FactException {
+		return documentoDetalleDao.getByProductoId(productoId,hoy, hoyfin);
+	}
 	
 }

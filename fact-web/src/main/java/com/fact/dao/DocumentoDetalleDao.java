@@ -23,5 +23,5 @@ public interface DocumentoDetalleDao {
 	void borrar(Long documentoDetalleId,Long estado, Long server)throws FactException;
 	List<DocumentoDetalle> getPropinasByUsuario(Long tipoDocumentoId, Date hoy, Date hoyfin, Date hoyfin2,Long usuarioId, Boolean conCierre, Long server)throws FactException;
 	List<DocumentoDetalle> getbyEmpleado(Long empleadoId, Date hoy, Date hoyfin)throws FactException;
-		
+	List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin)throws FactException;
 }
