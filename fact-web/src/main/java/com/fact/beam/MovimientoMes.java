@@ -49,9 +49,14 @@ import com.fact.vo.DocumentoDetalleVo;
 public class MovimientoMes implements Serializable {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2599894690114718736L;
+
+	/**
 	 * luis miguel gonzalez NiceSoft luismg8812@hotmail.com
 	 */
-	private static final long serialVersionUID = 1L;
+	
 
 	@EJB
 	private TipoDocumentoService tipoDocumentoService;
@@ -81,7 +86,7 @@ public class MovimientoMes implements Serializable {
 	private EventoService eventoService;
 
 	
-	List<TipoDocumento> tipoDocumentos;
+	private List<TipoDocumento> tipoDocumentos;
 	List<DocumentoDetalleVo> productos;
 	List<Producto> productosAll;
 	List<Proveedor> proveedoresAll;
@@ -93,10 +98,9 @@ public class MovimientoMes implements Serializable {
 	Producto productoSelect = new Producto();
 	Proveedor proveedorSelect = new Proveedor();
 	Documento documento;
-	//Usuario usuario = Login.getUsuarioLogin();
 	
 	Long tipoDocumento = 2l;
-	Long CodigoProveedor;
+	Long codigoProveedor;
 	String tipoDocumentoEntrada;
 	String identificacionProveedor;
 	Date fechaCreacion;
@@ -664,18 +668,16 @@ public class MovimientoMes implements Serializable {
 		String crearN = getEditarNew().toUpperCase();
 		if (crearN.equals("S")) {
 			
-			//RequestContext.getCurrentInstance().execute("alert('entra al if')");
 			String nombre = getProductoEdict().getNombre().trim();
 			getProductoEdict().setNombre(nombre);
 			Producto prodNew = getProductoEdict();
 			if(getProductoEdict().getProductoId()==1l){
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No es posible editar el producto ¡Varios!"));	
-				return "";
-				
+				return "";	
 			}
-			//System.out.println("grupo asignado:"+getGrupoNew().getNombre());
+			
 			//se existe un cambio de precio se registra el evento
-			if(!getPublicoNew().equals(getProductoEdict().getCostoPublico())){
+			if(getPublicoNew()!=null && getPublicoNew().equals(getProductoEdict().getCostoPublico())){
 				Evento evento = new Evento();
 				TipoEvento tipoEvento= new TipoEvento();
 				tipoEvento.setTipoEventoId(3l); // se envia tipo evento igual a cambio de precio
@@ -687,10 +689,9 @@ public class MovimientoMes implements Serializable {
 				eventoService.save(evento);
 			}
 			
-			//prodNew.setProductoId(getCodigoNew().longValue());
 			if (getValanzaNew() != null) {
-				prodNew.setBalanza(getValanzaNew().toUpperCase().equals("N") ? 0l : 1l);
-				if(getValanzaNew().toUpperCase().equals("S")){
+				prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("N") ? 0l : 1l);
+				if(getValanzaNew().equalsIgnoreCase("S")){
 					setUnidadNew("N");
 				}else{
 					setUnidadNew("S");
@@ -737,7 +738,6 @@ public class MovimientoMes implements Serializable {
 				prodNew.setGrupoId(getGrupoNew());
 			}
 			prodNew.setMarcaId(getMarcaNew());
-			//prodNew.setNombre(getArticuloNew().toUpperCase());
 			prodNew.setPeso(getPesoKgNew());
 			prodNew.setStockMax(getStockMaxNew());
 			prodNew.setStockMin(getStockMinNew());
@@ -748,8 +748,6 @@ public class MovimientoMes implements Serializable {
 			if(server==2l){
 				productoService.update(prodNew,2l);
 			}
-			//getProductosAll().add(productoSelect);
-			//setCantidad(0l);
 			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto editado Exitosamente"));		
 			limpiarEditar();
@@ -758,10 +756,6 @@ public class MovimientoMes implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto NO editado"));	
 		}
 		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
-		//setCrearNew("N");		
-		//RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
-		//RequestContext.getCurrentInstance().execute("document.getElementById('deseaGuardar').style.display='none';");
-		//RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProducto').style.display='none';");
 		return "";
 	}
 	
@@ -1601,11 +1595,11 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public Long getCodigoProveedor() {
-		return CodigoProveedor;
+		return codigoProveedor;
 	}
 
 	public void setCodigoProveedor(Long codigoProveedor) {
-		CodigoProveedor = codigoProveedor;
+		this.codigoProveedor = codigoProveedor;
 	}
 
 	public String getTipoDocumentoEntrada() {

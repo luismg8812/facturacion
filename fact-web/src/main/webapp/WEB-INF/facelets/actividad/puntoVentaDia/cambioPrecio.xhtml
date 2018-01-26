@@ -21,7 +21,7 @@
 	<table width="100%" align="center">
 		<tr>
 			<td><p:outputLabel value="Precio:" /></td>
-			<td><p:inputNumber value="#{puntoVentaDia.cambioTemp}"  size="10"  onkeydown="cambioPrecio1(event)" >
+			<td><p:inputNumber value="#{puntoVentaDia.cambioTemp}"  size="10"  onkeydown="cambioPrecio1(event)" onblur="PF('cambioPrecio').hide();">
 				<p:ajax event="blur"  partialSubmit="true" 
 					        listener="#{puntoVentaDia.recalcularPrecio}" update="dataList1,excento,gravado,iva,total"/> 
 			</p:inputNumber> </td>

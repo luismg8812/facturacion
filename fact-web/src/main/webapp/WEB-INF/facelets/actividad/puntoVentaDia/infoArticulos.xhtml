@@ -179,6 +179,12 @@
 		 document.getElementById('costoEdit_input').focus();
 		   document.getElementById('costoEdit_input').select();
 	}
+
+	function calcular2(){		  
+		alert("entra");
+		  document.getElementById('calcular2').click();
+		  
+	  }
 	</script>
 	<p:growl id="growl3" life="7000" />
 	<table width="100%" align="center">
@@ -230,9 +236,9 @@
 			<td width="20%">
 			<p:outputLabel value="Publico: "  /></td>
 			<td width="20">
-			<p:inputNumber value="#{movimientoMes.publicoNew}" size="15" maxlength="20"
+			<p:inputNumber value="#{movimientoMes.publicoNew}" size="15" maxlength="20" onblur="calcular2"
 					onkeydown="teclasEditProducto(event,this)" id="publicoEdit" >
-				<p:ajax event="keyup" partialSubmit="true"/>
+				<p:ajax event="blur" partialSubmit="true" onstart="calcular2"/>
 				</p:inputNumber>	</td>
 			
 		</tr>
@@ -335,13 +341,16 @@
 		<tr>
 			<td><p:outputLabel value="Desea Editar el Producto: " /></td>
 			<td><p:inputText value="#{movimientoMes.editarNew}" maxlength="1"
-					id="editar_input" size="3" onkeyup="">
-					<p:ajax event="keydown" partialSubmit="true" delay="30"
+					id="editar_input" size="3" >
+					<p:ajax event="keydown" partialSubmit="true" delay="30" 
 						listener="#{movimientoMes.editarNewProducto}" update="growl3"
 						/>
 				</p:inputText></td>
 
 		</tr>
 	</table>
-
+	<p:commandButton value="."
+							id="calcular2" style="display:inline"
+							process="publicoEdit"
+							update="publicoEdit" />
 </ui:composition>

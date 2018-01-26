@@ -2054,20 +2054,29 @@ public class PuntoVentaDia implements Serializable {
 //			return;
 //		}
 		int pos = getProductos().indexOf(dCambio);
-		Double descuento = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
+		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
 		if (dCambio.getUnitario() > getCambioTemp()) {
-			descuento += (dCambio.getUnitario() - getCambioTemp());
+			descuentoTemp += (dCambio.getUnitario() - getCambioTemp());
 		}
-		getDocumento().setDescuento(descuento);
-		Double cantidad = dCambio.getCantidad();
+		getDocumento().setDescuento(descuentoTemp);
+		Double cantidadtemp = dCambio.getCantidad();
 		dCambio.setUnitario(getCambioTemp());
-		dCambio.setParcial(cantidad * getCambioTemp());
+		dCambio.setParcial(cantidadtemp * getCambioTemp());
 		getProductos().set(pos, dCambio);
 
-		Calculos.calcularExcento(getDocumento(), getProductos());
-		// for(DocumentoDetalleVo d: getProductos() ){
-		// document.getElementById('dataList1:0:precioVariable_input').select();
-		// }
+		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
+		Long server= configuracion().getServer();
+		if(tipo==9l && server==2){
+			documentoService.save(getDocumento(), server);
+		}else{
+			documentoService.save(getDocumento(), 1l);
+		}
+		
+		setTotal(getDocumento().getTotal());
+		setIva(getDocumento().getIva());
+		setExcento(getDocumento().getExcento());
+		setGravado(getDocumento().getGravado());
 	}
 
 	public void modificarUltimaFactura() {
