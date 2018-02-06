@@ -236,8 +236,6 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void buscarProductoCodBarras() {
-		// System.out.println("busqueda por codigo de
-		// barras:"+getCodigoBarras());
 		String completo = getCodigoBarras();
 		String codigoProducoString = "";
 		if (completo != null && !completo.isEmpty()) {
@@ -258,37 +256,41 @@ public class PuntoVentaDia implements Serializable {
 					cantidadEnter(null);
 				} else {
 					p = getProductosAllCodigo().get(Long.valueOf(completo));
-					if(p!=null){
+					if (p != null) {
 						System.out.println("entra al else");
 						RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
 						setCodigoInterno(p.getProductoId().toString());
 						setArticulo(p);
 						setUnidad(p.getCostoPublico().doubleValue());
 						productoSelect = p;
-						RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
+						RequestContext.getCurrentInstance()
+								.execute("document.getElementById('cantidad_in1').select();");
 						RequestContext.getCurrentInstance().update("art_11");
 						RequestContext.getCurrentInstance().update("art_11_input");
 						RequestContext.getCurrentInstance().update("cod_1_input");
 						RequestContext.getCurrentInstance().update("cod_1");
-					}	
+					}
 				}
 			} catch (Exception e) {
-				p = getProductosAllCodigo().get(Long.valueOf(completo));
-				if(p!=null){
-					System.out.println("entra al else");
-					RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
-					setCodigoInterno(p.getProductoId().toString());
-					setArticulo(p);
-					setUnidad(p.getCostoPublico().doubleValue());
-					productoSelect = p;
-					RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
-					RequestContext.getCurrentInstance().update("art_11");
-					RequestContext.getCurrentInstance().update("art_11_input");
-					RequestContext.getCurrentInstance().update("cod_1_input");
-					RequestContext.getCurrentInstance().update("cod_1");
-				}	
-				System.out.println("cod de barras no numerico");
-				e.printStackTrace();
+				try {
+					p = getProductosAllCodigo().get(Long.valueOf(completo));
+					if (p != null) {
+						RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
+						setCodigoInterno(p.getProductoId().toString());
+						setArticulo(p);
+						setUnidad(p.getCostoPublico());
+						productoSelect = p;
+						RequestContext.getCurrentInstance()
+								.execute("document.getElementById('cantidad_in1').select();");
+						RequestContext.getCurrentInstance().update("art_11");
+						RequestContext.getCurrentInstance().update("art_11_input");
+						RequestContext.getCurrentInstance().update("cod_1_input");
+						RequestContext.getCurrentInstance().update("cod_1");
+					}
+				} catch (Exception e2) {
+
+				}
+
 			}
 
 		}
@@ -688,7 +690,7 @@ public class PuntoVentaDia implements Serializable {
 			docDetalleVo.setUnitario(getPx01());
 			// setUnidad(getPx01());
 			docDetalleVo.setParcial(getPx01());
-			getProductos().add(0,docDetalleVo);
+			getProductos().add(0, docDetalleVo);
 			setDocumento(Calculos.calcularExcento(getDocumento(), getProductos())); // en
 																					// esta
 																					// funcion
@@ -763,7 +765,9 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	/**
-	 * Metodo que ejecuta las acciones de restar de inventario cuando se agrega la cantidad de un producto;
+	 * Metodo que ejecuta las acciones de restar de inventario cuando se agrega
+	 * la cantidad de un producto;
+	 * 
 	 * @param event
 	 * @return
 	 */
@@ -788,10 +792,9 @@ public class PuntoVentaDia implements Serializable {
 				return "";
 				// getProductos().add(docDetalleVo);
 			}
-			//se agrega un tope maximo de cantidad de 1500
-			if(getCantidad()>1500){
-				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage("La cantidad maxima es de 1500"));
+			// se agrega un tope maximo de cantidad de 1500
+			if (getCantidad() > 1500) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La cantidad maxima es de 1500"));
 				return "";
 			}
 			// si stock esta activo se valida que la cantidad en existencia es
@@ -947,7 +950,7 @@ public class PuntoVentaDia implements Serializable {
 				}
 				if (getCantidad() != 0l) {
 
-					getProductos().add(0,docDetalleVo);
+					getProductos().add(0, docDetalleVo);
 				}
 
 			}
@@ -984,14 +987,16 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	/**
-	 * Metodo que actualiza y resta las cantidades de inventario de los subproductos
+	 * Metodo que actualiza y resta las cantidades de inventario de los
+	 * subproductos
+	 * 
 	 * @param productoSelect3
 	 */
 	private void restarCantidadesSubProducto(Producto productoSelect3) {
 		List<SubProducto> subProductos = productoService.subProductoByProducto(productoSelect3.getProductoId());
-		for(SubProducto s: subProductos){
-			Double cantidadAnterior=s.getProductoHijo().getCantidad();
-			Double cantidadNueva = cantidadAnterior-s.getCantidad();
+		for (SubProducto s : subProductos) {
+			Double cantidadAnterior = s.getProductoHijo().getCantidad();
+			Double cantidadNueva = cantidadAnterior - s.getCantidad();
 			s.getProductoHijo().setCantidad(cantidadNueva);
 			productoService.update(s.getProductoHijo(), 1l);
 		}
@@ -1029,13 +1034,7 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
-	public String imprimirFactura()
-			throws DocumentException, IOException, PrinterException, PrintException, InterruptedException {
-		// colocar la ruta de la imagen principal de la empresa
-		// 77 acabar de cambiar los campos en la empresion de recibos txt y pdf
-		System.out.println("entra a imprimir");
-		// System.out.println("Documento:"+getDocumento().getDocumentoId());
-		// System.out.println("Usuario:"+ usuario().getLogin());
+	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null) {
 			return "";
 		}
@@ -1043,7 +1042,7 @@ public class PuntoVentaDia implements Serializable {
 		Long numeroImpresiones = configuracion.getNumImpresion();
 		Long server = configuracion.getServer();
 		String impresora = impresora();
-		if (getImpresion() != null && getImpresion().toUpperCase().equals("S")) {
+		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = Login.getEmpresaLogin();
 			String tituloFactura = "";
 			getDocumento().setImpreso(1l);
@@ -1116,7 +1115,7 @@ public class PuntoVentaDia implements Serializable {
 			}
 			// se asigna un tipo de pago
 			TipoPago tipa = new TipoPago();
-			if (getCartera().toUpperCase().equals("S")) {
+			if (getCartera().equalsIgnoreCase("S")) {
 				tipa.setTipoPagoId(2l);// pago a credito
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2l;
@@ -1213,7 +1212,7 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
 
 		}
-		if (getImpresion() != null && getImpresion().toUpperCase().equals("N")) {
+		if (getImpresion() == null || getImpresion().equalsIgnoreCase("N")) {
 			limpiar();
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
@@ -1266,8 +1265,9 @@ public class PuntoVentaDia implements Serializable {
 		// Double totalTemp = getDocumento().getTotal() +
 		// (getDocumento().getTotal() * des);
 		Double totalTemp = getDocumento().getTotal();
-		//Long tem = Long.valueOf(
-		//		totalTemp.toString().substring(totalTemp.toString().length() - 4, totalTemp.toString().length() - 2));
+		// Long tem = Long.valueOf(
+		// totalTemp.toString().substring(totalTemp.toString().length() - 4,
+		// totalTemp.toString().length() - 2));
 		// if (tem < 50) {
 		// totalTemp = totalTemp + (50 - tem);
 		// } else {
@@ -1934,7 +1934,7 @@ public class PuntoVentaDia implements Serializable {
 			vo.setFechaRegistro(d1.getFechaRegistro());
 			vo.setParcial(d1.getParcial());
 			vo.setProductoId(d1.getProductoId());
-			System.out.println("productos:"+d1.getProductoId().getNombre());
+			System.out.println("productos:" + d1.getProductoId().getNombre());
 			if (Calculos.validarPromo(d1.getProductoId(), cantidad)) {
 				Double precioPromo = d1.getProductoId().getPubPromo();
 				Double cantidadPromo = d1.getProductoId().getkGPromo();
@@ -2050,9 +2050,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public void recalcularPrecio() {
 		System.out.println("cambio de precio:" + getCambioTemp());
-//		if (getCambioTemp() < dCambio.getUnitario()) { //se comenta el pedaso de codigo que hace que se pueda bajar el precio
-//			return;
-//		}
+		//se comenta el pedaso de codigo que hace que se pueda bajar el precio		
 		int pos = getProductos().indexOf(dCambio);
 		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
 		if (dCambio.getUnitario() > getCambioTemp()) {
@@ -2066,13 +2064,17 @@ public class PuntoVentaDia implements Serializable {
 
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
-		Long server= configuracion().getServer();
-		if(tipo==9l && server==2){
-			documentoService.save(getDocumento(), server);
-		}else{
-			documentoService.save(getDocumento(), 1l);
+		Long server = configuracion().getServer();
+		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId());
+		d.setParcial(cantidadtemp * getCambioTemp());
+		if (tipo == 9l && server == 2) {
+
+			documentoService.update(getDocumento(), server);
+			documentoDetalleService.update(d, server);
+		} else {
+			documentoService.update(getDocumento(), 1l);
+			documentoDetalleService.update(d, 1l);
 		}
-		
 		setTotal(getDocumento().getTotal());
 		setIva(getDocumento().getIva());
 		setExcento(getDocumento().getExcento());
@@ -2764,7 +2766,7 @@ public class PuntoVentaDia implements Serializable {
 			tipoDocumentoId.add(4l); // tipo documento cotizacion
 			tipoDocumentoId.add(9l); // numero de guia
 			// se agrega al anterior siguiente cotizaciones y remisiones por que
-			// zohan dijo que lo tenia que hacer		
+			// zohan dijo que lo tenia que hacer
 			Usuario usuario = usuario();
 			Configuracion configuracion = configuracion();
 			Long server = configuracion.getServer();

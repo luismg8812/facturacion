@@ -14,11 +14,11 @@ import com.fact.model.Usuario;
 @Local
 public interface AbonoDao {
 
-	void save(Abono abono)throws FactException;
-	void update(Abono abono)throws FactException;
-	void delete(Abono abono)throws FactException;
-	Abono getById(Long abono)throws FactException;
-	List<Abono> getByDocumento(Long documentoId) throws FactException;
-	List<Abono> abonosDia(Date hoy, Date hoyfin, Usuario usuario,List<Long> tipoDocumentoId) throws FactException;
+	void save(Abono abono) ;
+	void update(Abono abono);
+	void delete(Abono abono);
+	Abono getById(Long abono);
+	List<Abono> getByDocumento(Long documentoId) ;
+	List<Abono> abonosDia(Date hoy, Date hoyfin, Usuario usuario,List<Long> tipoDocumentoId);
 		
 }

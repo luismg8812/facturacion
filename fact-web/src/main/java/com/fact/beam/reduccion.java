@@ -481,8 +481,7 @@ public class reduccion implements Serializable {
 							formatea.format(getTotalFaturasMac(id.getFechaInforme(), m, conCierre, 1l)), 19);
 					bw.write("" + Calculos.cortarDescripcion(m, 20) + "  "
 							+ Calculos.cortarCantidades(numeroDocumentosMac, 10) + "  " + totalMac + "\n");
-				} catch (ParseException e1) {
-					// TODO Auto-generated catch block
+				} catch (ParseException e1) {					
 					e1.printStackTrace();
 				}
 			}
@@ -720,18 +719,18 @@ public class reduccion implements Serializable {
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		// se trae la lista de las mac que facturaron
 		List<String> macs = documentoService.getMagList();
+		Double redu = (id.getPorcReduccion() / 100.0);
 		for (String m : macs) {
 			numeroDocumentosMac = 0.0;
 
 			try {
 				String totalMac = Calculos.cortarCantidades(
-						formatea.format(getTotalFaturasMac(id.getFechaInforme(), m, conCierre, 1l)), 19);
+						formatea.format(getTotalFaturasMac(id.getFechaInforme(), m, conCierre, 1l)-(getTotalFaturasMac(id.getFechaInforme(), m, conCierre, 1l)*redu)), 19);
 				documento.add(new Paragraph(new Phrase(lineSpacing,
 						"" + Calculos.cortarDescripcion(m, 20) + "  "
 								+ Calculos.cortarCantidades(numeroDocumentosMac, 10) + "  " + totalMac,
 						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			} catch (ParseException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -786,20 +785,35 @@ public class reduccion implements Serializable {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "%: " + id.getPorcReduccion(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
-		documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL VENTAS : " + id.getTotalReducido(),
+		
+		String totalVent = Calculos.cortarCantidades(formatea.format(id.getTotalOriginal()-(id.getTotalOriginal()*redu)),12);
+		String ivatotal = Calculos.cortarCantidades(formatea.format(id.getIvaReducido()-(id.getIvaReducido()*redu)),10);
+		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19()-(id.getIva19()*redu)),10);
+		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5()-(id.getIva5()*redu)),10);
+		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19()-(id.getBase19()*redu)),10);
+		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5()-(id.getBase5()*redu)),10);
+		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcento()-(id.getExcento()*redu)),10);
+		
+		documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL VENTAS    IVA TOTAL     IVA 19        IVA 5  GRAVADO 19  GRAVADO 5   EXCLUIDO",
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+		documento.add(new Paragraph(new Phrase(lineSpacing, "" + totalVent
+																		   +"   "+ivatotal
+																		   +" "+iva19t
+																		   +"   "+iva5t
+																		   +"  "+base19t
+																		   +" "+base5t
+																		   +" "+execnto,
+				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+		
+		
 		if (userPropietario.equals("true")) {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REAL: " + id.getTotalOriginal(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
-		documento.add(new Paragraph(new Phrase(lineSpacing, "IVA TOTAL: " + id.getIvaReducido(),
-				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		if (userPropietario.equals("true")) {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "IVA TOTAL REAL: " + id.getIvaOriginal(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
-		documento.add(new Paragraph(new Phrase(lineSpacing, "COSTO TOTAL: " + id.getCostoReducido(),
-				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		if (userPropietario.equals("true")) {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "COSTO REAL: " + id.getCostoOriginal(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
@@ -808,9 +822,14 @@ public class reduccion implements Serializable {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REMISIONES: " + id.getTotalRemisiones(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
+		
+		
+		
+		
+		
 		List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
 															// los// cajeros
-		Double redu = (id.getPorcReduccion() / 100.0);
+		
 		System.out.println(redu);
 		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 		Long server = configuracion.getServer();
@@ -849,13 +868,16 @@ public class reduccion implements Serializable {
 				new Phrase(lineSpacing, "------------------------------------------------------------------",
 						FontFactory.getFont(FontFactory.COURIER, fntSize))));
 		List<DocumentoDetalle> bolsas = documentoDetalleService.getByProductoId(5l,
-				Calculos.fechaInicial(id.getFechaInforme()),
-				Calculos.fechaFinal(id.getFechaInforme()));// se busca la
-																// cantidad de
-																// detalles con
-																// producto
-																// 5=bolsas
-		System.out.println("cantidad bolsas:"+bolsas.size());
+				Calculos.fechaInicial(id.getFechaInforme()), Calculos.fechaFinal(id.getFechaInforme()));// se
+																										// busca
+																										// la
+																										// cantidad
+																										// de
+																										// detalles
+																										// con
+																										// producto
+																										// 5=bolsas
+		System.out.println("cantidad bolsas:" + bolsas.size());
 		if (bolsas != null && !bolsas.isEmpty()) {
 			Double totalBolsas = 0.0;
 			Double cantidadBolsas = 0.0;
@@ -1093,9 +1115,8 @@ public class reduccion implements Serializable {
 			Long hoyfin = Long.valueOf(fhoyFin);
 			List<InfoDiario> infoList = new ArrayList<>();
 			infoList = documentoService.buscarInfodiarioByFecha(getFechaInicio(), getFechafin());
-			
-			List<Usuario> usu = new ArrayList<>();
-			usu = usuarioService.getByRol(2l);
+
+			List<Usuario> usu =  usuarioService.getByRol(2l);
 			for (Long i = hoy; i <= hoyfin; i++) {
 				InfoDiario rvo = new InfoDiario();
 				for (InfoDiario r : infoList) {
@@ -1125,15 +1146,14 @@ public class reduccion implements Serializable {
 					costoTotal = 0.0;
 					numeroDocumentos = 0.0;
 					for (Usuario u : usu) {
-						// System.out.println(df.parse(i.toString()));
+
 						cantidadOriginal = getTotalFaturasToDay(df.parse(i.toString()), u, conCierre, 1l)
 								+ cantidadOriginal;
 						totalRemisiones = getTotalRemisionesToDay(df.parse(i.toString()), u, conCierre, server)
 								+ totalRemisiones;
 						totalAvanceEfectivo = getTotalAvanceEfectivoToDay(df.parse(i.toString()), u, conCierre, server)
 								+ totalAvanceEfectivo;
-						// ivaOriginal=
-						// System.out.println(rvo.getCantidadReducida());
+
 					}
 					cantidadReducida = cantidadOriginal - (cantidadOriginal * porcenta);
 					Date hoy2 = Calculos.fechaInicial(df.parse(i.toString()));
@@ -1265,7 +1285,7 @@ public class reduccion implements Serializable {
 
 		List<Long> tipoDocumentoId = new ArrayList<>();
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
-		//tipoDocumentoId.add(8l);
+		// tipoDocumentoId.add(8l);
 		Date hoy = Calculos.fechaInicial(dia);
 		Date hoyfin = Calculos.fechaFinal(dia);
 		List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,
@@ -1299,7 +1319,7 @@ public class reduccion implements Serializable {
 				costoTotal = dode.getProductoId().getCosto() + costoTotal;
 			}
 		}
-		
+
 		return total;
 	}
 
@@ -1342,7 +1362,7 @@ public class reduccion implements Serializable {
 
 		List<Long> tipoDocumentoId = new ArrayList<>();
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
-		//tipoDocumentoId.add(8l);
+		// tipoDocumentoId.add(8l);
 		Date hoy = Calculos.fechaInicial(dia);
 		Date hoyfin = Calculos.fechaFinal(dia);
 		List<Documento> factDia = documentoService.getByMacAndTipoDocumento(tipoDocumentoId, mac, hoy, hoyfin,
@@ -1428,16 +1448,17 @@ public class reduccion implements Serializable {
 		return "";
 	}
 
-	public StreamedContent getFileXls(InfoDiario info) throws DocumentException, IOException, PrinterException, ParseException  {
+	public StreamedContent getFileXls(InfoDiario info)
+			throws DocumentException, IOException, PrinterException, ParseException {
 		StreamedContent file = null;
 		imprimirinforme(info);
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String fhoyIni = df.format(info.getFechaInforme());
 		String carpeta = "C:\\facturas\\infoDiario";
 		String pdf = "\\informeDiario_" + fhoyIni + ".pdf";
-		File f= new File(carpeta+pdf);
+		File f = new File(carpeta + pdf);
 		InputStream stream = new FileInputStream(f);
-		//stream = this.crearLibro(info);
+		// stream = this.crearLibro(info);
 		if (stream != null) {
 			file = new DefaultStreamedContent(stream, "application/pdf", pdf);
 		}

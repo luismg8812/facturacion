@@ -37,9 +37,9 @@ public class TransferenciaEmpresaDaoImpl implements TransferenciaEmpresaDao {
 			}
 			throw e;
 		} finally {
-			if (session != null) {
+			
 				session.close();
-			}
+			
 		}
 	}
 
@@ -56,16 +56,16 @@ public class TransferenciaEmpresaDaoImpl implements TransferenciaEmpresaDao {
 			}
 			throw e;
 		} finally {
-			if (session != null) {
+			
 				session.close();
-			}
+			
 		}
 	}
 
 	@Override
 	public void delete(TransferenciaEmpresa transferenciaEmpresa) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		;
+		
 		Transaction transaction = session.beginTransaction();
 		try {
 			session.delete(transferenciaEmpresa);
@@ -76,16 +76,16 @@ public class TransferenciaEmpresaDaoImpl implements TransferenciaEmpresaDao {
 			}
 			throw e;
 		} finally {
-			if (session != null) {
+		
 				session.close();
-			}
+			
 		}
 	}
 
 	@Override
 	public TransferenciaEmpresa getById(Long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		;
+		
 		session.beginTransaction();
 		TransferenciaEmpresa abono = null;
 		try {
@@ -103,15 +103,15 @@ public class TransferenciaEmpresaDaoImpl implements TransferenciaEmpresaDao {
 		List<TransferenciaEmpresa> documentoList = new ArrayList<>();
 		try {
 			DetachedCriteria detached = DetachedCriteria.forClass(TransferenciaEmpresa.class);
-			if(fechaIni!=null && fechaFin!=null){
+			if (fechaIni != null && fechaFin != null) {
 				detached.add(Restrictions.between("fechaRegistro", fechaIni, fechaFin));
 			}
-			if(desdeReporte!=null){
+			if (desdeReporte != null) {
 				detached.add(Restrictions.eq("empresaDesde.empresaId", desdeReporte));
 			}
-			if(hastaReporte!=null){
+			if (hastaReporte != null) {
 				detached.add(Restrictions.eq("empresaHasta.empresaId", hastaReporte));
-			}			
+			}
 			detached.addOrder(org.hibernate.criterion.Order.desc("fechaRegistro"));
 			Criteria criteria = detached.getExecutableCriteria(session);
 			documentoList = criteria.list();

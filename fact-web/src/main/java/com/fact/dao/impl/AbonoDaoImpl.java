@@ -59,7 +59,7 @@ public class AbonoDaoImpl implements AbonoDao{
 	}
 	
 	@Override
-	public void delete(Abono abono){
+	public void delete(Abono abono) {
 		Session session = HibernateUtil.getSessionFactory().openSession();;
 		Transaction transaction = session.beginTransaction();
 		try {
@@ -92,7 +92,7 @@ public class AbonoDaoImpl implements AbonoDao{
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Abono> getByDocumento(Long documentoId) throws FactException {
+	public List<Abono> getByDocumento(Long documentoId)  {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Abono> abonoList = new ArrayList<>(); 
 		try {
@@ -100,9 +100,11 @@ public class AbonoDaoImpl implements AbonoDao{
 			Query query = session.createQuery(sql);
 			query.setParameter("documentoId", documentoId);			
 			abonoList=  query.list(); 
-			session.close();
+			
 		} catch (FactException e) {
-			throw e;
+			
+		}finally{
+			session.close();
 		}
 		return abonoList;
 	}
