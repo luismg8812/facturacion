@@ -73,6 +73,7 @@
 			</p:column>
 			
 		</p:dataTable>
+		
 	</h:form>
 	<p:blockUI block="abonosClientesForm" trigger="abonosClientesForm:buscar">
 					CARGANDO<br />
@@ -84,17 +85,18 @@
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
 		</div>
 	</p:dialog>
-	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos" width="40%" closeOnEscape="true" showEffect="fade" resizable="false">
-		<div >
-			<ui:include
-				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
-		</div>
-	</p:dialog>
-	<p:dialog widgetVar="crearVale" header="Crear Vale" closeOnEscape="false" showEffect="fade" resizable="false">
+	<p:dialog widgetVar="crearVale" header="Crear Vale" closeOnEscape="true" showEffect="fade" resizable="false"  >
 		<div >
 			<ui:include
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearVale.xhtml" />
 		</div>
 	</p:dialog>
+	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos"  closeOnEscape="true" showEffect="fade" resizable="false">
+		<div >
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
+		</div>
+	</p:dialog>
+	
 	
 </ui:composition>

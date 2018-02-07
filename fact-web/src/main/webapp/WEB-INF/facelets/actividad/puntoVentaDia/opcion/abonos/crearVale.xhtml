@@ -9,16 +9,17 @@
 	
 	</script>
 	<h:form id="crearVale">
-	<p:growl id="growl1" life="7000" />
-		<table width="80%" align="left">
-				<tr>
+		<p:growl id="growl1" life="7000" />
+		<table width="30%" align="left">
+			<tr>
 				<td><p:outputLabel value="Cliente: " /></td>
-				<td><p:selectOneMenu value="#{abonos.clienteId}"
-						id="proveedor">
+				<td><p:selectOneMenu value="#{abonos.clienteId}" id="proveedor">
 						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
 						<f:selectItems value="#{abonos.clientes}" var="cli"
 							itemLabel="#{cli.nombre}" itemValue="#{cli.clienteId}" />
 					</p:selectOneMenu></td>
+			</tr>
+			<tr>
 				<td><p:outputLabel value="Tipo Facturas:" /></td>
 				<td><p:selectOneMenu value="#{abonos.tipoFacturas}"
 						id="tipoFacturas">
@@ -31,29 +32,28 @@
 					</p:selectOneMenu></td>
 			</tr>
 			<tr>
-			<td><p:outputLabel value="Total Vale: "/>
-				</td>
-				<td><p:inputNumber value="#{abonos.cantidadTotal}"/>
-				</td>
-				<td><p:outputLabel value="Factura: "/>
-				</td>
-				<td><p:inputText value="#{abonos.detalleNew}"/></td>
-				
+				<td><p:outputLabel value="Total Vale: " /></td>
+				<td><p:inputNumber value="#{abonos.cantidadTotal}" /></td>
 			</tr>
-				
 			<tr>
-				<td><p:commandButton value="Guardar" id="guardar" process="@form"  update="growl1,crearDocument" onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
-				actionListener="#{abonos.crearVale}" />
-				</td>
-				<td><p:commandButton value="Salir"/></td>
-			</tr>		
+				<td><p:outputLabel value="Factura: " /></td>
+				<td><p:inputText value="#{abonos.detalleNew}" /></td>
+
+			</tr>
+
+			<tr>
+				<td><p:commandButton value="Guardar" id="guardar"
+						process="@form" update="growl1,crearDocument"
+						onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
+						actionListener="#{abonos.crearVale}" /></td>
+				<td><p:commandButton value="Salir" /></td>
+			</tr>
 		</table>
-		<p:blockUI block="guardar"
-		widgetVar="bui">
+		<p:blockUI block="guardar" widgetVar="bui">
 					CARGANDO<br />
-		<p:graphicImage url="/images/bloqBar.gif" />
-	</p:blockUI>
+			<p:graphicImage url="/images/bloqBar.gif" />
+		</p:blockUI>
 	</h:form>
-	
+
 
 </ui:composition>
