@@ -328,14 +328,12 @@ public class PuntoVentaDia implements Serializable {
 
 		}
 		event.getObject().toString();
-		// }
 	}
 
 	public void buscarProducto(SelectEvent event) throws IOException {
 		productoSelect = (Producto) event.getObject();
 		if (productoSelect != null && (productoSelect.getProductoId() == 0l || productoSelect.getProductoId() == 1l
-				|| productoSelect.getProductoId() == 2l)) {
-			System.out.println("producto x01");
+				|| productoSelect.getProductoId() == 2l)) {			
 			RequestContext.getCurrentInstance().execute("PF('px01').show();");
 			setUnidad(0.0);
 			RequestContext.getCurrentInstance().execute("document.getElementById('px01_input_input').focus();");
@@ -345,7 +343,6 @@ public class PuntoVentaDia implements Serializable {
 
 			if (productoSelect != null && productoSelect.getBalanza() == 1l) {
 				RequestContext.getCurrentInstance().execute("pupupCantidad();");
-				// System.out.println("tiene balamza");
 				determinarBalanza(null);
 				setParciaPopup("S");
 			} else {
