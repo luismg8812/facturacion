@@ -6,7 +6,9 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
-	
+		function ocultarDialogoVale(){
+			document.getElementById('abonosClientesForm:crearVale1').style.display = 'none';
+		}
 	</script>
 	<h:form id="crearVale">
 		<p:growl id="growl1" life="7000" />
@@ -45,8 +47,8 @@
 				<td><p:commandButton value="Guardar" id="guardar"
 						process="@form" update="growl1,crearDocument"
 						onstart="PF('bui').show()" oncomplete="PF('bui').hide()"
-						actionListener="#{abonos.crearVale}" /></td>
-				<td><p:commandButton value="Salir" /></td>
+						actionListener="#{abonos.crearVale}" onclick="ocultarDialogoVale()" /></td>
+				<td><p:commandButton value="Salir" onclick="ocultarDialogoVale()"/></td>
 			</tr>
 		</table>
 		<p:blockUI block="guardar" widgetVar="bui">

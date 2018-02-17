@@ -6,9 +6,13 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
-	function salirAbonosCliente(){
-		PF('abonos').hide();
-		
+	function showDialogoVale(){
+		document.getElementById('abonosClientesForm:crearVale1').style.display = 'inline';
+		document.getElementById('abonosClientesForm:crearAbonoCliente').style.display = 'none';
+	}
+	function showDialocrearAbonoCliente(){
+		document.getElementById('abonosClientesForm:crearAbonoCliente').style.display = 'inline';
+		document.getElementById('abonosClientesForm:crearVale1').style.display = 'none';
 	}
 	</script>
 	<h:form id="abonosClientesForm">
@@ -16,8 +20,7 @@
 		<table width="100%" align="center">
 			<tr>
 				<td><p:outputLabel value="Cliente:" /></td>
-				<td><p:selectOneMenu value="#{abonos.clienteId}"
-						id="cliente">
+				<td><p:selectOneMenu value="#{abonos.clienteId}" id="cliente">
 						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
 						<f:selectItems value="#{clientes.clientes}" var="clie"
 							itemLabel="#{clie.nombre}" itemValue="#{clie.clienteId}" />
@@ -25,40 +28,44 @@
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Desde: " /></td>
-				<td><p:calendar id="fechaInicial" value="#{abonos.fechaInicio}" size="16" 
-						pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:calendar id="fechaInicial" value="#{abonos.fechaInicio}"
+						size="16" pattern="dd-MM-yyyy" mask="true" /></td>
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Hasta: " /></td>
-				<td><p:calendar id="fechaFinal" value="#{abonos.fechafin}" size="16" 
-						pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:calendar id="fechaFinal" value="#{abonos.fechafin}"
+						size="16" pattern="dd-MM-yyyy" mask="true" /></td>
 			</tr>
 
 		</table>
 		<table width="100%" align="center">
 			<tr>
 				<td><p:commandButton value="Buscar" process="@form"
-						update="documentosCliente" id="buscar" actionListener="#{abonos.buscarAbonosCliente}" />
-					 <p:commandButton
-						value="Salir" onclick="salirAbonosCliente"/>
-						<p:commandButton value="Crear Vale" onclick="PF('crearVale').show();"/>
-				</td>
+						update="documentosCliente" id="buscar"
+						actionListener="#{abonos.buscarAbonosCliente}" /> <p:commandButton
+						value="Salir" onclick="PF('bonos').hide();" /> <p:commandButton
+						value="Crear Vale" onclick="showDialogoVale()" /></td>
 			</tr>
 		</table>
-		<p:dataTable id="documentosCliente" var="docu" value="#{abonos.documentosCliente}"
-			scrollable="true" scrollHeight="290"
+		<p:dataTable id="documentosCliente" var="docu"
+			value="#{abonos.documentosCliente}" style="font-size: 9px"
+			scrollable="true" scrollHeight="150"
 			emptyMessage="No hay facturas disponibles para El proveedor seleccionado">
 			<f:facet name="header">
             Facturas
         </f:facet>
-			<p:column headerText="Opción">		
-					<p:commandLink value="Detalle" action="#{abonos.consultarAbonosCliente(docu)}" />
-					<br />				
-				<p:commandLink  value="Crear"  action="#{abonos.abrirPopupAbonoCliente(docu)}"/>
-				<br />				
-				<p:commandLink  value="Eliminar"  action="#{abonos.borrarVale(docu)}" update="documentosCliente,growl1,@form"/>
-				
-									</p:column>
+			<p:column headerText="Opción">
+				<p:commandLink value="Detalle"
+					action="#{abonos.consultarAbonosCliente(docu)}" />
+				<br />
+				<p:commandButton value="Crear"
+					action="#{abonos.abrirPopupAbonoCliente(docu)}"
+					onclick="showDialocrearAbonoCliente()" />
+				<br />
+				<p:commandLink value="Eliminar" action="#{abonos.borrarVale(docu)}"
+					update="documentosCliente,growl1,@form" />
+
+			</p:column>
 			<p:column headerText="No. Documento">
 				<h:outputText value="#{docu.consecutivoDian}" />
 			</p:column>
@@ -71,32 +78,38 @@
 			<p:column headerText="No. Abonos">
 				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
 			</p:column>
-			
+
 		</p:dataTable>
-		
-	</h:form>
-	<p:blockUI block="abonosClientesForm" trigger="abonosClientesForm:buscar">
+		<p:blockUI block="abonosClientesForm"
+			trigger="abonosClientesForm:buscar">
 					CARGANDO<br />
-		<p:graphicImage url="/images/bloqBar.gif" />
-	</p:blockUI>
-	<p:dialog widgetVar="crearAbonoCliente" header="Crear Abono"  closeOnEscape="true" showEffect="fade" resizable="false">
-		<div >
-			<ui:include
-				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
-		</div>
-	</p:dialog>
-	<p:dialog widgetVar="crearVale" header="Crear Vale" closeOnEscape="true" showEffect="fade" resizable="false"  >
-		<div >
-			<ui:include
-				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearVale.xhtml" />
-		</div>
-	</p:dialog>
-	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos"  closeOnEscape="true" showEffect="fade" resizable="false">
-		<div >
-			<ui:include
-				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
-		</div>
-	</p:dialog>
-	
-	
+			<p:graphicImage url="/images/bloqBar.gif" />
+		</p:blockUI>
+
+		<p:panelGrid columns="1" layout="grid" style="display:none"
+			id="crearAbonoCliente">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
+			</div>
+		</p:panelGrid>
+		<p:panelGrid columns="1" layout="grid" style="display:none"
+			id="crearVale1">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearVale.xhtml" />
+			</div>
+		</p:panelGrid>
+
+		<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos"
+			closeOnEscape="true" showEffect="fade" resizable="false">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
+			</div>
+		</p:dialog>
+	</h:form>
+
+
+
 </ui:composition>

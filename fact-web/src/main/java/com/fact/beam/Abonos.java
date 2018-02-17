@@ -130,7 +130,7 @@ public class Abonos implements Serializable {
 		docu.setDetalleEntrada(getDetalleNew());
 		documentoService.save(docu,server);
 		 System.out.println("se crea el vale por abonos Cliente:"+ docu.getDocumentoId());
-		    RequestContext.getCurrentInstance().execute("PF('crearVale').hide();");
+		   // RequestContext.getCurrentInstance().execute("PF('crearVale').hide();");
 		    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
 	}
 	
@@ -169,8 +169,8 @@ public class Abonos implements Serializable {
 	    docu.setSaldo(saldoNew-getCantidadNew());
 	    documentoService.update(docu,server);
 	    System.out.println("se crea el abono:"+ getAbonoNew().getAbonoId());
-	    RequestContext.getCurrentInstance().execute("PF('crearAbono').hide();");
-	    RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').hide();");
+	    //RequestContext.getCurrentInstance().execute("PF('crearAbono').hide();");
+	    //RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').hide();");
 	    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Abono Creado exitosamente"));
 	    setAbonoNew(null);
 	}
@@ -202,7 +202,7 @@ public class Abonos implements Serializable {
 		getAbonoNew().setDocumentoId(docu);
 		getAbonoNew().setFechaRegistro(new Date());
 		setCantidadNew(null);
-		RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').show();");
+		//RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').show();");
 		RequestContext.getCurrentInstance().update("@form");
 	}
 	

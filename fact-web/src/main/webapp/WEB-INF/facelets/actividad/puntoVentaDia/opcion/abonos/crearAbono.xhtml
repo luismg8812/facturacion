@@ -6,7 +6,9 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
-	
+	function ocultarDialocrearAbonoCliente(){
+		document.getElementById('abonosClientesForm:crearAbonoCliente').style.display = 'none';
+	}
 	</script>
 	<h:form id="crearAbono">
 		<p:growl id="growl1" life="7000" />
@@ -47,9 +49,9 @@
 			</tr>
 			<tr>
 				<td><p:commandButton value="Guardar" id="guardar"
-						process="@form" update="growl1,abonosClientesForm"
+						process="@form" update="growl1,abonosClientesForm" onclick="ocultarDialocrearAbonoCliente()"
 						actionListener="#{abonos.crearAbono()}" /></td>
-				<td><p:commandButton value="Salir" /></td>
+				<td><p:commandButton value="Salir" onclick="ocultarDialocrearAbonoCliente()"/></td>
 				<p:commandButton value="Actualizar" update="@form" />
 			</tr>
 		</table>
