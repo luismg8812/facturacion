@@ -111,7 +111,7 @@ public class MovimientoMes implements Serializable {
 	String codigoBarras;
 	Double cantidad;
 	Double Unidad;
-	Long Parcial;
+	Double parcial;
 	String Detalle;
 
 	String focus = "";
@@ -141,7 +141,7 @@ public class MovimientoMes implements Serializable {
 	//
 
 	private String parciaPopup;
-	
+	Conector conector = null;
 
 	public String getSubProductoNew() {
 		return subProductoNew;
@@ -304,11 +304,7 @@ public class MovimientoMes implements Serializable {
 		productoSelect = (Producto) event.getObject();
 		if (productoSelect != null && productoSelect.getBalanza() == 1l) {
 			RequestContext.getCurrentInstance().execute("pupupCantidadMM();");
-			try {
-				determinarBalanza(null);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			determinarBalanza();
 			setParciaPopup("S");
 		} else {
 
@@ -319,15 +315,32 @@ public class MovimientoMes implements Serializable {
 		}
 	}
 
-	public String determinarBalanza(AjaxBehaviorEvent event) throws IOException {
+	public String determinarBalanza() {
 		if (productoSelect.getProductoId() == 1l || productoSelect.getBalanza() == null
 				|| productoSelect.getBalanza() != 1l) {
 			return "";
 		}
-		
-
+		String gramera = "" + configuracion().getGramera();
+		if (conector == null) {
+			conector = new Conector();
+		}
+		Double costoP;
+		try {
+			Double canti = Calculos.determinarBalanza(conector, gramera);
+			
+			if (Calculos.validarPromo(productoSelect, canti)) {
+				costoP = productoSelect.getPubPromo() ;
+			}else{
+				costoP=productoSelect.getCostoPublico();
+			}
+			setCantidad(canti);
+			setParcial(canti * costoP);
+		} catch (Exception e) {
+			setCantidad(0.0);
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar..."));
+		}
 		return "";
-
 	}
 
 	public void detalleEnDocumento(AjaxBehaviorEvent event) {
@@ -1386,12 +1399,12 @@ public class MovimientoMes implements Serializable {
 		Unidad = unidad;
 	}
 
-	public Long getParcial() {
-		return Parcial;
+	public Double getParcial() {
+		return parcial;
 	}
 
-	public void setParcial(Long parcial) {
-		Parcial = parcial;
+	public void setParcial(Double parcial) {
+		this.parcial = parcial;
 	}
 
 	public String getFocus() {

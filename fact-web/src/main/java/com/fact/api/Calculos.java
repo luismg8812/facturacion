@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List; 
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.FacesMessage;
@@ -28,11 +28,11 @@ import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
 
 public class Calculos {
+	
 	private static Configuracion configuracion() {
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, Object> sessionMap = externalContext.getSessionMap();
-		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
-		return configuracion;
+		return (Configuracion) sessionMap.get("configuracion");
 	}
 
 	/**
@@ -41,11 +41,11 @@ public class Calculos {
 	 * gusqueda un dia antes
 	 * 
 	 * @return retorna fecha de inicio de busqueda
+	 * @throws ParseException 
 	 */
 	public static Date fechaInicial(Date hoy) {
 		//
 		Long fechaCombinada = configuracion().getFechaCombinada();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(hoy);
 		if (fechaCombinada == 1l) {
@@ -54,13 +54,6 @@ public class Calculos {
 			calendar.set(Calendar.MINUTE, 0);
 			calendar.set(Calendar.SECOND, 0);
 		} else {
-			String fhoyIni = df.format(hoy);
-			try {
-				hoy = df.parse(fhoyIni);
-			} catch (ParseException e) {
-				System.out.println("Error en fecha inicial");
-				e.printStackTrace();
-			}
 			calendar.set(Calendar.HOUR_OF_DAY, 0);
 			calendar.set(Calendar.MINUTE, 0);
 			calendar.set(Calendar.SECOND, 0);
@@ -71,8 +64,6 @@ public class Calculos {
 
 	public static Date fechaFinal(Date fin) {
 		Long fechaCombinada = configuracion().getFechaCombinada();
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String fhoyFin = df.format(fin);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(fin);
 		// si la fecha es nula toma por defecto la fecha del sistema
@@ -81,12 +72,6 @@ public class Calculos {
 			calendar.set(Calendar.MINUTE, 59);
 			calendar.set(Calendar.SECOND, 59);
 		} else {
-			try {
-				fin = df.parse(fhoyFin);
-			} catch (ParseException e) {
-				System.out.println("Error en fecha Final");
-				e.printStackTrace();
-			}
 			calendar.set(Calendar.HOUR_OF_DAY, 23);
 			calendar.set(Calendar.MINUTE, 59);
 			calendar.set(Calendar.SECOND, 59);
@@ -125,56 +110,56 @@ public class Calculos {
 	 * @param maxTamañoNombre
 	 * @return
 	 */
-	public static String cortarDescripcion(String nombre, int maxTamañoNombre) {
-		int tamañoNombre = 0;
+	public static String cortarDescripcion(String nombre, int maxTamanoNombre) {
+		int tamanoNombre = 0;
 		nombre = nombre == null ? " " : nombre;
 		try {
-			nombre = nombre.trim().substring(0, maxTamañoNombre);
+			nombre = nombre.trim().substring(0, maxTamanoNombre);
 		} catch (Exception e2) {
 			nombre = nombre.trim();
-			tamañoNombre = nombre.length();
+			tamanoNombre = nombre.length();
 		}
-		if (tamañoNombre != 0) {
-			for (int j = tamañoNombre; j < maxTamañoNombre; j++) {
+		if (tamanoNombre != 0) {
+			for (int j = tamanoNombre; j < maxTamanoNombre; j++) {
 				nombre += " ";
 			}
 		}
 		return nombre;
 	}
 
-	public static String cortarCantidades(Double cantidad, int maxTamañoUnit) {
+	public static String cortarCantidades(Double cantidad, int maxTamanoUnit) {
 		String unit = "";
-		int tamañoUnit = 0;
+		int tamanoUnit = 0;
 		unit = cantidad == null ? "0" : "" + cantidad;
 		unit = unit.replace(".0", "");
 		try {
-			unit = unit.substring(0, maxTamañoUnit);
+			unit = unit.substring(0, maxTamanoUnit);
 		} catch (Exception e2) {
-			tamañoUnit = unit.length();
+			tamanoUnit = unit.length();
 		}
-		if (tamañoUnit != 0) {
-			for (int j = tamañoUnit; j < maxTamañoUnit; j++) {
+		if (tamanoUnit != 0) {
+			for (int j = tamanoUnit; j < maxTamanoUnit; j++) {
 				unit = " " + unit;
 			}
 		}
 		return unit;
 	}
 
-	public static String cortarCantidades(String cantidad, int maxTamañoUnit) {
+	public static String cortarCantidades(String cantidad, int maxTamanoUnit) {
 		String unit = "";
-		int tamañoUnit = 0;
+		int tamanoUnit = 0;
 		unit = cantidad == null ? "0" : "" + cantidad;
 		if (unit.endsWith(".0")) {
 			unit = unit.substring(0, unit.length() - 2);
 		}
 		try {
-			unit = unit.substring(0, maxTamañoUnit);
+			unit = unit.substring(0, maxTamanoUnit);
 		} catch (Exception e2) {
-			tamañoUnit = unit.length();
+			tamanoUnit = unit.length();
 		}
-		if (tamañoUnit != 0) {
-			for (int j = tamañoUnit; j < maxTamañoUnit; j++) {
-				unit = " " + unit;
+		if (tamanoUnit != 0) {
+			for (int j = tamanoUnit; j < maxTamanoUnit; j++) {
+				unit += " ";
 			}
 		}
 		return unit;
@@ -186,11 +171,12 @@ public class Calculos {
 		Double gravado = 0.0;
 		Double ivatotal = 0.0;
 		Double peso = 0.0;
-		Double iva5=0.0;
-		Double iva19=0.0;	
-		Double base5=0.0;
-		Double base19=0.0;
-		//aqui voy toca poner a sumar las variables nuebas para que se reflejen en el info diario
+		Double iva5 = 0.0;
+		Double iva19 = 0.0;
+		Double base5 = 0.0;
+		Double base19 = 0.0;
+		// aqui voy toca poner a sumar las variables nuebas para que se reflejen
+		// en el info diario
 		for (DocumentoDetalleVo dDV : productos) {
 			Double costoPublico = dDV.getParcial();
 			Double iva1 = dDV.getProductoId().getIva().doubleValue() / 100;
@@ -200,20 +186,20 @@ public class Calculos {
 			double temp;
 			ivatotal = ivatotal + ((costoPublico / (1 + iva1)) * iva1);
 			peso = peso + peso1;
-			//si es iva del 19 se agrega al documento junto con la base
-			if(iva1==0.19){
-				iva19=iva19+((costoPublico / (1 + iva1)) * iva1);
-				base19=base19+(costoPublico / (1 + iva1));
+			// si es iva del 19 se agrega al documento junto con la base
+			if (iva1 == 0.19) {
+				iva19 = iva19 + ((costoPublico / (1 + iva1)) * iva1);
+				base19 = base19 + (costoPublico / (1 + iva1));
 			}
-			//si es iva del 5 se agrega al documento junto con la base
-			if(iva1==0.05){
-				iva5=iva5+((costoPublico / (1 + iva1)) * iva1);
-				base5=base5+(costoPublico / (1 + iva1));
+			// si es iva del 5 se agrega al documento junto con la base
+			if (iva1 == 0.05) {
+				iva5 = iva5 + ((costoPublico / (1 + iva1)) * iva1);
+				base5 = base5 + (costoPublico / (1 + iva1));
 			}
 			if (iva1 > 0.0) {
 				temp = costoPublico / (1 + iva1);
 				gravado += temp;
-				
+
 			} else {
 				temp = costoPublico;
 				exectoReal += temp;
@@ -240,53 +226,48 @@ public class Calculos {
 			byte[] mac = a.getHardwareAddress();
 			for (int i = 0; i < mac.length; i++) {
 				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-			}			
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return "" + sb.toString();
 	}
-	
+
 	public static String conseguirMAC2() throws UnknownHostException, SocketException {
-		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		//request.getRemoteAddr();
-		 InetAddress address = InetAddress.getByName(request.getRemoteAddr());
-		 StringBuilder sb = new StringBuilder();
-		 /*
-          * Get NetworkInterface for the current host and then read
-          * the hardware address.
-          */
-         NetworkInterface ni = 
-                 NetworkInterface.getByInetAddress(address);
-         if (ni != null) {
-             byte[] mac = ni.getHardwareAddress();
-             if (mac != null) {
-                 /*
-                  * Extract each array of mac address and convert it 
-                  * to hexa with the following format 
-                  * 08-00-27-DC-4A-9E.
-                  */
-                 for (int i = 0; i < mac.length; i++) {
-                	 sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                 }
-             } else {
-                 System.out.println("Address doesn't exist or is not " +
-                         "accessible.");
-             }
-         } else {
-             return request.getRemoteAddr();
-         }
-         return "" + sb.toString();
-     
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
+				.getRequest();
+		InetAddress address = InetAddress.getByName(request.getRemoteAddr());
+		StringBuilder sb = new StringBuilder();
+		/*
+		 * Get NetworkInterface for the current host and then read the hardware
+		 * address.
+		 */
+		NetworkInterface ni = NetworkInterface.getByInetAddress(address);
+		if (ni != null) {
+			byte[] mac = ni.getHardwareAddress();
+			if (mac != null) {
+				/*
+				 * Extract each array of mac address and convert it to hexa with
+				 * the following format 08-00-27-DC-4A-9E.
+				 */
+				for (int i = 0; i < mac.length; i++) {
+					sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+				}
+			}
+		} else {
+			return request.getRemoteAddr();
+		}
+		return "" + sb.toString();
+
 	}
-	
+
 	/**
 	 * ordena los productos por varios
 	 */
 	public static List<DocumentoDetalleVo> ordenar(List<DocumentoDetalleVo> productos) {
 		List<DocumentoDetalleVo> temp = new ArrayList<>();
 		for (DocumentoDetalleVo ddV : productos) {
-			if (ddV.getProductoId().getVarios()!=null && ddV.getProductoId().getVarios() != 1) {
+			if (ddV.getProductoId().getVarios() != null && ddV.getProductoId().getVarios() != 1) {
 				temp.add(ddV);
 			}
 		}
@@ -297,245 +278,110 @@ public class Calculos {
 		}
 		return temp;
 	}
-	
-//	public static Image generarCodBaras(Long value) throws FileNotFoundException, DocumentException{
-//		Document documento = new Document();
-//		PdfWriter pdfw = PdfWriter.getInstance(documento, new FileOutputStream("C:\\facturas\\codigo"+value+".pdf"));
-//		Barcode128 barcode = new Barcode128();
-//		barcode.setCodeType(Barcode.CODE128);
-//		barcode.setCode(value.toString());
-//		Image img = barcode.createImageWithBarcode( pdfw.getDirectContent(), null, null);
-//		documento.add(img);
-//		documento.close();
-//		return img;
-//	}
-	
+
 	/**
-	 * Metodo que determina el tipo de gramera configurada y trae el valor de la pesa 
+	 * Metodo que determina el tipo de gramera configurada y trae el valor de la
+	 * pesa
+	 * 
 	 * @param event
 	 * @return
 	 * @throws IOException
 	 */
-	public String determinarBalanza(Producto productoSelect) throws IOException {
-		
+	public static Double determinarBalanza(Conector conector, String gramera) {
+
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
 				.getRequest();
-		if (conector == null) {
-			conector = new Conector();
-		}
+
 		String[] numerosComoArray;
-		StringBuilder invertido ;
+		String invertido = "";
 		String respuesta = "";
-		String gramera = "" + configuracion().getGramera();
+		String cant = "";
+		Double canti = 0.0;
+		respuesta = conector.inicio(request.getRemoteAddr(), gramera);
 		switch (gramera) {
 		case "1":
-			respuesta = conector.inicio(request.getRemoteAddr(), gramera);
 			numerosComoArray = respuesta.split("=");
-			try {
-				String cant = numerosComoArray[1];
-				cant = cant.replace("=", "");
-				cant = cant.replace(" ", "");
-				for (int x = cant.length() - 1; x >= 0; x--)
-					invertido.append( cant.charAt(x));
-				Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-						: productoSelect.getCostoPublico().doubleValue();
-				Double canti = Double.parseDouble(invertido);
-				// setParcial(canti * costoP);
-				setCantidad(canti);
-				setParcial(canti * costoP);
-			} catch (Exception e) {
-				setCantidad(0.0);
-				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar..."));
-				throw e;
-			}
+			cant = numerosComoArray[1];
+			cant = cant.replace("=", "");
+			cant = cant.replace(" ", "");
+			for (int x = cant.length() - 1; x >= 0; x--)
+				invertido += cant.charAt(x);
+			canti = Double.parseDouble(invertido);
 			break;
 		case "2":
 			do {
-				try {
-					respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-					respuesta = respuesta == null ? "" : respuesta;
-					respuesta = respuesta.trim();
-					respuesta = respuesta.replace(".", "");
-					numerosComoArray = respuesta.split(",");
-					String cant = "";
-					for (int i = 0; i < numerosComoArray.length; i++) {
-						if (numerosComoArray[i].contains("+")) {
-							cant = numerosComoArray[i];
-							break;
-						}
-					}
-					cant = cant.replace("=", "");
-					cant = cant.replaceAll(" ", "");
-					cant = cant.replace("+", "");
-					String parte1 = "000";
-					String parte2 = "0000";
-					try {
-						parte1 = cant.substring(cant.length() - 3, cant.length());
-						parte2 = cant.substring(0, cant.length() - 3);
-					} catch (Exception e) {
-						// TODO: handle exception
-					}
-
-					cant = parte2 + "." + parte1;
-					System.out.println("cantidad peso: " + cant);
-					Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-							: productoSelect.getCostoPublico().doubleValue();
-					Double canti = Double.parseDouble(cant);
-					setCantidad(canti);
-					Long promo = 0l;
-					if (productoSelect.getPromo() != null) {
-						promo = productoSelect.getPromo();
-					}
-					if (promo == 1l) {
-						Double cantidadPromo = productoSelect.getkGPromo() == null ? 0.0 : productoSelect.getkGPromo();
-						if (canti > cantidadPromo) {
-							Double pubPromo = productoSelect.getPubPromo() == null ? 0.0
-									: productoSelect.getPubPromo().doubleValue();
-							costoP = pubPromo;
-
-						}
-					} else {
-						costoP = productoSelect.getCostoPublico() == null ? 0.0
-								: productoSelect.getCostoPublico().doubleValue();
-
-					}
-					setParcial(canti * costoP);
-
-				} catch (Exception e) {
-					setCantidad(0.0);
-					// FacesContext.getCurrentInstance().addMessage(null,
-					// new FacesMessage("Error en el uso de la Gramera,
-					// por favor vuelva a pesar..."));
-					throw e;
-				}
-
-			} while (numerosComoArray.length < 2);
-
-			break;
-		case "3":
-
-			do {
-				try {
-					respuesta = "";
-					respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-					if (respuesta == null || respuesta.equals("")) {
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage("por vafor retire el producto de la gramera y vuelva a ponerlo"));
-					}
-					respuesta = respuesta == null ? "" : respuesta;
-
-					System.out.println("cantidad peso: " + respuesta);
-					Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-							: productoSelect.getCostoPublico().doubleValue();
-					Double canti = 0.0;
-					try {
-						canti = Double.parseDouble(respuesta);
-					} catch (Exception e) {
-						System.out.println("Error, vuelva a pesar");
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
-						// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
-						RequestContext.getCurrentInstance().update("growl1");
-						setCantidad(canti);
+				respuesta = respuesta == null ? "" : respuesta;
+				respuesta = respuesta.trim();
+				respuesta = respuesta.replace(".", "");
+				numerosComoArray = respuesta.split(",");
+				cant = "";
+				for (int i = 0; i < numerosComoArray.length; i++) {
+					if (numerosComoArray[i].contains("+")) {
+						cant = numerosComoArray[i];
 						break;
 					}
-					setCantidad(canti);
-
-					setParcial(canti * costoP);
-					System.out.println("");
-				} catch (Exception e) {
-					setCantidad(0.0);
-					// FacesContext.getCurrentInstance().addMessage(null,
-					// new FacesMessage("Error en el uso de la Gramera,
-					// por favor vuelva a pesar..."));
-					throw e;
 				}
+				cant = cant.replace("=", "");
+				cant = cant.replaceAll(" ", "");
+				cant = cant.replace("+", "");
+				String parte1 = "000";
+				String parte2 = "0000";
+				try {
+					parte1 = cant.substring(cant.length() - 3, cant.length());
+					parte2 = cant.substring(0, cant.length() - 3);
+				} catch (Exception e) {
 
-			} while (respuesta.indexOf(".") == -1);
-			respuesta = "";
+				}
+				cant = parte2 + "." + parte1;
+			} while (numerosComoArray.length < 2);
+			canti = Double.parseDouble(cant);
 			break;
-		case "4":
+		case "3":
+			do {
+				if (respuesta == null || respuesta.equals("")) {
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage("por vafor retire el producto de la gramera y vuelva a ponerlo"));
+					RequestContext.getCurrentInstance().update("growl1");
+				}
+				respuesta = (respuesta == null ? "" : respuesta);
 
-			try {
-				respuesta = "";
-				respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-				respuesta = respuesta == null ? "" : respuesta;
-				respuesta = respuesta.replaceAll(",", "");
-				System.out.println("cantidad peso: " + respuesta);
-				Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-						: productoSelect.getCostoPublico().doubleValue();
-				Double canti = 0.0;
 				try {
 					canti = Double.parseDouble(respuesta);
 				} catch (Exception e) {
-					System.out.println("Error, vuelva a pesar");
+
 					FacesContext.getCurrentInstance().addMessage(null,
 							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
-					// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
 					RequestContext.getCurrentInstance().update("growl1");
-					setCantidad(canti);
 					break;
 				}
-				setCantidad(canti);
-
-				setParcial(canti * costoP);
-				System.out.println("");
+			} while (respuesta.indexOf(".") == -1);
+			break;
+		case "4":
+			respuesta = (respuesta == null ? "" : respuesta);
+			respuesta = respuesta.replaceAll(",", "");
+			canti = 0.0;
+			try {
+				canti = Double.parseDouble(respuesta);
 			} catch (Exception e) {
-				setCantidad(0.0);
-				// FacesContext.getCurrentInstance().addMessage(null,
-				// new FacesMessage("Error en el uso de la Gramera,
-				// por favor vuelva a pesar..."));
-				throw e;
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
+				RequestContext.getCurrentInstance().update("growl1");
+				break;
 			}
-
 			break;
 		case "5":
-
-			try {
-				respuesta = "";
-				respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-				respuesta = respuesta == null ? "" : respuesta;
-				respuesta = respuesta.replaceAll(",", "");
-				System.out.println("cantidad peso: " + respuesta);
-				Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-						: productoSelect.getCostoPublico().doubleValue();
-				Double canti = 0.0;
-				try {
-					canti = Double.parseDouble(respuesta);
-				} catch (Exception e) {
-					System.out.println("Error, vuelva a pesar");
-					// FacesContext.getCurrentInstance().addMessage(null,
-					// new FacesMessage(
-					// FacesMessage.SEVERITY_ERROR, "Error!, por favor
-					// vuelva a pesar", ""));
-					// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
-					// RequestContext.getCurrentInstance().update("growl1");
-					setCantidad(canti);
-					break;
-				}
-				setCantidad(canti);
-
-				setParcial(canti * costoP);
-				System.out.println("");
-			} catch (Exception e) {
-				setCantidad(0.0);
-				// FacesContext.getCurrentInstance().addMessage(null,
-				// new FacesMessage("Error en el uso de la Gramera,
-				// por favor vuelva a pesar..."));
-				throw e;
-			}
-
+			respuesta = (respuesta == null ? "" : respuesta);
+			respuesta = respuesta.replaceAll(",", "");
+			canti = Double.parseDouble(respuesta);
 			break;
-
 		default:
 			break;
 		}
-
-		RequestContext.getCurrentInstance()
-				.execute("document.getElementById('cantidad_in1').value='" + invertido + "';");
-
-		return "";
-
+		// este bloq de codigo hay que pasarlo a punto de venta dia.. por logica
+		// propia de la venta
+		// RequestContext.getCurrentInstance()
+		// .execute("document.getElementById('cantidad_in1').value='" +
+		// invertido + "';");
+		return canti;
 	}
 }

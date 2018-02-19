@@ -113,7 +113,7 @@ public class PuntoVentaDia implements Serializable {
 	Producto articulo;
 	Double Unidad;
 	Double cantidad;
-	Double Parcial;
+	Double parcial;
 	Documento documento;
 	Producto productoSelect = new Producto();
 	Producto productoSelect2 = new Producto();
@@ -2532,11 +2532,11 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public Double getParcial() {
-		return Parcial;
+		return parcial;
 	}
 
 	public void setParcial(Double parcial) {
-		Parcial = parcial;
+		this.parcial = parcial;
 	}
 
 	public Double getExcento() {
