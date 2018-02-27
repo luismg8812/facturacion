@@ -787,12 +787,12 @@ public class reduccion implements Serializable {
 		}
 		
 		String totalVent = Calculos.cortarCantidades(formatea.format(id.getTotalOriginal()-(id.getTotalOriginal()*redu)),12);
-		String ivatotal = Calculos.cortarCantidades(formatea.format(id.getIvaReducido()-(id.getIvaReducido()*redu)),10);
-		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19()-(id.getIva19()*redu)),10);
-		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5()-(id.getIva5()*redu)),10);
-		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19()-(id.getBase19()*redu)),10);
-		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5()-(id.getBase5()*redu)),10);
-		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcento()-(id.getExcento()*redu)),10);
+		String ivatotal = Calculos.cortarCantidades(formatea.format(id.getIvaReducido()),10);
+		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19()),10);
+		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5()),10);
+		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19()),10);
+		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5()),10);
+		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcento()),10);
 		
 		documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL VENTAS    IVA TOTAL     IVA 19        IVA 5  GRAVADO 19  GRAVADO 5   EXCLUIDO",
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
