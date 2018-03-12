@@ -12,13 +12,13 @@
 	<table width="100%" align="center">
 			<tr>
 				<td><p:outputLabel
-						value="#{puntoVentaDia.productoSelect.nombre} " id="nombrePro"
+						value="#{movimientoMes.productoSelect.nombre} " id="nombrePro"
 						style="font-size: 80px"></p:outputLabel></td>
 			</tr>
 			<tr>
 				<td><h:outputLabel value="Precio: "
 						style="font-size: 80px;color:red" /> <p:outputLabel
-						value="#{puntoVentaDia.parcial}" id="valorParcial"
+						value="#{movimientoMes.parcial}" id="valorParcial"
 						style="font-size: 80px;color:red">
 						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 					</p:outputLabel></td>
@@ -26,19 +26,19 @@
 			<tr>
 				<td><h:outputLabel value="Cantidad"
 						style="font-size: 80px;color:red" /> <p:outputLabel
-						value="#{puntoVentaDia.cantidad}" id="cantidadPar"
+						value="#{movimientoMes.cantidad}" id="cantidadPar"
 						style="font-size: 80px;color:red">
-						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						
 					</p:outputLabel></td>
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Facturar:" /></td>
-				<td><p:inputText value="#{puntoVentaDia.parciaPopup}" size="2"
+				<td><p:inputText value="#{movimientoMes.parciaPopup}" size="2" 
 						id="facturar">
-						<p:focus for="facturar" id="focoFact" />
+						<p:focus for="cantidadMM:facturar" id="focoFact" />
 						<p:ajax event="keydown" partialSubmit="true"
-							listener="#{puntoVentaDia.cantidadBalanza}" delay="10"
-							onstart="PF('cantidadPopup').hide();" process="facturar,@this" />
+							listener="#{movimientoMes.cantidadBalanza}" delay="10"
+							onstart="PF('cantidadPopupMM').hide();" process="facturar,@this" />
 					</p:inputText></td>
 			</tr>
 		</table>

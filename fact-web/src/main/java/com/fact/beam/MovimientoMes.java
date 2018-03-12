@@ -86,6 +86,10 @@ public class MovimientoMes implements Serializable {
 	@EJB
 	private EventoService eventoService;
 
+	public static final String FOCUS_CANTIDAD = "document.getElementById('cantidad_in').focus();";
+	public static final String SELECT_CANTIDAD = "document.getElementById('cantidad_in').select();";
+	public static final String MOSTRAR_LA_LISTA = "document.getElementById('prodList').style.display='inline';";
+
 	private List<TipoDocumento> tipoDocumentos;
 	List<DocumentoDetalleVo> productos;
 	List<Producto> productosAll;
@@ -140,7 +144,7 @@ public class MovimientoMes implements Serializable {
 	String subProductoNew;
 	//
 
-	private String parciaPopup;
+	private String parciaPopup = "";
 	Conector conector = null;
 
 	public String getSubProductoNew() {
@@ -161,6 +165,7 @@ public class MovimientoMes implements Serializable {
 	Double iva;
 	Double execento;
 	Double total;
+	Double gravado;
 
 	// modificar factura
 	String modFactura;
@@ -175,6 +180,8 @@ public class MovimientoMes implements Serializable {
 	OpcionUsuario facturacionGuiaActivo;
 	// saber si la cartera de clientes esta activa
 	OpcionUsuario claveBorradoActivo;
+	// actvar el cambio de precio en los producto durante la facturacion
+	OpcionUsuario cambioPrecio;
 
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
@@ -302,14 +309,13 @@ public class MovimientoMes implements Serializable {
 
 	public void buscarProducto(SelectEvent event) {
 		productoSelect = (Producto) event.getObject();
+		setParciaPopup("S");
 		if (productoSelect != null && productoSelect.getBalanza() == 1l) {
 			RequestContext.getCurrentInstance().execute("pupupCantidadMM();");
 			determinarBalanza();
-			setParciaPopup("S");
 		} else {
-
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').select();");
+			RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
+			RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
 			RequestContext.getCurrentInstance().execute(
 					"document.getElementById('cantidad_in').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
 		}
@@ -327,11 +333,11 @@ public class MovimientoMes implements Serializable {
 		Double costoP;
 		try {
 			Double canti = Calculos.determinarBalanza(conector, gramera);
-			
+
 			if (Calculos.validarPromo(productoSelect, canti)) {
-				costoP = productoSelect.getPubPromo() ;
-			}else{
-				costoP=productoSelect.getCostoPublico();
+				costoP = productoSelect.getPubPromo();
+			} else {
+				costoP = productoSelect.getCostoPublico();
 			}
 			setCantidad(canti);
 			setParcial(canti * costoP);
@@ -380,8 +386,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public Configuracion configuracion() {
-		Configuracion yourVariable = (Configuracion) sessionMap.get("configuracion");
-		return yourVariable;
+		return (Configuracion) sessionMap.get("configuracion");
 	}
 
 	public String selectedTipoDoc(TipoDocumento td) {
@@ -414,12 +419,6 @@ public class MovimientoMes implements Serializable {
 																														// documento
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('op_mov_mes_content').style.display='none';");// opciones
-		// RequestContext.getCurrentInstance().execute("document.getElementById('busquedaCodBarras').style.display='inline';");//
-		// se
-		// RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='inline';");
-		// // campos
-		// RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').focus();");//
-		// art_1_input
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('detalleEntrada').style.display='inline';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('detalleEntrada').focus();");
@@ -453,150 +452,144 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public String cantidadEnter(AjaxBehaviorEvent event) {
-		if (getCantidad() != null) {
-			Double cantidad = 0.0;
-			Configuracion configuracion = configuracion();
-			Long server = configuracion.getServer();
-			if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == 1l && server == 2l) { // si
-																									// es
-																									// una
-																									// entrada
-																									// de
-																									// almacen
-																									// se
-																									// guarda
-																									// el
-																									// en
-																									// el
-																									// server
-																									// 2
-				server = 2l;
-				// System.out.println("oracle_2");
-			} else {
-				server = 1l;
-			}
-
-			System.out.println("dio enter en cantidad");
-			DocumentoDetalle docDetalle = new DocumentoDetalle();
-			DocumentoDetalleVo docDetalleVo = new DocumentoDetalleVo();
-			docDetalle.setCantidad(getCantidad());
-			docDetalle.setProductoId(productoSelect);
-			docDetalle.setDocumentoId(getDocumento());
-			Date fecha = new Date();
-			docDetalle.setFechaRegistro(fecha);
-			docDetalle.setEstado(1l);
-			docDetalle.setParcial(getCantidad() * productoSelect.getCosto());
-			documentoDetalleService.save(docDetalle, server);
-			Producto productEdit = new Producto();
-			productEdit = productoSelect;
-			cantidad = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad().doubleValue();
-			System.out.println("cantidad actual:" + cantidad);
-			OpcionUsuario stock = new OpcionUsuario();
-			switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
-			case "6": // tipo documento igual a salida de almacen
-				System.out.println("salida de almacen");
-				cantidad = cantidad - getCantidad();
-				System.out.println("cantidad actualizada:" + cantidad);
-				break;
-			case "2":// tipo documento igual a entrada de almacen
-				cantidad = cantidad + getCantidad();
-				stock = (OpcionUsuario) sessionMap.get("stock");
-				if (stock != null && productoSelect.getStockMax() != null) {
-					Double cantidadTempo = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad();
-					if (cantidadTempo > productoSelect.getStockMax()) {
-						System.out.println("entro");
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage("Lacantidad max sugerida para " + productoSelect.getNombre() + " "
-										+ productoSelect.getStockMax()));
-					}
-				}
-				RequestContext.getCurrentInstance().update("growl");
-				System.out.println("entrada de almacen");
-				System.out.println("cantidad actualizada:" + cantidad);
-				break;
-			case "1":// tipo documento igual a entrada de almacen
-				cantidad = cantidad + getCantidad();
-				stock = (OpcionUsuario) sessionMap.get("stock");
-				if (stock != null && productoSelect.getStockMax() != null) {
-					if (productoSelect.getCantidad() > productoSelect.getStockMax()) {
-						System.out.println("entro");
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage("Lacantidad max sugerida para " + productoSelect.getNombre() + " "
-										+ productoSelect.getStockMax()));
-					}
-				}
-				RequestContext.getCurrentInstance().update("growl");
-				System.out.println("entrada de almacen");
-				System.out.println("cantidad actualizada:" + cantidad);
-				break;
-			default:
-				break;
-			}
-
-			Evento evento = new Evento();
-			TipoEvento tipoEvento = new TipoEvento();
-			tipoEvento.setTipoEventoId(5l); // se envia tipo evento igual a
-			evento.setCampo(productoSelect.getNombre()); // cambio de
-															// cantidad
-			evento.setTipoEventoId(tipoEvento);
-			evento.setFechaRegistro(new Date());
-			evento.setUsuarioId(usuario());
-			evento.setValorActual("" + cantidad);
-			evento.setValorAnterior("" + productoSelect.getCantidad());
-			eventoService.save(evento);
-
-			productEdit.setCantidad(cantidad);
-			productoService.update(productEdit, server);
-			docDetalleVo.setCantidad(getCantidad());
-			docDetalleVo.setProductoId(productoSelect);
-			docDetalleVo.setDocumentoId(getDocumento());
-			docDetalleVo.setFechaRegistro(fecha);
-			if (getCantidad() != null && productoSelect.getCosto() != null) {
-				docDetalleVo.setParcial(getCantidad() * productoSelect.getCosto());
-			} else {
-				docDetalleVo.setParcial(0.0);
-			}
-			if (getCantidad() > 0) {
-				getProductos().add(docDetalleVo);
-			}
-			Calculos.calcularExcento(getDocumento(), getProductos());// en esta
-																		// funcion
-																		// de
-																		// calcula
-																		// el
-																		// excento,
-																		// iva,
-																		// total
-			documentoService.update(getDocumento(), server);
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList').style.display='inline';"); // campos//
-																														// del
-																														// nuevo
-																														// //
-																														// producto
-			setArticulo(null);
-			setCantidad(null);
-			setCodigoInterno(null);
-			setCodigoBarras(null);
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
-			RequestContext.getCurrentInstance().update("prodList");
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('busquedaCodBarras').style.display='inline';");
-			RequestContext.getCurrentInstance().update("codBarras_input");
-			RequestContext.getCurrentInstance().update("busquedaCodBarras");
-			RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').select();");
-
-		} else {
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').select();");
+		System.out.println("entra a cantidad enter");
+		if (getCantidad() == null) {
+			RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
+			RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
 			RequestContext.getCurrentInstance().execute(
 					"document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+			return "";
 		}
+		Double cantidadTemp;
+		Configuracion configuracion = configuracion();
+		Long server = configuracion.getServer();
+		if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == 1l && server == 2l) { // si
+																								// es
+																								// una
+																								// entrada
+																								// de
+																								// almacen
+																								// se
+																								// guarda
+																								// el
+																								// en
+																								// el
+																								// server
+																								// 2
+			server = 2l;
+		} else {
+			server = 1l;
+		}
+		System.out.println("dio enter en cantidad");
+		DocumentoDetalle docDetalle = new DocumentoDetalle();
+		DocumentoDetalleVo docDetalleVo = new DocumentoDetalleVo();
+		docDetalle.setCantidad(getCantidad());
+		docDetalle.setProductoId(productoSelect);
+		docDetalle.setDocumentoId(getDocumento());
+		Date fecha = new Date();
+		docDetalle.setFechaRegistro(fecha);
+		docDetalle.setEstado(1l);
+		docDetalle.setParcial(getCantidad() * productoSelect.getCosto());
+		documentoDetalleService.save(docDetalle, server);
+		Producto productEdit = productoSelect;
+		cantidadTemp = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad();
+		System.out.println("cantidad actual:" + cantidadTemp);
+		OpcionUsuario stock;
+		switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
+		case "6": // tipo documento igual a salida de almacen
+			System.out.println("salida de almacen");
+			cantidadTemp = cantidadTemp - getCantidad();
+			System.out.println("cantidad actualizada:" + cantidadTemp);
+			break;
+		case "2":// tipo documento igual a entrada de almacen
+			cantidadTemp = cantidadTemp + getCantidad();
+			stock = (OpcionUsuario) sessionMap.get("stock");
+			Double cantidadTempo = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad();
+			if (stock != null && productoSelect.getStockMax() != null && cantidadTempo > productoSelect.getStockMax()) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La cantidad max sugerida para "
+						+ productoSelect.getNombre() + " " + productoSelect.getStockMax()));
+			}
+			RequestContext.getCurrentInstance().update("growl");
+			System.out.println("cantidad actualizada:" + cantidadTemp);
+			break;
+		case "1":// tipo documento igual a entrada de almacen
+			cantidadTemp = cantidadTemp + getCantidad();
+			stock = (OpcionUsuario) sessionMap.get("stock");
+			if (stock != null && productoSelect.getStockMax() != null
+					&& productoSelect.getCantidad() > productoSelect.getStockMax()) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Lacantidad max sugerida para "
+						+ productoSelect.getNombre() + " " + productoSelect.getStockMax()));
+			}
+			RequestContext.getCurrentInstance().update("growl");
+			System.out.println("cantidad actualizada:" + cantidadTemp);
+			break;
+		default:
+			break;
+		}
+
+		Evento evento = new Evento();
+		TipoEvento tipoEvento = new TipoEvento();
+		tipoEvento.setTipoEventoId(5l); // se envia tipo evento igual a
+		evento.setCampo(productoSelect.getNombre()); // cambio de
+														// cantidad
+		evento.setTipoEventoId(tipoEvento);
+		evento.setFechaRegistro(new Date());
+		evento.setUsuarioId(usuario());
+		evento.setValorActual("" + cantidadTemp);
+		evento.setValorAnterior("" + productoSelect.getCantidad());
+		eventoService.save(evento);
+
+		productEdit.setCantidad(cantidadTemp);
+		productoService.update(productEdit, server);
+		docDetalleVo.setCantidad(getCantidad());
+		docDetalleVo.setProductoId(productoSelect);
+		docDetalleVo.setDocumentoId(getDocumento());
+		docDetalleVo.setFechaRegistro(fecha);
+		if (getCantidad() != null && productoSelect.getCosto() != null) {
+			docDetalleVo.setParcial(getCantidad() * productoSelect.getCosto());
+		} else {
+			docDetalleVo.setParcial(0.0);
+		}
+		if (getCantidad() > 0) {
+			getProductos().add(docDetalleVo);
+		}
+		// en esta funcion de calcula el excento, iva, total
+		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		// se agrega re
+		if (proveedorSelect != null && proveedorSelect.getRetencion() != null) {
+			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorSelect));
+		}
+		setTotal(getDocumento().getTotal());
+		setIva(getDocumento().getIva());
+		setExecento(getDocumento().getExcento());
+		setGravado(getDocumento().getGravado());
+		documentoService.update(getDocumento(), server);
+		RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA); // campos//
+																		// del
+																		// nuevo
+																		// //
+																		// producto
+		setArticulo(null);
+		setCantidad(null);
+		setCodigoInterno(null);
+		setCodigoBarras(null);
+		RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
+		RequestContext.getCurrentInstance().update("prodList");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance()
+				.execute("document.getElementById('busquedaCodBarras').style.display='inline';");
+		RequestContext.getCurrentInstance().update("codBarras_input");
+		RequestContext.getCurrentInstance().update("busquedaCodBarras");
+		RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').focus();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').select();");
 		return "";
 	}
 
 	public void crearProducto(AjaxBehaviorEvent event) {
-		if (getCrear().toUpperCase().equals("S")) {
+		if (getCrear().equalsIgnoreCase("S")) {
 			setArticuloNew("");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('nuevoProductoForm:articuloNew').value='';");
@@ -621,111 +614,106 @@ public class MovimientoMes implements Serializable {
 
 	public void crearNewProducto() {
 		String crearN = getCrearNew().toUpperCase();
-		Configuracion configuracion = configuracion();
-		Long server = configuracion.getServer();
-
-		if (crearN.equals("S")) {
-			// RequestContext.getCurrentInstance().execute("alert('entra al
-			// if')");
-			Producto prodNew = new Producto();
-			prodNew.setProductoId(getCodigoNew().longValue());
-			prodNew.setUnidad(getUnidadNew());
-			if (getCodigoBarrasNew() != null) {
-				Producto p = productoService.getByCodigoBarras(getCodigoBarrasNew());
-				if (p != null) {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage("El Producto Con código de barras " + getCodigoBarrasNew()
-									+ " ya se encuentra registrado"));
-					return;
-				}
-			}
-			if (getValanzaNew() != null) {
-				prodNew.setBalanza(getValanzaNew().toUpperCase().equals("S") ? 1l : 0l);
-			} else {
-				prodNew.setBalanza(0l);
-			}
-			if (getVariosNew() != null) {
-				prodNew.setVarios(getVariosNew().toUpperCase().equals("S") ? 1l : 0l);
-			} else {
-				prodNew.setVarios(0l);
-			}
-			if (getSubProductoNew() != null) {
-				prodNew.setSubProducto(getSubProductoNew().toUpperCase().equals("S") ? 1l : 0l);
-			} else {
-				prodNew.setSubProducto(0l);
-				;
-			}
-
-			prodNew.setCodigoBarras(getCodigoBarrasNew());
-			if (getCostoNew() != null) {
-				prodNew.setCosto(getCostoNew());
-			} else {
-				prodNew.setCosto(0.0);
-			}
-			if (getPublicoNew() != null) {
-				prodNew.setCostoPublico(getPublicoNew());
-			} else {
-				prodNew.setCostoPublico(0.0);
-			}
-			prodNew.setFechaRegistro(new Date());
-			if (getIvaNew() != null) {
-				prodNew.setIva(getIvaNew());
-			} else {
-				prodNew.setIva(0.0);
-			}
-			if (getHipoconsumo() != null) {
-				prodNew.setHipoconsumo(getHipoconsumo());
-			} else {
-				prodNew.setHipoconsumo(0.0);
-			}
-			if (getProveedorNew() != null) {
-				prodNew.setProveedorId(getProveedorNew());
-			}
-			if (getGrupoNew() != null) {
-				prodNew.setGrupoId(getGrupoNew());
-			}
-			if (getMarcaNew() != null) {
-				prodNew.setMarcaId(getMarcaNew());
-			}
-			prodNew.setNombre(getArticuloNew().toUpperCase().trim());
-			if (getStockMaxNew() != null) {
-				prodNew.setStockMax(getStockMaxNew());
-			} else {
-				prodNew.setStockMax(1000000l);
-			}
-			if (getStockMinNew() != null) {
-				prodNew.setStockMin(getStockMinNew());
-			} else {
-				prodNew.setStockMin(-1000000l);
-			}
-			prodNew.setPeso(getPesoKgNew());
-			prodNew.setEstado(1l);
-			prodNew.setCantidad(0.0);
-			productoService.save(prodNew, 1l);
-			if (server == 2l) {
-				productoService.save(prodNew, server);
-			}
-			setCodigoNew(null);
-			productoSelect = prodNew;
-			setCodigoInterno(prodNew.getProductoId().toString());
-			setArticulo(prodNew);
-			setUnidad(prodNew.getCosto());
-			getProductosAll().add(productoSelect);
-			// setCantidad(0l);
-			RequestContext.getCurrentInstance().update("art_1");
-			RequestContext.getCurrentInstance().update("art_1_input");
-			RequestContext.getCurrentInstance().update("cod_");
-			RequestContext.getCurrentInstance().update("cantidad_in");
-
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').select();");
-			RequestContext.getCurrentInstance().execute(
-					"document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Creado exitosamente"));
-		} else {
+		if (!crearN.equals("S")) {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+			return;
 		}
+		
+		if (getCodigoBarrasNew() != null) {
+			Producto p = productoService.getByCodigoBarras(getCodigoBarrasNew());
+			if (p != null) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
+						"El Producto Con código de barras " + getCodigoBarrasNew() + " ya se encuentra registrado"));
+				return;
+			}
+		}
+		Configuracion configuracion = configuracion();
+		Long server = configuracion.getServer();
+		Producto prodNew = new Producto();
+		prodNew.setProductoId(getCodigoNew().longValue());
+		prodNew.setUnidad(getUnidadNew());
+		if (getValanzaNew() != null) {
+			prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("S") ? 1l : 0l);
+		} else {
+			prodNew.setBalanza(0l);
+		}
+		if (getVariosNew() != null) {
+			prodNew.setVarios(getVariosNew().equalsIgnoreCase("S") ? 1l : 0l);
+		} else {
+			prodNew.setVarios(0l);
+		}
+		if (getSubProductoNew() != null) {
+			prodNew.setSubProducto(getSubProductoNew().equalsIgnoreCase("S") ? 1l : 0l);
+		} else {
+			prodNew.setSubProducto(0l);
+		}
+
+		prodNew.setCodigoBarras(getCodigoBarrasNew());
+		if (getCostoNew() != null) {
+			prodNew.setCosto(getCostoNew());
+		} else {
+			prodNew.setCosto(0.0);
+		}
+		if (getPublicoNew() != null) {
+			prodNew.setCostoPublico(getPublicoNew());
+		} else {
+			prodNew.setCostoPublico(0.0);
+		}
+		prodNew.setFechaRegistro(new Date());
+		if (getIvaNew() != null) {
+			prodNew.setIva(getIvaNew());
+		} else {
+			prodNew.setIva(0.0);
+		}
+		if (getHipoconsumo() != null) {
+			prodNew.setHipoconsumo(getHipoconsumo());
+		} else {
+			prodNew.setHipoconsumo(0.0);
+		}
+		if (getProveedorNew() != null) {
+			prodNew.setProveedorId(getProveedorNew());
+		}
+		if (getGrupoNew() != null) {
+			prodNew.setGrupoId(getGrupoNew());
+		}
+		if (getMarcaNew() != null) {
+			prodNew.setMarcaId(getMarcaNew());
+		}
+		prodNew.setNombre(getArticuloNew().toUpperCase().trim());
+		if (getStockMaxNew() != null) {
+			prodNew.setStockMax(getStockMaxNew());
+		} else {
+			prodNew.setStockMax(1000000l);
+		}
+		if (getStockMinNew() != null) {
+			prodNew.setStockMin(getStockMinNew());
+		} else {
+			prodNew.setStockMin(-1000000l);
+		}
+		prodNew.setPeso(getPesoKgNew());
+		prodNew.setEstado(1l);
+		prodNew.setCantidad(0.0);
+		productoService.save(prodNew, 1l);
+		if (server == 2l) {
+			productoService.save(prodNew, server);
+		}
+		setCodigoNew(null);
+		productoSelect = prodNew;
+		setCodigoInterno(prodNew.getProductoId().toString());
+		setArticulo(prodNew);
+		setUnidad(prodNew.getCosto());
+		getProductosAll().add(productoSelect);		
+		RequestContext.getCurrentInstance().update("art_1");
+		RequestContext.getCurrentInstance().update("art_1_input");
+		RequestContext.getCurrentInstance().update("cod_");
+		RequestContext.getCurrentInstance().update("cantidad_in");
+		RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
+		RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
+		RequestContext.getCurrentInstance().execute(
+				"document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Creado exitosamente"));
+
 		setCrearNew("N");
 		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('deseaGuardar').style.display='none';");
@@ -734,97 +722,98 @@ public class MovimientoMes implements Serializable {
 
 	public String editarNewProducto(AjaxBehaviorEvent event) {
 		String crearN = getEditarNew().toUpperCase();
-		if (crearN.equals("S")) {
-
-			String nombre = getProductoEdict().getNombre().trim();
-			getProductoEdict().setNombre(nombre);
-			Producto prodNew = getProductoEdict();
-			if (getProductoEdict().getProductoId() == 1l) {
-				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage("No es posible editar el producto ¡Varios!"));
-				return "";
-			}
-
-			// se existe un cambio de precio se registra el evento
-			if (getPublicoNew() != null && getPublicoNew().equals(getProductoEdict().getCostoPublico())) {
-				Evento evento = new Evento();
-				TipoEvento tipoEvento = new TipoEvento();
-				tipoEvento.setTipoEventoId(3l); // se envia tipo evento igual a
-												// cambio de precio
-				evento.setTipoEventoId(tipoEvento);
-				evento.setFechaRegistro(new Date());
-				evento.setUsuarioId(usuario());
-				evento.setValorActual("" + getPublicoNew());
-				evento.setValorAnterior("" + getProductoEdict().getCostoPublico());
-				eventoService.save(evento);
-			}
-
-			if (getValanzaNew() != null) {
-				prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("N") ? 0l : 1l);
-				if (getValanzaNew().equalsIgnoreCase("S")) {
-					setUnidadNew("N");
-				} else {
-					setUnidadNew("S");
-				}
-			} else {
-				prodNew.setBalanza(0l);
-				setUnidadNew("S");
-			}
-
-			if (getVariosNew() != null) {
-				prodNew.setVarios((getVariosNew().toUpperCase().equals("N") ? 0l : 1l));
-			} else {
-				prodNew.setVarios(0l);
-			}
-
-			if (getUnidadNew() != null) {
-				prodNew.setUnidad(getUnidadNew().toUpperCase().equals("N") ? "N" : "S");
-			} else {
-				prodNew.setUnidad("N");
-			}
-			prodNew.setCodigoBarras(getCodigoBarrasNew());
-			if (getCostoNew() != null) {
-				prodNew.setCosto(getCostoNew());
-			} else {
-				prodNew.setCosto(0.0);
-			}
-			if (getPublicoNew() != null) {
-				prodNew.setCostoPublico(getPublicoNew());
-			} else {
-				prodNew.setCostoPublico(0.0);
-			}
-			prodNew.setFechaActualiza(getFechaEdit());
-			if (getIvaNew() != null) {
-				prodNew.setIva(getIvaNew());
-			} else {
-				prodNew.setIva(0.0);
-			}
-			if (getHipoconsumo() != null) {
-				prodNew.setHipoconsumo(getHipoconsumo());
-			} else {
-				prodNew.setHipoconsumo(0.0);
-			}
-			if (getGrupoNew() != null) {
-				prodNew.setGrupoId(getGrupoNew());
-			}
-			prodNew.setMarcaId(getMarcaNew());
-			prodNew.setPeso(getPesoKgNew());
-			prodNew.setStockMax(getStockMaxNew());
-			prodNew.setStockMin(getStockMinNew());
-			prodNew.setEstado(1l);
-			Configuracion configuracion = configuracion();
-			Long server = configuracion.getServer();
-			productoService.update(prodNew, 1l);
-			if (server == 2l) {
-				productoService.update(prodNew, 2l);
-			}
-			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto editado Exitosamente"));
-			limpiarEditar();
-		} else {
+		if (!crearN.equals("S")) {
 			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto NO editado"));
 		}
+
+
+		String nombre = getProductoEdict().getNombre().trim();
+		getProductoEdict().setNombre(nombre);
+		Producto prodNew = getProductoEdict();
+		if (getProductoEdict().getProductoId() == 1l) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("No es posible editar el producto ¡Varios!"));
+			return "";
+		}
+
+		// se existe un cambio de precio se registra el evento
+		if (getPublicoNew() != null && getPublicoNew().equals(getProductoEdict().getCostoPublico())) {
+			Evento evento = new Evento();
+			TipoEvento tipoEvento = new TipoEvento();
+			tipoEvento.setTipoEventoId(3l); // se envia tipo evento igual a
+											// cambio de precio
+			evento.setTipoEventoId(tipoEvento);
+			evento.setFechaRegistro(new Date());
+			evento.setUsuarioId(usuario());
+			evento.setValorActual("" + getPublicoNew());
+			evento.setValorAnterior("" + getProductoEdict().getCostoPublico());
+			eventoService.save(evento);
+		}
+
+		if (getValanzaNew() != null) {
+			prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("N") ? 0l : 1l);
+			if (getValanzaNew().equalsIgnoreCase("S")) {
+				setUnidadNew("N");
+			} else {
+				setUnidadNew("S");
+			}
+		} else {
+			prodNew.setBalanza(0l);
+			setUnidadNew("S");
+		}
+
+		if (getVariosNew() != null) {
+			prodNew.setVarios((getVariosNew().toUpperCase().equals("N") ? 0l : 1l));
+		} else {
+			prodNew.setVarios(0l);
+		}
+
+		if (getUnidadNew() != null) {
+			prodNew.setUnidad(getUnidadNew().toUpperCase().equals("N") ? "N" : "S");
+		} else {
+			prodNew.setUnidad("N");
+		}
+		prodNew.setCodigoBarras(getCodigoBarrasNew());
+		if (getCostoNew() != null) {
+			prodNew.setCosto(getCostoNew());
+		} else {
+			prodNew.setCosto(0.0);
+		}
+		if (getPublicoNew() != null) {
+			prodNew.setCostoPublico(getPublicoNew());
+		} else {
+			prodNew.setCostoPublico(0.0);
+		}
+		prodNew.setFechaActualiza(getFechaEdit());
+		if (getIvaNew() != null) {
+			prodNew.setIva(getIvaNew());
+		} else {
+			prodNew.setIva(0.0);
+		}
+		if (getHipoconsumo() != null) {
+			prodNew.setHipoconsumo(getHipoconsumo());
+		} else {
+			prodNew.setHipoconsumo(0.0);
+		}
+		if (getGrupoNew() != null) {
+			prodNew.setGrupoId(getGrupoNew());
+		}
+		prodNew.setMarcaId(getMarcaNew());
+		prodNew.setPeso(getPesoKgNew());
+		prodNew.setStockMax(getStockMaxNew());
+		prodNew.setStockMin(getStockMinNew());
+		prodNew.setEstado(1l);
+		Configuracion configuracion = configuracion();
+		Long server = configuracion.getServer();
+		productoService.update(prodNew, 1l);
+		if (server == 2l) {
+			productoService.update(prodNew, 2l);
+		}
+		RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto editado Exitosamente"));
+		limpiarEditar();
+	
 		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
 		return "";
 	}
@@ -850,12 +839,9 @@ public class MovimientoMes implements Serializable {
 			pr.setGrupoId(grupoService.getById(pr.getGrupoId().getGrupoId()));
 			setGrupoNew(pr.getGrupoId());
 		}
-
-		setMarcaNew(pr.getMarcaId());
-		// setProveedorNew(set);
+		setMarcaNew(pr.getMarcaId());		
 		setCodigoBarrasNew(pr.getCodigoBarras());
-		setPesoKgNew(pr.getPeso());
-		// setEditarNew("S");
+		setPesoKgNew(pr.getPeso());		
 		if (pr.getUnidad() == null) {
 			setUnidadNew("N");
 		} else {
@@ -873,8 +859,7 @@ public class MovimientoMes implements Serializable {
 		}
 	}
 
-	public void limpiarEditar() {
-		// if("info_articulos".equals(bar)){
+	public void limpiarEditar() {		
 		System.out.println("entra a limpiar editar: ");
 		setProductoEdict(null);
 		setCodigoEdit(null);
@@ -886,7 +871,6 @@ public class MovimientoMes implements Serializable {
 		setStockMinNew(null);
 		setGrupoNew(null);
 		setMarcaNew(null);
-		// setProveedorNew(set);
 		setCodigoBarrasNew(null);
 		setPesoKgNew(null);
 		setEditarNew(null);
@@ -896,11 +880,8 @@ public class MovimientoMes implements Serializable {
 		setVariosNew(null);
 	}
 
-	public Usuario usuario() {
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		Map<String, Object> sessionMap = externalContext.getSessionMap();
-		Usuario yourVariable = (Usuario) sessionMap.get("userLogin");
-		return yourVariable;
+	public Usuario usuario() {			
+		return (Usuario) sessionMap.get("userLogin");
 	}
 
 	public void buscarUltimaFactura() {
@@ -908,7 +889,7 @@ public class MovimientoMes implements Serializable {
 		Documento ultimoFactura;
 		Usuario usuario = usuario();
 		Long idFactura = 2l; // id de tipo documento entrada de almacen
-		List<DocumentoDetalle> dd = new ArrayList<>();
+		List<DocumentoDetalle> dd;
 		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
 		ultimoFactura = documentoService.getByLastAndTipo(idFactura, usuario.getUsuarioId());
 		if (ultimoFactura != null) {
@@ -930,20 +911,18 @@ public class MovimientoMes implements Serializable {
 			setTotal(ultimoFactura.getTotal());
 			setExecento(ultimoFactura.getExcento());
 			setIva(ultimoFactura.getIva());
-			// setGravado(ultimoFactura.getGravado());
-			// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('dataList_content').style.display='inline';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList').style.display='inline';");
+			RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 			RequestContext.getCurrentInstance().update("cod_");
 			RequestContext.getCurrentInstance().update("nombc");
 			RequestContext.getCurrentInstance().update("art_1");
 			RequestContext.getCurrentInstance().update("cantidad_in");
 			RequestContext.getCurrentInstance().update("dataList");
-			RequestContext.getCurrentInstance().update("execentoFact");
-			// RequestContext.getCurrentInstance().update("gravado");
+			RequestContext.getCurrentInstance().update("execentoFact");	
 			RequestContext.getCurrentInstance().update("ivaFact");
 			RequestContext.getCurrentInstance().update("totalFact");
+			RequestContext.getCurrentInstance().update("gravadoFact");
 			RequestContext.getCurrentInstance().update("unidad_");
 			// falta poner el focus en codigo de barras
 			// actualizar los campos y ocultar los que no se ven y mostrar los
@@ -1038,6 +1017,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("ivaFact");
 		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
 		if (!getProductos().isEmpty()) {
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('borrarTablaMM:checkboxDT:0:rowDelete_').focus();");
@@ -1073,25 +1053,7 @@ public class MovimientoMes implements Serializable {
 			actModFactura = Boolean.FALSE;
 		} else {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
-					"El módulo de impresión de movimientos mes esta desactivado, comuniquese con su proveedor del sistema"));
-			// System.out.println("imprimir");
-			// RequestContext.getCurrentInstance().execute("PF('imprimir').show();");
-			// RequestContext.getCurrentInstance().execute("document.getElementById('pogoTargeta').value='N';");
-			// RequestContext.getCurrentInstance().execute("document.getElementById('cartera').value='N';");
-			// RequestContext.getCurrentInstance().execute(
-			// "document.getElementById('cartera').className=' ui-inputfield
-			// ui-inputtext ui-widget ui-state-default ui-corner-all
-			// state-focus';");
-			// RequestContext.getCurrentInstance().execute("document.getElementById('cartera').focus();");
-			// RequestContext.getCurrentInstance().execute("document.getElementById('cartera').select();");
-			// setCartera("N");
-			// RequestContext.getCurrentInstance().update("excento_tag");
-			// RequestContext.getCurrentInstance().update("cartera");
-			// RequestContext.getCurrentInstance().update("gravado_tag");
-			// RequestContext.getCurrentInstance().update("iva_tag");
-			// RequestContext.getCurrentInstance().update("total1");
-			// RequestContext.getCurrentInstance().update("iva_tag");
-			// RequestContext.getCurrentInstance().update("pogoTargeta");
+					"El módulo de impresión de movimientos mes esta desactivado, comuniquese con su proveedor del sistema"));			
 		}
 	}
 
@@ -1121,13 +1083,9 @@ public class MovimientoMes implements Serializable {
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
-				// setGravado(getDocumentoActual().getGravado());
-				// setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("nombc");
 				RequestContext.getCurrentInstance().update("art_1");
@@ -1137,8 +1095,8 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
-				RequestContext.getCurrentInstance().update("unidad_");
-				// RequestContext.getCurrentInstance().update("nombreCliente2");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("unidad_");				
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1165,13 +1123,9 @@ public class MovimientoMes implements Serializable {
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
-				// setGravado(getDocumentoActual().getGravado());
-				// setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("nombc");
 				RequestContext.getCurrentInstance().update("art_1");
@@ -1181,8 +1135,8 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
-				RequestContext.getCurrentInstance().update("unidad_");
-				// RequestContext.getCurrentInstance().update("nombreCliente2");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("unidad_");				
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1216,13 +1170,9 @@ public class MovimientoMes implements Serializable {
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
-				// setGravado(getDocumentoActual().getGravado());
-				// setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("nombc");
 				RequestContext.getCurrentInstance().update("art_1");
@@ -1232,8 +1182,8 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
 				RequestContext.getCurrentInstance().update("unidad_");
-				// RequestContext.getCurrentInstance().update("nombreCliente2");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1260,13 +1210,9 @@ public class MovimientoMes implements Serializable {
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
-				// setGravado(getDocumentoActual().getGravado());
-				// setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("art_1");
 				RequestContext.getCurrentInstance().update("nombc");
@@ -1276,13 +1222,36 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
 				RequestContext.getCurrentInstance().update("unidad_1");
-				// RequestContext.getCurrentInstance().update("nombreCliente2");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
 
 		}
+	}
+
+	public String cantidadBalanza(AjaxBehaviorEvent event) {
+		if (getParciaPopup().equalsIgnoreCase("S")) {
+			System.out.println("entra");
+			cantidadEnter(null);
+		} else {
+			System.out.println("else");
+			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+			RequestContext.getCurrentInstance().execute(
+					"document.getElementById('art_1_input').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+		}
+		RequestContext.getCurrentInstance().update("dataList");
+		RequestContext.getCurrentInstance().update("art_1");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		return "";
 	}
 
 	public List<Documento> getListaDocumento() throws ParseException {
@@ -1742,4 +1711,30 @@ public class MovimientoMes implements Serializable {
 	public void setParciaPopup(String parciaPopup) {
 		this.parciaPopup = parciaPopup;
 	}
+
+	public Producto getProductoSelect() {
+		return productoSelect;
+	}
+
+	public void setProductoSelect(Producto productoSelect) {
+		this.productoSelect = productoSelect;
+	}
+
+	public Double getGravado() {
+		return gravado;
+	}
+
+	public void setGravado(Double gravado) {
+		this.gravado = gravado;
+	}
+
+	public String getCambioPrecio() {
+		cambioPrecio = (OpcionUsuario) sessionMap.get("cambioPrecio");
+		return cambioPrecio == null ? "false" : "true";
+	}
+
+	public void setCambioPrecio(OpcionUsuario cambioPrecio) {
+		this.cambioPrecio = cambioPrecio;
+	}
+
 }

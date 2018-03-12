@@ -24,6 +24,7 @@ import org.primefaces.context.RequestContext;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.Producto;
+import com.fact.model.Proveedor;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
 
@@ -164,10 +165,18 @@ public class Calculos {
 		}
 		return unit;
 	}
+	
+	public static Documento calcularRetefuente(Documento doc, Proveedor pro){
+		Double retencion = pro.getRetencion()/100;
+		Double retefuente = ((doc.getTotal()-doc.getIva())*retencion); 
+		doc.setRetefuente(retefuente);
+		return doc;
+	}
 
 	// en esta funcion de calcula el excento, iva, total
 	public static Documento calcularExcento(Documento doc, List<DocumentoDetalleVo> productos) {
-		Double totalReal = 0.0, exectoReal = 0.0;
+		Double totalReal = 0.0 ;
+		Double exectoReal = 0.0;
 		Double gravado = 0.0;
 		Double ivatotal = 0.0;
 		Double peso = 0.0;
@@ -373,6 +382,14 @@ public class Calculos {
 			respuesta = (respuesta == null ? "" : respuesta);
 			respuesta = respuesta.replaceAll(",", "");
 			canti = Double.parseDouble(respuesta);
+			break;
+		case "6":
+			//numerosComoArray = respuesta.split("=");
+			cant = respuesta;
+			cant = cant.replace("=", "");
+			cant = cant.replace(" ", "");			
+			canti = Double.parseDouble(cant);
+			System.out.println("canti:"+canti);
 			break;
 		default:
 			break;

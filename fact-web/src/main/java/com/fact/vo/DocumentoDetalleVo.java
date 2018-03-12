@@ -17,6 +17,7 @@ public class DocumentoDetalleVo {
 	private Double parcial;
 	private Double cantidad;
 	private Double unitario;
+	private Double costoUnitario;
 	private Double cantidadDevolucion;
 	private Double cambioPrecio;
 	private String borrar;
@@ -94,6 +95,12 @@ public class DocumentoDetalleVo {
 	}
 	public void setCantidad2(Double cantidad2) {
 		this.cantidad2 = cantidad2;
+	}
+	public Double getCostoUnitario() {
+		return costoUnitario;
+	}
+	public void setCostoUnitario(Double costoUnitario) {
+		this.costoUnitario = costoUnitario;
 	}
 	
 	

@@ -2,11 +2,12 @@
  * 
  */
 function pupupCantidadMM() {
+	//alert("ejecuta");
 	PF('cantidadPopupMM').show();
 	document.getElementById('cantidadMM:facturar').focus();
 	document.getElementById('cantidadMM:facturar').select();
 	document.getElementById('cantidadMM:facturar').className = ' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus ui-state-focus';
-	// alert("ejecuta");
+	
 }
 
 function controlTeclasMM(e,element){

@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form>
+	<p:growl id="growl" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial" value="#{proveedores.fechaInicio}"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal" value="#{proveedores.fechafin}"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Proveedor: " /></td>
+				<td><p:inputText value="#{proveedores.proveedoresId}" /></td>
+			</tr>
+			<tr>
+				<td> <p:outputLabel value=""/></td>
+				<td><p:commandButton value="Buscar" action="#{proveedores.buscarProveedores}" update="documentos,growl"/> 
+				<h:commandLink value="Exportar">
+						<p:dataExporter type="xls" target="documentos" fileName="RetefuenteProveedores" />
+					</h:commandLink> </td>
+				</tr>
+		</table>
+		<p:dataTable id="documentos" var="docu" value="#{proveedores.proveedoresVo}"
+			rows="5" paginator="true"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="5,10,15"
+			emptyMessage="No hay facturas disponibles para El proveedor seleccionado">
+			<f:facet name="header">
+            Retefuente Proveedores
+        </f:facet>
+			
+			<p:column headerText="Cliente">
+				<h:outputText value="#{docu.proveedorId.nombre}" />
+			</p:column>
+
+			<p:column headerText="Total compras">
+				<h:outputText value="#{docu.totalCompras}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Retefuente">
+				<h:outputText value="#{docu.retefuente}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			
+		</p:dataTable>
+	</h:form>
+
+
+</ui:composition>

@@ -327,7 +327,17 @@ items {
 						<td width="10%"><p:outputLabel value="#{prod1.productoId.productoId}" size="10" /></td>
 						<td width="40%"><p:outputLabel value="#{prod1.productoId.nombre}" size="38"/></td>
 						<td width="15%"><p:outputLabel value="#{prod1.cantidad}" size="10" /></td>
-						<td width="10%"><p:outputLabel value="#{prod1.productoId.costo}" size="10" /></td>
+						<td width="10%"><p:outputLabel value="#{prod1.productoId.costo}" size="10"  rendered="!#{movimientoMes.cambioPrecio}"/>
+						
+						<p:inputNumber value="#{prod1.costoUnitario}"
+									rendered="#{movimientoMes.cambioPrecio}" symbol="$"
+									decimalPlaces="0" id="precioVariable" minValue="0"
+									onfocus="PF('cambioPrecio').show();">
+									<p:ajax event="focus"
+										listener="#{puntoVentaDia.recalcularPrecio(prod1)}"></p:ajax>
+								</p:inputNumber>
+						
+						</td>
 						<td width="15%"><p:outputLabel value="#{prod1.parcial}" size="10" /></td>
 					</tr>
 				</table>
@@ -374,8 +384,8 @@ items {
 					<p:autoComplete id="art_1" value="#{movimientoMes.articulo}"  onkeyup="ciclo(event,this)"  minQueryLength="2"
 									completeMethod="#{movimientoMes.completeText}" maxResults="11"  var="name" size="38"
 									itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{productoConverter}">
-									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProducto}" process="@this,art_1" immediate="true"
-									 onstart="focoCantidad()" 
+									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProducto}" process="@this,art_1" immediate="true" update="cantidadMM:facturar"
+									 
 									  />
 						<p:column >
 							<p:outputLabel value="#{name.nombre}" />
@@ -398,7 +408,7 @@ items {
 				<td width="15%">
 					<p:inputText value= "#{movimientoMes.cantidad}" onselect="focoCantidad" onfocus="focoCantidad"  size="10" onblur="listaProductos()"   id="cantidad_in" onkeyup="enterCantidad(event)">
 						<p:ajax event="blur"  partialSubmit="true"
-					        listener="#{movimientoMes.cantidadEnter}" update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact,totalFact"/> 
+					        listener="#{movimientoMes.cantidadEnter}" update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact"/> 
 					        
 					</p:inputText>
 				</td>
@@ -446,7 +456,7 @@ items {
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Vr. Gravado" /></td>
-					<td><p:inputNumber value="0" disabled="true"/></td>
+					<td><p:inputNumber value="#{movimientoMes.gravado}" id="gravadoFact" disabled="true"/></td>
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Vr. Iva" /></td>
