@@ -26,6 +26,7 @@
 	var descuentoEnFactura=0; //variable que controla si se visualiza el descuento o la factura o no
 	var bloqCuadreCaja=0; //variable que controla el bloq del cuadre de caja para los cajeros
 	var asignarEmpleadoFactura=0; //variable que controla la asignacion de los empleados a la factura
+	var activarComandas=0; //variable que controla la activacion de las comandas para los restaurantes
 	function info(elEvento) {
 		var texto = document.getElementById('menuPrincipal') //acceso al sitio de escritura
         var evento = elEvento || window.event // definir objeto event
@@ -439,6 +440,13 @@
 		<div style="width: 250px; height: 330px">
 			<ui:include
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/imprimir.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="dialogComanda" id="dialogComanda"  onShow="document.getElementById('comandas:btnImprComanda').focus();"
+		style="font-size: 16px" header="Seleccionar Comanda o Factura">
+		<div style="width: 250px; height: 130px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/seleccionarComandaOrFactura.xhtml" />
 		</div>
 	</p:dialog>
 	<p:dialog widgetVar="px01" id="px01"  focus="px01_input" closeOnEscape="true"

@@ -31,6 +31,7 @@ import com.fact.beam.Login;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.Empresa;
+import com.fact.model.Grupo;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.Usuario;
@@ -330,6 +331,43 @@ public class Impresion {
 		}
 
 		return "";
+	}
+	
+	/**
+	 * Medoto encargado de imprimir las comandas en formato txt
+	 * @param documentoImp
+	 * @param productos
+	 * @param grupo
+	 * @param config
+	 * @param impresora
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws DocumentException
+	 */
+	public static String imprimirComandaPDF(Documento documentoImp, List<DocumentoDetalleVo> productos, Grupo grupo,
+			Configuracion config,String impresora) throws FileNotFoundException, DocumentException{
+		Empresa e = Login.getEmpresaLogin();
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+		Date hoy = new Date();
+		String pdf = "C:\\facturas\\comandas\\comanda_" + documentoImp.getDocumentoId()+"_"+ df.format(hoy)+ ".pdf";
+		FileOutputStream archivo = new FileOutputStream(pdf);
+		DecimalFormat formatea = new DecimalFormat("###,###.##");
+		Document documento = new Document();
+		float fntSize, lineSpacing;
+		fntSize = 9f;
+		lineSpacing = 10f;
+		PdfWriter.getInstance(documento, archivo);
+		documento.setMargins(10, 1, 1, 1);
+		documento.open();
+		documento.add(new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Comanda para: " + grupo.getNombre(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, 11f))));
+		documento.close();
+
+		printer(impresora, pdf, config);
+
+		return pdf;
+		
 	}
 
 	/**

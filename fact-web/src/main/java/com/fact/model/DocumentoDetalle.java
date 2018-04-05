@@ -57,6 +57,9 @@ public class DocumentoDetalle {
 	
 	@Column(name="CANTIDAD_2")
 	private Double cantidad2;
+	
+	@Column(name="IMPRESO_COMANDA")
+	private Integer impresoComanda;
 
 	public Long getDocumentoDetalleId() {
 		return documentoDetalleId;
@@ -155,8 +158,14 @@ public class DocumentoDetalle {
 
 	public void setCantidad2(Double cantidad2) {
 		this.cantidad2 = cantidad2;
+	}
+
+	public Integer getImpresoComanda() {
+		return impresoComanda;
+	}
+
+	public void setImpresoComanda(Integer impresoComanda) {
+		this.impresoComanda = impresoComanda;
 	}	
-	
-	
 	
 }

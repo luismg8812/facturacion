@@ -14,7 +14,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List; 
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
@@ -35,6 +35,7 @@ import javax.print.attribute.PrintRequestAttributeSet;
 
 import org.primefaces.context.RequestContext;
 
+import com.fact.api.Calculos;
 import com.fact.api.Impresion;
 import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
@@ -79,10 +80,9 @@ public class borrarFacturas implements Serializable {
 
 	@EJB
 	private ClienteService clienteService;
-	
+
 	@EJB
 	private EventoService eventoService;
-	
 
 	List<DocumentoVo> documentosVo = new ArrayList<>();
 	List<DocumentoVo> documentosVoSelect = new ArrayList<>();
@@ -110,148 +110,190 @@ public class borrarFacturas implements Serializable {
 		imprimirFactura();
 
 	}
-	
+
 	public String imprimirFactura() throws DocumentException, IOException, PrinterException {
-		System.out.println("entra a imprimir");		
-			documentoSelect.getDocumentoId().setImpreso(1l);
-			documentoService.update(documentoSelect.getDocumentoId(),1l);
-			Empresa e =Login.getEmpresaLogin();
-			String pdf= "";
-			String imp=e.getImpresion().toUpperCase();
-			if(imp.equals("TXT")){
-				pdf=imprimirTxt();
-			}else{
-				pdf= "factura_"+documentoSelect.getDocumentoId()+".pdf";
-			 FileOutputStream archivo = new FileOutputStream("C:\\facturacion\\"+pdf);
-		      Document documento = new Document();
-		      float fntSize, lineSpacing;
-		      fntSize = 9f;
-		      lineSpacing = 10f;
-		      PdfWriter.getInstance(documento, archivo);
-		      documento.setMargins(1, 1, 1, 1);
-		      documento.open();
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"---------------------------------------------"))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"        >>"+e.getNombre()+"<<",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); //NOMBRE EMPRESA
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"           "+e.getRepresentante()+"         ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL     
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"      NIT. "+e.getNit()+"   "+e.getRegimen()+"   ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // NIT
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"          "+e.getDireccion()+"           ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // DIRECCION
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"           "+e.getBarrio()+"            ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // barrio
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"  	 	        "+e.getCiudad()+"- "+e.getDepartamento()+"		 ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // ciudad
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"             TEL: "+e.getTelefonoFijo()+" - "+e.getNombre()+"    ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // tel
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"  FACTURA DE VANTA:    "+documentoSelect.getDocumentoId().getConsecutivoDian(),
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // numer de factura
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"   "+documentoSelect.getDocumentoId().getFechaRegistro(),
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // fecha
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"CAJERO: "+documentoSelect.getDocumentoId().getUsuarioId().getUsuarioId()+" "+
-		    		  documentoSelect.getDocumentoId().getUsuarioId().getNombre()+" "+documentoSelect.getDocumentoId().getUsuarioId().getApellido(),
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"---------------------------------------------"))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Descripción        CANT  UNIDAD  TOTAL",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"---------------------------------------------"))); // REPRESENTANTE LEGAL
-		      List<DocumentoDetalle> detalles =  documentoDetalleService.getByDocumento(documentoSelect.getDocumentoId().getDocumentoId(),1l);
-		      for(DocumentoDetalle ddV: detalles){
-		      documento.add(new Paragraph(new Phrase(lineSpacing,""+ddV.getProductoId().getNombre()+"     "+ddV.getCantidad()+
-		    			  " "+ddV.getProductoId().getCostoPublico()+" "+(ddV.getProductoId().getCostoPublico()*ddV.getCantidad()),
-		    			  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL  
-		      }
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"---------------------------------------------"))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Valor Exento:          "+ 0,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Valor Gravado:         "+ 0,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Iva:                   "+ 0,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"---------------------------------------------"))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"TOTAL A PAGAR:         "+documentoSelect.getDocumentoId().getTotal(),
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"---------------------------------------------"))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"         **** FORMA DE MAGO****        ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      //Long pago= getValorTargeta()==null?0l:getValorTargeta();
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Vr. Pago con Targeta:  "+0,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Vr. Comisión Targeta:  "+ 0l,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Vr. Total Factura:     "+ documentoSelect.getDocumentoId().getTotal(),
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Efectivo:			     "+ 0,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"Cambio:			     "+ 0,
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"  *****GRACIAS POR SU COMPRA*****      ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"             Software                  ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.add(new Paragraph(new Phrase(lineSpacing,"   NICESOFT Cel 3185222474-3112864974  ",
-		    		  FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE LEGAL
-		      documento.close();
+		System.out.println("entra a imprimir");
+		documentoSelect.getDocumentoId().setImpreso(1l);
+		documentoService.update(documentoSelect.getDocumentoId(), 1l);
+		Empresa e = Login.getEmpresaLogin();
+		String pdf = "";
+		String imp = e.getImpresion().toUpperCase();
+		if (imp.equals("TXT")) {
+			pdf = imprimirTxt();
+		} else {
+			pdf = "factura_" + documentoSelect.getDocumentoId() + ".pdf";
+			FileOutputStream archivo = new FileOutputStream("C:\\facturacion\\" + pdf);
+			Document documento = new Document();
+			float fntSize, lineSpacing;
+			fntSize = 9f;
+			lineSpacing = 10f;
+			PdfWriter.getInstance(documento, archivo);
+			documento.setMargins(1, 1, 1, 1);
+			documento.open();
+			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
+																													// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "        >>" + e.getNombre() + "<<",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // NOMBRE
+																			// EMPRESA
+			documento.add(new Paragraph(new Phrase(lineSpacing, "           " + e.getRepresentante() + "         ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(
+					new Paragraph(new Phrase(lineSpacing, "      NIT. " + e.getNit() + "   " + e.getRegimen() + "   ",
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // NIT
+			documento.add(new Paragraph(new Phrase(lineSpacing, "          " + e.getDireccion() + "           ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // DIRECCION
+			documento.add(new Paragraph(new Phrase(lineSpacing, "           " + e.getBarrio() + "            ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // barrio
+			documento.add(new Paragraph(
+					new Phrase(lineSpacing, "  	 	        " + e.getCiudad() + "- " + e.getDepartamento() + "		 ",
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // ciudad
+			documento.add(new Paragraph(
+					new Phrase(lineSpacing, "             TEL: " + e.getTelefonoFijo() + " - " + e.getNombre() + "    ",
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // tel
+			documento.add(new Paragraph(new Phrase(lineSpacing,
+					"  FACTURA DE VANTA:    " + documentoSelect.getDocumentoId().getConsecutivoDian(),
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // numer
+																			// de
+																			// factura
+			documento.add(
+					new Paragraph(new Phrase(lineSpacing, "   " + documentoSelect.getDocumentoId().getFechaRegistro(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // fecha
+			documento.add(new Paragraph(new Phrase(lineSpacing,
+					"CAJERO: " + documentoSelect.getDocumentoId().getUsuarioId().getUsuarioId() + " "
+							+ documentoSelect.getDocumentoId().getUsuarioId().getNombre() + " "
+							+ documentoSelect.getDocumentoId().getUsuarioId().getApellido(),
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
+																													// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Descripción        CANT  UNIDAD  TOTAL",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
+																													// LEGAL
+			List<DocumentoDetalle> detalles = documentoDetalleService
+					.getByDocumento(documentoSelect.getDocumentoId().getDocumentoId(), 1l);
+			for (DocumentoDetalle ddV : detalles) {
+				documento.add(new Paragraph(new Phrase(lineSpacing,
+						"" + ddV.getProductoId().getNombre() + "     " + ddV.getCantidad() + " "
+								+ ddV.getProductoId().getCostoPublico() + " "
+								+ (ddV.getProductoId().getCostoPublico() * ddV.getCantidad()),
+						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																				// LEGAL
+			}
+			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
+																													// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Valor Exento:          " + 0,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Valor Gravado:         " + 0,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Iva:                   " + 0,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
+																													// LEGAL
+			documento.add(new Paragraph(
+					new Phrase(lineSpacing, "TOTAL A PAGAR:         " + documentoSelect.getDocumentoId().getTotal(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																					// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
+																													// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "         **** FORMA DE MAGO****        ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			// Long pago= getValorTargeta()==null?0l:getValorTargeta();
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Vr. Pago con Targeta:  " + 0,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Vr. Comisión Targeta:  " + 0l,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(
+					new Phrase(lineSpacing, "Vr. Total Factura:     " + documentoSelect.getDocumentoId().getTotal(),
+							FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																					// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Efectivo:			     " + 0,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Cambio:			     " + 0,
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "  *****GRACIAS POR SU COMPRA*****      ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "             Software                  ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.add(new Paragraph(new Phrase(lineSpacing, "   NICESOFT Cel 3185222474-3112864974  ",
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // REPRESENTANTE
+																			// LEGAL
+			documento.close();
 		}
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Factura Marcada como impresa exitosamente"));
-			
-				//falta auto incrementable dian 
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage("Factura Marcada como impresa exitosamente"));
+
+		// falta auto incrementable dian
 		return "";
 	}
-	
-	public String imprimirTxt() throws IOException{
+
+	public String imprimirTxt() throws IOException {
 		System.out.println("entra a imprimir");
-		Empresa e =Login.getEmpresaLogin();
-		String pdf= "factura_"+documentoSelect.getDocumentoId()+".txt";
-		File archivo = new File("C:\\facturacion\\"+pdf);
+		Empresa e = Login.getEmpresaLogin();
+		String pdf = "factura_" + documentoSelect.getDocumentoId() + ".txt";
+		File archivo = new File("C:\\facturacion\\" + pdf);
 		BufferedWriter bw;
-	    bw = new BufferedWriter(new FileWriter(archivo));
-	    bw.write("---------------------------------------\n");
-	    bw.write("         >>"+e.getNombre()+"<<\n");
-	    bw.write("           "+e.getRepresentante()+"         \n");
-	    bw.write("      NIT. "+e.getNit()+"   "+e.getRegimen()+"   \n");
-	    bw.write("          "+e.getDireccion()+"           \n");
-	    bw.write("           "+e.getBarrio()+"            \n");
-	    bw.write("  	 	   "+e.getCiudad()+"-"+e.getDepartamento()+"	        \n");
-	    bw.write("             TEL: "+e.getTelefonoFijo()+"             \n");
-	    bw.write("FACTURA DE VANTA:    "+documentoSelect.getDocumentoId().getConsecutivoDian());
-	    bw.write("\n"+documentoSelect.getDocumentoId().getFechaRegistro());
-	    bw.write("\nCAJERO: "+documentoSelect.getDocumentoId().getUsuarioId().getUsuarioId()+" "+documentoSelect.getDocumentoId().getUsuarioId().getNombre()+" "+documentoSelect.getDocumentoId().getUsuarioId().getApellido());
-	    bw.write("\n-----------------------------------\n");
-	    bw.write("Descripción        CANT  UNIDAD  TOTAL\n");
-	    bw.write("----------------------------------------");
-	    List<DocumentoDetalle> detalles =  documentoDetalleService.getByDocumento(documentoSelect.getDocumentoId().getDocumentoId(),1l);
-	    for(DocumentoDetalle ddV: detalles){
-	    bw.write("\n"+ddV.getProductoId().getNombre().trim()+"     "+ddV.getCantidad()+
-		    			  " "+ddV.getProductoId().getCostoPublico()+" "+(ddV.getProductoId().getCostoPublico()*ddV.getCantidad()));
-	    }
-	    bw.write("\n---------------------------------------");
-	    bw.write("\nValor Exento:          "+ documentoSelect.getDocumentoId().getExcento());
-	    bw.write("\nValor Gravado:         "+ documentoSelect.getDocumentoId().getGravado());
-	    bw.write("\nIva:                   "+ documentoSelect.getDocumentoId().getIva());
-	    bw.write("\n---------------------------------------");
-	    bw.write( "\nTOTAL A PAGAR:         "+ documentoSelect.getDocumentoId().getTotal());
-	    bw.write("\n---------------------------------------\n");
-	    bw.write("         **** FORMA DE PAGO****        ");
-	    //Long pago= getValorTargeta()==null?0l:getValorTargeta();
-	    bw.write("\nVr. Pago con Targeta:  "+0);
-	    bw.write("\nVr. Comisión Targeta:  "+ 0l);
-	    bw.write("\nVr. Total Factura:     "+ documentoSelect.getDocumentoId().getTotal());  
-	    bw.write("\nEfectivo:			"+ 0);
-	    bw.write("\nCambio:			     "+ 0);
-	    bw.write("\n  *****GRACIAS POR SU COMPRA*****   \n");
-	    bw.write("             Software               \n");
-	    bw.write("   NICESOFT Cel 3185222474-3112864974  ");
-	    bw.write("\n");
-	    bw.write("\n");
-	    bw.write("\n");
-	    bw.write(" \n");
-	    bw.close();
-	    return pdf;
+		bw = new BufferedWriter(new FileWriter(archivo));
+		bw.write("---------------------------------------\n");
+		bw.write("         >>" + e.getNombre() + "<<\n");
+		bw.write("           " + e.getRepresentante() + "         \n");
+		bw.write("      NIT. " + e.getNit() + "   " + e.getRegimen() + "   \n");
+		bw.write("          " + e.getDireccion() + "           \n");
+		bw.write("           " + e.getBarrio() + "            \n");
+		bw.write("  	 	   " + e.getCiudad() + "-" + e.getDepartamento() + "	        \n");
+		bw.write("             TEL: " + e.getTelefonoFijo() + "             \n");
+		bw.write("FACTURA DE VANTA:    " + documentoSelect.getDocumentoId().getConsecutivoDian());
+		bw.write("\n" + documentoSelect.getDocumentoId().getFechaRegistro());
+		bw.write("\nCAJERO: " + documentoSelect.getDocumentoId().getUsuarioId().getUsuarioId() + " "
+				+ documentoSelect.getDocumentoId().getUsuarioId().getNombre() + " "
+				+ documentoSelect.getDocumentoId().getUsuarioId().getApellido());
+		bw.write("\n-----------------------------------\n");
+		bw.write("Descripción        CANT  UNIDAD  TOTAL\n");
+		bw.write("----------------------------------------");
+		List<DocumentoDetalle> detalles = documentoDetalleService
+				.getByDocumento(documentoSelect.getDocumentoId().getDocumentoId(), 1l);
+		for (DocumentoDetalle ddV : detalles) {
+			bw.write("\n" + ddV.getProductoId().getNombre().trim() + "     " + ddV.getCantidad() + " "
+					+ ddV.getProductoId().getCostoPublico() + " "
+					+ (ddV.getProductoId().getCostoPublico() * ddV.getCantidad()));
+		}
+		bw.write("\n---------------------------------------");
+		bw.write("\nValor Exento:          " + documentoSelect.getDocumentoId().getExcento());
+		bw.write("\nValor Gravado:         " + documentoSelect.getDocumentoId().getGravado());
+		bw.write("\nIva:                   " + documentoSelect.getDocumentoId().getIva());
+		bw.write("\n---------------------------------------");
+		bw.write("\nTOTAL A PAGAR:         " + documentoSelect.getDocumentoId().getTotal());
+		bw.write("\n---------------------------------------\n");
+		bw.write("         **** FORMA DE PAGO****        ");
+		// Long pago= getValorTargeta()==null?0l:getValorTargeta();
+		bw.write("\nVr. Pago con Targeta:  " + 0);
+		bw.write("\nVr. Comisión Targeta:  " + 0l);
+		bw.write("\nVr. Total Factura:     " + documentoSelect.getDocumentoId().getTotal());
+		bw.write("\nEfectivo:			" + 0);
+		bw.write("\nCambio:			     " + 0);
+		bw.write("\n  *****GRACIAS POR SU COMPRA*****   \n");
+		bw.write("             Software               \n");
+		bw.write("   NICESOFT Cel 3185222474-3112864974  ");
+		bw.write("\n");
+		bw.write("\n");
+		bw.write("\n");
+		bw.write(" \n");
+		bw.close();
+		return pdf;
 	}
-	
-	
+
 	private Usuario usuario() {
 		Usuario yourVariable = (Usuario) sessionMap.get("userLogin");
 		return yourVariable;
@@ -261,7 +303,7 @@ public class borrarFacturas implements Serializable {
 		Configuracion yourVariable = (Configuracion) sessionMap.get("configuracion");
 		return yourVariable;
 	}
-	
+
 	private String impresora() {
 		String yourVariable = (String) sessionMap.get("impresora");
 		return yourVariable;
@@ -271,7 +313,8 @@ public class borrarFacturas implements Serializable {
 		System.out.println("borrar_todas");
 		long server = 1;
 		for (DocumentoVo dvoss : getDocumentosVoSelect()) {
-			List<DocumentoDetalle> dd = documentoDetalleService.getByDocumento(dvoss.getDocumentoId().getDocumentoId(),1l);
+			List<DocumentoDetalle> dd = documentoDetalleService.getByDocumento(dvoss.getDocumentoId().getDocumentoId(),
+					1l);
 			for (DocumentoDetalle dob : dd) {
 				dob.setEstado(0l);
 				documentoDetalleService.update(dob, server);
@@ -293,7 +336,7 @@ public class borrarFacturas implements Serializable {
 		tipoDocumentoId.add(4l); // tipo documento cotizacion
 		tipoDocumentoId.add(9l); // numero de guia
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		d = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId,1l);
+		d = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, 1l);
 		for (Documento docu : d) {
 			DocumentoVo dvo = new DocumentoVo();
 			dvo.setDocumentoId(docu);
@@ -304,9 +347,6 @@ public class borrarFacturas implements Serializable {
 		documentosVo = doVos;
 		return documentosVo;
 	}
-
-	
-	
 
 	public void buscarFacturas() {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
@@ -326,7 +366,7 @@ public class borrarFacturas implements Serializable {
 	}
 
 	public void consultarDetalle(Documento docu) {
-		setDocumentoDetallesList(documentoDetalleService.getByDocumento(docu.getDocumentoId(),1l));
+		setDocumentoDetallesList(documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l));
 		setDocuConsulta(docu);
 		RequestContext.getCurrentInstance().execute("PF('consultarDetalle').show();");
 
@@ -339,104 +379,60 @@ public class borrarFacturas implements Serializable {
 		System.out.println("entra a imprimir");
 		System.out.println("Documento:" + docu.getDocumentoId());
 		Configuracion configuracion = configuracion();
-		String impresora=impresora();
+		String impresora = impresora();
 		Empresa e = Login.getEmpresaLogin();
 		String tituloFactura = "";
 		docu.setImpreso(1l);
-		//se agrega evento copia factura
-				Evento evento = new Evento();
-				TipoEvento tipoEvento = new TipoEvento();
-				tipoEvento.setTipoEventoId(4l); // se asigna tipo evento igual a copia factura
-				evento.setTipoEventoId(tipoEvento);
-				evento.setUsuarioId(usuario());
-				evento.setFechaRegistro(new Date());
-				evento.setCampo("" + docu.getConsecutivoDian());
-				eventoService.save(evento);
+		// se agrega evento copia factura
+		Evento evento = new Evento();
+		TipoEvento tipoEvento = new TipoEvento();
+		tipoEvento.setTipoEventoId(4l); // se asigna tipo evento igual a copia
+										// factura
+		evento.setTipoEventoId(tipoEvento);
+		evento.setUsuarioId(usuario());
+		evento.setFechaRegistro(new Date());
+		evento.setCampo("" + docu.getConsecutivoDian());
+		eventoService.save(evento);
 		switch (docu.getTipoDocumentoId().getTipoDocumentoId().toString()) {
 		case "9":
 			System.out.println("consecutivo documentoId: " + docu.getDocumentoId());
 			tituloFactura = "No. DE GUIA";
 			break;
-		case "10":
-			// System.out.println("consecutivo Dian: " +
-			// docu.getConsecutivoDian());
+		case "10":			
 			tituloFactura = "FACTURA DE VENTA";
 			break;
 		case "4":
-			System.out.println("consecutivo Cotizacion: " + docu.getDocumentoId());
 			tituloFactura = "No. DE COTIZACIÓN";
 			break;
 		default:
 			break;
 		}
-		List<DocumentoDetalle> detalles = documentoDetalleService.getByDocumento(docu.getDocumentoId(),1l);
-		List<DocumentoDetalleVo> voList = new ArrayList<>();
+		List<DocumentoDetalle> detalles = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l);
+
 		String pdf = "";
 		String imp = e.getImpresion().toUpperCase();
 		switch (imp) {
 		case "TXT":
-			for (DocumentoDetalle d : detalles) {
-				DocumentoDetalleVo vo = new DocumentoDetalleVo();
-				vo.setCantidad(d.getCantidad());
-				vo.setDocumentoDetalleId(d.getDocumentoDetalleId());
-				vo.setDocumentoId(d.getDocumentoId());
-				vo.setFechaRegistro(d.getFechaRegistro());
-				vo.setParcial(d.getParcial());
-				vo.setProductoId(d.getProductoId());
-				vo.setUnitario(d.getParcial() / d.getCantidad());
-				voList.add(vo);
-			}
-			pdf = Impresion.imprimirTxt(docu, voList, docu.getUsuarioId(), configuracion,impresora);
+			pdf = Impresion.imprimirTxt(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
+					configuracion, impresora);
 			break;
 		case "BIG":
 			pdf = imprimirTemporal(tituloFactura, docu);
 			// pdf = imprimirBig(tituloFactura);
 			break;
 		case "PDF":
-			for (DocumentoDetalle d : detalles) {
-				DocumentoDetalleVo vo = new DocumentoDetalleVo();
-				vo.setCantidad(d.getCantidad());
-				vo.setDocumentoDetalleId(d.getDocumentoDetalleId());
-				vo.setDocumentoId(d.getDocumentoId());
-				vo.setFechaRegistro(d.getFechaRegistro());
-				vo.setParcial(d.getParcial());
-				vo.setProductoId(d.getProductoId());
-				vo.setUnitario(d.getParcial() / d.getCantidad());
-				voList.add(vo);
-			}
-			pdf = Impresion.imprimirPDF(docu, voList, docu.getUsuarioId(), configuracion,impresora);
+			pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
+					configuracion, impresora);
 			break;
 		case "SMALL_PDF":
-			for (DocumentoDetalle d : detalles) {
-				DocumentoDetalleVo vo = new DocumentoDetalleVo();
-				vo.setCantidad(d.getCantidad());
-				vo.setDocumentoDetalleId(d.getDocumentoDetalleId());
-				vo.setDocumentoId(d.getDocumentoId());
-				vo.setFechaRegistro(d.getFechaRegistro());
-				vo.setParcial(d.getParcial());
-				vo.setProductoId(d.getProductoId());
-				vo.setUnitario(d.getParcial() / d.getCantidad());
-				voList.add(vo);
-			}
-			Impresion.imprimirPDFSmall(docu, voList, usuario(), configuracion, impresora);
+			Impresion.imprimirPDFSmall(docu, Calculos.llenarDocumentoDetalleVoList(detalles), usuario(), configuracion,
+					impresora);
 			break;
-			case "BIG_PDF":
-				List<DocumentoDetalle> detalles1 = documentoDetalleService.getByDocumento(docu.getDocumentoId(),1l);
-				OpcionUsuario descuentoEnFactura = (OpcionUsuario) sessionMap.get("descuentoEnFactura");
-				List<DocumentoDetalleVo> voList1 = new ArrayList<>();
-				for (DocumentoDetalle d : detalles1) {
-					DocumentoDetalleVo vo = new DocumentoDetalleVo();
-					vo.setCantidad(d.getCantidad());
-					vo.setDocumentoDetalleId(d.getDocumentoDetalleId());
-					vo.setDocumentoId(d.getDocumentoId());
-					vo.setFechaRegistro(d.getFechaRegistro());
-					vo.setParcial(d.getParcial());
-					vo.setProductoId(d.getProductoId());
-					vo.setUnitario(d.getParcial() / d.getCantidad());
-					voList1.add(vo);
-					
-				}
-			Impresion.imprimirBig(docu, voList1, docu.getUsuarioId(), configuracion,descuentoEnFactura,impresora);
+		case "BIG_PDF":
+			List<DocumentoDetalle> detalles1 = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l);
+			OpcionUsuario descuentoEnFactura = (OpcionUsuario) sessionMap.get("descuentoEnFactura");
+			Impresion.imprimirBig(docu, Calculos.llenarDocumentoDetalleVoList(detalles1), docu.getUsuarioId(),
+					configuracion, descuentoEnFactura, impresora);
 			break;
 		default:
 			break;
@@ -473,7 +469,7 @@ public class borrarFacturas implements Serializable {
 		int tope = 16;
 		int pagina = 0;
 		int numProductos = tope;
-		List<DocumentoDetalle> productos = documentoDetalleService.getByDocumento(docu.getDocumentoId(),1l);
+		List<DocumentoDetalle> productos = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l);
 		productos = ordemar(productos);
 		for (DocumentoDetalle ddV : productos) {
 			String nombreProducto = "";

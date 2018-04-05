@@ -1073,6 +1073,7 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
     }
     Empresa e = Login.getEmpresaLogin();
 	SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+	SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 	String fhoyname = df.format(hoyfin);
 	String carpeta = "C:\\facturas\\AcumuladoVentas";
 	
@@ -1091,6 +1092,7 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 	PdfWriter.getInstance(documento, archivo);
 	documento.setMargins(1, 1, 1, 1);
 	documento.open();
+	Configuracion con=configuracion();
 	documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
 	if(redu!=null){	
 		// LEGAL
@@ -1115,6 +1117,8 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 	}
 	
 	documento.add(new Paragraph(new Phrase(lineSpacing, "Acumulado de ventas diarias: ",
+			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
+	documento.add(new Paragraph(new Phrase(lineSpacing,  df2.format(hoyfin),
 			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
 	documento.add(new Paragraph(new Phrase(lineSpacing, "",FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
 	documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
@@ -1247,11 +1251,18 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 	calendar.set(Calendar.SECOND, 0);
 	Date hoy = calendar.getTime();
 	Long server=1l;
+	ReduccionVo redu3 = new ReduccionVo();
 	if(redu==null){
 		ReduccionVo redu2 = new ReduccionVo();
 		redu=redu2;
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		redu.setUsuarioId(usuario);
+		redu3 = null;
+	}else{
+		ReduccionVo redu2 = new ReduccionVo();
+		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		redu3.setUsuarioId(usuario);
+		redu3=redu2;
 	}
 	
 	documentos=documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,redu.getUsuarioId().getUsuarioId() , sinCierre,server);
@@ -1295,25 +1306,27 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 	documento.setMargins(1, 1, 1, 1);
 	documento.open();
 	documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------"))); // REPRESENTANTE
-																											// LEGAL
-	documento.add(new Paragraph(new Phrase(lineSpacing, ">>" + e.getNombre() + "<<",
-			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // NOMBRE
-																	// EMPRESA
-	documento.add(new Paragraph(
-			new Phrase(lineSpacing, "" + e.getSlogan(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // slogan
-	documento.add(new Paragraph(
-			new Phrase(lineSpacing, "" + e.getRepresentante(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
-																														// LEGAL
-	documento.add(new Paragraph(new Phrase(lineSpacing, "NIT. " + e.getNit() + " " + e.getRegimen(),
-			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // NIT
-	documento.add(new Paragraph(
-			new Phrase(lineSpacing, "" + e.getDireccion(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
-	documento.add(new Paragraph(
-			new Phrase(lineSpacing, "" + e.getBarrio(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // barrio
-	documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getCiudad() + "- " + e.getDepartamento(),
-			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // ciudad
-	documento.add(new Paragraph(new Phrase(lineSpacing, "TEL: " + e.getTelefonoFijo() + " - " + e.getNombre(),
-			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
+	if(redu3!=null){
+		documento.add(new Paragraph(new Phrase(lineSpacing, ">>" + e.getNombre() + "<<",
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // NOMBRE
+																		// EMPRESA
+		documento.add(new Paragraph(
+				new Phrase(lineSpacing, "" + e.getSlogan(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // slogan
+		documento.add(new Paragraph(
+				new Phrase(lineSpacing, "" + e.getRepresentante(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
+																															// LEGAL
+		documento.add(new Paragraph(new Phrase(lineSpacing, "NIT. " + e.getNit() + " " + e.getRegimen(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // NIT
+		documento.add(new Paragraph(
+				new Phrase(lineSpacing, "" + e.getDireccion(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
+		documento.add(new Paragraph(
+				new Phrase(lineSpacing, "" + e.getBarrio(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // barrio
+		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getCiudad() + "- " + e.getDepartamento(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // ciudad
+		documento.add(new Paragraph(new Phrase(lineSpacing, "TEL: " + e.getTelefonoFijo() + " - " + e.getNombre(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
+	}
+	
 	documento.add(new Paragraph(new Phrase(lineSpacing, "Cajero: " + redu.getUsuarioId().getNombre() + " - " +  redu.getUsuarioId().getApellido(),
 			FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
 	documento.add(new Paragraph(new Phrase(lineSpacing, "",FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel

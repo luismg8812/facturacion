@@ -29,6 +29,7 @@ import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 
+import com.fact.api.Calculos;
 import com.fact.api.Impresion;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
@@ -95,17 +96,7 @@ public class Devoluciones  implements Serializable{
 		}
 		List<DocumentoDetalle> list = documentoDetalleService.getByDocumento(documentoSelect.getDocumentoId(),1l);
 		setDetalles(new ArrayList<DocumentoDetalleVo>());
-		for(DocumentoDetalle doc: list){
-			DocumentoDetalleVo dVo = new DocumentoDetalleVo();
-			dVo.setDocumentoDetalleId(doc.getDocumentoDetalleId());
-			dVo.setDocumentoId(doc.getDocumentoId());
-			dVo.setFechaRegistro(doc.getFechaRegistro());
-			dVo.setParcial(doc.getParcial());
-			dVo.setProductoId(doc.getProductoId());
-			dVo.setCantidad(doc.getCantidad());
-			dVo.setUnitario(doc.getParcial()/doc.getCantidad());
-			getDetalles().add(dVo);
-		}
+		setDetalles(Calculos.llenarDocumentoDetalleVoList(list));
 		return "";
 	}
 	
@@ -134,7 +125,7 @@ public class Devoluciones  implements Serializable{
 				dd.setEstado(1l);
 			}
 			dd.setCantidad(cantidadNew);
-			dd.setDocumentoDetalleId(d.getDocumentoDetalleId());
+			dd.setDocumentoDetalleId(d.getDocumentoDetalleId().getDocumentoDetalleId());
 			dd.setDocumentoId(d.getDocumentoId());
 			dd.setFechaRegistro(d.getFechaRegistro());
 			dd.setProductoId(d.getProductoId());

@@ -5,12 +5,13 @@ package com.fact.vo;
 import java.util.Date;
 
 import com.fact.model.Documento;
+import com.fact.model.DocumentoDetalle;
 import com.fact.model.Producto;
 
 public class DocumentoDetalleVo {
 
 	
-	private Long documentoDetalleId;	
+	private DocumentoDetalle documentoDetalleId;	
 	private Documento documentoId;
 	private Producto productoId;
 	private Date fechaRegistro;
@@ -23,10 +24,10 @@ public class DocumentoDetalleVo {
 	private Double cantidad1;
 	private Double cantidad2;
 	
-	public Long getDocumentoDetalleId() {
+	public DocumentoDetalle getDocumentoDetalleId() {
 		return documentoDetalleId;
 	}
-	public void setDocumentoDetalleId(Long documentoDetalleId) {
+	public void setDocumentoDetalleId(DocumentoDetalle documentoDetalleId) {
 		this.documentoDetalleId = documentoDetalleId;
 	}
 	public Documento getDocumentoId() {

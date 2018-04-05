@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
+import com.fact.model.DocumentoDetalle;
 import com.fact.model.Producto;
 import com.fact.vo.DocumentoDetalleVo;
 
@@ -290,6 +291,22 @@ public class Calculos {
 			}
 		}
 		return temp;
+	}
+	
+	public static List<DocumentoDetalleVo> llenarDocumentoDetalleVoList(List<DocumentoDetalle> detalles){
+		List<DocumentoDetalleVo> voList = new ArrayList<>();
+		for (DocumentoDetalle d : detalles) {
+			DocumentoDetalleVo vo = new DocumentoDetalleVo();
+			vo.setCantidad(d.getCantidad());
+			vo.setDocumentoDetalleId(d);
+			vo.setDocumentoId(d.getDocumentoId());
+			vo.setFechaRegistro(d.getFechaRegistro());
+			vo.setParcial(d.getParcial());
+			vo.setProductoId(d.getProductoId());
+			vo.setUnitario(d.getParcial() / d.getCantidad());
+			voList.add(vo);
+		}
+		return voList;
 	}
 	
 //	public static Image generarCodBaras(Long value) throws FileNotFoundException, DocumentException{

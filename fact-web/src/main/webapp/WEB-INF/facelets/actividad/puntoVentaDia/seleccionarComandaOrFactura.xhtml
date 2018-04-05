@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function teclasComanda(evento,element){		
+		/////////////////////TECLA ENTER y TECLA ABAJO ///////////////////////////////////////////////
+		var elec = element.getAttribute('id').toString();
+		//alert(elec)		
+		if(evento.keyCode==40){ //cuando se presiona la tacla abajo 				
+			       document.getElementById('comandas:btnImprFactura').focus();
+			      
+			      return "";			
+		}
+		if(evento.keyCode==38){ //cuando se presiona la tacla abajo 
+			document.getElementById('comandas:btnImprComanda').focus();
+		}	
+		
+}
+	</script>
+	<h:form id="comandas">
+		<table width="100%" align="center">
+		<tr>
+			<td><p:commandButton value="Imprimir Comanda" id="btnImprComanda" action="#{puntoVentaDia.imprimirComanda}"
+			onkeydown="teclasComanda(event,this)"></p:commandButton></td>
+			
+		</tr>
+		<tr>
+			<td><p:commandButton value="Imprimir Factura" id="btnImprFactura" action="#{puntoVentaDia.abrirDialogImprimir}"
+			onkeydown="teclasComanda(event,this)"></p:commandButton></td>
+			
+		</tr>		
+	</table>
+	</h:form>
+</ui:composition>
