@@ -433,8 +433,9 @@ public class PuntoVentaDia implements Serializable {
 			setParcial(canti * costoP);
 		} catch (Exception e) {
 			setCantidad(0.0);
+			e.printStackTrace();
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar..."));
+					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar: "+e.getMessage()));
 		}
 		return "";
 	}
@@ -916,7 +917,7 @@ public class PuntoVentaDia implements Serializable {
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2l;
 			} else {
-				if (getTarjeta() != null && getTarjeta().toUpperCase().equals("S")) {
+				if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
 					tipa.setTipoPagoId(5l);// pago con targeta
 					getDocumento().setTipoPagoId(tipa);
 				} else {

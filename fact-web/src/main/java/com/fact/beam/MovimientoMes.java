@@ -1,5 +1,6 @@
 package com.fact.beam;
 
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,15 +17,21 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.print.PrintException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
 import com.fact.api.Calculos;
+import com.fact.api.FactException;
+import com.fact.api.Impresion;
+import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
+import com.fact.model.Empresa;
 import com.fact.model.Evento;
 import com.fact.model.Grupo;
 import com.fact.model.Marca;
@@ -33,6 +40,7 @@ import com.fact.model.Producto;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
+import com.fact.model.TipoPago;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
@@ -45,6 +53,7 @@ import com.fact.service.TipoDocumentoService;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
+import com.itextpdf.text.DocumentException;
 
 @ManagedBean
 @SessionScoped
@@ -54,6 +63,7 @@ public class MovimientoMes implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -2599894690114718736L;
+	private static Logger log = Logger.getLogger(MovimientoMes.class);
 
 	/**
 	 * luis miguel gonzalez NiceSoft luismg8812@hotmail.com
@@ -89,6 +99,8 @@ public class MovimientoMes implements Serializable {
 	public static final String FOCUS_CANTIDAD = "document.getElementById('cantidad_in').focus();";
 	public static final String SELECT_CANTIDAD = "document.getElementById('cantidad_in').select();";
 	public static final String MOSTRAR_LA_LISTA = "document.getElementById('prodList').style.display='inline';";
+	public static final String ACTIVAR_CAMPO_COD_BARRAS = "document.getElementById('busquedaCodBarras').style.display='inline';";
+	public static final String UPDATE_CAMPO_ARTICULO = "art_1";
 
 	private List<TipoDocumento> tipoDocumentos;
 	List<DocumentoDetalleVo> productos;
@@ -121,6 +133,7 @@ public class MovimientoMes implements Serializable {
 	String focus = "";
 	String crear;
 	String crearNew;
+	private String impresion;
 
 	// variables nuevo producto
 	BigDecimal codigoNew;
@@ -190,6 +203,10 @@ public class MovimientoMes implements Serializable {
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 
+	private String impresora() {
+		return (String) sessionMap.get("impresora");
+	}
+
 	public List<Producto> completeText(String query) {
 		List<Producto> nombProductos = new ArrayList<>();
 		for (Producto p : getProductosAll()) {
@@ -229,8 +246,8 @@ public class MovimientoMes implements Serializable {
 					}
 				}
 			}
-		} catch (Exception e) {
-			System.out.println("no found product server thow");
+		} catch (FactException e) {
+			log.info("error en busqueda de productos del server 2: " + e.getMessage());
 			return nombProductos;
 		}
 		return nombProductos;
@@ -279,7 +296,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public List<String> completeCodigo(String query) {
-		List<String> codProductos = new ArrayList<String>();
+		List<String> codProductos = new ArrayList<>();
 		for (Producto p : getProductosAll()) {
 			if (p.getProductoId() != null) {
 				String articul = p.getProductoId().toString();
@@ -294,14 +311,12 @@ public class MovimientoMes implements Serializable {
 	public String buscarProductoCodBarras(AjaxBehaviorEvent event) {
 		String completo = getCodigoBarras();
 		for (Producto p : getProductosAll()) {
-			if (p.getCodigoBarras() != null) {
-				if (completo.equals(p.getCodigoBarras().toString())) {
-					setCodigoInterno(p.getProductoId().toString());
-					setArticulo(p);
-					setUnidad(p.getCosto());
-					productoSelect = p;
-					break;
-				}
+			if (p.getCodigoBarras() != null && completo.equals(p.getCodigoBarras().toString())) {
+				setCodigoInterno(p.getProductoId().toString());
+				setArticulo(p);
+				setUnidad(p.getCosto());
+				productoSelect = p;
+				break;
 			}
 		}
 		return "";
@@ -343,8 +358,9 @@ public class MovimientoMes implements Serializable {
 			setParcial(canti * costoP);
 		} catch (Exception e) {
 			setCantidad(0.0);
+			e.printStackTrace();
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar..."));
+					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar: " + e.getMessage()));
 		}
 		return "";
 	}
@@ -357,7 +373,7 @@ public class MovimientoMes implements Serializable {
 
 		proveedorSelect = (Proveedor) event.getObject();
 		long server = 1;
-		System.out.println("proveedor select:" + proveedorSelect.getNombre());
+		log.info("proveedor select:" + proveedorSelect.getNombre());
 		setCodigoProveedor(proveedorSelect.getProveedorId());
 		setTipoDocumentoEntrada(getDocumento().getTipoDocumentoId().getNombreCorto());
 		setIdentificacionProveedor(proveedorSelect.getDocumento());
@@ -365,8 +381,7 @@ public class MovimientoMes implements Serializable {
 		getDocumento().setProveedorId(proveedorSelect);
 		getDocumento().setDetalleEntrada(getDetalle());
 		documentoService.update(getDocumento(), server);
-		RequestContext.getCurrentInstance()
-				.execute("document.getElementById('busquedaCodBarras').style.display='inline';");// se
+		RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);// se
 		RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='inline';"); // campos
 		RequestContext.getCurrentInstance().execute("entrarFactura();");// art_1_input
 	}
@@ -402,7 +417,6 @@ public class MovimientoMes implements Serializable {
 																// guarda el en
 																// el server 2
 			server = 2l;
-			System.out.println("oracle_2");
 		} else {
 			server = 1l;
 		}
@@ -413,10 +427,15 @@ public class MovimientoMes implements Serializable {
 		documentoService.save(docOjb, server);
 		setDocumento(docOjb);
 		setTipoDocumentoEntrada(td.getNombre());
+		limpiar();
+		return "";
+	}
+
+	private void limpiar() {
 		RequestContext.getCurrentInstance().execute("document.getElementById('tipo_documento').style.display='none';"); // opciones
-																														// de
-																														// tipo
-																														// documento
+		// de
+		// tipo
+		// documento
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('op_mov_mes_content').style.display='none';");// opciones
 		RequestContext.getCurrentInstance()
@@ -438,7 +457,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("detalleEntrada");
 		RequestContext.getCurrentInstance().update("codig");
 		RequestContext.getCurrentInstance().update("nombcop_mov_mes");
-		RequestContext.getCurrentInstance().update("art_1");
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("nombc");
 		RequestContext.getCurrentInstance().update("cod_");
 		RequestContext.getCurrentInstance().update("cantidad_in");
@@ -448,7 +467,6 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
 		RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('prodList').style.display='none';");
-		return "";
 	}
 
 	public String cantidadEnter(AjaxBehaviorEvent event) {
@@ -579,8 +597,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("execentoFact");
 		RequestContext.getCurrentInstance().update("ivaFact");
 		RequestContext.getCurrentInstance().update("gravadoFact");
-		RequestContext.getCurrentInstance()
-				.execute("document.getElementById('busquedaCodBarras').style.display='inline';");
+		RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);
 		RequestContext.getCurrentInstance().update("codBarras_input");
 		RequestContext.getCurrentInstance().update("busquedaCodBarras");
 		RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').focus();");
@@ -619,7 +636,7 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
 			return;
 		}
-		
+
 		if (getCodigoBarrasNew() != null) {
 			Producto p = productoService.getByCodigoBarras(getCodigoBarrasNew());
 			if (p != null) {
@@ -703,8 +720,8 @@ public class MovimientoMes implements Serializable {
 		setCodigoInterno(prodNew.getProductoId().toString());
 		setArticulo(prodNew);
 		setUnidad(prodNew.getCosto());
-		getProductosAll().add(productoSelect);		
-		RequestContext.getCurrentInstance().update("art_1");
+		getProductosAll().add(productoSelect);
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("art_1_input");
 		RequestContext.getCurrentInstance().update("cod_");
 		RequestContext.getCurrentInstance().update("cantidad_in");
@@ -726,7 +743,6 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto NO editado"));
 		}
-
 
 		String nombre = getProductoEdict().getNombre().trim();
 		getProductoEdict().setNombre(nombre);
@@ -813,7 +829,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto editado Exitosamente"));
 		limpiarEditar();
-	
+
 		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
 		return "";
 	}
@@ -839,9 +855,9 @@ public class MovimientoMes implements Serializable {
 			pr.setGrupoId(grupoService.getById(pr.getGrupoId().getGrupoId()));
 			setGrupoNew(pr.getGrupoId());
 		}
-		setMarcaNew(pr.getMarcaId());		
+		setMarcaNew(pr.getMarcaId());
 		setCodigoBarrasNew(pr.getCodigoBarras());
-		setPesoKgNew(pr.getPeso());		
+		setPesoKgNew(pr.getPeso());
 		if (pr.getUnidad() == null) {
 			setUnidadNew("N");
 		} else {
@@ -859,7 +875,7 @@ public class MovimientoMes implements Serializable {
 		}
 	}
 
-	public void limpiarEditar() {		
+	public void limpiarEditar() {
 		System.out.println("entra a limpiar editar: ");
 		setProductoEdict(null);
 		setCodigoEdit(null);
@@ -880,7 +896,64 @@ public class MovimientoMes implements Serializable {
 		setVariosNew(null);
 	}
 
-	public Usuario usuario() {			
+	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
+		if (getDocumento().getDocumentoId() == null) {
+			return "";
+		}
+		log.info("entra a imprimir entrada almacen");
+		Configuracion configuracion = configuracion();
+		Long numeroImpresiones = configuracion.getNumImpresion();
+		Long server = configuracion.getServer();
+		String impresora = impresora();
+		Empresa e = Login.getEmpresaLogin();
+		getDocumento().setImpreso(1l);
+		getDocumento().setEntregado(0l);
+
+		if (getDocumento().getProveedorId() == null) {
+			Proveedor c = new Proveedor();
+			c.setProveedorId(1l); // se le envia proveedor varios por
+									// defecto
+			c.setNombre("Varios");
+			c.setDireccion("");
+			getDocumento().setProveedorId(c);
+		}
+		// se busca la mac del equipo y se le asigna a la factura
+		getDocumento().setMac(Calculos.conseguirMAC2());
+		documentoService.update(getDocumento(), server);
+
+		String imp = e.getImpresion().toUpperCase();
+		for (int i = 0; i < numeroImpresiones; i++) { // si la factura fue
+														// a// credito se//
+														// imprime dos veces
+			setProductos(Calculos.ordenar(getProductos()));
+			switch (imp) {
+			case "TXT":
+				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				break;
+			case "BIG":
+				// quitar la dependencia del ireport
+				// imprimirTemporal(tituloFactura);
+				// pdf = imprimirBig(tituloFactura);
+				break;
+			case "PDF":
+				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				break;
+			case "BIG_PDF":
+				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora);
+				break;
+			case "SMALL_PDF":
+				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				break;
+			default:
+				break;
+
+			}
+
+		}
+		return "";
+	}
+
+	public Usuario usuario() {
 		return (Usuario) sessionMap.get("userLogin");
 	}
 
@@ -916,10 +989,10 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 			RequestContext.getCurrentInstance().update("cod_");
 			RequestContext.getCurrentInstance().update("nombc");
-			RequestContext.getCurrentInstance().update("art_1");
+			RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 			RequestContext.getCurrentInstance().update("cantidad_in");
 			RequestContext.getCurrentInstance().update("dataList");
-			RequestContext.getCurrentInstance().update("execentoFact");	
+			RequestContext.getCurrentInstance().update("execentoFact");
 			RequestContext.getCurrentInstance().update("ivaFact");
 			RequestContext.getCurrentInstance().update("totalFact");
 			RequestContext.getCurrentInstance().update("gravadoFact");
@@ -1031,8 +1104,7 @@ public class MovimientoMes implements Serializable {
 			System.out.println("i en modificar factura");
 			// todo lo de modificar, activar cosas y asi....
 
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('busquedaCodBarras').style.display='inline';");
+			RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='inline';");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('op_mov_mes_content').style.display='none';");
@@ -1043,7 +1115,7 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
 			RequestContext.getCurrentInstance().execute("pagina='creando_facturaMM';");
 			RequestContext.getCurrentInstance().update("busquedaCodBarras");
-			RequestContext.getCurrentInstance().update("art_1");
+			RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 			RequestContext.getCurrentInstance().update("codBarras_input");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
@@ -1052,8 +1124,25 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('confir_mm').style.display='none';");
 			actModFactura = Boolean.FALSE;
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
-					"El módulo de impresión de movimientos mes esta desactivado, comuniquese con su proveedor del sistema"));			
+			log.info("imprimir");
+			try {
+				imprimirFactura();	
+				limpiar();
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Impresión Completa"));
+			} catch (IOException e) {
+				log.error("Probable error en impresion con la imagen de la factura: " + e.getMessage());
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
+			} catch (DocumentException e) {
+				log.error("Probable error en impresion con la creacion del documento: " + e.getMessage());
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
+			} catch (PrinterException e) {
+				log.error("Probable error en impresion : " + e.getMessage());
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
+
+			} catch (PrintException e) {
+				log.error("Probable error en impresion PrintException : " + e.getMessage());
+			}
+
 		}
 	}
 
@@ -1088,7 +1177,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("nombc");
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
@@ -1096,7 +1185,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
 				RequestContext.getCurrentInstance().update("gravadoFact");
-				RequestContext.getCurrentInstance().update("unidad_");				
+				RequestContext.getCurrentInstance().update("unidad_");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1128,7 +1217,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("nombc");
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
@@ -1136,7 +1225,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
 				RequestContext.getCurrentInstance().update("gravadoFact");
-				RequestContext.getCurrentInstance().update("unidad_");				
+				RequestContext.getCurrentInstance().update("unidad_");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1175,7 +1264,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
 				RequestContext.getCurrentInstance().update("nombc");
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
@@ -1214,7 +1303,7 @@ public class MovimientoMes implements Serializable {
 						.execute("document.getElementById('dataList_content').style.display='inline';");
 				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("nombc");
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
@@ -1245,7 +1334,7 @@ public class MovimientoMes implements Serializable {
 					"document.getElementById('art_1_input').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
 		}
 		RequestContext.getCurrentInstance().update("dataList");
-		RequestContext.getCurrentInstance().update("art_1");
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("execentoFact");
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("ivaFact");
@@ -1735,6 +1824,14 @@ public class MovimientoMes implements Serializable {
 
 	public void setCambioPrecio(OpcionUsuario cambioPrecio) {
 		this.cambioPrecio = cambioPrecio;
+	}
+
+	public String getImpresion() {
+		return impresion;
+	}
+
+	public void setImpresion(String impresion) {
+		this.impresion = impresion;
 	}
 
 }

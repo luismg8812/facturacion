@@ -387,7 +387,8 @@ public class Calculos {
 			//numerosComoArray = respuesta.split("=");
 			cant = respuesta;
 			cant = cant.replace("=", "");
-			cant = cant.replace(" ", "");			
+			cant = cant.replace(" ", "");	
+			System.out.println("cant:"+cant);
 			canti = Double.parseDouble(cant);
 			System.out.println("canti:"+canti);
 			break;
