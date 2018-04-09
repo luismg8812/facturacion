@@ -23,6 +23,7 @@ import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.Producto;
+import com.fact.model.Proveedor;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
 
@@ -438,5 +439,12 @@ public class Calculos {
 		// .execute("document.getElementById('cantidad_in1').value='" +
 		// invertido + "';");
 		return canti;
+	}
+	
+	public static Documento calcularRetefuente(Documento doc, Proveedor pro){
+		Double retencion = pro.getRetencion()/100;
+		Double retefuente = ((doc.getTotal()-doc.getIva())*retencion); 
+		doc.setRetefuente(retefuente);
+		return doc;
 	}
 }
