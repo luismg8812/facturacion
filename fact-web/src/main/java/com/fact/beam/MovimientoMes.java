@@ -595,7 +595,7 @@ public class MovimientoMes implements Serializable {
 		docDetalleVo.setProductoId(productoSelect);
 		docDetalleVo.setDocumentoId(getDocumento());
 		docDetalleVo.setUnitario(productoSelect.getCosto());
-		docDetalleVo.setDocumentoDetalleId(docDetalle.getDocumentoDetalleId());
+		docDetalleVo.setDocumentoDetalleId(docDetalle);
 		docDetalleVo.setFechaRegistro(fecha);
 		if (getCantidad() != null && productoSelect.getCosto() != null) {
 			docDetalleVo.setParcial(getCantidad() * productoSelect.getCosto());
@@ -808,7 +808,7 @@ public class MovimientoMes implements Serializable {
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
 		Long server = configuracion().getServer();
-		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId());
+		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId().getDocumentoDetalleId());
 		d.setParcial(cantidadtemp * cambioTemp1);
 		if (tipo == 9l && server == 2) {
 
@@ -1077,7 +1077,7 @@ public class MovimientoMes implements Serializable {
 			for (DocumentoDetalle d1 : dd) {
 				DocumentoDetalleVo vo = new DocumentoDetalleVo();
 				vo.setCantidad(d1.getCantidad());
-				vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
+				vo.setDocumentoDetalleId(d1);
 				vo.setDocumentoId(d1.getDocumentoId());
 				vo.setFechaRegistro(d1.getFechaRegistro());
 				vo.setParcial(d1.getParcial());
@@ -1156,9 +1156,8 @@ public class MovimientoMes implements Serializable {
 		DocumentoDetalle dd = new DocumentoDetalle();
 		Documento docu = new Documento();
 		long server = 1;
-		dd.setDocumentoDetalleId(d.getDocumentoDetalleId());
+		dd.setDocumentoDetalleId(d.getDocumentoDetalleId().getDocumentoDetalleId());
 		dd.setCantidad(d.getCantidad());
-		dd.setDocumentoDetalleId(d.getDocumentoDetalleId());
 		dd.setDocumentoId(d.getDocumentoId());
 		dd.setFechaRegistro(d.getFechaRegistro());
 		dd.setProductoId(d.getProductoId());
@@ -1280,7 +1279,7 @@ public class MovimientoMes implements Serializable {
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
+					vo.setDocumentoDetalleId(d1);
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1322,7 +1321,7 @@ public class MovimientoMes implements Serializable {
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
+					vo.setDocumentoDetalleId(d1);
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1371,7 +1370,7 @@ public class MovimientoMes implements Serializable {
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
+					vo.setDocumentoDetalleId(d1);
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1413,7 +1412,7 @@ public class MovimientoMes implements Serializable {
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
+					vo.setDocumentoDetalleId(d1);
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());

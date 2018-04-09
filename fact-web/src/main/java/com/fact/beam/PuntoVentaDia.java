@@ -651,8 +651,8 @@ public class PuntoVentaDia implements Serializable {
 				RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
 				RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
 				actModFactura = Boolean.FALSE;
-				documentoDetalleService.borrar(DetalleSelect.getDocumentoDetalleId(), 0l, server);
-				docDetalle.setDocumentoDetalleId(DetalleSelect.getDocumentoDetalleId());
+				documentoDetalleService.borrar(DetalleSelect.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
+				docDetalle.setDocumentoDetalleId(DetalleSelect.getDocumentoDetalleId().getDocumentoDetalleId());
 				docDetalleVo = DetalleSelect;
 				getProductos().remove(DetalleSelect);
 				DetalleSelect = null;
@@ -730,7 +730,7 @@ public class PuntoVentaDia implements Serializable {
 				docDetalleVo.setProductoId(productoSelect);
 				docDetalleVo.setDocumentoId(getDocumento());
 				docDetalleVo.setFechaRegistro(fecha);
-				docDetalleVo.setDocumentoDetalleId(docDetalle.getDocumentoDetalleId());
+				docDetalleVo.setDocumentoDetalleId(docDetalle);
 				if (promo) {
 					Double precioPromo = productoSelect.getPubPromo();
 					Double cantidadPromo = productoSelect.getkGPromo();
@@ -1729,7 +1729,7 @@ public class PuntoVentaDia implements Serializable {
 		for (DocumentoDetalle d1 : dd) {
 			DocumentoDetalleVo vo = new DocumentoDetalleVo();
 			vo.setCantidad(d1.getCantidad());
-			vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
+			vo.setDocumentoDetalleId(d1);
 			vo.setDocumentoId(d1.getDocumentoId());
 			vo.setFechaRegistro(d1.getFechaRegistro());
 			vo.setParcial(d1.getParcial());
@@ -1865,7 +1865,7 @@ public class PuntoVentaDia implements Serializable {
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
 		Long server = configuracion().getServer();
-		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId());
+		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId().getDocumentoDetalleId());
 		d.setParcial(cantidadtemp * getCambioTemp());
 		if (tipo == 9l && server == 2) {
 
@@ -1913,7 +1913,7 @@ public class PuntoVentaDia implements Serializable {
 			setIva(getDocumento().getIva());
 			setTotal(getDocumento().getTotal());
 			setPesoTotal(getDocumento().getPesoTotal());
-			documentoDetalleService.borrar(d.getDocumentoDetalleId(), 0l, server);
+			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
 			Producto productoEdit = d.getProductoId();
 			Double cantidad = productoEdit.getCantidad() + d.getCantidad1();
 			productoEdit.setCantidad(cantidad);
