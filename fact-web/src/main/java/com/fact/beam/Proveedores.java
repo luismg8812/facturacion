@@ -1,6 +1,8 @@
 package com.fact.beam;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,11 +13,16 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import com.fact.model.Ciudad;
+import com.fact.model.Cliente;
 import com.fact.model.Departamento;
+import com.fact.model.Documento;
 import com.fact.model.Proveedor;
 import com.fact.service.CiudadService;
 import com.fact.service.DepartamentoService;
+import com.fact.service.DocumentoService;
 import com.fact.service.ProveedorService;
+import com.fact.vo.ClienteVo;
+import com.fact.vo.ProveedorVo;
 
 @ManagedBean
 @SessionScoped
@@ -35,15 +42,18 @@ public class Proveedores implements Serializable {
 	@EJB
 	private ProveedorService proveedorService;
 	
+	@EJB
+	private DocumentoService documentoService;
+	
 	private String nombre;
 	private Long ciudad;
 	private Long departamento;
 	private String documento;
-	private String Barrio;
+	private String barrio;
 	private String direccion;
 	private Long celular;
 	private Long fijo;
-	private Date Cumpleaños;
+	private Date cumpleanos;
 	private Boolean creditoActivo=Boolean.FALSE;
 	private Long cupoCredito;
 	private double retencion;
@@ -53,8 +63,13 @@ public class Proveedores implements Serializable {
 	private List<Ciudad> ciudades;
 	private List<Proveedor> proveedores;
 	
-	public String llenarCampos(){
-		System.out.println(getProveedorId());
+	// retefuente
+		private Date fechaInicio;
+		private Date fechafin;
+		private Long proveedoresId;
+		private List<ProveedorVo> proveedoresVo;
+	
+	public String llenarCampos(){		
 		Proveedor p =new Proveedor();
 		for(Proveedor pSelect:getProveedores()){
 			if(pSelect.getProveedorId().toString().equals(getProveedorId().toString())){
@@ -66,14 +81,13 @@ public class Proveedores implements Serializable {
 		setCelular(p.getCelular());
 		setCiudad(p.getCiudadId()!=null?p.getCiudadId().getCiudadId():0l);
 		setCreditoActivo(p.getCreditoActivo()==0?Boolean.FALSE:Boolean.TRUE);
-		setCumpleaños(p.getCumpleaños());
+		setCumpleanos(p.getCumpleaños());
 		setCupoCredito(p.getCupoCredito());
 		setDireccion(p.getDireccion());
 		setDocumento(p.getDocumento());
 		setFijo(p.getFijo());
 		setNombre(p.getNombre());
-		setRetencion(p.getRetencion());
-		//setDepartamento(p.getCiudadId()!=null?p.getCiudadId().getDepartamentoId().getDepartamentoId():0l);
+		setRetencion(p.getRetencion());		
 		return "";
 	}
 	
@@ -88,8 +102,7 @@ public class Proveedores implements Serializable {
     	return valido;
 	}
 	
-	public String editarProveedor(){
-		System.out.println("entra a guardar");
+	public String editarProveedor(){		
 		if(validarEdicion()){
 			Proveedor proveedor = new Proveedor();
 			proveedor.setBarrio(getBarrio());
@@ -98,7 +111,7 @@ public class Proveedores implements Serializable {
 			ciu.setCiudadId(getCiudad());
 			proveedor.setCiudadId(ciu);
 			proveedor.setCreditoActivo(getCreditoActivo()==Boolean.TRUE?1l:0l);
-			proveedor.setCumpleaños(getCumpleaños());
+			proveedor.setCumpleaños(getCumpleanos());
 			proveedor.setCupoCredito(getCupoCredito());
 			proveedor.setDocumento(getDocumento());
 			proveedor.setFechaRegistro(new Date());
@@ -120,8 +133,7 @@ public class Proveedores implements Serializable {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!,El Nombre es obligatorio",""));
             valido = false;
         }else {      	
-        	Proveedor pro = new Proveedor();
-        	pro=proveedorService.getByName(getNombre().toUpperCase()); 
+        	Proveedor pro =proveedorService.getByName(getNombre().toUpperCase()); 
         	if(pro!=null){
         		context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, El Proveedor ya existe",""));
                 valido = false;         
@@ -141,7 +153,7 @@ public class Proveedores implements Serializable {
 				proveedor.setCiudadId(ciu);
 			}
 			proveedor.setCreditoActivo(getCreditoActivo()==Boolean.TRUE?1l:0l);
-			proveedor.setCumpleaños(getCumpleaños());
+			proveedor.setCumpleaños(getCumpleanos());
 			proveedor.setCupoCredito(getCupoCredito());
 			proveedor.setDocumento(getDocumento());
 			proveedor.setDireccion(getDireccion());
@@ -156,6 +168,71 @@ public class Proveedores implements Serializable {
 	}
 	
 	
+	/**
+	 * Medo encargado de buscar las compras a los proveedores en un rango de fechas establecido
+	 */
+	public void buscarProveedores() {
+		if(!validarfiltros()){
+			return;
+		}
+		List<Proveedor> clientesTemp = new ArrayList<>();
+		List<Long> tipoDocumentoId = new ArrayList<>();
+		setProveedoresVo(new ArrayList<>());
+		tipoDocumentoId.add(2l);//se agrega tipo documento factura de venta
+		if (getProveedorId() == null) {
+			clientesTemp = proveedorService.getByAll();
+		} else {
+			Proveedor cli = proveedorService.getById(getProveedorId());
+			clientesTemp.add(cli);
+		}
+		for (Proveedor c : clientesTemp) {
+				
+				List<Documento> facturas = documentoService.getByProveedor(c.getProveedorId(),tipoDocumentoId,getFechaInicio(), getFechafin());
+				Double total=0.0;
+				Double retefuente=0.0;
+				
+				for(Documento d: facturas){
+					total+=(d.getTotal()==null?0.0:d.getTotal());
+					retefuente+=(d.getRetefuente()==null?0.0:d.getRetefuente());
+					
+				}
+				ProveedorVo cl= new ProveedorVo();
+				cl.setRetefuente(retefuente);
+				cl.setProveedorId(c);
+				cl.setTotalCompras(total);
+				getProveedoresVo().add(cl);
+		}
+	}
+	
+	/**
+	 * Metodo encargado de realizar las validaciones de los rangos de fechas engresadas
+	 * @return
+	 */
+	private boolean validarfiltros() {
+		FacesContext context = FacesContext.getCurrentInstance();
+    	boolean valido= true;
+    	if (getFechaInicio() == null ) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, La fecha de inicio es obligatoria",""));
+            valido = false;         
+        }
+    	if (getFechafin() == null ) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, La fecha de inicio es obligatoria",""));
+            valido = false;         
+        }
+    	
+    	if(getFechafin()!=null && getFechaInicio()!=null){
+    		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+    		String fhoyIni = df.format(getFechaInicio());
+    		String fhoyFin = df.format(getFechafin());
+    		Long hoy = Long.valueOf(fhoyIni);
+    		Long hoyfin = Long.valueOf(fhoyFin);
+        	if(hoyfin<hoy){
+        		context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, Fecha fin es mayor a la fecha de inicio",""));
+                valido = false;         
+        	}
+    	}
+    	return valido;
+	}
 	
 	public String ciudadByDepartamento(AjaxBehaviorEvent event){
 		setCiudades(ciudadService.getByDepartamento(getDepartamento()));
@@ -187,10 +264,10 @@ public class Proveedores implements Serializable {
 		this.documento = documento;
 	}
 	public String getBarrio() {
-		return Barrio;
+		return barrio;
 	}
 	public void setBarrio(String barrio) {
-		Barrio = barrio;
+		this.barrio = barrio;
 	}
 	public String getDireccion() {
 		return direccion;
@@ -210,11 +287,11 @@ public class Proveedores implements Serializable {
 	public void setFijo(Long fijo) {
 		this.fijo = fijo;
 	}
-	public Date getCumpleaños() {
-		return Cumpleaños;
+	public Date getCumpleanos() {
+		return cumpleanos;
 	}
-	public void setCumpleaños(Date cumpleaños) {
-		Cumpleaños = cumpleaños;
+	public void setCumpleanos(Date cumpleanos) {
+		this.cumpleanos = cumpleanos;
 	}
 	public Boolean getCreditoActivo() {
 		return creditoActivo;
@@ -267,6 +344,38 @@ public class Proveedores implements Serializable {
 
 	public void setProveedorId(Long proveedorId) {
 		this.proveedorId = proveedorId;
+	}
+
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	public Date getFechafin() {
+		return fechafin;
+	}
+
+	public void setFechafin(Date fechafin) {
+		this.fechafin = fechafin;
+	}
+
+	public Long getProveedoresId() {
+		return proveedoresId;
+	}
+
+	public void setProveedoresId(Long proveedoresId) {
+		this.proveedoresId = proveedoresId;
+	}
+
+	public List<ProveedorVo> getProveedoresVo() {
+		return proveedoresVo;
+	}
+
+	public void setProveedoresVo(List<ProveedorVo> proveedoresVo) {
+		this.proveedoresVo = proveedoresVo;
 	}
 
 	

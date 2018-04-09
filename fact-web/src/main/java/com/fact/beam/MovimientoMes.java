@@ -1,5 +1,6 @@
 package com.fact.beam;
 
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,14 +17,22 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.print.PrintException;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.poi.hssf.record.chart.SeriesToChartGroupRecord;
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
 import com.fact.api.Calculos;
+import com.fact.api.FactException;
+import com.fact.api.Impresion;
+import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
+import com.fact.model.Empresa;
 import com.fact.model.Evento;
 import com.fact.model.Grupo;
 import com.fact.model.Marca;
@@ -32,6 +41,7 @@ import com.fact.model.Producto;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
+import com.fact.model.TipoPago;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
@@ -42,7 +52,9 @@ import com.fact.service.ProductoService;
 import com.fact.service.ProveedorService;
 import com.fact.service.TipoDocumentoService;
 import com.fact.service.UsuarioService;
+import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
+import com.itextpdf.text.DocumentException;
 
 @ManagedBean
 @SessionScoped
@@ -52,11 +64,11 @@ public class MovimientoMes implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -2599894690114718736L;
+	private static Logger log = Logger.getLogger(MovimientoMes.class);
 
 	/**
 	 * luis miguel gonzalez NiceSoft luismg8812@hotmail.com
 	 */
-	
 
 	@EJB
 	private TipoDocumentoService tipoDocumentoService;
@@ -72,20 +84,25 @@ public class MovimientoMes implements Serializable {
 
 	@EJB
 	private ProveedorService proveedorService;
-	
+
 	@EJB
 	private GrupoService grupoService;
-	
+
 	@EJB
 	private MarcaService marcaService;
-	
+
 	@EJB
 	private UsuarioService usuarioService;
-	
+
 	@EJB
 	private EventoService eventoService;
 
-	
+	public static final String FOCUS_CANTIDAD = "document.getElementById('cantidad_in').focus();";
+	public static final String SELECT_CANTIDAD = "document.getElementById('cantidad_in').select();";
+	public static final String MOSTRAR_LA_LISTA = "document.getElementById('prodList').style.display='inline';";
+	public static final String ACTIVAR_CAMPO_COD_BARRAS = "document.getElementById('busquedaCodBarras').style.display='inline';";
+	public static final String UPDATE_CAMPO_ARTICULO = "art_1";
+
 	private List<TipoDocumento> tipoDocumentos;
 	List<DocumentoDetalleVo> productos;
 	List<Producto> productosAll;
@@ -98,28 +115,26 @@ public class MovimientoMes implements Serializable {
 	Producto productoSelect = new Producto();
 	Proveedor proveedorSelect = new Proveedor();
 	Documento documento;
-	
+
 	Long tipoDocumento = 2l;
 	Long codigoProveedor;
 	String tipoDocumentoEntrada;
 	String identificacionProveedor;
 	Date fechaCreacion;
 	Proveedor proveedor;
-	
-
-	
 
 	String codigoInterno;
 	Producto articulo;
 	String codigoBarras;
 	Double cantidad;
 	Double Unidad;
-	Long Parcial;
+	Double parcial;
 	String Detalle;
 
 	String focus = "";
 	String crear;
 	String crearNew;
+	private String impresion;
 
 	// variables nuevo producto
 	BigDecimal codigoNew;
@@ -132,18 +147,26 @@ public class MovimientoMes implements Serializable {
 	Long stockMinNew;
 	Long stockMaxNew;
 	Grupo grupoNew;
-	
 
 	Marca marcaNew;
 	Proveedor proveedorNew;
 	Long codigoBarrasNew;
 	Double pesoKgNew;
+	Double pesoEmpaqueKgNew;
 	String unidadNew;
 	String valanzaNew;
 	String variosNew;
 	String subProductoNew;
 	//
 	
+	// cambio de precio
+	String cambioTemp;// variable para almacednar el cambio dde precio temporal
+	DocumentoDetalleVo dCambio;// variable que contiene el detalle del producto
+								// que se le cambiara el precio
+
+	private String parciaPopup = "";
+	Conector conector = null;
+
 	public String getSubProductoNew() {
 		return subProductoNew;
 	}
@@ -151,121 +174,136 @@ public class MovimientoMes implements Serializable {
 	public void setSubProductoNew(String subProductoNew) {
 		this.subProductoNew = subProductoNew;
 	}
+	
+	public String getCambioTemp() {
+		return cambioTemp;
+	}
+
+	public void setCambioTemp(String cambioTemp) {
+		this.cambioTemp = cambioTemp;
+	}
 
 	// variables producto edit producto
 	Producto productoEdict;
 	BigDecimal codigoEdit;
 	Date fechaEdit;
 	String editarNew;
-	
-	//total
-	Double iva;
-	Double execento;
-	Double total;
-	
+
+	// total
+	private Double iva;
+	private Double execento;
+	private Double total;
+	private Double gravado;
+	private Double retefuente;
+
 	// modificar factura
-		String modFactura;
-		Boolean actModFactura = Boolean.FALSE;
-		
-		// saber si el codigo de barras esta activo
-		OpcionUsuario codBarrasActivo;
-		// saber si la cartera de clientes esta activa
-		OpcionUsuario carteraClientesActivo;
-		// saber si esta activo la facturacion pora cotizaciones ,remisiones y
-		// factura
-		OpcionUsuario facturacionGuiaActivo;
-		// saber si la cartera de clientes esta activa
-			OpcionUsuario claveBorradoActivo;
-			
+	String modFactura;
+	Boolean actModFactura = Boolean.FALSE;
+
+	// saber si el codigo de barras esta activo
+	OpcionUsuario codBarrasActivo;
+	// saber si la cartera de clientes esta activa
+	OpcionUsuario carteraClientesActivo;
+	// saber si esta activo la facturacion pora cotizaciones ,remisiones y
+	// factura
+	OpcionUsuario facturacionGuiaActivo;
+	// saber si la cartera de clientes esta activa
+	OpcionUsuario claveBorradoActivo;
+	// actvar el cambio de precio en los producto durante la facturacion
+	OpcionUsuario cambioPrecio;
+
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
 	Documento documentoActual;
-	
+
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
-	
-	
-	
+
+	private String impresora() {
+		return (String) sessionMap.get("impresora");
+	}
+
 	public List<Producto> completeText(String query) {
 		List<Producto> nombProductos = new ArrayList<>();
 		for (Producto p : getProductosAll()) {
-			if(p.getNombre()!=null){
+			if (p.getNombre() != null) {
 				String articul = p.getNombre().toUpperCase().trim();
-				//if (articul.indexOf(query.toUpperCase()) != -1) {
-				if (articul.startsWith(query.toUpperCase().trim())) {					 
+				// if (articul.indexOf(query.toUpperCase()) != -1) {
+				if (articul.startsWith(query.toUpperCase().trim())) {
 					nombProductos.add(p);
 				}
 			}
 		}
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
-		if(server==2 && !nombProductos.isEmpty()){
-			return cantidadproductoServer2(nombProductos,server);
+		if (server == 2 && !nombProductos.isEmpty()) {
+			return cantidadproductoServer2(nombProductos, server);
 		}
 		return nombProductos;
 	}
-	
+
 	/**
 	 * Metodo que busca productos en el server 2 y actualiza la cantidad
+	 * 
 	 * @param nombProductos
 	 * @return
 	 */
-	private List<Producto> cantidadproductoServer2(List<Producto> nombProductos,Long server){
+	private List<Producto> cantidadproductoServer2(List<Producto> nombProductos, Long server) {
 		try {
-			List<Producto> nombProductos2= productoService.getByList(nombProductos,server);
-			for(Producto p: nombProductos){
-				String producto1 =p.getProductoId().toString();
-				for(Producto p2: nombProductos2){
-					String producto2 =p2.getProductoId().toString();
-					if(producto1.equals(producto2)){
-					 Double cantidadNew = p.getCantidad()+p2.getCantidad();
-					 p.setCantidad(cantidadNew);
-					 break;
+			List<Producto> nombProductos2 = productoService.getByList(nombProductos, server);
+			for (Producto p : nombProductos) {
+				String producto1 = p.getProductoId().toString();
+				for (Producto p2 : nombProductos2) {
+					String producto2 = p2.getProductoId().toString();
+					if (producto1.equals(producto2)) {
+						Double cantidadNew = p.getCantidad() + p2.getCantidad();
+						p.setCantidad(cantidadNew);
+						break;
 					}
-				}		
+				}
 			}
-		} catch (Exception e) {
-			System.out.println("no found product server thow");
+		} catch (FactException e) {
+			log.info("error en busqueda de productos del server 2: " + e.getMessage());
 			return nombProductos;
-		}		
+		}
 		return nombProductos;
 	}
-	
+
 	public List<Proveedor> completeTextProveedor(String query) {
 		List<Proveedor> nombProveedores = new ArrayList<>();
 		for (Proveedor p : getProveedoresAll()) {
-			if(p.getNombre()!=null){
+			if (p.getNombre() != null) {
 				String articul = p.getNombre().toUpperCase().trim();
-				//if (articul.indexOf(query.toUpperCase()) != -1) {
-				if (articul.startsWith(query.toUpperCase().trim())) {					 
+				// if (articul.indexOf(query.toUpperCase()) != -1) {
+				if (articul.startsWith(query.toUpperCase().trim())) {
 					nombProveedores.add(p);
 				}
 			}
 		}
 		return nombProveedores;
 	}
-	
+
 	public List<Grupo> completeTextGrupo(String query) {
 		List<Grupo> nombGrupos = new ArrayList<>();
 		for (Grupo g : getGruposAll()) {
-			if(g.getNombre()!=null){
+			if (g.getNombre() != null) {
 				String articul = g.getNombre().toUpperCase().trim();
 				if (articul.indexOf(query.toUpperCase()) != -1) {
-//				if (articul.startsWith(query.toUpperCase().trim())) {					 
+					// if (articul.startsWith(query.toUpperCase().trim())) {
 					nombGrupos.add(g);
 				}
 			}
 		}
 		return nombGrupos;
 	}
-	
+
 	public List<Marca> completeTextMarca(String query) {
 		List<Marca> nombMarcas = new ArrayList<>();
 		for (Marca p : getMarcasAll()) {
-			if(p.getNombre()!=null){
+			if (p.getNombre() != null) {
 				String articul = p.getNombre().toUpperCase().trim();
-				//if (articul.indexOf(query.toUpperCase()) != -1) {
-				if (articul.startsWith(query.toUpperCase().trim())) {					 
+				// if (articul.indexOf(query.toUpperCase()) != -1) {
+				if (articul.startsWith(query.toUpperCase().trim())) {
 					nombMarcas.add(p);
 				}
 			}
@@ -274,7 +312,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public List<String> completeCodigo(String query) {
-		List<String> codProductos = new ArrayList<String>();
+		List<String> codProductos = new ArrayList<>();
 		for (Producto p : getProductosAll()) {
 			if (p.getProductoId() != null) {
 				String articul = p.getProductoId().toString();
@@ -289,54 +327,81 @@ public class MovimientoMes implements Serializable {
 	public String buscarProductoCodBarras(AjaxBehaviorEvent event) {
 		String completo = getCodigoBarras();
 		for (Producto p : getProductosAll()) {
-			if(p.getCodigoBarras()!=null){
-			if (completo.equals(p.getCodigoBarras().toString())) {
+			if (p.getCodigoBarras() != null && completo.equals(p.getCodigoBarras().toString())) {
 				setCodigoInterno(p.getProductoId().toString());
 				setArticulo(p);
 				setUnidad(p.getCosto());
 				productoSelect = p;
-				// if(p.getBalanza()!=null && p.getBalanza()==1l){
-				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').select();");
-				RequestContext.getCurrentInstance().update("art_1");
-				RequestContext.getCurrentInstance().update("art_1_input");
-				RequestContext.getCurrentInstance().update("cod_");
-				// setFocus("cantidad_in");
-				// }else{
-				// setFocus("unidad_");
-				// RequestContext.getCurrentInstance().execute("document.getElementById('unidad_')addEventListener('focus',
-				// ponerFondoAmarillo);");
-				// RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-
-				// }
 				break;
-			}
 			}
 		}
 		return "";
 	}
 
-	public void buscarProducto(SelectEvent event) {	
-		productoSelect= (Producto) event.getObject();
+	public void buscarProducto(SelectEvent event) {
+		productoSelect = (Producto) event.getObject();
+		setParciaPopup("S");
+		if (productoSelect != null && productoSelect.getBalanza() == 1l) {
+			RequestContext.getCurrentInstance().execute("pupupCantidadMM();");
+			determinarBalanza();
+		} else {
+			RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
+			RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
+			RequestContext.getCurrentInstance().execute(
+					"document.getElementById('cantidad_in').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+		}
 	}
-	
-	public void detalleEnDocumento(AjaxBehaviorEvent event){
+
+	public String determinarBalanza() {
+		if (productoSelect.getProductoId() == 1l || productoSelect.getBalanza() == null
+				|| productoSelect.getBalanza() != 1l) {
+			return "";
+		}
+		String gramera = "" + configuracion().getGramera();
+		if (conector == null) {
+			conector = new Conector();
+		}
+		Double costoP;
+		try {
+			Double canti = Calculos.determinarBalanza(conector, gramera);
+
+			if (Calculos.validarPromo(productoSelect, canti)) {
+				costoP = productoSelect.getPubPromo();
+			} else {
+				costoP = productoSelect.getCosto();
+			}
+			setCantidad(canti);
+			log.info("costo publico:"+costoP);
+			setParcial(canti * costoP);
+			RequestContext.getCurrentInstance().update("cantidadMM:nombrePro");
+			RequestContext.getCurrentInstance().update("cantidadMM:valorParcial");
+			RequestContext.getCurrentInstance().update("cantidadMM:cantidadPar");
+		} catch (Exception e) {
+			setCantidad(0.0);
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar: " + e.getMessage()));
+		}
+		return "";
+	}
+
+	public void detalleEnDocumento(AjaxBehaviorEvent event) {
 		getDocumento().setDetalleEntrada(getDetalle());
 	}
-	
+
 	public void buscarProveedor(SelectEvent event) throws IOException {
-		
-		proveedorSelect= (Proveedor) event.getObject();
-		long server =1;
-		System.out.println("proveedor select:"+ proveedorSelect.getNombre());
+
+		proveedorSelect = (Proveedor) event.getObject();
+		long server = 1;
+		log.info("proveedor select:" + proveedorSelect.getNombre());
 		setCodigoProveedor(proveedorSelect.getProveedorId());
 		setTipoDocumentoEntrada(getDocumento().getTipoDocumentoId().getNombreCorto());
 		setIdentificacionProveedor(proveedorSelect.getDocumento());
 		setFechaCreacion(new Date());
 		getDocumento().setProveedorId(proveedorSelect);
 		getDocumento().setDetalleEntrada(getDetalle());
-		documentoService.update(getDocumento(),server);
-		RequestContext.getCurrentInstance().execute("document.getElementById('busquedaCodBarras').style.display='inline';");// se
+		documentoService.update(getDocumento(), server);
+		RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);// se
 		RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='inline';"); // campos
 		RequestContext.getCurrentInstance().execute("entrarFactura();");// art_1_input
 	}
@@ -354,10 +419,9 @@ public class MovimientoMes implements Serializable {
 		}
 		event.getObject().toString();
 	}
-	
-	public Configuracion configuracion(){		
-		Configuracion yourVariable = (Configuracion) sessionMap.get("configuracion");
-		return yourVariable;
+
+	public Configuracion configuracion() {
+		return (Configuracion) sessionMap.get("configuracion");
 	}
 
 	public String selectedTipoDoc(TipoDocumento td) {
@@ -366,25 +430,50 @@ public class MovimientoMes implements Serializable {
 		docOjb.setFechaRegistro(new Date());
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		Configuracion configuracion = configuracion();
-		Long server=configuracion.getServer();
-		if(td.getTipoDocumentoId()==1l && server==2l){ //si es una entrada de almacen se guarda el en el server 2
-			server=2l;
-			System.out.println("oracle_2");
-		}else{
-			server=1l;
+		Long server = configuracion.getServer();
+		if (td.getTipoDocumentoId() == 1l && server == 2l) { // si es una
+																// entrada de
+																// almacen se
+																// guarda el en
+																// el server 2
+			server = 2l;
+		} else {
+			server = 1l;
 		}
 		docOjb.setUsuarioId(usuario);
 		Proveedor pro = new Proveedor();
 		pro.setProveedorId(1l);
 		docOjb.setProveedorId(pro);
-		documentoService.save(docOjb,server);
+		documentoService.save(docOjb, server);
 		setDocumento(docOjb);
 		setTipoDocumentoEntrada(td.getNombre());
-		RequestContext.getCurrentInstance().execute("document.getElementById('tipo_documento').style.display='none';"); // opciones   de  tipo documento
-		RequestContext.getCurrentInstance().execute("document.getElementById('op_mov_mes_content').style.display='none';");// opciones		
-		RequestContext.getCurrentInstance().execute("document.getElementById('detalleEntrada').style.display='inline';"); 
-		RequestContext.getCurrentInstance().execute("document.getElementById('detalleEntrada').focus();");
 		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
+		setTotal(null);
+		setIva(null);
+		setRetefuente(null);
+		setGravado(null);
+		setExecento(null);
+		limpiar();
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");		
+		return "";
+	}
+
+	private void limpiar() {
+		RequestContext.getCurrentInstance().execute("document.getElementById('tipo_documento').style.display='none';"); // opciones
+		// de
+		// tipo
+		// documento
+		RequestContext.getCurrentInstance()
+				.execute("document.getElementById('op_mov_mes_content').style.display='none';");// opciones
+		RequestContext.getCurrentInstance()
+				.execute("document.getElementById('detalleEntrada').style.display='inline';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('detalleEntrada').focus();");
+		
 		setArticulo(null);
 		setCodigoBarras(null);
 		setCantidad(null);
@@ -395,375 +484,470 @@ public class MovimientoMes implements Serializable {
 		setProductosBorrarList(null);
 		setDocumentoActual(null);
 		setListaDocumento(null);
-		productoSelect=null;
+		productoSelect = null;
 		actModFactura = Boolean.FALSE;
 		RequestContext.getCurrentInstance().update("detalleEntrada");
 		RequestContext.getCurrentInstance().update("codig");
 		RequestContext.getCurrentInstance().update("nombcop_mov_mes");
-		RequestContext.getCurrentInstance().update("art_1");
-		RequestContext.getCurrentInstance().update("nombc");	
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
+		RequestContext.getCurrentInstance().update("nombc");
 		RequestContext.getCurrentInstance().update("cod_");
 		RequestContext.getCurrentInstance().update("cantidad_in");
 		RequestContext.getCurrentInstance().update("unidad_");
 		RequestContext.getCurrentInstance().update("dataList");
-		RequestContext.getCurrentInstance().update("codBarras_input");	
-		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");	
+		RequestContext.getCurrentInstance().update("codBarras_input");
+		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
 		RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('prodList').style.display='none';");
-		return "";
 	}
 
 	public String cantidadEnter(AjaxBehaviorEvent event) {
-		if (getCantidad() != null) {
-			Double  cantidad = 0.0;
-			Configuracion configuracion = configuracion();
-			Long server=configuracion.getServer();
-			if(getDocumento().getTipoDocumentoId().getTipoDocumentoId()==1l && server==2l){ //si es una entrada de almacen se guarda el en el server 2
-				server=2l;
-				//System.out.println("oracle_2");
-			}else{
-				server=1l;
-			}
-			
-			System.out.println("dio enter en cantidad");
-			DocumentoDetalle docDetalle = new DocumentoDetalle();
-			DocumentoDetalleVo docDetalleVo = new DocumentoDetalleVo();
-			docDetalle.setCantidad(getCantidad());
-			docDetalle.setProductoId(productoSelect);
-			docDetalle.setDocumentoId(getDocumento());
-			Date fecha = new Date();
-			docDetalle.setFechaRegistro(fecha);
-			docDetalle.setEstado(1l);
-			docDetalle.setParcial(getCantidad()*productoSelect.getCosto());
-			documentoDetalleService.save(docDetalle,server);
-			Producto productEdit =  new Producto();
-			productEdit=productoSelect;
-			cantidad =productoSelect.getCantidad()==null?0.0:productoSelect.getCantidad().doubleValue();
-			System.out.println("cantidad actual:"+cantidad);
-			OpcionUsuario stock=new OpcionUsuario();
-			switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
-			case "6": 	//tipo documento igual a salida de almacen
-				System.out.println("salida de almacen");
-				cantidad = cantidad-getCantidad();
-				System.out.println("cantidad actualizada:"+cantidad);
-				break;
-			case "2" ://tipo documento igual a entrada de almacen
-				cantidad = cantidad+getCantidad();
-				stock = (OpcionUsuario) sessionMap.get("stock");
-				if(stock!=null && productoSelect.getStockMax()!=null){
-					Double cantidadTempo = productoSelect.getCantidad()==null?0.0:productoSelect.getCantidad();
-					if(cantidadTempo>productoSelect.getStockMax()){
-						System.out.println("entro");
-						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Lacantidad max sugerida para "+productoSelect.getNombre()+" "+productoSelect.getStockMax() ));				
-					}		
-				}
-				RequestContext.getCurrentInstance().update("growl");
-				System.out.println("entrada de almacen");
-				System.out.println("cantidad actualizada:"+cantidad);
-				break;
-			case "1" ://tipo documento igual a entrada de almacen
-				cantidad = cantidad+getCantidad();
-				stock = (OpcionUsuario) sessionMap.get("stock");
-				if(stock!=null && productoSelect.getStockMax()!=null){
-					if(productoSelect.getCantidad()>productoSelect.getStockMax()){
-						System.out.println("entro");
-						FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Lacantidad max sugerida para "+productoSelect.getNombre()+" "+productoSelect.getStockMax() ));				
-					}		
-				}
-				RequestContext.getCurrentInstance().update("growl");
-				System.out.println("entrada de almacen");
-				System.out.println("cantidad actualizada:"+cantidad);
-				break;
-			default:
-				break;
-			}
-			
-			
-				Evento evento = new Evento();
-				TipoEvento tipoEvento = new TipoEvento();
-				tipoEvento.setTipoEventoId(5l); // se envia tipo evento igual a
-				evento.setCampo(productoSelect.getNombre()); // cambio de
-																// cantidad
-				evento.setTipoEventoId(tipoEvento);
-				evento.setFechaRegistro(new Date());
-				evento.setUsuarioId(usuario());
-				evento.setValorActual("" + cantidad);
-				evento.setValorAnterior("" + productoSelect.getCantidad());
-				eventoService.save(evento);
-			
-			
-			productEdit.setCantidad(cantidad);
-			productoService.update(productEdit,server);
-			docDetalleVo.setCantidad(getCantidad());
-			docDetalleVo.setProductoId(productoSelect);
-			docDetalleVo.setDocumentoId(getDocumento());
-			docDetalleVo.setFechaRegistro(fecha);
-			if (getCantidad() != null && productoSelect.getCosto() != null) {
-				docDetalleVo.setParcial(getCantidad() * productoSelect.getCosto());
-			} else {
-				docDetalleVo.setParcial(0.0);
-			}
-			if(getCantidad()>0 ){
-				getProductos().add(docDetalleVo);
-			}
-			Calculos.calcularExcento(getDocumento(), getProductos());// en esta funcion de calcula el excento, iva, total
-			documentoService.update(getDocumento(),server);		
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList').style.display='inline';"); // campos// del
-																														// nuevo																												// producto
-			setArticulo(null);
-			setCantidad(null);
-			setCodigoInterno(null);
-			setCodigoBarras(null);
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
-			RequestContext.getCurrentInstance().update("prodList");
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('busquedaCodBarras').style.display='inline';");
-			RequestContext.getCurrentInstance().update("codBarras_input");
-			RequestContext.getCurrentInstance().update("busquedaCodBarras");
-			RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').select();");
-			
-
-		}else{
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').select();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+		System.out.println("entra a cantidad enter");
+		if (getCantidad() == null) {
+			RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
+			RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
+			RequestContext.getCurrentInstance().execute(
+					"document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+			return "";
 		}
+		Double cantidadTemp;
+		Configuracion configuracion = configuracion();
+		Long server = configuracion.getServer();
+		if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == 1l && server == 2l) { // si
+																								// es
+																								// una
+																								// entrada
+																								// de
+																								// almacen
+																								// se
+																								// guarda
+																								// el
+																								// en
+																								// el
+																								// server
+																								// 2
+			server = 2l;
+		} else {
+			server = 1l;
+		}
+		System.out.println("dio enter en cantidad");
+		DocumentoDetalle docDetalle = new DocumentoDetalle();
+		DocumentoDetalleVo docDetalleVo = new DocumentoDetalleVo();
+		docDetalle.setCantidad(getCantidad());
+		docDetalle.setProductoId(productoSelect);
+		docDetalle.setDocumentoId(getDocumento());
+		Date fecha = new Date();
+		docDetalle.setFechaRegistro(fecha);
+		docDetalle.setEstado(1l);
+		docDetalle.setParcial(getCantidad() * productoSelect.getCosto());
+		documentoDetalleService.save(docDetalle, server);
+		Producto productEdit = productoSelect;
+		cantidadTemp = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad();
+		System.out.println("cantidad actual:" + cantidadTemp);
+		OpcionUsuario stock;
+		switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
+		case "6": // tipo documento igual a salida de almacen
+			System.out.println("salida de almacen");
+			cantidadTemp = cantidadTemp - getCantidad();
+			System.out.println("cantidad actualizada:" + cantidadTemp);
+			break;
+		case "2":// tipo documento igual a entrada de almacen
+			cantidadTemp = cantidadTemp + getCantidad();
+			stock = (OpcionUsuario) sessionMap.get("stock");
+			Double cantidadTempo = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad();
+			if (stock != null && productoSelect.getStockMax() != null && cantidadTempo > productoSelect.getStockMax()) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La cantidad max sugerida para "
+						+ productoSelect.getNombre() + " " + productoSelect.getStockMax()));
+			}
+			RequestContext.getCurrentInstance().update("growl");
+			System.out.println("cantidad actualizada:" + cantidadTemp);
+			break;
+		case "1":// tipo documento igual a entrada de almacen
+			cantidadTemp = cantidadTemp + getCantidad();
+			stock = (OpcionUsuario) sessionMap.get("stock");
+			if (stock != null && productoSelect.getStockMax() != null
+					&& productoSelect.getCantidad() > productoSelect.getStockMax()) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Lacantidad max sugerida para "
+						+ productoSelect.getNombre() + " " + productoSelect.getStockMax()));
+			}
+			RequestContext.getCurrentInstance().update("growl");
+			System.out.println("cantidad actualizada:" + cantidadTemp);
+			break;
+		default:
+			break;
+		}
+
+		Evento evento = new Evento();
+		TipoEvento tipoEvento = new TipoEvento();
+		tipoEvento.setTipoEventoId(5l); // se envia tipo evento igual a
+		evento.setCampo(productoSelect.getNombre()); // cambio de
+														// cantidad
+		evento.setTipoEventoId(tipoEvento);
+		evento.setFechaRegistro(new Date());
+		evento.setUsuarioId(usuario());
+		evento.setValorActual("" + cantidadTemp);
+		evento.setValorAnterior("" + productoSelect.getCantidad());
+		eventoService.save(evento);
+
+		productEdit.setCantidad(cantidadTemp);
+		productoService.update(productEdit, server);
+		docDetalleVo.setCantidad(getCantidad());
+		docDetalleVo.setProductoId(productoSelect);
+		docDetalleVo.setDocumentoId(getDocumento());
+		docDetalleVo.setUnitario(productoSelect.getCosto());
+		docDetalleVo.setDocumentoDetalleId(docDetalle.getDocumentoDetalleId());
+		docDetalleVo.setFechaRegistro(fecha);
+		if (getCantidad() != null && productoSelect.getCosto() != null) {
+			docDetalleVo.setParcial(getCantidad() * productoSelect.getCosto());
+		} else {
+			docDetalleVo.setParcial(0.0);
+		}
+		if (getCantidad() > 0) {
+			getProductos().add(docDetalleVo);
+		}
+		// en esta funcion de calcula el excento, iva, total
+		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		// se agrega re
+		if (proveedorSelect != null && proveedorSelect.getRetencion() != null) {
+			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorSelect));
+		}
+		setTotal(getDocumento().getTotal());
+		setIva(getDocumento().getIva());
+		setExecento(getDocumento().getExcento());
+		setGravado(getDocumento().getGravado());
+		setRetefuente(getDocumento().getRetefuente());
+		documentoService.update(getDocumento(), server);
+		RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA); // campos//
+																		// del
+																		// nuevo
+																		// //
+																		// producto
+		setArticulo(null);
+		setCantidad(null);
+		setCodigoInterno(null);
+		setCodigoBarras(null);
+		RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
+		RequestContext.getCurrentInstance().update("prodList");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);
+		RequestContext.getCurrentInstance().update("codBarras_input");
+		RequestContext.getCurrentInstance().update("busquedaCodBarras");
+		RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').focus();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('codBarras_input').select();");
 		return "";
 	}
-	
 
 	public void crearProducto(AjaxBehaviorEvent event) {
-		if(getCrear().toUpperCase().equals("S")){
+		if (getCrear().equalsIgnoreCase("S")) {
 			setArticuloNew("");
-			RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProductoForm:articuloNew').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProductoForm:articuloNew').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProductoForm:articuloNew').select();");
-			RequestContext.getCurrentInstance().execute("PF('nuevoProducto').show();");			
-			RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProductoForm:articuloNew').className+=' state-focus';");
+			RequestContext.getCurrentInstance()
+					.execute("document.getElementById('nuevoProductoForm:articuloNew').value='';");
+			RequestContext.getCurrentInstance()
+					.execute("document.getElementById('nuevoProductoForm:articuloNew').focus();");
+			RequestContext.getCurrentInstance()
+					.execute("document.getElementById('nuevoProductoForm:articuloNew').select();");
+			RequestContext.getCurrentInstance().execute("PF('nuevoProducto').show();");
+			RequestContext.getCurrentInstance()
+					.execute("document.getElementById('nuevoProductoForm:articuloNew').className+=' state-focus';");
 			RequestContext.getCurrentInstance().execute("pagina='crearProducto';");
-			//faltan los valores por defecto del formulario de guardar
+			// faltan los valores por defecto del formulario de guardar
 			setCrearNew("N");
 			System.out.println("presiono s entra popup creacion crear");
-		}else{
-			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
-			System.out.println("presiono ota cosa no entra al formulario de crear");
-		}		
-		setCrear("N");
-	}
-		
-	public void crearNewProducto() {
-		String crearN = getCrearNew().toUpperCase();
-		Configuracion configuracion = configuracion();
-		Long server=configuracion.getServer();
-		
-		if (crearN.equals("S")) {
-			//RequestContext.getCurrentInstance().execute("alert('entra al if')");
-			Producto prodNew = new Producto();
-			prodNew.setProductoId(getCodigoNew().longValue());
-			prodNew.setUnidad(getUnidadNew());
-			if(getCodigoBarrasNew()!=null){
-				Producto p =productoService.getByCodigoBarras(getCodigoBarrasNew());
-				if(p!=null){
-					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El Producto Con código de barras "+ getCodigoBarrasNew()+" ya se encuentra registrado"));
-					return;
-				}
-			}
-			if (getValanzaNew() != null) {
-				prodNew.setBalanza(getValanzaNew().toUpperCase().equals("S")? 1l : 0l);
-			}else{
-				prodNew.setBalanza(0l);
-			}
-			if (getVariosNew() != null) {
-				prodNew.setVarios(getVariosNew().toUpperCase().equals("S")? 1l : 0l);
-			}else{
-				prodNew.setVarios(0l);
-			}
-			if (getSubProductoNew() != null) {
-				prodNew.setSubProducto(getSubProductoNew().toUpperCase().equals("S")? 1l : 0l);
-			}else{
-				prodNew.setSubProducto(0l);;
-			}
-			
-			prodNew.setCodigoBarras(getCodigoBarrasNew());
-			if(getCostoNew()!=null){
-				prodNew.setCosto(getCostoNew());
-			}else{
-				prodNew.setCosto(0.0);
-			}
-			if(getPublicoNew()!=null){
-				prodNew.setCostoPublico(getPublicoNew());
-			}else{
-				prodNew.setCostoPublico(0.0);
-			}
-			prodNew.setFechaRegistro(new Date());
-			if(getIvaNew()!=null){
-				prodNew.setIva(getIvaNew());
-			}else{
-				prodNew.setIva(0.0);
-			}
-			if(getHipoconsumo()!=null){
-				prodNew.setHipoconsumo(getHipoconsumo());
-			}else{
-				prodNew.setHipoconsumo(0.0);
-			}
-			if(getProveedorNew()!=null ){
-				prodNew.setProveedorId(getProveedorNew());
-			}
-			if(getGrupoNew()!=null ){
-				prodNew.setGrupoId(getGrupoNew());
-			}
-			if(getMarcaNew()!=null){
-				prodNew.setMarcaId(getMarcaNew());
-			}
-			prodNew.setNombre(getArticuloNew().toUpperCase().trim());
-			if(getStockMaxNew()!=null){
-				prodNew.setStockMax(getStockMaxNew());
-			}else{
-				prodNew.setStockMax(1000000l);
-			}
-			if(getStockMinNew()!=null){
-				prodNew.setStockMin(getStockMinNew());
-			}else{
-				prodNew.setStockMin(-1000000l);
-			}
-			prodNew.setPeso(getPesoKgNew());
-			prodNew.setEstado(1l);	
-			prodNew.setCantidad(0.0);
-			productoService.save(prodNew,1l);
-			if(server==2l){
-				productoService.save(prodNew,server);
-			}
-			setCodigoNew(null);
-			productoSelect = prodNew;
-			setCodigoInterno(prodNew.getProductoId().toString());
-			setArticulo(prodNew);
-			setUnidad(prodNew.getCosto());
-			getProductosAll().add(productoSelect);
-			//setCantidad(0l);
-			RequestContext.getCurrentInstance().update("art_1");
-			RequestContext.getCurrentInstance().update("art_1_input");
-			RequestContext.getCurrentInstance().update("cod_");
-			RequestContext.getCurrentInstance().update("cantidad_in");
-			
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').select();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Creado exitosamente"));
 		} else {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+			System.out.println("presiono ota cosa no entra al formulario de crear");
 		}
-		setCrearNew("N");		
+		setCrear("N");
+	}
+
+	public void crearNewProducto() {
+		String crearN = getCrearNew().toUpperCase();
+		if (!crearN.equals("S")) {
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+			return;
+		}
+
+		if (getCodigoBarrasNew() != null) {
+			Producto p = productoService.getByCodigoBarras(getCodigoBarrasNew());
+			if (p != null) {
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
+						"El Producto Con código de barras " + getCodigoBarrasNew() + " ya se encuentra registrado"));
+				return;
+			}
+		}
+		Configuracion configuracion = configuracion();
+		Long server = configuracion.getServer();
+		Producto prodNew = new Producto();
+		prodNew.setProductoId(getCodigoNew().longValue());
+		prodNew.setUnidad(getUnidadNew());
+		if (getValanzaNew() != null) {
+			prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("S") ? 1l : 0l);
+		} else {
+			prodNew.setBalanza(0l);
+		}
+		if (getVariosNew() != null) {
+			prodNew.setVarios(getVariosNew().equalsIgnoreCase("S") ? 1l : 0l);
+		} else {
+			prodNew.setVarios(0l);
+		}
+		if (getSubProductoNew() != null) {
+			prodNew.setSubProducto(getSubProductoNew().equalsIgnoreCase("S") ? 1l : 0l);
+		} else {
+			prodNew.setSubProducto(0l);
+		}
+
+		prodNew.setCodigoBarras(getCodigoBarrasNew());
+		if (getCostoNew() != null) {
+			prodNew.setCosto(getCostoNew());
+		} else {
+			prodNew.setCosto(0.0);
+		}
+		if (getPublicoNew() != null) {
+			prodNew.setCostoPublico(getPublicoNew());
+		} else {
+			prodNew.setCostoPublico(0.0);
+		}
+		prodNew.setFechaRegistro(new Date());
+		if (getIvaNew() != null) {
+			prodNew.setIva(getIvaNew());
+		} else {
+			prodNew.setIva(0.0);
+		}
+		if (getHipoconsumo() != null) {
+			prodNew.setHipoconsumo(getHipoconsumo());
+		} else {
+			prodNew.setHipoconsumo(0.0);
+		}
+		if (getProveedorNew() != null) {
+			prodNew.setProveedorId(getProveedorNew());
+		}
+		if (getGrupoNew() != null) {
+			prodNew.setGrupoId(getGrupoNew());
+		}
+		if (getMarcaNew() != null) {
+			prodNew.setMarcaId(getMarcaNew());
+		}
+		prodNew.setNombre(getArticuloNew().toUpperCase().trim());
+		if (getStockMaxNew() != null) {
+			prodNew.setStockMax(getStockMaxNew());
+		} else {
+			prodNew.setStockMax(1000000l);
+		}
+		if (getStockMinNew() != null) {
+			prodNew.setStockMin(getStockMinNew());
+		} else {
+			prodNew.setStockMin(-1000000l);
+		}
+		prodNew.setPeso(getPesoKgNew());
+		prodNew.setPesoEmpaque(getPesoEmpaqueKgNew()==null?0.0:getPesoEmpaqueKgNew());
+		prodNew.setEstado(1l);
+		prodNew.setCantidad(0.0);
+		productoService.save(prodNew, 1l);
+		if (server == 2l) {
+			productoService.save(prodNew, server);
+		}
+		setCodigoNew(null);
+		productoSelect = prodNew;
+		setCodigoInterno(prodNew.getProductoId().toString());
+		setArticulo(prodNew);
+		setUnidad(prodNew.getCosto());
+		getProductosAll().add(productoSelect);
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
+		RequestContext.getCurrentInstance().update("art_1_input");
+		RequestContext.getCurrentInstance().update("cod_");
+		RequestContext.getCurrentInstance().update("cantidad_in");
+		RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
+		RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
+		RequestContext.getCurrentInstance().execute(
+				"document.getElementById('cantidad_in').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto Creado exitosamente"));
+
+		setCrearNew("N");
 		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('deseaGuardar').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProducto').style.display='none';");
 	}
 	
-	public String editarNewProducto(AjaxBehaviorEvent event) {
-		String crearN = getEditarNew().toUpperCase();
-		if (crearN.equals("S")) {
-			
-			String nombre = getProductoEdict().getNombre().trim();
-			getProductoEdict().setNombre(nombre);
-			Producto prodNew = getProductoEdict();
-			if(getProductoEdict().getProductoId()==1l){
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No es posible editar el producto ¡Varios!"));	
-				return "";	
-			}
-			
-			//se existe un cambio de precio se registra el evento
-			if(getPublicoNew()!=null && getPublicoNew().equals(getProductoEdict().getCostoPublico())){
-				Evento evento = new Evento();
-				TipoEvento tipoEvento= new TipoEvento();
-				tipoEvento.setTipoEventoId(3l); // se envia tipo evento igual a cambio de precio
-				evento.setTipoEventoId(tipoEvento);
-				evento.setFechaRegistro(new Date());
-				evento.setUsuarioId(usuario());
-				evento.setValorActual(""+getPublicoNew());
-				evento.setValorAnterior(""+getProductoEdict().getCostoPublico());
-				eventoService.save(evento);
-			}
-			
-			if (getValanzaNew() != null) {
-				prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("N") ? 0l : 1l);
-				if(getValanzaNew().equalsIgnoreCase("S")){
-					setUnidadNew("N");
-				}else{
-					setUnidadNew("S");
-				}
-			}else{
-				prodNew.setBalanza(0l);
-				setUnidadNew("S");
-			}
-			
-			if (getVariosNew() != null) {
-				prodNew.setVarios((getVariosNew().toUpperCase().equals("N") ? 0l : 1l));
-			}else{
-				prodNew.setVarios(0l);
-			}
-			
-			if (getUnidadNew() != null) {
-				prodNew.setUnidad(getUnidadNew().toUpperCase().equals("N") ? "N" : "S");
-			}else{
-				prodNew.setUnidad("N");
-			}
-			prodNew.setCodigoBarras(getCodigoBarrasNew());
-			if(getCostoNew()!=null){
-				prodNew.setCosto(getCostoNew());
-			}else{
-				prodNew.setCosto(0.0);
-			}
-			if(getPublicoNew()!=null){
-				prodNew.setCostoPublico(getPublicoNew());
-			}else{
-				prodNew.setCostoPublico(0.0);
-			}
-			prodNew.setFechaActualiza(getFechaEdit());
-			if(getIvaNew()!=null){
-				prodNew.setIva(getIvaNew());
-			}else{
-				prodNew.setIva(0.0);
-			}
-			if(getHipoconsumo()!=null){
-				prodNew.setHipoconsumo(getHipoconsumo());
-			}else{
-				prodNew.setHipoconsumo(0.0);
-			}
-			if(getGrupoNew()!=null){
-				prodNew.setGrupoId(getGrupoNew());
-			}
-			prodNew.setMarcaId(getMarcaNew());
-			prodNew.setPeso(getPesoKgNew());
-			prodNew.setStockMax(getStockMaxNew());
-			prodNew.setStockMin(getStockMinNew());
-			prodNew.setEstado(1l);
-			Configuracion configuracion = configuracion();
-			Long server = configuracion.getServer();
-			productoService.update(prodNew,1l);
-			if(server==2l){
-				productoService.update(prodNew,2l);
-			}
-			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto editado Exitosamente"));		
-			limpiarEditar();
-		} else {
-			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto NO editado"));	
+	public void recalcularPrecio(DocumentoDetalleVo d) {
+		System.out.println("aqui va");
+		dCambio = d;
+	}
+	
+	public String recalcularPrecio(AjaxBehaviorEvent event) {
+		System.out.println("cambio de precio MM:" + getCambioTemp());
+		if(getCambioTemp()==null || (getCambioTemp().indexOf(' ') == -1) ){
+			return "";
 		}
-		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
+		
+		Double cambioTemp1;
+		try {
+		   cambioTemp1 = Double.valueOf(getCambioTemp());
+		} catch (Exception e) {
+			return "";
+		}
+		System.out.println("paso:" + getCambioTemp());
+		//se comenta el pedaso de codigo que hace que se pueda bajar el precio		
+		int pos = getProductos().indexOf(dCambio);
+		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
+		
+		if ( dCambio.getUnitario() > cambioTemp1) {
+			descuentoTemp += (dCambio.getUnitario() - cambioTemp1);
+		}
+		getDocumento().setDescuento(descuentoTemp);
+		Double cantidadtemp = dCambio.getCantidad();
+		dCambio.setUnitario(cambioTemp1);
+		dCambio.setParcial(cantidadtemp * cambioTemp1);
+		getProductos().set(pos, dCambio);
+
+		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
+		Long server = configuracion().getServer();
+		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId());
+		d.setParcial(cantidadtemp * cambioTemp1);
+		if (tipo == 9l && server == 2) {
+
+			documentoService.update(getDocumento(), server);
+			documentoDetalleService.update(d, server);
+		} else {
+			documentoService.update(getDocumento(), 1l);
+			documentoDetalleService.update(d, 1l);
+		}
+		setTotal(getDocumento().getTotal());
+		setIva(getDocumento().getIva());
+		//setExcento(getDocumento().getExcento());
+		setGravado(getDocumento().getGravado());
+		setRetefuente(getDocumento().getRetefuente());
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').value='';");
+		RequestContext.getCurrentInstance().execute("PF('cambioPrecioMM').hide();");
+		RequestContext.getCurrentInstance().update("dataList");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().update("art_1");
+		setCambioTemp(null);
+		RequestContext.getCurrentInstance().update("cambioPrecioFormMM:cambioPrecioIn");		
 		return "";
 	}
 	
+
+	public String editarNewProducto(AjaxBehaviorEvent event) {
+		String crearN = getEditarNew().toUpperCase();
+		if (!crearN.equals("S")) {
+			RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto NO editado"));
+		}
+
+		String nombre = getProductoEdict().getNombre().trim();
+		getProductoEdict().setNombre(nombre);
+		Producto prodNew = getProductoEdict();
+		if (getProductoEdict().getProductoId() == 1l) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("No es posible editar el producto ¡Varios!"));
+			return "";
+		}
+
+
+		
+		// se existe un cambio de precio se registra el evento
+		if (getPublicoNew() != null && getPublicoNew().equals(getProductoEdict().getCostoPublico())) {
+			Evento evento = new Evento();
+			TipoEvento tipoEvento = new TipoEvento();
+			tipoEvento.setTipoEventoId(3l); // se envia tipo evento igual a
+											// cambio de precio
+			evento.setTipoEventoId(tipoEvento);
+			evento.setFechaRegistro(new Date());
+			evento.setUsuarioId(usuario());
+			evento.setValorActual("" + getPublicoNew());
+			evento.setValorAnterior("" + getProductoEdict().getCostoPublico());
+			eventoService.save(evento);
+		}
+
+		if (getValanzaNew() != null) {
+			prodNew.setBalanza(getValanzaNew().equalsIgnoreCase("N") ? 0l : 1l);
+			if (getValanzaNew().equalsIgnoreCase("S")) {
+				setUnidadNew("N");
+			} else {
+				setUnidadNew("S");
+			}
+		} else {
+			prodNew.setBalanza(0l);
+			setUnidadNew("S");
+		}
+
+		if (getVariosNew() != null) {
+			prodNew.setVarios((getVariosNew().toUpperCase().equals("N") ? 0l : 1l));
+		} else {
+			prodNew.setVarios(0l);
+		}
+
+		if (getUnidadNew() != null) {
+			prodNew.setUnidad(getUnidadNew().toUpperCase().equals("N") ? "N" : "S");
+		} else {
+			prodNew.setUnidad("N");
+		}
+		prodNew.setCodigoBarras(getCodigoBarrasNew());
+		if (getCostoNew() != null) {
+			prodNew.setCosto(getCostoNew());
+		} else {
+			prodNew.setCosto(0.0);
+		}
+		if (getPublicoNew() != null) {
+			prodNew.setCostoPublico(getPublicoNew());
+		} else {
+			prodNew.setCostoPublico(0.0);
+		}
+		prodNew.setFechaActualiza(getFechaEdit());
+		if (getIvaNew() != null) {
+			prodNew.setIva(getIvaNew());
+		} else {
+			prodNew.setIva(0.0);
+		}
+		if (getHipoconsumo() != null) {
+			prodNew.setHipoconsumo(getHipoconsumo());
+		} else {
+			prodNew.setHipoconsumo(0.0);
+		}
+		if (getGrupoNew() != null) {
+			prodNew.setGrupoId(getGrupoNew());
+		}
+		prodNew.setMarcaId(getMarcaNew());
+		prodNew.setPeso(getPesoKgNew());
+		prodNew.setStockMax(getStockMaxNew());
+		prodNew.setStockMin(getStockMinNew());
+		prodNew.setEstado(1l);
+		Configuracion configuracion = configuracion();
+		Long server = configuracion.getServer();
+		productoService.update(prodNew, 1l);
+		if (server == 2l) {
+			productoService.update(prodNew, 2l);
+		}
+		RequestContext.getCurrentInstance().execute("PF('info_articulos').hide();");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Producto editado Exitosamente"));
+		limpiarEditar();
+
+		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
+		return "";
+	}
+
 	public void asignarGrupo(SelectEvent event) {
-		Grupo pr= (Grupo) event.getObject();
+		Grupo pr = (Grupo) event.getObject();
 		setGrupoNew(pr);
-		System.out.println("grupo asignado:"+pr.getNombre());
+		System.out.println("grupo asignado:" + pr.getNombre());
 	}
 
 	public void editarProducto(SelectEvent event) {
-		Producto pr= (Producto) event.getObject();
+		Producto pr = (Producto) event.getObject();
 		setProductoEdict(pr);
 		setCodigoEdit(new BigDecimal(pr.getProductoId()));
 		setFechaEdit(pr.getFechaRegistro());
@@ -772,79 +956,128 @@ public class MovimientoMes implements Serializable {
 		setIvaNew(pr.getIva());
 		setStockMaxNew(pr.getStockMax());
 		setStockMinNew(pr.getStockMin());
-		
-		if(pr.getGrupoId()!=null){
+
+		if (pr.getGrupoId() != null) {
 			pr.setGrupoId(grupoService.getById(pr.getGrupoId().getGrupoId()));
 			setGrupoNew(pr.getGrupoId());
 		}
-		
 		setMarcaNew(pr.getMarcaId());
-		//setProveedorNew(set);
 		setCodigoBarrasNew(pr.getCodigoBarras());
 		setPesoKgNew(pr.getPeso());
-		//setEditarNew("S");
-		if(pr.getUnidad()==null){
+		if (pr.getUnidad() == null) {
 			setUnidadNew("N");
-		}else{
-			setUnidadNew(pr.getUnidad().toUpperCase());		
-		}	
-		if(pr.getBalanza()==null){
+		} else {
+			setUnidadNew(pr.getUnidad().toUpperCase());
+		}
+		if (pr.getBalanza() == null) {
 			setValanzaNew("N");
-		}else{
-			setValanzaNew(pr.getBalanza()==1l?"S":"N");
-		}	
-		if(pr.getVarios()==null){
+		} else {
+			setValanzaNew(pr.getBalanza() == 1l ? "S" : "N");
+		}
+		if (pr.getVarios() == null) {
 			setVariosNew("N");
-		}else{
-			setVariosNew(pr.getBalanza()==1l?"S":"N");
-		}	
+		} else {
+			setVariosNew(pr.getBalanza() == 1l ? "S" : "N");
+		}
 	}
-	
-	public void limpiarEditar(){
-		//if("info_articulos".equals(bar)){
-			System.out.println("entra a limpiar editar: ");
-			setProductoEdict(null);
-			setCodigoEdit(null);
-			setFechaEdit(null);
-			setCostoNew(null);
-			setPublicoNew(null);
-			setIvaNew(null);
-			setStockMaxNew(null);
-			setStockMinNew(null);
-			setGrupoNew(null);
-			setMarcaNew(null);
-			//setProveedorNew(set);
-			setCodigoBarrasNew(null);
-			setPesoKgNew(null);
-			setEditarNew(null);
-			setUnidadNew(null);	
-			setValanzaNew(null);
-			setProductosAll(null);
-			setVariosNew(null);
+
+	public void limpiarEditar() {
+		System.out.println("entra a limpiar editar: ");
+		setProductoEdict(null);
+		setCodigoEdit(null);
+		setFechaEdit(null);
+		setCostoNew(null);
+		setPublicoNew(null);
+		setIvaNew(null);
+		setStockMaxNew(null);
+		setStockMinNew(null);
+		setGrupoNew(null);
+		setMarcaNew(null);
+		setCodigoBarrasNew(null);
+		setPesoKgNew(null);
+		setEditarNew(null);
+		setUnidadNew(null);
+		setValanzaNew(null);
+		setProductosAll(null);
+		setVariosNew(null);
 	}
-	
-	public Usuario usuario(){
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		Map<String, Object> sessionMap = externalContext.getSessionMap();
-		Usuario yourVariable = (Usuario) sessionMap.get("userLogin");
-		return yourVariable;
+
+	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
+		if (getDocumento().getDocumentoId() == null) {
+			return "";
+		}
+		log.info("entra a imprimir entrada almacen");
+		Configuracion configuracion = configuracion();
+		Long numeroImpresiones = configuracion.getNumImpresion();
+		Long server = configuracion.getServer();
+		String impresora = impresora();
+		Empresa e = Login.getEmpresaLogin();
+		getDocumento().setImpreso(1l);
+		getDocumento().setEntregado(0l);
+
+		if (getDocumento().getProveedorId() == null) {
+			Proveedor c = new Proveedor();
+			c.setProveedorId(1l); // se le envia proveedor varios por
+									// defecto
+			c.setNombre("Varios");
+			c.setDireccion("");
+			getDocumento().setProveedorId(c);
+		}
+		// se busca la mac del equipo y se le asigna a la factura
+		getDocumento().setMac(Calculos.conseguirMAC2());
+		documentoService.update(getDocumento(), server);
+
+		String imp = e.getImpresion().toUpperCase();
+		for (int i = 0; i < numeroImpresiones; i++) { // si la factura fue
+														// a// credito se//
+														// imprime dos veces
+			setProductos(Calculos.ordenar(getProductos()));
+			switch (imp) {
+			case "TXT":
+				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				break;
+			case "BIG":
+				// quitar la dependencia del ireport
+				// imprimirTemporal(tituloFactura);
+				// pdf = imprimirBig(tituloFactura);
+				break;
+			case "PDF":
+				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				break;
+			case "BIG_PDF":
+				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora);
+				break;
+			case "SMALL_PDF":
+				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				break;
+			default:
+				break;
+
+			}
+
+		}
+		return "";
 	}
-	
+
+	public Usuario usuario() {
+		return (Usuario) sessionMap.get("userLogin");
+	}
+
 	public void buscarUltimaFactura() {
 		System.out.println("buscar ultima factura");
 		Documento ultimoFactura;
-		Usuario usuario =  usuario();
+		Usuario usuario = usuario();
 		Long idFactura = 2l; // id de tipo documento entrada de almacen
-		List<DocumentoDetalle> dd = new ArrayList<>();
+		List<DocumentoDetalle> dd;
 		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
 		ultimoFactura = documentoService.getByLastAndTipo(idFactura, usuario.getUsuarioId());
 		if (ultimoFactura != null) {
 			setDocumento(ultimoFactura);
-			dd = documentoDetalleService.getByDocumento(ultimoFactura.getDocumentoId(),1l);
+			dd = documentoDetalleService.getByDocumento(ultimoFactura.getDocumentoId(), 1l);
 			for (DocumentoDetalle d1 : dd) {
 				DocumentoDetalleVo vo = new DocumentoDetalleVo();
 				vo.setCantidad(d1.getCantidad());
-				vo.setDocumentoDetalleId(d1);
+				vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
 				vo.setDocumentoId(d1.getDocumentoId());
 				vo.setFechaRegistro(d1.getFechaRegistro());
 				vo.setParcial(d1.getParcial());
@@ -857,21 +1090,21 @@ public class MovimientoMes implements Serializable {
 			setTotal(ultimoFactura.getTotal());
 			setExecento(ultimoFactura.getExcento());
 			setIva(ultimoFactura.getIva());
-			//setGravado(ultimoFactura.getGravado());
-			// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
+			setRetefuente(ultimoFactura.getRetefuente());
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('dataList_content').style.display='inline';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList').style.display='inline';");
+			RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 			RequestContext.getCurrentInstance().update("cod_");
-			RequestContext.getCurrentInstance().update("nombc");		
-			RequestContext.getCurrentInstance().update("art_1");
+			RequestContext.getCurrentInstance().update("nombc");
+			RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 			RequestContext.getCurrentInstance().update("cantidad_in");
 			RequestContext.getCurrentInstance().update("dataList");
 			RequestContext.getCurrentInstance().update("execentoFact");
-			//RequestContext.getCurrentInstance().update("gravado");
 			RequestContext.getCurrentInstance().update("ivaFact");
 			RequestContext.getCurrentInstance().update("totalFact");
+			RequestContext.getCurrentInstance().update("gravadoFact");
 			RequestContext.getCurrentInstance().update("unidad_");
+			RequestContext.getCurrentInstance().update("retefuentelFact");
 			// falta poner el focus en codigo de barras
 			// actualizar los campos y ocultar los que no se ven y mostrar los
 			// que se ven
@@ -879,7 +1112,7 @@ public class MovimientoMes implements Serializable {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay Entradas de almacen"));
 		}
 	}
-	
+
 	public void modificarUltimaFactura() {
 		System.out.println("buscar ultima factura MM");
 		if (getDocumento() != null && getDocumento().getTipoDocumentoId() != null) {
@@ -888,19 +1121,19 @@ public class MovimientoMes implements Serializable {
 		}
 		// colocar una variable para saber si esta modificando factura,
 	}
-	
+
 	public void borrarFactura() {
-	    claveBorradoActivo = (OpcionUsuario) sessionMap.get("claveBorradoActivo");
+		claveBorradoActivo = (OpcionUsuario) sessionMap.get("claveBorradoActivo");
 		if (getDocumento() != null && getDocumento().getTipoDocumentoId() != null) {
-			if(claveBorradoActivo!=null){
-				 RequestContext.getCurrentInstance().execute("PF('modificarFactura').show();");
-			}else{
+			if (claveBorradoActivo != null) {
+				RequestContext.getCurrentInstance().execute("PF('modificarFactura').show();");
+			} else {
 				activarBorrado();
 			}
 		}
 	}
-	
-	public void activarBorrado(){
+
+	public void activarBorrado() {
 		System.out.println("presiona b para borrar factura MM");
 		setProductosBorrar(Boolean.TRUE);
 		setProductosBorrarList(getProductos());
@@ -918,27 +1151,28 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().execute("ruta=='movimiento_mes';");
 		actModFactura = Boolean.FALSE;
 	}
-	
+
 	public void borrarFacturaSelect(DocumentoDetalleVo d) {
 		DocumentoDetalle dd = new DocumentoDetalle();
 		Documento docu = new Documento();
-		long server =1;
-		dd.setDocumentoDetalleId(d.getDocumentoDetalleId().getDocumentoDetalleId());
+		long server = 1;
+		dd.setDocumentoDetalleId(d.getDocumentoDetalleId());
 		dd.setCantidad(d.getCantidad());
+		dd.setDocumentoDetalleId(d.getDocumentoDetalleId());
 		dd.setDocumentoId(d.getDocumentoId());
 		dd.setFechaRegistro(d.getFechaRegistro());
 		dd.setProductoId(d.getProductoId());
 		dd.setEstado(0l);
 		dd.setParcial(d.getParcial());
 		docu = dd.getDocumentoId();
-		Double ivaDocu = docu.getIva()==null?0.0:docu.getIva();
+		Double ivaDocu = docu.getIva() == null ? 0.0 : docu.getIva();
 		Double ivaProd = (d.getProductoId().getIva() == null ? 0.0 : d.getProductoId().getIva()) / 100;
 		ivaDocu = ivaDocu - (ivaProd * d.getParcial());
 		Double excentoB = docu.getExcento();
 		Double canti = docu.getTotal();
 		canti = canti - (d.getParcial());
 		double temp = d.getParcial() * ivaProd;
-		temp=d.getParcial()-temp;
+		temp = d.getParcial() - temp;
 		excentoB = excentoB - temp;
 		docu.setExcento(excentoB);
 		docu.setIva(ivaDocu);
@@ -949,21 +1183,22 @@ public class MovimientoMes implements Serializable {
 		Producto productoEdit = d.getProductoId();
 		Double cantidad = productoEdit.getCantidad() - d.getCantidad();
 		productoEdit.setCantidad(cantidad);
-		productoService.update(productoEdit,1l);
-		if(server==2l){
+		productoService.update(productoEdit, 1l);
+		if (server == 2l) {
 			productoEdit = productoService.getById(d.getProductoId().getProductoId());
-		    cantidad = productoEdit.getCantidad() + d.getCantidad2();
+			cantidad = productoEdit.getCantidad() + d.getCantidad2();
 			productoEdit.setCantidad(cantidad);
-			productoService.update(productoEdit,server);
+			productoService.update(productoEdit, server);
 		}
-		documentoDetalleService.update(dd,server);
-		documentoService.update(docu,server);
+		documentoDetalleService.update(dd, server);
+		documentoService.update(docu, server);
 		getProductos().remove(d);
 		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
 		RequestContext.getCurrentInstance().update("execentoFact");
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("ivaFact");
 		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
 		if (!getProductos().isEmpty()) {
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('borrarTablaMM:checkboxDT:0:rowDelete_').focus();");
@@ -971,14 +1206,13 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
 		System.out.println("documentoDetalle borrado:" + d.getDocumentoDetalleId());
 	}
-	
+
 	public void popupImprimir() {
 		if (actModFactura) {
 			System.out.println("i en modificar factura");
 			// todo lo de modificar, activar cosas y asi....
-			
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('busquedaCodBarras').style.display='inline';");
+
+			RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='inline';");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('op_mov_mes_content').style.display='none';");
@@ -989,7 +1223,7 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
 			RequestContext.getCurrentInstance().execute("pagina='creando_facturaMM';");
 			RequestContext.getCurrentInstance().update("busquedaCodBarras");
-			RequestContext.getCurrentInstance().update("art_1");
+			RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 			RequestContext.getCurrentInstance().update("codBarras_input");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
@@ -998,26 +1232,41 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('confir_mm').style.display='none';");
 			actModFactura = Boolean.FALSE;
 		} else {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El módulo de impresión de movimientos mes esta desactivado, comuniquese con su proveedor del sistema"));
-//			System.out.println("imprimir");
-//			RequestContext.getCurrentInstance().execute("PF('imprimir').show();");
-//			RequestContext.getCurrentInstance().execute("document.getElementById('pogoTargeta').value='N';");
-//			RequestContext.getCurrentInstance().execute("document.getElementById('cartera').value='N';");
-//			RequestContext.getCurrentInstance().execute(
-//					"document.getElementById('cartera').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
-//			RequestContext.getCurrentInstance().execute("document.getElementById('cartera').focus();");
-//			RequestContext.getCurrentInstance().execute("document.getElementById('cartera').select();");
-//			setCartera("N");
-//			RequestContext.getCurrentInstance().update("excento_tag");
-//			RequestContext.getCurrentInstance().update("cartera");
-//			RequestContext.getCurrentInstance().update("gravado_tag");
-//			RequestContext.getCurrentInstance().update("iva_tag");
-//			RequestContext.getCurrentInstance().update("total1");
-//			RequestContext.getCurrentInstance().update("iva_tag");
-//			RequestContext.getCurrentInstance().update("pogoTargeta");
+			log.info("imprimir");
+			try {
+				imprimirFactura();	
+				RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
+				setTotal(null);
+				setIva(null);
+				setRetefuente(null);
+				setGravado(null);
+				setExecento(null);
+				limpiar();
+				RequestContext.getCurrentInstance().update("execentoFact");
+				RequestContext.getCurrentInstance().update("gravado");
+				RequestContext.getCurrentInstance().update("ivaFact");
+				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
+				
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Impresión Completa"));
+			} catch (IOException e) {
+				log.error("Probable error en impresion con la imagen de la factura: " + e.getMessage());
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
+			} catch (DocumentException e) {
+				log.error("Probable error en impresion con la creacion del documento: " + e.getMessage());
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
+			} catch (PrinterException e) {
+				log.error("Probable error en impresion : " + e.getMessage());
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
+
+			} catch (PrintException e) {
+				log.error("Probable error en impresion PrintException : " + e.getMessage());
+			}
+
 		}
 	}
-	
+
 	public void siguienteFactura() throws ParseException {
 		System.out.println("siguiente_factura_MM");
 		List<DocumentoDetalle> dd = new ArrayList<>();
@@ -1027,11 +1276,11 @@ public class MovimientoMes implements Serializable {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
 				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(),1l);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1);
+					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1043,25 +1292,23 @@ public class MovimientoMes implements Serializable {
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
-				//setGravado(getDocumentoActual().getGravado());
-				//setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
-				RequestContext.getCurrentInstance().update("nombc");	
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update("nombc");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("unidad_");
-				//RequestContext.getCurrentInstance().update("nombreCliente2");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1071,11 +1318,11 @@ public class MovimientoMes implements Serializable {
 				setDocumentoActual(getListaDocumento().get(pos - 1));
 				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(),1l);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1);
+					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1086,33 +1333,31 @@ public class MovimientoMes implements Serializable {
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
 				setProductos(ddVo);
 				setTotal(getDocumentoActual().getTotal());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
-				//setGravado(getDocumentoActual().getGravado());
-				//setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
-				RequestContext.getCurrentInstance().update("nombc");	
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update("nombc");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("unidad_");
-				//RequestContext.getCurrentInstance().update("nombreCliente2");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
 
 		}
 	}
-	
+
 	public void anteriorFactura() throws ParseException {
 		System.out.println("siguiente_factura_MM");
 		List<DocumentoDetalle> dd = new ArrayList<>();
@@ -1122,11 +1367,11 @@ public class MovimientoMes implements Serializable {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
 				System.out.println("documento actual MM: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(),1l);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1);
+					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1138,25 +1383,23 @@ public class MovimientoMes implements Serializable {
 				setProductos(ddVo);
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setIva(getDocumentoActual().getIva());
-				//setGravado(getDocumentoActual().getGravado());
-				//setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
-				RequestContext.getCurrentInstance().update("nombc");	
-				RequestContext.getCurrentInstance().update("art_1");
+				RequestContext.getCurrentInstance().update("nombc");
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("unidad_");
-				//RequestContext.getCurrentInstance().update("nombreCliente2");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
@@ -1166,11 +1409,11 @@ public class MovimientoMes implements Serializable {
 				setDocumentoActual(getListaDocumento().get(pos + 1));
 				System.out.println("documento actual: MM" + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
-				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(),1l);
+				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
 					DocumentoDetalleVo vo = new DocumentoDetalleVo();
 					vo.setCantidad(d1.getCantidad());
-					vo.setDocumentoDetalleId(d1);
+					vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
 					vo.setDocumentoId(d1.getDocumentoId());
 					vo.setFechaRegistro(d1.getFechaRegistro());
 					vo.setParcial(d1.getParcial());
@@ -1181,39 +1424,61 @@ public class MovimientoMes implements Serializable {
 				setProductos(ddVo);
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
 				setTotal(getDocumentoActual().getTotal());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
-				//setGravado(getDocumentoActual().getGravado());
-				//setNombreCliente2(getDocumentoActual().getClienteId()==null?"VARIOS":getDocumentoActual().getClienteId().getNombre());
-				// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('prodList').style.display='inline';");
+				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 				RequestContext.getCurrentInstance().update("cod_");
-				RequestContext.getCurrentInstance().update("art_1");
-				RequestContext.getCurrentInstance().update("nombc");	
+				RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
+				RequestContext.getCurrentInstance().update("nombc");
 				RequestContext.getCurrentInstance().update("cantidad_in");
 				RequestContext.getCurrentInstance().update("dataList");
 				RequestContext.getCurrentInstance().update("execentoFact");
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
 				RequestContext.getCurrentInstance().update("unidad_1");
-				//RequestContext.getCurrentInstance().update("nombreCliente2");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
 			}
 
 		}
 	}
-	
+
+	public String cantidadBalanza(AjaxBehaviorEvent event) {
+		if (getParciaPopup().equalsIgnoreCase("S")) {
+			System.out.println("entra");
+			cantidadEnter(null);
+		} else {
+			System.out.println("else");
+			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+			RequestContext.getCurrentInstance().execute(
+					"document.getElementById('art_1_input').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+		}
+		RequestContext.getCurrentInstance().update("dataList");
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		return "";
+	}
+
 	public List<Documento> getListaDocumento() throws ParseException {
 		if (listaDocumento == null) {
 			List<Long> tipoDocumentoId = new ArrayList<>();
-			tipoDocumentoId.add(2l); // tipo documento factura de salida		
-			Usuario usuario =  usuario();
-			listaDocumento = documentoService.getDocNoImp(usuario.getUsuarioId(),tipoDocumentoId,1l);
+			tipoDocumentoId.add(2l); // tipo documento factura de salida
+			Usuario usuario = usuario();
+			listaDocumento = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, 1l);
 		}
 		return listaDocumento;
 	}
@@ -1221,7 +1486,7 @@ public class MovimientoMes implements Serializable {
 	public void setListaDocumento(List<Documento> listaDocumento) {
 		this.listaDocumento = listaDocumento;
 	}
-	
+
 	public Documento getDocumentoActual() {
 		return documentoActual;
 	}
@@ -1229,7 +1494,7 @@ public class MovimientoMes implements Serializable {
 	public void setDocumentoActual(Documento documentoActual) {
 		this.documentoActual = documentoActual;
 	}
-	
+
 	public Boolean getProductosBorrar() {
 		return productosBorrar;
 	}
@@ -1237,7 +1502,7 @@ public class MovimientoMes implements Serializable {
 	public void setProductosBorrar(Boolean productosBorrar) {
 		this.productosBorrar = productosBorrar;
 	}
-	
+
 	public List<DocumentoDetalleVo> getProductosBorrarList() {
 		if (productosBorrarList == null) {
 			productosBorrarList = new ArrayList<>();
@@ -1248,13 +1513,13 @@ public class MovimientoMes implements Serializable {
 	public void setProductosBorrarList(List<DocumentoDetalleVo> productosBorrarList) {
 		this.productosBorrarList = productosBorrarList;
 	}
-	
+
 	public List<TipoDocumento> getTipoDocumentos() {
 		tipoDocumentos = new ArrayList<>();
-		List<Long> ids= new ArrayList<>();
-		ids.add(1l);//entradas por remision
-		ids.add(2l);//entrada de almacen
-		ids.add(6l);//salidas de almacen
+		List<Long> ids = new ArrayList<>();
+		ids.add(1l);// entradas por remision
+		ids.add(2l);// entrada de almacen
+		ids.add(6l);// salidas de almacen
 		tipoDocumentos = tipoDocumentoService.getById(ids);
 		return tipoDocumentos;
 	}
@@ -1322,15 +1587,13 @@ public class MovimientoMes implements Serializable {
 		Unidad = unidad;
 	}
 
-	public Long getParcial() {
-		return Parcial;
+	public Double getParcial() {
+		return parcial;
 	}
 
-	public void setParcial(Long parcial) {
-		Parcial = parcial;
+	public void setParcial(Double parcial) {
+		this.parcial = parcial;
 	}
-
-	
 
 	public String getFocus() {
 		return focus;
@@ -1356,7 +1619,6 @@ public class MovimientoMes implements Serializable {
 		this.crear = crear;
 	}
 
-	
 	public String getCrearNew() {
 		return crearNew;
 	}
@@ -1375,7 +1637,7 @@ public class MovimientoMes implements Serializable {
 	public void setCodigoNew(BigDecimal codigoNew) {
 		this.codigoNew = codigoNew;
 	}
-	
+
 	public BigDecimal getCodigoEdit() {
 		return codigoEdit;
 	}
@@ -1401,8 +1663,8 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public Double getIvaNew() {
-		if(ivaNew==null){
-			ivaNew =19.0;
+		if (ivaNew == null) {
+			ivaNew = 19.0;
 		}
 		return ivaNew;
 	}
@@ -1410,10 +1672,10 @@ public class MovimientoMes implements Serializable {
 	public void setIvaNew(Double ivaNew) {
 		this.ivaNew = ivaNew;
 	}
-	
+
 	public Double getHipoconsumo() {
-		if(hipoconsumoNew==null){
-			hipoconsumoNew =0.0;
+		if (hipoconsumoNew == null) {
+			hipoconsumoNew = 0.0;
 		}
 		return hipoconsumoNew;
 	}
@@ -1421,7 +1683,6 @@ public class MovimientoMes implements Serializable {
 	public void setHipoconsumo(Double hipoconsumoNew) {
 		this.hipoconsumoNew = hipoconsumoNew;
 	}
-
 
 	public Long getStockMinNew() {
 		return stockMinNew;
@@ -1478,6 +1739,14 @@ public class MovimientoMes implements Serializable {
 	public void setPesoKgNew(Double pesoKgNew) {
 		this.pesoKgNew = pesoKgNew;
 	}
+	
+	public Double getPesoEmpaqueKgNew() {
+		return pesoEmpaqueKgNew;
+	}
+
+	public void setPesoEmpaqueKgNew(Double pesoEmpaqueKgNew) {
+		this.pesoEmpaqueKgNew = pesoEmpaqueKgNew;
+	}
 
 	public String getUnidadNew() {
 		return unidadNew;
@@ -1513,19 +1782,19 @@ public class MovimientoMes implements Serializable {
 	public void setValanzaNew(String valanzaNew) {
 		this.valanzaNew = valanzaNew;
 	}
-	
-	public  List<Producto> getProductosAll() {
-		//if (productosAll == null || productosAll.isEmpty()) {
-			productosAll = productoService.getByAll();
-		//}
+
+	public List<Producto> getProductosAll() {
+		// if (productosAll == null || productosAll.isEmpty()) {
+		productosAll = productoService.getByAll();
+		// }
 		return productosAll;
 	}
 
 	public void setProductosAll(List<Producto> productosAll) {
 		this.productosAll = productosAll;
 	}
-	
-	public  List<Proveedor> getProveedoresAll() {
+
+	public List<Proveedor> getProveedoresAll() {
 		if (proveedoresAll == null || proveedoresAll.isEmpty()) {
 			proveedoresAll = proveedorService.getByAll();
 		}
@@ -1535,8 +1804,8 @@ public class MovimientoMes implements Serializable {
 	public void setProveedorestosAll(List<Proveedor> proveedoresAll) {
 		this.proveedoresAll = proveedoresAll;
 	}
-	
-	public  List<Grupo> getGruposAll() {
+
+	public List<Grupo> getGruposAll() {
 		if (gruposAll == null || gruposAll.isEmpty()) {
 			gruposAll = grupoService.getByAll();
 		}
@@ -1547,7 +1816,7 @@ public class MovimientoMes implements Serializable {
 		this.gruposAll = gruposAll;
 	}
 
-	public  List<Marca> getMarcasAll() {
+	public List<Marca> getMarcasAll() {
 		if (marcasAll == null || marcasAll.isEmpty()) {
 			marcasAll = marcaService.getByAll();
 		}
@@ -1653,7 +1922,7 @@ public class MovimientoMes implements Serializable {
 	public void setVariosNew(String variosNew) {
 		this.variosNew = variosNew;
 	}
-	
+
 	public Proveedor getProveedor() {
 		return proveedor;
 	}
@@ -1661,4 +1930,54 @@ public class MovimientoMes implements Serializable {
 	public void setProveedor(Proveedor proveedor) {
 		this.proveedor = proveedor;
 	}
+
+	public String getParciaPopup() {
+		return parciaPopup;
+	}
+
+	public void setParciaPopup(String parciaPopup) {
+		this.parciaPopup = parciaPopup;
+	}
+
+	public Producto getProductoSelect() {
+		return productoSelect;
+	}
+
+	public void setProductoSelect(Producto productoSelect) {
+		this.productoSelect = productoSelect;
+	}
+
+	public Double getGravado() {
+		return gravado;
+	}
+
+	public void setGravado(Double gravado) {
+		this.gravado = gravado;
+	}
+
+	public String getCambioPrecio() {
+		cambioPrecio = (OpcionUsuario) sessionMap.get("cambioPrecio");
+		return cambioPrecio == null ? "false" : "true";
+	}
+
+	public void setCambioPrecio(OpcionUsuario cambioPrecio) {
+		this.cambioPrecio = cambioPrecio;
+	}
+
+	public String getImpresion() {
+		return impresion;
+	}
+
+	public void setImpresion(String impresion) {
+		this.impresion = impresion;
+	}
+
+	public Double getRetefuente() {
+		return retefuente;
+	}
+
+	public void setRetefuente(Double retefuente) {
+		this.retefuente = retefuente;
+	}
+
 }

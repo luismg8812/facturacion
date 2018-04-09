@@ -71,6 +71,9 @@ public class Producto {
 	@Column(name="PESO")
 	private Double peso;
 	
+	@Column(name="PESO_EMPAQUE")
+	private Double pesoEmpaque;
+	
 	@Column(name="UNIDAD")
 	private String unidad;
 	
@@ -344,6 +347,15 @@ public class Producto {
 	public void setCostoSugerida(Double costoSugerida) {
 		this.costoSugerida = costoSugerida;
 	}
+
+	public Double getPesoEmpaque() {
+		return pesoEmpaque;
+	}
+
+	public void setPesoEmpaque(Double pesoEmpaque) {
+		this.pesoEmpaque = pesoEmpaque;
+	}
+	
 	
 	
 }

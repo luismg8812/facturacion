@@ -70,6 +70,11 @@
 				return "";
 			}
 			if(document.activeElement.name=="nuevoProductoForm:pesoKgNew_input"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:pesoEmpaqueKgNew_input').focus();
+				document.getElementById('nuevoProductoForm:pesoEmpaqueKgNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:pesoEmpaqueKgNew_input"){//cuendo esta seleccionando el tipo documento
 				document.getElementById('nuevoProductoForm:unidadNew').focus();
 				document.getElementById('nuevoProductoForm:unidadNew').select();
 				return "";
@@ -149,9 +154,14 @@
 				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').select();
 				return "";
 			}
-			if(document.activeElement.name=="nuevoProductoForm:unidadNew"){//cuendo esta seleccionando el tipo documento
+			if(document.activeElement.name=="nuevoProductoForm:pesoEmpaqueKgNew_input"){//cuendo esta seleccionando el tipo documento
 				document.getElementById('nuevoProductoForm:pesoKgNew_input').focus();
 				document.getElementById('nuevoProductoForm:pesoKgNew_input').select();
+				return "";
+			}
+			if(document.activeElement.name=="nuevoProductoForm:unidadNew"){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoProductoForm:pesoEmpaqueKgNew_input').focus();
+				document.getElementById('nuevoProductoForm:pesoEmpaqueKgNew_input').select();
 				return "";
 			}
 			if(document.activeElement.name=="nuevoProductoForm:valanzaNew"){//cuendo esta seleccionando el tipo documento
@@ -304,6 +314,13 @@
 						maxlength="3" onkeyup="teclasNewProducto(event,this)"
 						id="pesoKgNew">
 						<!-- 					<p:ajax event="keyup" partialSubmit="true" /> -->
+					</p:inputNumber></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Peso Empaque Kg:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.pesoEmpaqueKgNew}" size="15"
+						maxlength="3" onkeyup="teclasNewProducto(event,this)"
+						id="pesoEmpaqueKgNew">					
 					</p:inputNumber></td>
 			</tr>
 		</table>

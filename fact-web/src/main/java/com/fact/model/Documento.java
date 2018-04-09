@@ -121,6 +121,12 @@ public class Documento {
 	
 	@Column(name="BASE_5")
 	private Double base5;
+	
+	@Column(name="RETEFUENTE")
+	private Double retefuente;
+	
+	@Column(name="INTERES")
+	private Double interes;
 
 	public Long getDocumentoId() {
 		return documentoId;
@@ -168,6 +174,16 @@ public class Documento {
 
 	public void setFechaActualiza(Date fechaActualiza) {
 		this.fechaActualiza = fechaActualiza;
+	}
+
+	
+	
+	public Double getInteres() {
+		return interes;
+	}
+
+	public void setInteres(Double interes) {
+		this.interes = interes;
 	}
 
 	public String getConsecutivoDian() {
@@ -368,6 +384,14 @@ public class Documento {
 
 	public void setBase5(Double base5) {
 		this.base5 = base5;
+	}
+
+	public Double getRetefuente() {
+		return retefuente;
+	}
+
+	public void setRetefuente(Double retefuente) {
+		this.retefuente = retefuente;
 	}
 	
 }

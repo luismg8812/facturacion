@@ -10,13 +10,22 @@
 	</script>
 	<h:form id="avanceEfectivoForm">
 		<p:growl id="growl1" life="7000" />
-		<table width="80%" align="left">
+		<table width="100%" align="left">
 			<tr>
 				<td><p:outputLabel value="Cliente: " /></td>
 				<td><p:selectOneMenu value="#{abonos.clienteId}" id="cliente">
-						<f:selectItem itemLabel="Seccionar Cliente" itemValue="0" />
+						<f:selectItem itemLabel="Seccionar Cliente" itemValue="" />
 						<f:selectItems value="#{abonos.clientes}" var="cli"
 							itemLabel="#{cli.nombre}" itemValue="#{cli.clienteId}" />
+					</p:selectOneMenu></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Proveedor" /></td>
+				<td><p:selectOneMenu value="#{abonos.proveedorId}"
+						id="proveedorId">
+						<f:selectItem itemLabel="Seccionar Proveedor" itemValue="" />
+						<f:selectItems value="#{abonos.proveedores}" var="pro"
+							itemLabel="#{pro.nombre}" itemValue="#{pro.proveedorId}" />
 					</p:selectOneMenu></td>
 			</tr>
 			<tr>
@@ -24,12 +33,60 @@
 				<td><p:inputNumber value="#{abonos.cantidadTotal}" /></td>
 			</tr>
 			<tr>
+				<td><p:outputLabel value="Interes: " /></td>
+				<td><p:inputNumber value="#{abonos.interes}" /></td>
+			</tr>
+			<tr>
+				<td><p:commandButton value="Buscar" id="buscar" process="@form" actionListener="#{abonos.buscarAvancesEfectivo()}"
+						update="growl1,crearDocument,avances"
+						/></td>
 				<td><p:commandButton value="Guardar" id="guardar"
 						process="@form" update="growl1,crearDocument"
 						actionListener="#{abonos.crearAvance}" /></td>
 				<td><p:commandButton value="Salir" /></td>
 			</tr>
 		</table>
+		
+		
+		<table>
+		<tr>
+		<td>
+		<p:outputLabel value="Total:"></p:outputLabel>
+		</td>
+		<td>
+		<p:outputLabel value=""></p:outputLabel>
+		</td>
+		</tr>
+		</table>
+		<p:dataTable var="car" value="#{abonos.avances}" id="avances"
+		emptyMessage="No se encontraron avances ">
+		<p:column headerText="Opciones">
+				<p:commandLink value="Eliminar"  actionListener="#{abonos.eliminarAvanceEfectivo(car)}"  />
+			</p:column>
+			<p:column headerText="Fecha">
+				<h:outputText value="#{car.fechaRegistro}" />
+			</p:column>
+
+			<p:column headerText="Cliente">
+				<h:outputText value="#{car.clienteId.nombre}" />
+			</p:column>
+
+			<p:column headerText="Proveedor">
+				<h:outputText value="#{car.proveedorId.nombre}" />
+			</p:column>
+	
+			<p:column headerText="Interes">
+				<h:outputText value="#{car.interes}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="%" />
+				</h:outputText>
+			</p:column>
+			
+			<p:column headerText="Total">
+				<h:outputText value="#{car.total}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+		</p:dataTable>
 	</h:form>
 	<p:blockUI block="crearDocument" trigger="crearDocument:guardar">
 					CARGANDO<br />

@@ -1221,8 +1221,6 @@ public class reduccion implements Serializable {
 
 	private boolean validarfiltros() {
 		FacesContext context = FacesContext.getCurrentInstance();
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		Map<String, Object> sessionMap = externalContext.getSessionMap();
 		String userPropietario = (String) sessionMap.get("userPropietario");
 		boolean valido = true;
 		if (getFechaInicio() == null) {
@@ -1313,8 +1311,7 @@ public class reduccion implements Serializable {
 			if (d != null && d.getExcento() != null) {
 				execento = execento + (d.getExcento() == null ? 0.0 : d.getExcento());
 			}
-			List<DocumentoDetalle> dd = new ArrayList<>();
-			dd = documentoDetalleService.getByDocumento(d.getDocumentoId(), 1l);
+			List<DocumentoDetalle> dd = documentoDetalleService.getByDocumento(d.getDocumentoId(), 1l);
 			for (DocumentoDetalle dode : dd) {
 				costoTotal = dode.getProductoId().getCosto() + costoTotal;
 			}

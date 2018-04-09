@@ -6,39 +6,7 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
-		function controlTeclasMM(e,element){
-			if(e.keyCode==79){
-				document.getElementById('movMesForm:Opc_movi_mes_menuButton').click();
-				//alert("tecla o")		movimiento mes		
-			}
-			if(e.keyCode==85){
-				document.getElementById('movMesForm:Ult_movi_mes').click();
-				//alert("tecla u")		movimiento mes		
-			}
-			if(e.keyCode==77){
-				document.getElementById('movMesForm:Mod_movi_mes').click();
-				//alert("tecla m")		movimiento mes		
-			}
-			if(e.keyCode==73){
-				document.getElementById('movMesForm:Imp_movi_mes').click();
-				//alert("tecla i")		movimiento mes		
-			}
-			
-			if(e.keyCode==66){
-				document.getElementById('movimiento_mes_bor').click();
-				//alert("tecla b")		movimiento mes		
-			}
-
-			if(e.keyCode==65){
-				document.getElementById('movMesForm:Ant_movi_mes').click();
-				//alert("tecla a")		movimiento mes		
-			}
-
-			if(e.keyCode==83){
-				document.getElementById('movMesForm:Sig_movi_mes').click();
-				//alert("tecla s")		movimiento mes		
-			}
-		}	
+		
 	
 	   function selectTipoDoc(e){
 			if(e.keyCode==13){
@@ -273,7 +241,7 @@ items {
 									 update="growl, dataList,codig" >					
 				   		  <p:hotkey bind="f" partialSubmit="true" onstart="PF('movimiento_mes').hide();limpiarRuta;" />
 				    </p:commandButton> 
-					<p:commandButton value="Ant" id="Ant_movi_mes" update="growl, dataList,codig" actionListener="#{movimientoMes.anteriorFactura()}"/> 
+					<p:commandButton value="Ant" id="Ant_movi_mes" update="growl, dataList,codig,retefuentelFact,totalFact" actionListener="#{movimientoMes.anteriorFactura()}"/> 
 					<p:commandButton value="Pri" id="Pri_movi_mes" />
 					<p:commandButton value="Ult" id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
 									 actionListener="#{movimientoMes.buscarUltimaFactura()}" update="growl"/> 
@@ -354,7 +322,17 @@ items {
 						<td width="10%"><p:outputLabel value="#{prod1.productoId.productoId}" size="10" /></td>
 						<td width="40%"><p:outputLabel value="#{prod1.productoId.nombre}" size="38"/></td>
 						<td width="15%"><p:outputLabel value="#{prod1.cantidad}" size="10" /></td>
-						<td width="10%"><p:outputLabel value="#{prod1.productoId.costo}" size="10" /></td>
+						<td width="10%"><p:outputLabel value="#{prod1.productoId.costo}" size="10"  rendered="!#{movimientoMes.cambioPrecio}"/>
+						
+						<p:inputNumber value="#{prod1.costoUnitario}"
+									rendered="#{movimientoMes.cambioPrecio}" symbol="$"
+									decimalPlaces="0" id="precioVariable1" minValue="0"
+									onfocus="PF('cambioPrecioMM').show();">
+									<p:ajax event="focus"
+										listener="#{movimientoMes.recalcularPrecio(prod1)}"></p:ajax>
+								</p:inputNumber>
+						
+						</td>
 						<td width="15%"><p:outputLabel value="#{prod1.parcial}" size="10" /></td>
 					</tr>
 				</table>
@@ -401,8 +379,8 @@ items {
 					<p:autoComplete id="art_1" value="#{movimientoMes.articulo}"  onkeyup="ciclo(event,this)"  minQueryLength="2"
 									completeMethod="#{movimientoMes.completeText}" maxResults="11"  var="name" size="38"
 									itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{productoConverter}">
-									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProducto}" process="@this,art_1" immediate="true"
-									 onstart="focoCantidad()" 
+									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProducto}" process="@this,art_1" immediate="true" update="cantidadMM:facturar"
+									 
 									  />
 						<p:column >
 							<p:outputLabel value="#{name.nombre}" />
@@ -425,7 +403,7 @@ items {
 				<td width="15%">
 					<p:inputText value= "#{movimientoMes.cantidad}" onselect="focoCantidad" onfocus="focoCantidad"  size="10" onblur="listaProductos()"   id="cantidad_in" onkeyup="enterCantidad(event)">
 						<p:ajax event="blur"  partialSubmit="true"
-					        listener="#{movimientoMes.cantidadEnter}" update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact,totalFact"/> 
+					        listener="#{movimientoMes.cantidadEnter}" update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact"/> 
 					        
 					</p:inputText>
 				</td>
@@ -473,17 +451,30 @@ items {
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Vr. Gravado" /></td>
-					<td><p:inputNumber value="0" disabled="true"/></td>
+					<td><p:inputNumber value="#{movimientoMes.gravado}" id="gravadoFact" disabled="true"/></td>
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Vr. Iva" /></td>
 					<td><p:inputNumber value="#{movimientoMes.iva}" disabled="true" id="ivaFact" /></td>
 				</tr>
 				<tr>
+					<td><p:outputLabel value="Retefuente" /></td>
+					<td><p:inputNumber value="#{movimientoMes.retefuente}" id="retefuentelFact" disabled="true"/></td>
+				</tr>
+				<tr>
 					<td><p:outputLabel value="Total" /></td>
 					<td><p:inputNumber value="#{movimientoMes.total}" id="totalFact" disabled="true"/></td>
 				</tr>
+				
 			</table>
 		</p:layoutUnit>
 	</p:layout>
+	<p:dialog widgetVar="cambioPrecioMM" id="cambiopreMM"  
+		style="font-size: 16px" header="Cambio de precio">
+		<div style="width: 300px; ">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/movimientoMes/cambioPrecio.xhtml" />
+		</div>
+	</p:dialog>
+	<h:outputScript library="js/movimientoMes" name="movimientoMes.js" />
 </ui:composition>

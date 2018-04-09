@@ -15,38 +15,40 @@ import com.fact.model.InfoDiario;
 @Local
 public interface DocumentoDao {
 
-	void save(Documento documento,Long server)throws FactException;
-	void save(InfoDiario infoDiario)throws FactException;
-	void update(Documento documento, Long server)throws FactException;
-	void delete(Documento documento)throws FactException;
-	Documento getById(Long documento)throws FactException;
-	List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId)throws FactException;
-	List<Documento> getDocNoImp(Long usuarioId,List<Long> tipoDocumentoId,Long server)throws FactException;
-	Documento getByLastAndTipo(Long idFactura, Long usuarioId)throws FactException;
-	List<Documento> getByTipoSinUsuario(List<Long> tipoDocumentoId, Date hoy, Date hoyfin)throws FactException;
+	void save(Documento documento,Long server);
+	void save(InfoDiario infoDiario);
+	void update(Documento documento, Long server);
+	void delete(Documento documento);
+	Documento getById(Long documento);
+	List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId);
+	List<Documento> getDocNoImp(Long usuarioId,List<Long> tipoDocumentoId,Long server);
+	Documento getByLastAndTipo(Long idFactura, Long usuarioId);
+	List<Documento> getByTipoSinUsuario(List<Long> tipoDocumentoId, Date hoy, Date hoyfin);
 	List<Documento> buscarPorAbonos(Long proveedorId, Long tipoFacturas, Date fechaInicio, Date fechafin,
-			String detalle)throws FactException;
-	List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin)throws FactException;
-	List<Documento> getByHoyNoImpresas(List<Long> tipoDocumentoId, Date hoy, Date hoyfin)throws FactException;
-	List<Documento> buscarPorAbonosByClient(Long clienteId, Date fechaInicio, Date fechafin)throws FactException;
+			String detalle);
+	List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin);
+	List<Documento> getByHoyNoImpresas(List<Long> tipoDocumentoId, Date hoy, Date hoyfin);
+	List<Documento> buscarPorAbonosByClient(Long clienteId, Date fechaInicio, Date fechafin);
 	List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni, Date fechaFin,
-			String conDian,Long clienteId)throws FactException;
-	String getByUltimoId()throws FactException;
-	List<Documento> getRemisionesByUsuario(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre,Long server)throws FactException;
-	void update(InfoDiario infoDiario) throws FactException;;
-	List<InfoDiario> buscarInfodiarioByFecha(Date fechaInicio, Date fechafin) throws FactException;
-	List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,Long server)throws FactException;
-	List<Documento> getByFacturaSinCierre(List<Long> tipoDocumentoId, Date hoy, Date hoyfin) throws FactException;
-	Documento getByConsecutivoDian(String documento) throws FactException;
-	List<Documento> getByEntrega(Long entrega)throws FactException;
+			String conDian,Long clienteId);
+	String getByUltimoId();
+	List<Documento> getRemisionesByUsuario(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre,Long server);
+	void update(InfoDiario infoDiario) ;
+	List<InfoDiario> buscarInfodiarioByFecha(Date fechaInicio, Date fechafin) ;
+	List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,Long server);
+	List<Documento> getByFacturaSinCierre(List<Long> tipoDocumentoId, Date hoy, Date hoyfin) ;
+	Documento getByConsecutivoDian(String documento) ;
+	List<Documento> getByEntrega(Long entrega);
 	List<Documento> getByTipoPago(List<Long> tipoPago, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,
-			Long server)throws FactException;
-	List<String> getMagList()throws FactException;
+			Long server);
+	List<String> getMagList();
 	List<Documento> getByMacAndTipoDocumento(List<Long> tipoDocumentoId, String mac, Date hoy, Date hoyfin,
-			Boolean conCierre, Long server)throws FactException;
+			Boolean conCierre, Long server);
 	List<DocumentoDetalle> getByGrupo(List<Long> tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId, Boolean conCierre,
-			Long server,Long grupo)throws FactException;
-	List<Documento> getByCliente(Long clienteId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin)throws FactException;
+			Long server,Long grupo);
+	List<Documento> getByCliente(Long clienteId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
+	List<Documento> getByClienteAndProveedorAndTipo(Long clienteId, Long proveedorId, List<Long> tipoId);
+	List<Documento> getByProveedor(Long proveedorId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
 	
 	
 		

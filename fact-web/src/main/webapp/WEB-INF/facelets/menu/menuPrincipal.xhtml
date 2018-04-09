@@ -477,6 +477,13 @@
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/cantidad.xhtml" />
 		</div>
 	</p:dialog>
+	<p:dialog widgetVar="cantidadPopupMM" id="cantidadPopupMM"  focus="facturar" 
+		style="font-size: 26px">
+		<div style="width: 730px; height: 500px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/movimientoMes/cantidad.xhtml" />
+		</div>
+	</p:dialog>
 	<p:dialog widgetVar="modificarFactura" id="modificarFactura"   
 	header="Modificar Factura" onHide="focusModFactura"
 		   closeOnEscape="true" style="font-size: 26px">
@@ -499,4 +506,5 @@
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/cambioPrecio.xhtml" />
 		</div>
 	</p:dialog>
+	
 </ui:composition>

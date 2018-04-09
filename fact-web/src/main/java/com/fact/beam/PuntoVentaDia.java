@@ -1,12 +1,10 @@
 package com.fact.beam;
 
 import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
@@ -38,8 +36,6 @@ import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.printing.PDFPageable;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
@@ -52,7 +48,6 @@ import com.fact.model.DocumentoDetalle;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
 import com.fact.model.Evento;
-import com.fact.model.Grupo;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.SubProducto;
@@ -64,18 +59,12 @@ import com.fact.service.ClienteService;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
-import com.fact.service.GrupoService;
 import com.fact.service.OpcionUsuarioService;
 import com.fact.service.ProductoService;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
-import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfWriter;
 
 /**
  * @author luismg
@@ -89,6 +78,13 @@ public class PuntoVentaDia implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 2973927052075665647L;
+	
+	private static final String LISTA_PRODUCTOS_INLINE = "document.getElementById('prodList1').style.display='inline';";
+	private static final String LISTA_PRODUCTOS = "dataList1";
+	private static final String CAMPO_CANTIDAD = "document.getElementById('cantidad_in1').select();";
+	private static final String CAMPO_ARTICULO ="art_11";
+	
+	
 
 	/**
 	 * luis Miguel gonzalez
@@ -114,9 +110,6 @@ public class PuntoVentaDia implements Serializable {
 
 	@EJB
 	private EventoService eventoService;
-	
-	@EJB
-	private GrupoService grupoService;
 
 	String codigoBarras;
 	Map<Long, Producto> productosAllCodigo;
@@ -127,7 +120,7 @@ public class PuntoVentaDia implements Serializable {
 	Producto articulo;
 	Double Unidad;
 	Double cantidad;
-	Double Parcial;
+	Double parcial;
 	Documento documento;
 	Producto productoSelect = new Producto();
 	Producto productoSelect2 = new Producto();
@@ -146,7 +139,7 @@ public class PuntoVentaDia implements Serializable {
 	String nombreEmpleado2;
 	String identificacionCliente;
 	Date fechaCreacion;
-	Double PesoTotal;
+	Double pesoTotal;
 	String displayTipoDocumento = "none";
 
 	List<DocumentoDetalleVo> productos;
@@ -163,7 +156,7 @@ public class PuntoVentaDia implements Serializable {
 	String direcionClienteNew;
 	Long celularClienteNew;
 	Long fijoClienteNew;
-	Date cumpleañosClienteNew;
+	Date cumpleanosClienteNew;
 	String creditoActivoClienteNew;
 	Long cupoCreditoClienteNew;
 	String retencionClienteNew;
@@ -174,7 +167,7 @@ public class PuntoVentaDia implements Serializable {
 	Double excento;
 	Double gravado;
 	Double iva;
-	Double Total;
+	Double total;
 	String tarjeta;
 	String cartera;
 	Long efectivo;
@@ -190,7 +183,7 @@ public class PuntoVentaDia implements Serializable {
 	Boolean actModFactura = Boolean.FALSE;
 
 	// saber si el codigo de barras esta activo
-	OpcionUsuario codBarrasActivo;
+	public OpcionUsuario codBarrasActivo;
 	// saber si copia de factura esta activa esta activo
 	OpcionUsuario copiaFacuta;
 	// saber si STOCK max y min esta activo
@@ -222,9 +215,6 @@ public class PuntoVentaDia implements Serializable {
 	// se activa la asignacion de los empleados a la factura
 	OpcionUsuario asignarEmpleadoFactura;
 
-	// se activa las comandas para los restaurantes
-	OpcionUsuario activarComandas;
-
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
 	Documento documentoActual;
@@ -237,45 +227,27 @@ public class PuntoVentaDia implements Serializable {
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 
-	private Usuario usuario() {
+	private Usuario usuario() {		
 		return (Usuario) sessionMap.get("userLogin");
 	}
 
-	private Configuracion configuracion() {
+	private Configuracion configuracion() {		
 		return (Configuracion) sessionMap.get("configuracion");
 	}
 
-	private String impresora() {
+	private String impresora() {		
 		return (String) sessionMap.get("impresora");
-	}
-	
-	private void productoFind(String completo){
-		Producto p=null;
-		p = getProductosAllCodigo().get(Long.valueOf(completo));
-		if (p != null) {
-			System.out.println("entra al else");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
-			setCodigoInterno(p.getProductoId().toString());
-			setArticulo(p);
-			setUnidad(p.getCostoPublico());
-			productoSelect = p;
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('cantidad_in1').select();");
-			RequestContext.getCurrentInstance().update("art_11");
-			RequestContext.getCurrentInstance().update("art_11_input");
-			RequestContext.getCurrentInstance().update("cod_1_input");
-			RequestContext.getCurrentInstance().update("cod_1");
-			RequestContext.getCurrentInstance().update("unidad_1");		
-		}
 	}
 
 	public void buscarProductoCodBarras() {
 		String completo = getCodigoBarras();
 		String codigoProducoString = "";
 		if (completo != null && !completo.isEmpty()) {
+			return;
+		}
 			Producto p = null;
 			try {
-				codigoProducoString = completo.substring(1, 6);
+				codigoProducoString = completo==null?"":completo.substring(1, 6);
 				System.out.println("codigoP:" + codigoProducoString);
 				p = getProductosAllCodigo().get(Long.valueOf(codigoProducoString));
 				if (p != null) {
@@ -289,18 +261,42 @@ public class PuntoVentaDia implements Serializable {
 					productoSelect = p;
 					cantidadEnter(null);
 				} else {
-					productoFind(completo);
+					p = getProductosAllCodigo().get(Long.valueOf(completo));
+					if (p != null) {
+						System.out.println("entra al else");
+						RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
+						setCodigoInterno(p.getProductoId().toString());
+						setArticulo(p);
+						setUnidad(p.getCostoPublico());
+						productoSelect = p;
+						RequestContext.getCurrentInstance()
+								.execute(CAMPO_CANTIDAD);
+						RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
+						RequestContext.getCurrentInstance().update("art_11_input");
+						RequestContext.getCurrentInstance().update("cod_1_input");
+						RequestContext.getCurrentInstance().update("cod_1");
+					}
 				}
 			} catch (Exception e) {
 				try {
-					productoFind(completo);
-					} catch (Exception e2) {
+					p = getProductosAllCodigo().get(Long.valueOf(completo));
+					if (p != null) {
+						RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
+						setCodigoInterno(p.getProductoId().toString());
+						setArticulo(p);
+						setUnidad(p.getCostoPublico());
+						productoSelect = p;
+						RequestContext.getCurrentInstance()
+								.execute(CAMPO_CANTIDAD);
+						RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
+						RequestContext.getCurrentInstance().update("art_11_input");
+						RequestContext.getCurrentInstance().update("cod_1_input");
+						RequestContext.getCurrentInstance().update("cod_1");
+					}
+				} catch (Exception e2) {
 
 				}
-
 			}
-
-		}
 	}
 
 	public List<String> completeCodigo(String query) {
@@ -308,6 +304,7 @@ public class PuntoVentaDia implements Serializable {
 		for (Producto p : getProductosAll()) {
 			if (p.getProductoId() != null) {
 				String articul = p.getProductoId().toString();
+
 				// if (articul.indexOf(query) != -1) {
 				if (articul.startsWith(query.toUpperCase().trim())) {
 					codProductos.add(articul);
@@ -325,12 +322,13 @@ public class PuntoVentaDia implements Serializable {
 				setArticulo(p);
 				setUnidad(p.getCostoPublico());
 				productoSelect = p;
-				RequestContext.getCurrentInstance().update("art_11");
+				RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("art_11_input");
 				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
-				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
+				RequestContext.getCurrentInstance().execute(CAMPO_CANTIDAD);
 				break;
 			}
+
 		}
 		event.getObject().toString();
 	}
@@ -338,8 +336,7 @@ public class PuntoVentaDia implements Serializable {
 	public void buscarProducto(SelectEvent event) throws IOException {
 		productoSelect = (Producto) event.getObject();
 		if (productoSelect != null && (productoSelect.getProductoId() == 0l || productoSelect.getProductoId() == 1l
-				|| productoSelect.getProductoId() == 2l)) {
-			System.out.println("producto x01");
+				|| productoSelect.getProductoId() == 2l)) {			
 			RequestContext.getCurrentInstance().execute("PF('px01').show();");
 			setUnidad(0.0);
 			RequestContext.getCurrentInstance().execute("document.getElementById('px01_input_input').focus();");
@@ -349,7 +346,7 @@ public class PuntoVentaDia implements Serializable {
 
 			if (productoSelect != null && productoSelect.getBalanza() == 1l) {
 				RequestContext.getCurrentInstance().execute("pupupCantidad();");
-				determinarBalanza(null);
+				determinarBalanza();
 				setParciaPopup("S");
 			} else {
 				Configuracion configuracion = configuracion();
@@ -358,8 +355,9 @@ public class PuntoVentaDia implements Serializable {
 					productoSelect2 = productoService.getById(productoSelect.getProductoId());
 				}
 				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
-				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
-				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+				RequestContext.getCurrentInstance().execute(CAMPO_CANTIDAD);
+				RequestContext.getCurrentInstance().execute(
+						"document.getElementById('cantidad_in1').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
 			}
 
 		}
@@ -413,235 +411,33 @@ public class PuntoVentaDia implements Serializable {
 		return nombProductos;
 	}
 
-	public String determinarBalanza(AjaxBehaviorEvent event) throws IOException {
-		if (productoSelect.getProductoId() == 1l) {
-
-		} else {
-			if (productoSelect.getBalanza() != null && productoSelect.getBalanza() == 1l) {
-				// if (getCantidad() == null) {
-				// System.out.println("tiene valanza configurada");
-				HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
-						.getRequest();
-				if (conector == null) {
-					conector = new Conector();
-				}
-				String[] numerosComoArray;
-				String invertido = "";
-				String respuesta = "";
-				String gramera = "" + configuracion().getGramera();
-				switch (gramera) {
-				case "1":
-					respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-					numerosComoArray = respuesta.split("=");
-					try {
-						String cant = numerosComoArray[1];
-						cant = cant.replace("=", "");
-						cant = cant.replace(" ", "");
-						for (int x = cant.length() - 1; x >= 0; x--)
-							invertido = invertido + cant.charAt(x);
-						Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-								: productoSelect.getCostoPublico().doubleValue();
-						Double canti = Double.parseDouble(invertido);
-						// setParcial(canti * costoP);
-						setCantidad(canti);
-						setParcial(canti * costoP);
-					} catch (Exception e) {
-						setCantidad(0.0);
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar..."));
-						throw e;
-					}
-					break;
-				case "2":
-					do {
-						try {
-							respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-							respuesta = respuesta == null ? "" : respuesta;
-							respuesta = respuesta.trim();
-							respuesta = respuesta.replace(".", "");
-							numerosComoArray = respuesta.split(",");
-							String cant = "";
-							for (int i = 0; i < numerosComoArray.length; i++) {
-								if (numerosComoArray[i].contains("+")) {
-									cant = numerosComoArray[i];
-									break;
-								}
-							}
-							cant = cant.replace("=", "");
-							cant = cant.replaceAll(" ", "");
-							cant = cant.replace("+", "");
-							String parte1 = "000";
-							String parte2 = "0000";
-							try {
-								parte1 = cant.substring(cant.length() - 3, cant.length());
-								parte2 = cant.substring(0, cant.length() - 3);
-							} catch (Exception e) {
-								// TODO: handle exception
-							}
-
-							cant = parte2 + "." + parte1;
-							System.out.println("cantidad peso: " + cant);
-							Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-									: productoSelect.getCostoPublico().doubleValue();
-							Double canti = Double.parseDouble(cant);
-							setCantidad(canti);
-							Long promo = 0l;
-							if (productoSelect.getPromo() != null) {
-								promo = productoSelect.getPromo();
-							}
-							if (promo == 1l) {
-								Double cantidadPromo = productoSelect.getkGPromo() == null ? 0.0
-										: productoSelect.getkGPromo();
-								if (canti > cantidadPromo) {
-									Double pubPromo = productoSelect.getPubPromo() == null ? 0.0
-											: productoSelect.getPubPromo().doubleValue();
-									costoP = pubPromo;
-
-								}
-							} else {
-								costoP = productoSelect.getCostoPublico() == null ? 0.0
-										: productoSelect.getCostoPublico().doubleValue();
-
-							}
-							setParcial(canti * costoP);
-
-						} catch (Exception e) {
-							setCantidad(0.0);
-							// FacesContext.getCurrentInstance().addMessage(null,
-							// new FacesMessage("Error en el uso de la Gramera,
-							// por favor vuelva a pesar..."));
-							throw e;
-						}
-
-					} while (numerosComoArray.length < 2);
-
-					break;
-				case "3":
-
-					do {
-						try {
-							respuesta = "";
-							respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-							if (respuesta == null || respuesta.equals("")) {
-								FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
-										"por vafor retire el producto de la gramera y vuelva a ponerlo"));
-							}
-							respuesta = respuesta == null ? "" : respuesta;
-
-							System.out.println("cantidad peso: " + respuesta);
-							Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-									: productoSelect.getCostoPublico().doubleValue();
-							Double canti = 0.0;
-							try {
-								canti = Double.parseDouble(respuesta);
-							} catch (Exception e) {
-								System.out.println("Error, vuelva a pesar");
-								FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
-										FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
-								// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
-								RequestContext.getCurrentInstance().update("growl1");
-								setCantidad(canti);
-								break;
-							}
-							setCantidad(canti);
-
-							setParcial(canti * costoP);
-							System.out.println("");
-						} catch (Exception e) {
-							setCantidad(0.0);
-							// FacesContext.getCurrentInstance().addMessage(null,
-							// new FacesMessage("Error en el uso de la Gramera,
-							// por favor vuelva a pesar..."));
-							throw e;
-						}
-
-					} while (respuesta.indexOf(".") == -1);
-					respuesta = "";
-					break;
-				case "4":
-
-					try {
-						respuesta = "";
-						respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-						respuesta = respuesta == null ? "" : respuesta;
-						respuesta = respuesta.replaceAll(",", "");
-						System.out.println("cantidad peso: " + respuesta);
-						Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-								: productoSelect.getCostoPublico().doubleValue();
-						Double canti = 0.0;
-						try {
-							canti = Double.parseDouble(respuesta);
-						} catch (Exception e) {
-							System.out.println("Error, vuelva a pesar");
-							FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
-									FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
-							// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
-							RequestContext.getCurrentInstance().update("growl1");
-							setCantidad(canti);
-							break;
-						}
-						setCantidad(canti);
-
-						setParcial(canti * costoP);
-						System.out.println("");
-					} catch (Exception e) {
-						setCantidad(0.0);
-						// FacesContext.getCurrentInstance().addMessage(null,
-						// new FacesMessage("Error en el uso de la Gramera,
-						// por favor vuelva a pesar..."));
-						throw e;
-					}
-
-					break;
-				case "5":
-
-					try {
-						respuesta = "";
-						respuesta = conector.inicio(request.getRemoteAddr(), gramera);
-						respuesta = respuesta == null ? "" : respuesta;
-						respuesta = respuesta.replaceAll(",", "");
-						System.out.println("cantidad peso: " + respuesta);
-						Double costoP = productoSelect.getCostoPublico() == null ? 0.0
-								: productoSelect.getCostoPublico().doubleValue();
-						Double canti = 0.0;
-						try {
-							canti = Double.parseDouble(respuesta);
-						} catch (Exception e) {
-							System.out.println("Error, vuelva a pesar");
-							// FacesContext.getCurrentInstance().addMessage(null,
-							// new FacesMessage(
-							// FacesMessage.SEVERITY_ERROR, "Error!, por favor
-							// vuelva a pesar", ""));
-							// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
-							// RequestContext.getCurrentInstance().update("growl1");
-							setCantidad(canti);
-							break;
-						}
-						setCantidad(canti);
-
-						setParcial(canti * costoP);
-						System.out.println("");
-					} catch (Exception e) {
-						setCantidad(0.0);
-						// FacesContext.getCurrentInstance().addMessage(null,
-						// new FacesMessage("Error en el uso de la Gramera,
-						// por favor vuelva a pesar..."));
-						throw e;
-					}
-
-					break;
-
-				default:
-					break;
-				}
-
-				RequestContext.getCurrentInstance()
-						.execute("document.getElementById('cantidad_in1').value='" + invertido + "';");
+	public String determinarBalanza()  {
+		if (productoSelect.getProductoId() == 1l || productoSelect.getBalanza() == null
+				|| productoSelect.getBalanza() != 1l) {
+			return "";
+		}
+		String gramera = "" + configuracion().getGramera();
+		if (conector == null) {
+			conector = new Conector();
+		}
+		Double costoP;
+		try {
+			Double canti = Calculos.determinarBalanza(conector, gramera);
+			
+			if (Calculos.validarPromo(productoSelect, canti)) {
+				costoP = productoSelect.getPubPromo() ;
+			}else{
+				costoP=productoSelect.getCostoPublico();
 			}
-			// }
+			setCantidad(canti);
+			setParcial(canti * costoP);
+		} catch (Exception e) {
+			setCantidad(0.0);
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar: "+e.getMessage()));
 		}
 		return "";
-
 	}
 
 	public String precioX01() {
@@ -690,7 +486,6 @@ public class PuntoVentaDia implements Serializable {
 			docDetalleVo.setDocumentoId(getDocumento());
 			docDetalleVo.setFechaRegistro(fecha);
 			docDetalleVo.setUnitario(getPx01());
-			// setUnidad(getPx01());
 			docDetalleVo.setParcial(getPx01());
 			getProductos().add(0, docDetalleVo);
 			setDocumento(Calculos.calcularExcento(getDocumento(), getProductos())); // en
@@ -708,17 +503,17 @@ public class PuntoVentaDia implements Serializable {
 			setIva(getDocumento().getIva());
 			setTotal(getDocumento().getTotal());
 			setPesoTotal(getDocumento().getPesoTotal());
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='inline';"); // campos
+			RequestContext.getCurrentInstance().execute(LISTA_PRODUCTOS_INLINE); // campos
 			setArticulo(null);
 			setPx01(null);
 			setCodigoInterno(null);
 			setCodigoBarras(null);
 			RequestContext.getCurrentInstance().execute("document.getElementById('px01_input_input').value='';");
 
-			RequestContext.getCurrentInstance().update("dataList1");
-			RequestContext.getCurrentInstance().update("art_11");
+			RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
+			RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 			RequestContext.getCurrentInstance().update("cod_1");
-			RequestContext.getCurrentInstance().update("dataList1");
+			RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
 			RequestContext.getCurrentInstance().update("excento");
 			RequestContext.getCurrentInstance().update("gravado");
 			RequestContext.getCurrentInstance().update("iva");
@@ -748,7 +543,7 @@ public class PuntoVentaDia implements Serializable {
 			cantidadEnter(null);
 		} else {
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').value='';");
-			// RequestContext.getCurrentInstance().update("dataList1");
+			// RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
 			// RequestContext.getCurrentInstance().execute("document.getElementById('busquedaCodBarras1').style.display='inline';");
 			// RequestContext.getCurrentInstance().update("codBarras_input1");
 			// RequestContext.getCurrentInstance().update("busquedaCodBarras1");
@@ -758,7 +553,7 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute(
 					"document.getElementById('art_11_input').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
 		}
-		RequestContext.getCurrentInstance().update("art_11");
+		RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("excento");
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("iva");
@@ -776,7 +571,7 @@ public class PuntoVentaDia implements Serializable {
 	public String cantidadEnter(AjaxBehaviorEvent event) {
 		if (getCantidad() != null) {
 			System.out.println("dio enter en cantidad");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='inline';"); // campos
+			RequestContext.getCurrentInstance().execute(LISTA_PRODUCTOS_INLINE); // campos
 
 			Configuracion configuracion = configuracion();
 			if (codBarrasActivo != null) {
@@ -856,8 +651,8 @@ public class PuntoVentaDia implements Serializable {
 				RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
 				RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
 				actModFactura = Boolean.FALSE;
-				documentoDetalleService.borrar(DetalleSelect.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
-				docDetalle.setDocumentoDetalleId(DetalleSelect.getDocumentoDetalleId().getDocumentoDetalleId());
+				documentoDetalleService.borrar(DetalleSelect.getDocumentoDetalleId(), 0l, server);
+				docDetalle.setDocumentoDetalleId(DetalleSelect.getDocumentoDetalleId());
 				docDetalleVo = DetalleSelect;
 				getProductos().remove(DetalleSelect);
 				DetalleSelect = null;
@@ -924,7 +719,7 @@ public class PuntoVentaDia implements Serializable {
 				Producto proCantidad = productoSelect;
 				Producto proCantidad2 = productoSelect2;
 				proCantidad.setCantidad(newCantidad - docDetalle.getCantidad1());
-				restarCantidadesSubProducto(docDetalle);
+				restarCantidadesSubProducto(productoSelect);
 				documentoDetalleService.save(docDetalle, server);
 				productoService.update(proCantidad, 1l);
 				if (server == 2l && proCantidad2 != null) {
@@ -935,7 +730,7 @@ public class PuntoVentaDia implements Serializable {
 				docDetalleVo.setProductoId(productoSelect);
 				docDetalleVo.setDocumentoId(getDocumento());
 				docDetalleVo.setFechaRegistro(fecha);
-				docDetalleVo.setDocumentoDetalleId(docDetalle);
+				docDetalleVo.setDocumentoDetalleId(docDetalle.getDocumentoDetalleId());
 				if (promo) {
 					Double precioPromo = productoSelect.getPubPromo();
 					Double cantidadPromo = productoSelect.getkGPromo();
@@ -978,10 +773,10 @@ public class PuntoVentaDia implements Serializable {
 			setCodigoBarras(null);
 			setParciaPopup(null);
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').value='';");
-			RequestContext.getCurrentInstance().update("dataList1");
+			RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
 		} else {
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
+			RequestContext.getCurrentInstance().execute(CAMPO_CANTIDAD);
 			RequestContext.getCurrentInstance().execute(
 					"document.getElementById('cantidad_in1').className='ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
 		}
@@ -994,12 +789,11 @@ public class PuntoVentaDia implements Serializable {
 	 * 
 	 * @param productoSelect3
 	 */
-	private void restarCantidadesSubProducto(DocumentoDetalle productoSelect3) {
-		List<SubProducto> subProductos = productoService
-				.subProductoByProducto(productoSelect3.getProductoId().getProductoId());
+	private void restarCantidadesSubProducto(Producto productoSelect3) {
+		List<SubProducto> subProductos = productoService.subProductoByProducto(productoSelect3.getProductoId());
 		for (SubProducto s : subProductos) {
 			Double cantidadAnterior = s.getProductoHijo().getCantidad();
-			Double cantidadNueva = cantidadAnterior - (s.getCantidad() * productoSelect3.getCantidad());
+			Double cantidadNueva = cantidadAnterior - s.getCantidad();
 			s.getProductoHijo().setCantidad(cantidadNueva);
 			productoService.update(s.getProductoHijo(), 1l);
 		}
@@ -1123,7 +917,7 @@ public class PuntoVentaDia implements Serializable {
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2l;
 			} else {
-				if (getTarjeta() != null && getTarjeta().toUpperCase().equals("S")) {
+				if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
 					tipa.setTipoPagoId(5l);// pago con targeta
 					getDocumento().setTipoPagoId(tipa);
 				} else {
@@ -1516,7 +1310,6 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("DESCUENTO_ENFACTURA");
 			rutas.add("BLOQUEO_CUADRE_CAJA");
 			rutas.add("ASIGNAR_EMPLEADO_FACTURA");
-			rutas.add("ACTIVAR_COMANDAS");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarCodigoBarras(usuario, opcionesActivas);
@@ -1531,15 +1324,16 @@ public class PuntoVentaDia implements Serializable {
 			activarDescuentoEnFactura(usuario, opcionesActivas);
 			activarbloqCuadreCaja(usuario, opcionesActivas);
 			activarAsignacionEmpleadoFactura(usuario, opcionesActivas);
-			activarComandas(usuario, opcionesActivas);
 		}
 		if (op.equals("movimiento_mes")) {
 			rutas.add("CLAVE_BORRADO");
 			rutas.add("STOCK");
+			rutas.add("CAMBIO_PRECIO");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarClaveBorrado(usuario, opcionesActivas);
 			activarStock(opcionesActivas);
+			activarCambioPrecio(usuario, opcionesActivas);
 		}
 	}
 
@@ -1621,6 +1415,7 @@ public class PuntoVentaDia implements Serializable {
 			cambioPrecio = null;
 			RequestContext.getCurrentInstance().execute("cambioPrecio=0;");
 		}
+		sessionMap.put("cambioPrecio", cambioPrecio);
 	}
 
 	public void activarCopiaFactura(Usuario usuario, Map<String, OpcionUsuario> opcionesActivas) {
@@ -1695,18 +1490,6 @@ public class PuntoVentaDia implements Serializable {
 		}
 	}
 
-	public void activarComandas(Usuario usuario, Map<String, OpcionUsuario> opcionesActivas) {
-		String ruta = "ACTIVAR_COMANDAS";
-		if (opcionesActivas.containsKey(ruta)) {
-			System.out.println("tiene comanda  activo");
-			RequestContext.getCurrentInstance().execute("activarComandas=1;");
-			activarComandas = opcionesActivas.get(ruta);
-		} else {
-			activarComandas = null;
-			RequestContext.getCurrentInstance().execute("activarComandas=0;");
-		}
-	}
-
 	public void limpiar() {
 		System.out.println("limpiar");
 		setProductos(null);
@@ -1743,9 +1526,9 @@ public class PuntoVentaDia implements Serializable {
 		RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('nombreCliente_input').value='';");
 		RequestContext.getCurrentInstance().update("cod_1");
-		RequestContext.getCurrentInstance().update("art_11");
+		RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("cantidad_in1");
-		RequestContext.getCurrentInstance().update("dataList1");
+		RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
 		RequestContext.getCurrentInstance().update("excento");
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("iva");
@@ -1796,6 +1579,8 @@ public class PuntoVentaDia implements Serializable {
 	public void popupImprimir() {
 		if (actModFactura) {
 			System.out.println("i en modificar factura");
+			// todo lo de modificar, activar cosas y asi....
+
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('busquedaCodBarras1').style.display='inline';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='inline';");
@@ -1808,180 +1593,42 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').value='';");
 			RequestContext.getCurrentInstance().execute("pagina='creando_factura';");
 			RequestContext.getCurrentInstance().update("busquedaCodBarras1");
-			RequestContext.getCurrentInstance().update("art_11");
+			RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 			RequestContext.getCurrentInstance().update("codBarras_input1");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').select();");
 			RequestContext.getCurrentInstance().execute("pagina='borrando_factura';");
 			RequestContext.getCurrentInstance().execute("ruta=='punto_venta';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
+
 			actModFactura = Boolean.FALSE;
 		} else {
-			if (activarComandas != null) {
-				RequestContext.getCurrentInstance().execute("PF('dialogComanda').show();");
+			System.out.println("imprimir");
+			RequestContext.getCurrentInstance().execute("PF('imprimir').show();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('pogoTargeta').value='N';");
+			if (descuentosActivo != null) {
+				RequestContext.getCurrentInstance().execute("document.getElementById('descuento').value=0;");
+				RequestContext.getCurrentInstance().execute(
+						"document.getElementById('descuento').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+				RequestContext.getCurrentInstance().execute("document.getElementById('descuento').focus();");
+				RequestContext.getCurrentInstance().execute("document.getElementById('descuento').select();");
 			} else {
-				abrirDialogImprimir();
+				RequestContext.getCurrentInstance().execute("document.getElementById('cartera').value='N';");
+				RequestContext.getCurrentInstance().execute(
+						"document.getElementById('cartera').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
+				RequestContext.getCurrentInstance().execute("document.getElementById('cartera').focus();");
+				RequestContext.getCurrentInstance().execute("document.getElementById('cartera').select();");
+				RequestContext.getCurrentInstance().update("cartera");
 			}
-
+			setCartera("N");
+			RequestContext.getCurrentInstance().update("excento_tag");
+			RequestContext.getCurrentInstance().update("gravado_tag");
+			RequestContext.getCurrentInstance().update("iva_tag");
+			RequestContext.getCurrentInstance().update("total1");
+			RequestContext.getCurrentInstance().update("iva_tag");
+			RequestContext.getCurrentInstance().update("pogoTargeta");
+			RequestContext.getCurrentInstance().update("descuento");
 		}
-	}
-
-	public void imprimirComanda() throws FileNotFoundException, DocumentException {
-		System.out.println("imprimir comanda");
-		if (getDocumento().getDocumentoId() == null) {
-			return;
-		}
-		Configuracion configuracion = configuracion();
-		String impresora = impresora();
-		Empresa e = Login.getEmpresaLogin();
-		String imp = e.getImpresion().toUpperCase();
-		List<Long> gruposId = new ArrayList<>();
-		for (DocumentoDetalleVo ddvo : getProductos()) {
-			Boolean contieneGrupo=!gruposId.contains(ddvo.getProductoId().getGrupoId().getGrupoId());
-			Integer productoImpreso = ddvo.getDocumentoDetalleId().getImpresoComanda()==null?0:ddvo.getDocumentoDetalleId().getImpresoComanda();
-			if (contieneGrupo && productoImpreso==0) {
-				gruposId.add(ddvo.getProductoId().getGrupoId().getGrupoId());
-			}
-		}
-		for (Long g : gruposId) {
-			switch (imp) {
-			case "TXT":
-				System.out.println("no se imprime comandas en txt");
-				break;
-			case "BIG":
-				System.out.println("no se imprime comandas en big");
-				break;
-			case "PDF":
-				Grupo g2=grupoService.getById(g);
-				SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-				Date hoy = new Date();
-				String pdf = "C:\\facturas\\comandas\\comanda_" + getDocumento().getDocumentoId() + "_"+g2.getNombre()
-						+ df.format(hoy).replace(":", "_") + ".pdf";
-				FileOutputStream archivo = new FileOutputStream(pdf);				
-				Document documento = new Document();
-				float fntSize, lineSpacing;
-				fntSize = 11f;
-				lineSpacing = 10f;
-				PdfWriter.getInstance(documento, archivo);
-				documento.setMargins(10, 1, 1, 1);
-				documento.open();
-				documento.add(
-						new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
-				documento.add(new Paragraph(new Phrase(lineSpacing, "Comanda para: " + g2.getNombre(),
-						FontFactory.getFont(FontFactory.COURIER_BOLD, 14f))));
-				documento.add(new Paragraph(new Phrase(lineSpacing, "Documento: " + getDocumento().getDocumentoId(),
-						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
-				documento.add(
-						new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
-				documento.add(new Paragraph(
-						new Phrase(lineSpacing, "Producto               Cantidad     ",
-								FontFactory.getFont(FontFactory.COURIER_BOLD, 14f)))); //
-				for (DocumentoDetalleVo ddvo2 : getProductos()) {
-					Integer productoImpreso = ddvo2.getDocumentoDetalleId().getImpresoComanda()==null?0:ddvo2.getDocumentoDetalleId().getImpresoComanda();
-					if (g == ddvo2.getProductoId().getGrupoId().getGrupoId() && productoImpreso==0) {
-						// descripcion
-						String nombre = "";
-						int maxTamanoNombre = 24;
-						nombre = Calculos.cortarDescripcion(ddvo2.getProductoId().getNombre(), maxTamanoNombre);
-
-						// Cantidad
-						String cant = "";
-						int maxTamañoCant = 3;
-						cant = Calculos.cortarCantidades(ddvo2.getCantidad(), maxTamañoCant);
-						documento.add(new Paragraph(new Phrase(lineSpacing, nombre + " " + cant,
-								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
-						DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
-						edict.setImpresoComanda(1);
-						documentoDetalleService.update(edict, 1l);
-					}
-				}
-				documento.close();
-				PrinterJob job = PrinterJob.getPrinterJob();
-				PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-				System.out.println("Number of printers configured1: " + printServices.length);
-				for (PrintService printer : printServices) {
-					System.out.println("Printer: " + printer.getName());
-					System.out.println("comparacion:" + impresora + ":" + printer.getName());
-					if (printer.getName().toString().equals(impresora)) {
-						try {
-							job.setPrintService(printer);
-							System.out.println(impresora + " : " + printer.getName());
-							break;
-						} catch (PrinterException ex) {
-							ex.printStackTrace();
-						}
-					}
-				}
-				PDDocument document = null;
-				try {
-					document = PDDocument.load(new File(pdf));
-					job.setPageable(new PDFPageable(document));
-					try {
-						job.print();
-					} catch (PrinterException er) {
-						er.printStackTrace();
-					}
-					document.close();
-				} catch (IOException ef) {
-					ef.printStackTrace();
-				}
-				if (configuracion.getGuardarFacturas() == 0l) {
-					File borrar = new File(pdf);
-					if (!borrar.delete()) {
-						System.out.println("Error borrando facturas");
-					} else {
-						System.out.println("Documento borrado");
-					}
-				}
-
-				break;
-			case "BIG_PDF":
-				System.out.println("no se imprime comandas en big_pdf");
-
-				break;
-			case "SMALL_PDF":
-				System.out.println("no se imprime comandas en small_pdf");
-
-				break;
-			default:
-				break;
-
-			}
-
-		}
-		RequestContext.getCurrentInstance().execute("PF('dialogComanda').hide();");
-		RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').focus();");
-		RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').select();");
-		RequestContext.getCurrentInstance().update("art_11");
-	}
-
-	public void abrirDialogImprimir() {
-		System.out.println("imprimir");
-		RequestContext.getCurrentInstance().execute("PF('dialogComanda').hide();");
-		RequestContext.getCurrentInstance().execute("PF('imprimir').show();");
-		RequestContext.getCurrentInstance().execute("document.getElementById('pogoTargeta').value='N';");
-		if (descuentosActivo != null) {
-			RequestContext.getCurrentInstance().execute("document.getElementById('descuento').value=0;");
-			RequestContext.getCurrentInstance().execute(
-					"document.getElementById('descuento').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('descuento').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('descuento').select();");
-		} else {
-			RequestContext.getCurrentInstance().execute("document.getElementById('cartera').value='N';");
-			RequestContext.getCurrentInstance().execute(
-					"document.getElementById('cartera').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cartera').focus();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cartera').select();");
-			RequestContext.getCurrentInstance().update("cartera");
-		}
-		setCartera("N");
-		RequestContext.getCurrentInstance().update("excento_tag");
-		RequestContext.getCurrentInstance().update("gravado_tag");
-		RequestContext.getCurrentInstance().update("iva_tag");
-		RequestContext.getCurrentInstance().update("total1");
-		RequestContext.getCurrentInstance().update("iva_tag");
-		RequestContext.getCurrentInstance().update("pogoTargeta");
-		RequestContext.getCurrentInstance().update("descuento");
 	}
 
 	public void buscarUltimaFactura() {
@@ -2082,7 +1729,7 @@ public class PuntoVentaDia implements Serializable {
 		for (DocumentoDetalle d1 : dd) {
 			DocumentoDetalleVo vo = new DocumentoDetalleVo();
 			vo.setCantidad(d1.getCantidad());
-			vo.setDocumentoDetalleId(d1);
+			vo.setDocumentoDetalleId(d1.getDocumentoDetalleId());
 			vo.setDocumentoId(d1.getDocumentoId());
 			vo.setFechaRegistro(d1.getFechaRegistro());
 			vo.setParcial(d1.getParcial());
@@ -2109,11 +1756,11 @@ public class PuntoVentaDia implements Serializable {
 		// RequestContext.getCurrentInstance().execute("document.getElementById('opciones:op_mov_mes1_content').style.display='none';");
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('dataList1_content').style.display='inline';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='inline';");
+		RequestContext.getCurrentInstance().execute(LISTA_PRODUCTOS_INLINE);
 		RequestContext.getCurrentInstance().update("cod_1");
-		RequestContext.getCurrentInstance().update("art_11");
+		RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("cantidad_in1");
-		RequestContext.getCurrentInstance().update("dataList1");
+		RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
 		RequestContext.getCurrentInstance().update("excento");
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("iva");
@@ -2203,7 +1850,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public void recalcularPrecio() {
 		System.out.println("cambio de precio:" + getCambioTemp());
-		// se comenta el pedaso de codigo que hace que se pueda bajar el precio
+		//se comenta el pedaso de codigo que hace que se pueda bajar el precio		
 		int pos = getProductos().indexOf(dCambio);
 		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
 		if (dCambio.getUnitario() > getCambioTemp()) {
@@ -2218,7 +1865,7 @@ public class PuntoVentaDia implements Serializable {
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
 		Long server = configuracion().getServer();
-		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId().getDocumentoDetalleId());
+		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId());
 		d.setParcial(cantidadtemp * getCambioTemp());
 		if (tipo == 9l && server == 2) {
 
@@ -2248,7 +1895,7 @@ public class PuntoVentaDia implements Serializable {
 		RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='inline';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').value='';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
-		RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').select();");
+		RequestContext.getCurrentInstance().execute(CAMPO_CANTIDAD);
 		RequestContext.getCurrentInstance().update("cantidad_in1");
 		DetalleSelect = d;
 		productoSelect = d.getProductoId();
@@ -2266,7 +1913,7 @@ public class PuntoVentaDia implements Serializable {
 			setIva(getDocumento().getIva());
 			setTotal(getDocumento().getTotal());
 			setPesoTotal(getDocumento().getPesoTotal());
-			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
+			documentoDetalleService.borrar(d.getDocumentoDetalleId(), 0l, server);
 			Producto productoEdit = d.getProductoId();
 			Double cantidad = productoEdit.getCantidad() + d.getCantidad1();
 			productoEdit.setCantidad(cantidad);
@@ -2466,7 +2113,7 @@ public class PuntoVentaDia implements Serializable {
 			} else {
 				RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').focus();");
 				RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').select();");
-				RequestContext.getCurrentInstance().update("art_11");
+				RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 			}
 		}
 
@@ -2688,11 +2335,11 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public Double getParcial() {
-		return Parcial;
+		return parcial;
 	}
 
 	public void setParcial(Double parcial) {
-		Parcial = parcial;
+		this.parcial = parcial;
 	}
 
 	public Double getExcento() {
@@ -2720,11 +2367,11 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public Double getTotal() {
-		return Total;
+		return total;
 	}
 
 	public void setTotal(Double total) {
-		Total = total;
+		this.total = total;
 	}
 
 	public String getCartera() {
@@ -2790,7 +2437,6 @@ public class PuntoVentaDia implements Serializable {
 			productosAllCodigo = new HashMap<>();
 			for (Producto p : l) {
 				if (p.getCodigoBarras() != null) {
-					// System.out.println("p:"+p.getCodigoBarras());
 					productosAllCodigo.put(p.getCodigoBarras(), p);
 				}
 			}
@@ -2912,7 +2558,7 @@ public class PuntoVentaDia implements Serializable {
 		this.fechaCreacion = fechaCreacion;
 	}
 
-	public List<Documento> getListaDocumento() throws ParseException {
+	public List<Documento> getListaDocumento()  {
 		if (listaDocumento == null) {
 			List<Long> tipoDocumentoId = new ArrayList<>();
 			tipoDocumentoId.add(10l); // tipo documento factura de salida
@@ -2925,7 +2571,6 @@ public class PuntoVentaDia implements Serializable {
 			Long server = configuracion.getServer();
 			listaDocumento = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, 1l);
 			if (server == 2l) {
-				// System.out.println("server: "+2);
 				listaDocumento.addAll(documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, server));
 			}
 
@@ -3015,12 +2660,12 @@ public class PuntoVentaDia implements Serializable {
 		this.fijoClienteNew = fijoClienteNew;
 	}
 
-	public Date getCumpleañosClienteNew() {
-		return cumpleañosClienteNew;
+	public Date getCumpleanosClienteNew() {
+		return cumpleanosClienteNew;
 	}
 
-	public void setCumpleañosClienteNew(Date cumpleañosClienteNew) {
-		this.cumpleañosClienteNew = cumpleañosClienteNew;
+	public void setCumpleanosClienteNew(Date cumpleanosClienteNew) {
+		this.cumpleanosClienteNew = cumpleanosClienteNew;
 	}
 
 	public String getCreditoActivoClienteNew() {
@@ -3080,11 +2725,11 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public Double getPesoTotal() {
-		return PesoTotal;
+		return pesoTotal;
 	}
 
 	public void setPesoTotal(Double pesoTotal) {
-		PesoTotal = pesoTotal;
+		this.pesoTotal = pesoTotal;
 	}
 
 	public String getDescuentosActivo() {
