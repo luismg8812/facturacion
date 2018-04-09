@@ -246,7 +246,7 @@ items {
 									 update="growl, dataList,codig" >					
 				   		  <p:hotkey bind="f" partialSubmit="true" onstart="PF('movimiento_mes').hide();limpiarRuta;" />
 				    </p:commandButton> 
-					<p:commandButton value="Ant" id="Ant_movi_mes" update="growl, dataList,codig" actionListener="#{movimientoMes.anteriorFactura()}"/> 
+					<p:commandButton value="Ant" id="Ant_movi_mes" update="growl, dataList,codig,retefuentelFact,totalFact" actionListener="#{movimientoMes.anteriorFactura()}"/> 
 					<p:commandButton value="Pri" id="Pri_movi_mes" />
 					<p:commandButton value="Ult" id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
 									 actionListener="#{movimientoMes.buscarUltimaFactura()}" update="growl"/> 
@@ -331,10 +331,10 @@ items {
 						
 						<p:inputNumber value="#{prod1.costoUnitario}"
 									rendered="#{movimientoMes.cambioPrecio}" symbol="$"
-									decimalPlaces="0" id="precioVariable" minValue="0"
-									onfocus="PF('cambioPrecio').show();">
+									decimalPlaces="0" id="precioVariable1" minValue="0"
+									onfocus="PF('cambioPrecioMM').show();">
 									<p:ajax event="focus"
-										listener="#{puntoVentaDia.recalcularPrecio(prod1)}"></p:ajax>
+										listener="#{movimientoMes.recalcularPrecio(prod1)}"></p:ajax>
 								</p:inputNumber>
 						
 						</td>
@@ -463,11 +463,23 @@ items {
 					<td><p:inputNumber value="#{movimientoMes.iva}" disabled="true" id="ivaFact" /></td>
 				</tr>
 				<tr>
+					<td><p:outputLabel value="Retefuente" /></td>
+					<td><p:inputNumber value="#{movimientoMes.retefuente}" id="retefuentelFact" disabled="true"/></td>
+				</tr>
+				<tr>
 					<td><p:outputLabel value="Total" /></td>
 					<td><p:inputNumber value="#{movimientoMes.total}" id="totalFact" disabled="true"/></td>
 				</tr>
+				
 			</table>
 		</p:layoutUnit>
 	</p:layout>
+	<p:dialog widgetVar="cambioPrecioMM" id="cambiopreMM"  
+		style="font-size: 16px" header="Cambio de precio">
+		<div style="width: 300px; ">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/movimientoMes/cambioPrecio.xhtml" />
+		</div>
+	</p:dialog>
 	<h:outputScript library="js/movimientoMes" name="movimientoMes.js" />
 </ui:composition>

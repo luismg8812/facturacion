@@ -470,6 +470,11 @@ public class Impresion {
 								+ Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 13),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
+		documento
+		.add(new Paragraph(new Phrase(lineSpacing,
+				"Retefuente:         "
+						+ Calculos.cortarCantidades(formatea.format(documentoImp.getRetefuente()), 13),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //retefuente
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				(e.getImpuesto().equals("IVA") ? "IVA" : "IPO") + ":                   "
 						+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13),

@@ -81,6 +81,7 @@ public class Abonos implements Serializable {
 	private List<Documento> documentos;
 	private List<Abono> abonosByDocumento;
 	private List<TipoPago> TipoPagos;
+	private Double interes;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -93,6 +94,12 @@ public class Abonos implements Serializable {
 		if (getCantidadTotal() == null) {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage("La cantidad de avance es obligatoria"));
+			return;
+		}
+		
+		if(getInteres()!=null && getInteres()<0 || getInteres()>100){
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("El interes debe estar entre 0 y 100"));
 			return;
 		}
 		Proveedor pro = null;
@@ -109,33 +116,59 @@ public class Abonos implements Serializable {
 			return;
 		}
 
-		pro = proveedorService.getById(getProveedorId());
-		if (getProveedorId() != null && pro.getCreditoActivo() == null || pro.getCreditoActivo() != 1l) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("El proveedor NO esta activo para creditos "));
-			return;
+		if(getProveedorId()!=null){
+			pro = proveedorService.getById(getProveedorId());
+			if ( pro.getCreditoActivo() == null || pro.getCreditoActivo() != 1l) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("El proveedor NO esta activo para creditos "));
+				return;
+			}
+			if (getProveedorId() != null) {
+				List<Long> tipos = new ArrayList<>();
+				tipos.add(5l);
+				List<Documento> docum = documentoService.getByClienteAndProveedorAndTipo(null, getProveedorId(),tipos );
+				Double tope = 0.0;
+				for(Documento d: docum){
+					tope+=d.getTotal();
+				}
+				if((tope+getCantidadTotal()) > pro.getCupoCredito()){
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage("El proveedor solo tiene un cupo maximo de " + pro.getCupoCredito()));
+					return;
+				}
+				
+			}
+			docu.setProveedorId(pro);
+			
 		}
-		if (getProveedorId() != null && getCantidadTotal() > pro.getCupoCredito()) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("El proveedor solo tiene un cupo maximo de " + pro.getCupoCredito()));
-			return;
+		
+		if(getClienteId()!=null){
+			cli = clienteService.getById(getClienteId());
+			if (getClienteId() == null || cli.getCreditoActivo() == null || cli.getCreditoActivo() != 1l) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("El cliente NO esta activo para creditos "));
+				return;
+			}
+			if ( getClienteId()!=null) {
+				
+				List<Long> tipos = new ArrayList<>();
+				tipos.add(5l);
+				List<Documento> docum = documentoService.getByClienteAndProveedorAndTipo(null, getClienteId(),tipos );
+				Double tope = 0.0;
+				for(Documento d: docum){
+					tope+=d.getTotal();
+				}
+				if((tope+getCantidadTotal()) > cli.getCupoCredito()){
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage("El Cliente solo tiene un cupo maximo de " + cli.getCupoCredito()));
+					return;
+				}
+			}
+			docu.setClienteId(cli);	
+		
 		}
 
-		cli = clienteService.getById(getClienteId());
-		if (getClienteId() != null && cli.getCreditoActivo() == null || cli.getCreditoActivo() != 1l) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("El cliente NO esta activo para creditos "));
-			return;
-		}else{
-			docu.setClienteId(cli);	
-		}
-		if (getClienteId() != null && getCantidadTotal() > cli.getCupoCredito()) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage("El Cliente solo tiene un cupo maximo de " + cli.getCupoCredito()));
-			return;
-		}else{
-			docu.setProveedorId(pro);
-		}
+		
 
 		
 		TipoDocumento tido = new TipoDocumento();
@@ -143,12 +176,17 @@ public class Abonos implements Serializable {
 		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 		Long server = configuracion.getServer();
 		docu.setFechaRegistro(new Date());
-		docu.setSaldo(getCantidadTotal());
+		
 		tido.setTipoDocumentoId(5l); // se le envia tipo documento avance
 										// efectivo
 		docu.setTipoDocumentoId(tido);
-		docu.setTotal(getCantidadTotal());
+		Double interesG = (getInteres()!=null?(getInteres()/100):getInteres());
+		System.out.println("interesg"+interesG);
+		Double totalG=getCantidadTotal()+(getCantidadTotal()*interesG);
+		docu.setSaldo(totalG);
+		docu.setTotal(totalG);
 		docu.setUsuarioId(usuario);
+		docu.setInteres(getInteres()==null?0.0:getInteres());
 		try {
 			documentoService.save(docu, server);
 		} catch (Exception e) {
@@ -506,5 +544,15 @@ public class Abonos implements Serializable {
 	public void setAvances(List<Documento> avances) {
 		this.avances = avances;
 	}
+
+	public Double getInteres() {
+		return interes;
+	}
+
+	public void setInteres(Double interes) {
+		this.interes = interes;
+	}
+	
+	
 
 }

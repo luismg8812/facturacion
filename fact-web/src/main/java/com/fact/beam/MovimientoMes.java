@@ -20,6 +20,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.print.PrintException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.poi.hssf.record.chart.SeriesToChartGroupRecord;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -151,11 +152,17 @@ public class MovimientoMes implements Serializable {
 	Proveedor proveedorNew;
 	Long codigoBarrasNew;
 	Double pesoKgNew;
+	Double pesoEmpaqueKgNew;
 	String unidadNew;
 	String valanzaNew;
 	String variosNew;
 	String subProductoNew;
 	//
+	
+	// cambio de precio
+	String cambioTemp;// variable para almacednar el cambio dde precio temporal
+	DocumentoDetalleVo dCambio;// variable que contiene el detalle del producto
+								// que se le cambiara el precio
 
 	private String parciaPopup = "";
 	Conector conector = null;
@@ -167,6 +174,14 @@ public class MovimientoMes implements Serializable {
 	public void setSubProductoNew(String subProductoNew) {
 		this.subProductoNew = subProductoNew;
 	}
+	
+	public String getCambioTemp() {
+		return cambioTemp;
+	}
+
+	public void setCambioTemp(String cambioTemp) {
+		this.cambioTemp = cambioTemp;
+	}
 
 	// variables producto edit producto
 	Producto productoEdict;
@@ -175,10 +190,11 @@ public class MovimientoMes implements Serializable {
 	String editarNew;
 
 	// total
-	Double iva;
-	Double execento;
-	Double total;
-	Double gravado;
+	private Double iva;
+	private Double execento;
+	private Double total;
+	private Double gravado;
+	private Double retefuente;
 
 	// modificar factura
 	String modFactura;
@@ -352,10 +368,14 @@ public class MovimientoMes implements Serializable {
 			if (Calculos.validarPromo(productoSelect, canti)) {
 				costoP = productoSelect.getPubPromo();
 			} else {
-				costoP = productoSelect.getCostoPublico();
+				costoP = productoSelect.getCosto();
 			}
 			setCantidad(canti);
+			log.info("costo publico:"+costoP);
 			setParcial(canti * costoP);
+			RequestContext.getCurrentInstance().update("cantidadMM:nombrePro");
+			RequestContext.getCurrentInstance().update("cantidadMM:valorParcial");
+			RequestContext.getCurrentInstance().update("cantidadMM:cantidadPar");
 		} catch (Exception e) {
 			setCantidad(0.0);
 			e.printStackTrace();
@@ -427,7 +447,19 @@ public class MovimientoMes implements Serializable {
 		documentoService.save(docOjb, server);
 		setDocumento(docOjb);
 		setTipoDocumentoEntrada(td.getNombre());
+		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
+		setTotal(null);
+		setIva(null);
+		setRetefuente(null);
+		setGravado(null);
+		setExecento(null);
 		limpiar();
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");		
 		return "";
 	}
 
@@ -441,7 +473,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('detalleEntrada').style.display='inline';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('detalleEntrada').focus();");
-		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
+		
 		setArticulo(null);
 		setCodigoBarras(null);
 		setCantidad(null);
@@ -562,6 +594,8 @@ public class MovimientoMes implements Serializable {
 		docDetalleVo.setCantidad(getCantidad());
 		docDetalleVo.setProductoId(productoSelect);
 		docDetalleVo.setDocumentoId(getDocumento());
+		docDetalleVo.setUnitario(productoSelect.getCosto());
+		docDetalleVo.setDocumentoDetalleId(docDetalle.getDocumentoDetalleId());
 		docDetalleVo.setFechaRegistro(fecha);
 		if (getCantidad() != null && productoSelect.getCosto() != null) {
 			docDetalleVo.setParcial(getCantidad() * productoSelect.getCosto());
@@ -581,6 +615,7 @@ public class MovimientoMes implements Serializable {
 		setIva(getDocumento().getIva());
 		setExecento(getDocumento().getExcento());
 		setGravado(getDocumento().getGravado());
+		setRetefuente(getDocumento().getRetefuente());
 		documentoService.update(getDocumento(), server);
 		RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA); // campos//
 																		// del
@@ -597,6 +632,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("execentoFact");
 		RequestContext.getCurrentInstance().update("ivaFact");
 		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
 		RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);
 		RequestContext.getCurrentInstance().update("codBarras_input");
 		RequestContext.getCurrentInstance().update("busquedaCodBarras");
@@ -709,6 +745,7 @@ public class MovimientoMes implements Serializable {
 			prodNew.setStockMin(-1000000l);
 		}
 		prodNew.setPeso(getPesoKgNew());
+		prodNew.setPesoEmpaque(getPesoEmpaqueKgNew()==null?0.0:getPesoEmpaqueKgNew());
 		prodNew.setEstado(1l);
 		prodNew.setCantidad(0.0);
 		productoService.save(prodNew, 1l);
@@ -736,6 +773,73 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().execute("document.getElementById('deseaGuardar').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProducto').style.display='none';");
 	}
+	
+	public void recalcularPrecio(DocumentoDetalleVo d) {
+		System.out.println("aqui va");
+		dCambio = d;
+	}
+	
+	public String recalcularPrecio(AjaxBehaviorEvent event) {
+		System.out.println("cambio de precio MM:" + getCambioTemp());
+		if(getCambioTemp()==null || (getCambioTemp().indexOf(' ') == -1) ){
+			return "";
+		}
+		
+		Double cambioTemp1;
+		try {
+		   cambioTemp1 = Double.valueOf(getCambioTemp());
+		} catch (Exception e) {
+			return "";
+		}
+		System.out.println("paso:" + getCambioTemp());
+		//se comenta el pedaso de codigo que hace que se pueda bajar el precio		
+		int pos = getProductos().indexOf(dCambio);
+		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
+		
+		if ( dCambio.getUnitario() > cambioTemp1) {
+			descuentoTemp += (dCambio.getUnitario() - cambioTemp1);
+		}
+		getDocumento().setDescuento(descuentoTemp);
+		Double cantidadtemp = dCambio.getCantidad();
+		dCambio.setUnitario(cambioTemp1);
+		dCambio.setParcial(cantidadtemp * cambioTemp1);
+		getProductos().set(pos, dCambio);
+
+		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
+		Long server = configuracion().getServer();
+		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId());
+		d.setParcial(cantidadtemp * cambioTemp1);
+		if (tipo == 9l && server == 2) {
+
+			documentoService.update(getDocumento(), server);
+			documentoDetalleService.update(d, server);
+		} else {
+			documentoService.update(getDocumento(), 1l);
+			documentoDetalleService.update(d, 1l);
+		}
+		setTotal(getDocumento().getTotal());
+		setIva(getDocumento().getIva());
+		//setExcento(getDocumento().getExcento());
+		setGravado(getDocumento().getGravado());
+		setRetefuente(getDocumento().getRetefuente());
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').value='';");
+		RequestContext.getCurrentInstance().execute("PF('cambioPrecioMM').hide();");
+		RequestContext.getCurrentInstance().update("dataList");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().update("art_1");
+		setCambioTemp(null);
+		RequestContext.getCurrentInstance().update("cambioPrecioFormMM:cambioPrecioIn");		
+		return "";
+	}
+	
 
 	public String editarNewProducto(AjaxBehaviorEvent event) {
 		String crearN = getEditarNew().toUpperCase();
@@ -753,6 +857,8 @@ public class MovimientoMes implements Serializable {
 			return "";
 		}
 
+
+		
 		// se existe un cambio de precio se registra el evento
 		if (getPublicoNew() != null && getPublicoNew().equals(getProductoEdict().getCostoPublico())) {
 			Evento evento = new Evento();
@@ -984,6 +1090,7 @@ public class MovimientoMes implements Serializable {
 			setTotal(ultimoFactura.getTotal());
 			setExecento(ultimoFactura.getExcento());
 			setIva(ultimoFactura.getIva());
+			setRetefuente(ultimoFactura.getRetefuente());
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('dataList_content').style.display='inline';");
 			RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
@@ -997,6 +1104,7 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().update("totalFact");
 			RequestContext.getCurrentInstance().update("gravadoFact");
 			RequestContext.getCurrentInstance().update("unidad_");
+			RequestContext.getCurrentInstance().update("retefuentelFact");
 			// falta poner el focus en codigo de barras
 			// actualizar los campos y ocultar los que no se ven y mostrar los
 			// que se ven
@@ -1127,7 +1235,20 @@ public class MovimientoMes implements Serializable {
 			log.info("imprimir");
 			try {
 				imprimirFactura();	
+				RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
+				setTotal(null);
+				setIva(null);
+				setRetefuente(null);
+				setGravado(null);
+				setExecento(null);
 				limpiar();
+				RequestContext.getCurrentInstance().update("execentoFact");
+				RequestContext.getCurrentInstance().update("gravado");
+				RequestContext.getCurrentInstance().update("ivaFact");
+				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
+				
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Impresión Completa"));
 			} catch (IOException e) {
 				log.error("Probable error en impresion con la imagen de la factura: " + e.getMessage());
@@ -1171,6 +1292,7 @@ public class MovimientoMes implements Serializable {
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
@@ -1185,6 +1307,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
 				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("unidad_");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1210,6 +1333,7 @@ public class MovimientoMes implements Serializable {
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
 				setProductos(ddVo);
 				setTotal(getDocumentoActual().getTotal());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
 				RequestContext.getCurrentInstance()
@@ -1225,6 +1349,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
 				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("unidad_");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1258,6 +1383,7 @@ public class MovimientoMes implements Serializable {
 				setProductos(ddVo);
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setIva(getDocumentoActual().getIva());
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
@@ -1272,6 +1398,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
 				RequestContext.getCurrentInstance().update("gravadoFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("unidad_");
 			} else {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay facturas Disponibles"));
@@ -1297,6 +1424,7 @@ public class MovimientoMes implements Serializable {
 				setProductos(ddVo);
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
 				setTotal(getDocumentoActual().getTotal());
+				setRetefuente(getDocumentoActual().getRetefuente());
 				setExecento(getDocumentoActual().getExcento());
 				setIva(getDocumentoActual().getIva());
 				RequestContext.getCurrentInstance()
@@ -1311,6 +1439,7 @@ public class MovimientoMes implements Serializable {
 				RequestContext.getCurrentInstance().update("gravado");
 				RequestContext.getCurrentInstance().update("ivaFact");
 				RequestContext.getCurrentInstance().update("totalFact");
+				RequestContext.getCurrentInstance().update("retefuentelFact");
 				RequestContext.getCurrentInstance().update("gravadoFact");
 				RequestContext.getCurrentInstance().update("unidad_1");
 			} else {
@@ -1339,6 +1468,7 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("ivaFact");
 		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
 		RequestContext.getCurrentInstance().update("gravadoFact");
 		return "";
 	}
@@ -1609,6 +1739,14 @@ public class MovimientoMes implements Serializable {
 	public void setPesoKgNew(Double pesoKgNew) {
 		this.pesoKgNew = pesoKgNew;
 	}
+	
+	public Double getPesoEmpaqueKgNew() {
+		return pesoEmpaqueKgNew;
+	}
+
+	public void setPesoEmpaqueKgNew(Double pesoEmpaqueKgNew) {
+		this.pesoEmpaqueKgNew = pesoEmpaqueKgNew;
+	}
 
 	public String getUnidadNew() {
 		return unidadNew;
@@ -1832,6 +1970,14 @@ public class MovimientoMes implements Serializable {
 
 	public void setImpresion(String impresion) {
 		this.impresion = impresion;
+	}
+
+	public Double getRetefuente() {
+		return retefuente;
+	}
+
+	public void setRetefuente(Double retefuente) {
+		this.retefuente = retefuente;
 	}
 
 }

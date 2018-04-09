@@ -33,6 +33,10 @@
 				<td><p:inputNumber value="#{abonos.cantidadTotal}" /></td>
 			</tr>
 			<tr>
+				<td><p:outputLabel value="Interes: " /></td>
+				<td><p:inputNumber value="#{abonos.interes}" /></td>
+			</tr>
+			<tr>
 				<td><p:commandButton value="Buscar" id="buscar" process="@form" actionListener="#{abonos.buscarAvancesEfectivo()}"
 						update="growl1,crearDocument,avances"
 						/></td>
@@ -70,7 +74,13 @@
 			<p:column headerText="Proveedor">
 				<h:outputText value="#{car.proveedorId.nombre}" />
 			</p:column>
-
+	
+			<p:column headerText="Interes">
+				<h:outputText value="#{car.interes}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="%" />
+				</h:outputText>
+			</p:column>
+			
 			<p:column headerText="Total">
 				<h:outputText value="#{car.total}" >
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />

@@ -124,6 +124,9 @@ public class Documento {
 	
 	@Column(name="RETEFUENTE")
 	private Double retefuente;
+	
+	@Column(name="INTERES")
+	private Double interes;
 
 	public Long getDocumentoId() {
 		return documentoId;
@@ -171,6 +174,16 @@ public class Documento {
 
 	public void setFechaActualiza(Date fechaActualiza) {
 		this.fechaActualiza = fechaActualiza;
+	}
+
+	
+	
+	public Double getInteres() {
+		return interes;
+	}
+
+	public void setInteres(Double interes) {
+		this.interes = interes;
 	}
 
 	public String getConsecutivoDian() {
