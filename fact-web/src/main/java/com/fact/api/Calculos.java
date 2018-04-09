@@ -12,14 +12,18 @@ import java.util.Date;
 import java.util.List; 
 import java.util.Map;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+
+import org.primefaces.context.RequestContext;
 
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.Producto;
+import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
 
 public class Calculos {
@@ -320,4 +324,119 @@ public class Calculos {
 //		documento.close();
 //		return img;
 //	}
+	
+	/**
+	 * Metodo que determina el tipo de gramera configurada y trae el valor de la
+	 * pesa
+	 * 
+	 * @param event
+	 * @return
+	 * @throws IOException
+	 */
+	public static Double determinarBalanza(Conector conector, String gramera) {
+
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
+				.getRequest();
+
+		String[] numerosComoArray;
+		String invertido = "";
+		String respuesta = "";
+		String cant = "";
+		Double canti = 0.0;
+		respuesta = conector.inicio(request.getRemoteAddr(), gramera);
+		switch (gramera) {
+		case "1":
+			numerosComoArray = respuesta.split("=");
+			cant = numerosComoArray[1];
+			cant = cant.replace("=", "");
+			cant = cant.replace(" ", "");
+			for (int x = cant.length() - 1; x >= 0; x--)
+				invertido += cant.charAt(x);
+			canti = Double.parseDouble(invertido);
+			break;
+		case "2":
+			do {
+				respuesta = respuesta == null ? "" : respuesta;
+				respuesta = respuesta.trim();
+				respuesta = respuesta.replace(".", "");
+				numerosComoArray = respuesta.split(",");
+				cant = "";
+				for (int i = 0; i < numerosComoArray.length; i++) {
+					if (numerosComoArray[i].contains("+")) {
+						cant = numerosComoArray[i];
+						break;
+					}
+				}
+				cant = cant.replace("=", "");
+				cant = cant.replaceAll(" ", "");
+				cant = cant.replace("+", "");
+				String parte1 = "000";
+				String parte2 = "0000";
+				try {
+					parte1 = cant.substring(cant.length() - 3, cant.length());
+					parte2 = cant.substring(0, cant.length() - 3);
+				} catch (Exception e) {
+
+				}
+				cant = parte2 + "." + parte1;
+			} while (numerosComoArray.length < 2);
+			canti = Double.parseDouble(cant);
+			break;
+		case "3":
+			do {
+				if (respuesta == null || respuesta.equals("")) {
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage("por vafor retire el producto de la gramera y vuelva a ponerlo"));
+					RequestContext.getCurrentInstance().update("growl1");
+				}
+				respuesta = (respuesta == null ? "" : respuesta);
+
+				try {
+					canti = Double.parseDouble(respuesta);
+				} catch (Exception e) {
+
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
+					RequestContext.getCurrentInstance().update("growl1");
+					break;
+				}
+			} while (respuesta.indexOf(".") == -1);
+			break;
+		case "4":
+			respuesta = (respuesta == null ? "" : respuesta);
+			respuesta = respuesta.replaceAll(",", "");
+			canti = 0.0;
+			try {
+				canti = Double.parseDouble(respuesta);
+			} catch (Exception e) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
+				RequestContext.getCurrentInstance().update("growl1");
+				break;
+			}
+			break;
+		case "5":
+			respuesta = (respuesta == null ? "" : respuesta);
+			respuesta = respuesta.replaceAll(",", "");
+			canti = Double.parseDouble(respuesta);
+			break;
+		case "6":
+			//numerosComoArray = respuesta.split("=");
+			cant = respuesta;
+			cant = cant.replace("=", "");
+			cant = cant.replace(" ", "");	
+			System.out.println("cant:"+cant);
+			canti = Double.parseDouble(cant);
+			System.out.println("canti:"+canti);
+			break;
+		default:
+			break;
+		}
+		// este bloq de codigo hay que pasarlo a punto de venta dia.. por logica
+		// propia de la venta
+		// RequestContext.getCurrentInstance()
+		// .execute("document.getElementById('cantidad_in1').value='" +
+		// invertido + "';");
+		return canti;
+	}
 }
