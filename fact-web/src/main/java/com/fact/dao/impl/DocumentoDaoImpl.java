@@ -446,7 +446,36 @@ public class DocumentoDaoImpl implements DocumentoDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Documento> getRemisionesByUsuario(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId,
+	public List<Documento> getRemisionesByUsuario(Long tipoDocumentoId,  Long usuarioId,
+			Boolean conCierre, Long server) {
+		Session session;
+		if (server == 2) {
+			session = HibernateUtil.getSessionFactory2().openSession();
+		} else {
+			session = HibernateUtil.getSessionFactory().openSession();
+		}
+		List<Documento> documentoList = new ArrayList<>();
+		try {
+			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId =:tipoDocumentoId ";
+					if (conCierre) {
+						sql += " and d.cierreDiario is null ";
+					}
+					sql += " and d.usuarioId.usuarioId =:usuarioId order by d.usuarioId.nombre asc";
+			
+			Query query = session.createQuery(sql);
+			query.setParameter("tipoDocumentoId", Long.valueOf(tipoDocumentoId));
+			query.setParameter("usuarioId", usuarioId);
+			documentoList = query.list();
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return documentoList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Documento> getRemisionesByUsuarioConFecha(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId,
 			Boolean conCierre, Long server) {
 		Session session;
 		if (server == 2) {
@@ -457,8 +486,11 @@ public class DocumentoDaoImpl implements DocumentoDao {
 		List<Documento> documentoList = new ArrayList<>();
 		try {
 			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId =:tipoDocumentoId "
-					+ " and (d.fechaRegistro > :hoy) AND (d.fechaRegistro < :hoyFin)  "
-					+ " and d.usuarioId.usuarioId =:usuarioId order by d.usuarioId.nombre asc";
+					+ " and (d.fechaRegistro > :hoy) AND (d.fechaRegistro < :hoyFin)  ";
+					if (conCierre) {
+						sql += " and d.cierreDiario is null ";
+					}
+					sql += " and d.usuarioId.usuarioId =:usuarioId order by d.usuarioId.nombre asc";
 			Query query = session.createQuery(sql);
 			query.setParameter("tipoDocumentoId", Long.valueOf(tipoDocumentoId));
 			query.setParameter("hoy", hoy);
@@ -499,7 +531,38 @@ public class DocumentoDaoImpl implements DocumentoDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId,
+	public List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Long usuarioId,
+			Boolean conCierre, Long server) {
+		Session session;
+		if (server == 2l) {
+			session = HibernateUtil.getSessionFactory2().openSession();
+		} else {
+			session = HibernateUtil.getSessionFactory().openSession();
+		}
+
+		List<Documento> documentoList = new ArrayList<>();
+		
+			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId  in :tipoDocumentoId ";
+					
+			if (conCierre) {
+				sql += " and d.cierreDiario is null ";
+			}
+			sql += " and d.impreso = 1";
+			sql += " and d.consecutivoDian is not null ";
+			sql += " and d.usuarioId.usuarioId =:usuarioId order by d.consecutivoDian asc";
+			Query query = session.createQuery(sql);
+			query.setParameterList("tipoDocumentoId", tipoDocumentoId);		
+			query.setParameter("usuarioId", usuarioId);
+			documentoList = query.list();
+			session.close();
+		
+		return documentoList;
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Documento> getByfacturasRealesConFecha(List<Long> tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId,
 			Boolean conCierre, Long server) {
 
 		Session session;

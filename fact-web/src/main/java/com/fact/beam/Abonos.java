@@ -36,9 +36,8 @@ public class Abonos implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7074628949042545489L;
 
-	
 	@EJB
 	private ProveedorService proveedorService;
 	@EJB
@@ -47,14 +46,14 @@ public class Abonos implements Serializable {
 	private AbonoService abonoService;
 	@EJB
 	private TipoPagoService tipoPagoService;
-	
+
 	@EJB
 	private ClienteService clienteService;
-	
+
 	@EJB
 	private UsuarioService usuarioService;
-	
-	//proveedores
+
+	// proveedores
 	private Long proveedorId;
 	private Long tipoFacturas;
 	private Long tipoPago;
@@ -68,193 +67,301 @@ public class Abonos implements Serializable {
 	private String detalleNew;
 	private Double total;
 	private Double saldoTotal;
-	
-	//clientes
+
+	// clientes
 	private Long clienteId;
 	private List<Documento> documentosCliente;
 	private List<Cliente> clientes;
 	private Documento documentoSelect;
-	
-	
+
+	// avance efectivo
+	private List<Documento> avances;
+
 	private List<Proveedor> proveedores;
 	private List<Documento> documentos;
 	private List<Abono> abonosByDocumento;
 	private List<TipoPago> TipoPagos;
-	
+	private Double interes;
+
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
-	
-	public void crearAvance(){
+
+	private Usuario usuario() {
+		return (Usuario) sessionMap.get("userLogin");
+	}
+
+	public void crearAvance() {
+		if (getCantidadTotal() == null) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("La cantidad de avance es obligatoria"));
+			return;
+		}
+		
+		if(getInteres()!=null && getInteres()<0 || getInteres()>100){
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("El interes debe estar entre 0 y 100"));
+			return;
+		}
+		Proveedor pro = null;
+		Cliente cli = null;
 		Documento docu = new Documento();
-		Cliente cli= new Cliente();
-		TipoDocumento tido= new TipoDocumento();
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		if (getProveedorId() == null && getClienteId() == null) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Debe seleccionar un proveedor o un cliente"));
+			return;
+		}
+		if (getProveedorId() != null && getClienteId() != null) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Solo puede seleccionar o un cliente o un proveedor"));
+			return;
+		}
+
+		if(getProveedorId()!=null){
+			pro = proveedorService.getById(getProveedorId());
+			if ( pro.getCreditoActivo() == null || pro.getCreditoActivo() != 1l) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("El proveedor NO esta activo para creditos "));
+				return;
+			}
+			if (getProveedorId() != null) {
+				List<Long> tipos = new ArrayList<>();
+				tipos.add(5l);
+				List<Documento> docum = documentoService.getByClienteAndProveedorAndTipo(null, getProveedorId(),tipos );
+				Double tope = 0.0;
+				for(Documento d: docum){
+					tope+=d.getTotal();
+				}
+				if((tope+getCantidadTotal()) > pro.getCupoCredito()){
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage("El proveedor solo tiene un cupo maximo de " + pro.getCupoCredito()));
+					return;
+				}
+				
+			}
+			docu.setProveedorId(pro);
+			
+		}
+		
+		if(getClienteId()!=null){
+			cli = clienteService.getById(getClienteId());
+			if (getClienteId() == null || cli.getCreditoActivo() == null || cli.getCreditoActivo() != 1l) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("El cliente NO esta activo para creditos "));
+				return;
+			}
+			if ( getClienteId()!=null) {
+				
+				List<Long> tipos = new ArrayList<>();
+				tipos.add(5l);
+				List<Documento> docum = documentoService.getByClienteAndProveedorAndTipo(null, getClienteId(),tipos );
+				Double tope = 0.0;
+				for(Documento d: docum){
+					tope+=d.getTotal();
+				}
+				if((tope+getCantidadTotal()) > cli.getCupoCredito()){
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage("El Cliente solo tiene un cupo maximo de " + cli.getCupoCredito()));
+					return;
+				}
+			}
+			docu.setClienteId(cli);	
+		
+		}
+
+		
+
+		
+		TipoDocumento tido = new TipoDocumento();
+		Usuario usuario = usuario();
 		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
-		Long server=configuracion.getServer();
+		Long server = configuracion.getServer();
 		docu.setFechaRegistro(new Date());
-		cli.setClienteId(getClienteId());
-		docu.setClienteId(cli);
-		docu.setSaldo(getCantidadTotal());
-		tido.setTipoDocumentoId(5l); //se le envia tipo documento avance efectivo
+		
+		tido.setTipoDocumentoId(5l); // se le envia tipo documento avance
+										// efectivo
 		docu.setTipoDocumentoId(tido);
-		docu.setTotal(getCantidadTotal());
+		Double interesG = (getInteres()!=null?(getInteres()/100):getInteres());
+		System.out.println("interesg"+interesG);
+		Double totalG=getCantidadTotal()+(getCantidadTotal()*interesG);
+		docu.setSaldo(totalG);
+		docu.setTotal(totalG);
 		docu.setUsuarioId(usuario);
+		docu.setInteres(getInteres()==null?0.0:getInteres());
 		try {
-			documentoService.save(docu,server);
+			documentoService.save(docu, server);
 		} catch (Exception e) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error Creando Avance efectivo, por favor consulte a su proveedor del programa"));
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Error Creando Avance efectivo, por favor consulte a su proveedor del programa"));
 			System.out.println("Server two desactivate: ");
-		}		
-		System.out.println("se crea el adelanto efectivo: "+ docu.getDocumentoId());
-		RequestContext.getCurrentInstance().execute("PF('avance_efectivo').hide();");
+		}
+		System.out.println("se crea el adelanto efectivo: " + docu.getDocumentoId());
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Avance efectivo Creado exitosamente"));
 	}
-	
-	public void crearVale(){
+
+	public void eliminarAvanceEfectivo(Documento docu) {
+		getAvances().remove(docu);
+		documentoService.delete(docu);
+		RequestContext.getCurrentInstance().update("avances");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Avance efectivo Eliminado exitosamente"));
+		RequestContext.getCurrentInstance().update("growl1");
+	}
+
+	public void buscarAvancesEfectivo() {
+		List<Long> tipoId = new ArrayList<>();
+		tipoId.add(5l);// se agrega tipo documento avance efectivo
+		setAvances(documentoService.getByClienteAndProveedorAndTipo(getClienteId(), getProveedorId(), tipoId));
+	}
+
+	public void crearVale() {
 		Documento docu = new Documento();
-		Cliente cli= new Cliente();
-		TipoDocumento tido= new TipoDocumento();
+		Cliente cli = new Cliente();
+		TipoDocumento tido = new TipoDocumento();
 		TipoPago pago = new TipoPago();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		long server =1;
+		long server = 1;
 		docu.setFechaRegistro(new Date());
 		cli.setClienteId(getClienteId());
 		docu.setClienteId(cli);
 		docu.setSaldo(getCantidadTotal());
-		tido.setTipoDocumentoId(8l); //se le envia tipo documento vale (Vale) // por que zohan dijo
+		tido.setTipoDocumentoId(8l); // se le envia tipo documento vale (Vale)
+										// // por que zohan dijo
 		docu.setTipoDocumentoId(tido);
-		pago.setTipoPagoId(6l); // se envia tipo pago con vale, debido a que el vale es un documento a credito
+		pago.setTipoPagoId(6l); // se envia tipo pago con vale, debido a que el
+								// vale es un documento a credito
 		docu.setTipoPagoId(pago);
 		docu.setTotal(getCantidadTotal());
 		docu.setUsuarioId(usuario);
 		docu.setDetalleEntrada(getDetalleNew());
-		documentoService.save(docu,server);
-		 System.out.println("se crea el vale por abonos Cliente:"+ docu.getDocumentoId());
-		   // RequestContext.getCurrentInstance().execute("PF('crearVale').hide();");
-		    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
+		documentoService.save(docu, server);
+		System.out.println("se crea el vale por abonos Cliente:" + docu.getDocumentoId());
+		RequestContext.getCurrentInstance().execute("PF('crearVale').hide();");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
 	}
-	
-	public void crearDocumento(){
+
+	public void crearDocumento() {
 		Documento docu = new Documento();
-		Proveedor pro= new Proveedor();
-		TipoDocumento tido= new TipoDocumento();
+		Proveedor pro = new Proveedor();
+		TipoDocumento tido = new TipoDocumento();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		long server =1;
+		long server = 1;
 		docu.setFechaRegistro(new Date());
 		pro.setProveedorId(getProveedorId());
 		docu.setProveedorId(pro);
 		docu.setSaldo(getCantidadTotal());
-		tido.setTipoDocumentoId(2l); //se le envia tipo documento entrada de almacen
+		tido.setTipoDocumentoId(2l); // se le envia tipo documento entrada de
+										// almacen
 		docu.setTipoDocumentoId(tido);
 		docu.setTotal(getCantidadTotal());
 		docu.setUsuarioId(usuario);
 		docu.setDetalleEntrada(getDetalleNew());
-		documentoService.save(docu,server);
-		 System.out.println("se crea el documento por abonos:"+ docu.getDocumentoId());
-		    RequestContext.getCurrentInstance().execute("PF('crearDocumento').hide();");
-		    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Documento Creado exitosamente"));
+		documentoService.save(docu, server);
+		System.out.println("se crea el documento por abonos:" + docu.getDocumentoId());
+		RequestContext.getCurrentInstance().execute("PF('crearDocumento').hide();");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Documento Creado exitosamente"));
 	}
-	
-	public void crearAbono(){
-	    getAbonoNew().setCantidadAbono(getCantidadNew());
-	    TipoPago tipa = new TipoPago();
-	    tipa.setTipoPagoId(getTipoPago());
-	    Usuario usuario = (Usuario) sessionMap.get("userLogin");
-	    long server =1;
-	    getAbonoNew().setUsuarioId(usuario);
-	    getAbonoNew().setTipoPagoId(tipa);
-	    abonoService.save(getAbonoNew());
-	    Documento docu = getAbonoNew().getDocumentoId();
-	    Double saldoNew= docu.getSaldo()==null?0.0:docu.getSaldo();
-	    docu.setSaldo(saldoNew-getCantidadNew());
-	    documentoService.update(docu,server);
-	    System.out.println("se crea el abono:"+ getAbonoNew().getAbonoId());
-	    //RequestContext.getCurrentInstance().execute("PF('crearAbono').hide();");
-	    //RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').hide();");
-	    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Abono Creado exitosamente"));
-	    setAbonoNew(null);
+
+	public void crearAbono() {
+		getAbonoNew().setCantidadAbono(getCantidadNew());
+		TipoPago tipa = new TipoPago();
+		tipa.setTipoPagoId(getTipoPago());
+		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		long server = 1;
+		getAbonoNew().setUsuarioId(usuario);
+		getAbonoNew().setTipoPagoId(tipa);
+		abonoService.save(getAbonoNew());
+		Documento docu = getAbonoNew().getDocumentoId();
+		Double saldoNew = docu.getSaldo() == null ? 0.0 : docu.getSaldo();
+		docu.setSaldo(saldoNew - getCantidadNew());
+		documentoService.update(docu, server);
+		System.out.println("se crea el abono:" + getAbonoNew().getAbonoId());
+		RequestContext.getCurrentInstance().execute("PF('crearAbono').hide();");
+		RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').hide();");
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Abono Creado exitosamente"));
+		setAbonoNew(null);
 	}
-	public void consultarAbonos(Documento docu){
-		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()) );
+
+	public void consultarAbonos(Documento docu) {
+		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()));
 		RequestContext.getCurrentInstance().execute("PF('consultarAbono').show();");
-		
+
 	}
-	
-	public void consultarAbonosCliente(Documento docu){
+
+	public void consultarAbonosCliente(Documento docu) {
 		setDocumentoSelect(docu);
-		System.out.println("documento id"+docu.getDocumentoId());
-		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()) );
+		System.out.println("documento id" + docu.getDocumentoId());
+		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()));
 		RequestContext.getCurrentInstance().execute("PF('consultarAbonoCliente').show();");
 		RequestContext.getCurrentInstance().update("consultarAbono");
 	}
-	
-	public void abrirPopupAbono(Documento docu){
-		System.out.println("entra a popup crear abono:"+docu.getDocumentoId());
+
+	public void abrirPopupAbono(Documento docu) {
+		System.out.println("entra a popup crear abono:" + docu.getDocumentoId());
 		getAbonoNew().setDocumentoId(docu);
 		getAbonoNew().setFechaRegistro(new Date());
 		setCantidadNew(null);
 		RequestContext.getCurrentInstance().execute("PF('crearAbono').show();");
 		RequestContext.getCurrentInstance().update("@form");
 	}
-	
-	public void abrirPopupAbonoCliente(Documento docu){
-		System.out.println("entra a popup crear abono:"+docu.getDocumentoId());
+
+	public void abrirPopupAbonoCliente(Documento docu) {
+		System.out.println("entra a popup crear abono:" + docu.getDocumentoId());
 		getAbonoNew().setDocumentoId(docu);
 		getAbonoNew().setFechaRegistro(new Date());
 		setCantidadNew(null);
-		//RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').show();");
+		RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').show();");
 		RequestContext.getCurrentInstance().update("@form");
 	}
-	
-	public void borrarVale(Documento docu){
-		System.out.println("entra a borrar vale:"+docu.getDocumentoId());
-		if(docu.getTipoDocumentoId().getTipoDocumentoId()==8l){
+
+	public void borrarVale(Documento docu) {
+		System.out.println("entra a borrar vale:" + docu.getDocumentoId());
+		if (docu.getTipoDocumentoId().getTipoDocumentoId() == 8l) {
 			documentoService.delete(docu);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale borrado exitosamente"));
-		}else{
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El documento que intenta borrar no es un Vale"));
+		} else {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("El documento que intenta borrar no es un Vale"));
 		}
-		
-		 
+
 		RequestContext.getCurrentInstance().update("@form");
 	}
-	
-	public String abonoByDocumento(Documento docu){
-		if(docu!=null){
+
+	public String abonoByDocumento(Documento docu) {
+		if (docu != null) {
 			List<Abono> aList = new ArrayList<>();
-			aList= abonoService.getByDocumento(docu.getDocumentoId());
-			if(aList==null || aList.isEmpty()){
+			aList = abonoService.getByDocumento(docu.getDocumentoId());
+			if (aList == null || aList.isEmpty()) {
 				return "0";
-			}else{
-				return ""+aList.size();
-			}		
-		}else{
-			return  "0";
+			} else {
+				return "" + aList.size();
+			}
+		} else {
+			return "0";
 		}
-		
+
 	}
-	
-	public String buscar(){	
-		setDocumentos(documentoService.buscarPorAbonos(getProveedorId(),getTipoFacturas(),getFechaInicio(),getFechafin(),getDetalle()));
-		Double totalTemp=0.0;
-		Double saldoTotalTemp=0.0;
-		for(Documento d: getDocumentos()){
-			totalTemp=totalTemp+(d.getTotal()==null?0.0:d.getTotal());
-			saldoTotalTemp=saldoTotalTemp+(d.getSaldo()==null?0.0:d.getSaldo());
+
+	public String buscar() {
+		setDocumentos(documentoService.buscarPorAbonos(getProveedorId(), getTipoFacturas(), getFechaInicio(),
+				getFechafin(), getDetalle()));
+		Double totalTemp = 0.0;
+		Double saldoTotalTemp = 0.0;
+		for (Documento d : getDocumentos()) {
+			totalTemp = totalTemp + (d.getTotal() == null ? 0.0 : d.getTotal());
+			saldoTotalTemp = saldoTotalTemp + (d.getSaldo() == null ? 0.0 : d.getSaldo());
 		}
 		setSaldoTotal(saldoTotalTemp);
 		setTotal(totalTemp);
 		return "";
 	}
-	
-	public String buscarAbonosCliente(){	
-		setDocumentosCliente(documentoService.buscarPorAbonosByClient(getClienteId(),getFechaInicio(),getFechafin()));
+
+	public String buscarAbonosCliente() {
+		setDocumentosCliente(documentoService.buscarPorAbonosByClient(getClienteId(), getFechaInicio(), getFechafin()));
 		return "";
 	}
-	
+
 	public List<Proveedor> getProveedores() {
-		if(proveedores==null){
-			proveedores=proveedorService.getByAll();
+		if (proveedores == null) {
+			proveedores = proveedorService.getByAll();
 		}
 		return proveedores;
 	}
@@ -262,7 +369,7 @@ public class Abonos implements Serializable {
 	public void setProveedores(List<Proveedor> proveedores) {
 		this.proveedores = proveedores;
 	}
-	
+
 	public Long getProveedorId() {
 		return proveedorId;
 	}
@@ -312,8 +419,8 @@ public class Abonos implements Serializable {
 	}
 
 	public Abono getAbonoNew() {
-		if(abonoNew==null){
-			abonoNew=new Abono();
+		if (abonoNew == null) {
+			abonoNew = new Abono();
 		}
 		return abonoNew;
 	}
@@ -337,30 +444,38 @@ public class Abonos implements Serializable {
 	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
+
 	public List<Abono> getAbonosByDocumento() {
 		return abonosByDocumento;
 	}
+
 	public void setAbonosByDocumento(List<Abono> abonosByDocumento) {
 		this.abonosByDocumento = abonosByDocumento;
 	}
+
 	public List<TipoPago> getTipoPagos() {
-		if(TipoPagos==null){
+		if (TipoPagos == null) {
 			TipoPagos = tipoPagoService.getByAll();
 		}
 		return TipoPagos;
 	}
+
 	public void setTipoPagos(List<TipoPago> tipoPagos) {
 		TipoPagos = tipoPagos;
 	}
+
 	public Long getTipoPago() {
 		return tipoPago;
 	}
+
 	public void setTipoPago(Long tipoPago) {
 		this.tipoPago = tipoPago;
 	}
+
 	public Double getCantidadTotal() {
 		return cantidadTotal;
 	}
+
 	public void setCantidadTotal(Double cantidadTotal) {
 		this.cantidadTotal = cantidadTotal;
 	}
@@ -390,7 +505,7 @@ public class Abonos implements Serializable {
 	}
 
 	public List<Cliente> getClientes() {
-		clientes=clienteService.getByAll();
+		clientes = clienteService.getByAll();
 		return clientes;
 	}
 
@@ -421,5 +536,23 @@ public class Abonos implements Serializable {
 	public void setSaldoTotal(Double saldoTotal) {
 		this.saldoTotal = saldoTotal;
 	}
+
+	public List<Documento> getAvances() {
+		return avances;
+	}
+
+	public void setAvances(List<Documento> avances) {
+		this.avances = avances;
+	}
+
+	public Double getInteres() {
+		return interes;
+	}
+
+	public void setInteres(Double interes) {
+		this.interes = interes;
+	}
 	
+	
+
 }

@@ -32,10 +32,13 @@ public interface DocumentoDao {
 	List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni, Date fechaFin,
 			String conDian,Long clienteId);
 	String getByUltimoId();
-	List<Documento> getRemisionesByUsuario(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre,Long server);
+	List<Documento> getRemisionesByUsuario(Long tipoDocumentoId,Long usuarioId,Boolean conCierre,Long server);
+	List<Documento> getRemisionesByUsuarioConFecha(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre,Long server);
 	void update(InfoDiario infoDiario) ;
 	List<InfoDiario> buscarInfodiarioByFecha(Date fechaInicio, Date fechafin) ;
-	List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,Long server);
+	List<Documento> getByfacturasReales(List<Long> tipoDocumentoId,  Long usuarioId, Boolean conCierre,Long server);
+	List<Documento> getByfacturasRealesConFecha(List<Long> tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId,
+			Boolean conCierre, Long server);
 	List<Documento> getByFacturaSinCierre(List<Long> tipoDocumentoId, Date hoy, Date hoyfin) ;
 	Documento getByConsecutivoDian(String documento) ;
 	List<Documento> getByEntrega(Long entrega);
@@ -49,6 +52,7 @@ public interface DocumentoDao {
 	List<Documento> getByCliente(Long clienteId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
 	List<Documento> getByClienteAndProveedorAndTipo(Long clienteId, Long proveedorId, List<Long> tipoId);
 	List<Documento> getByProveedor(Long proveedorId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
+	
 	
 	
 		

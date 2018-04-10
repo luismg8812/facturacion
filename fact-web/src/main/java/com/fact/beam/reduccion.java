@@ -266,9 +266,9 @@ public class reduccion implements Serializable {
 		for (Usuario u : uList) {
 			Double VentasTemp = 0.0;
 			Double RemisionesTemp = 0.0;
-			List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,
+			List<Documento> factDia = documentoService.getByfacturasRealesConFecha(tipoDocumentoId, hoy, hoyfin,
 					u.getUsuarioId(), Boolean.FALSE, 1l);
-			List<Documento> remisiList = documentoService.getRemisionesByUsuario(9l, hoy, hoyfin, u.getUsuarioId(),
+			List<Documento> remisiList = documentoService.getRemisionesByUsuarioConFecha(9l, hoy, hoyfin, u.getUsuarioId(),
 					Boolean.FALSE, config.getServer());
 			totalFacturasTemp += factDia.size();
 			String nombreCajero = Calculos.cortarDescripcion(u.getNombre() + " " + u.getApellido(), 15);
@@ -330,7 +330,7 @@ public class reduccion implements Serializable {
 		documento.add(new Paragraph(
 				new Phrase(lineSpacing, "REMISIONES", FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 		for (Usuario u : uList) {
-			List<Documento> remisiList = documentoService.getRemisionesByUsuario(9l, hoy, hoyfin, u.getUsuarioId(),
+			List<Documento> remisiList = documentoService.getRemisionesByUsuarioConFecha(9l, hoy, hoyfin, u.getUsuarioId(),
 					Boolean.FALSE, config.getServer());
 			for (Documento d : remisiList) {
 				String nombreCajero = Calculos.cortarDescripcion(u.getNombre() + " " + u.getApellido(), 15);
@@ -1286,7 +1286,7 @@ public class reduccion implements Serializable {
 		// tipoDocumentoId.add(8l);
 		Date hoy = Calculos.fechaInicial(dia);
 		Date hoyfin = Calculos.fechaFinal(dia);
-		List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,
+		List<Documento> factDia = documentoService.getByfacturasRealesConFecha(tipoDocumentoId, hoy, hoyfin,
 				usuario.getUsuarioId(), conCierre, server);
 		Double total = 0.0;
 		for (Documento d : factDia) {
@@ -1391,7 +1391,7 @@ public class reduccion implements Serializable {
 		Date hoyfin;
 		hoyfin = calendar.getTime();
 
-		List<Documento> factDia = documentoService.getRemisionesByUsuario(tipoDocumentoId, hoy, hoyfin,
+		List<Documento> factDia = documentoService.getRemisionesByUsuarioConFecha(tipoDocumentoId, hoy, hoyfin,
 				usuario.getUsuarioId(), conCierre, server);
 		Double total = 0.0;
 		for (Documento d : factDia) {
@@ -1419,15 +1419,15 @@ public class reduccion implements Serializable {
 		Date hoyfin;
 		hoyfin = calendar.getTime();
 
-		List<Documento> factDia = documentoService.getRemisionesByUsuario(tipoDocumentoId, hoy, hoyfin,
+		List<Documento> factDia = documentoService.getRemisionesByUsuarioConFecha(tipoDocumentoId, hoy, hoyfin,
 				usuario.getUsuarioId(), conCierre, server);
-		Double total = 0.0;
+		Double total1 = 0.0;
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {
-				total = total + d.getTotal().doubleValue();
+				total1 += d.getTotal().doubleValue();
 			}
 		}
-		return total;
+		return total1;
 	}
 
 	public Long getTotalFaturasNoImp() {

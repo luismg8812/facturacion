@@ -140,14 +140,14 @@ public class CuadreCaja implements Serializable {
 		//tipoDocumentoId.add(8l);// tipo documento factura de salida
 		Long server=1l;
 		Boolean conCierre = Boolean.TRUE;
-		Date hoy = Calculos.fechaInicial(new Date());
-		Date hoyfin = Calculos.fechaFinal(new Date());
+		//Date hoy = Calculos.fechaInicial(new Date());
+		//Date hoyfin = Calculos.fechaFinal(new Date());
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		totalFacturasToDay = 0.0;
 		OpcionUsuario liberarCuadre= opcionUsuarioService.getbySubMenuAndUsuario(usuario, 15l);
 		List<Documento> factDia=new ArrayList<>();
 		if(liberarCuadre.getLiberarCuadre()!=null && liberarCuadre.getLiberarCuadre()==1l){
-			 factDia = documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId(),conCierre,server);
+			 factDia = documentoService.getByfacturasReales(tipoDocumentoId, usuario.getUsuarioId(),conCierre,server);
 		}
 		
 	
@@ -789,7 +789,7 @@ public Double getVales() throws ParseException {
 	Boolean conCierre=Boolean.TRUE;
 	Long server=1l;
 	Usuario usuario = (Usuario) sessionMap.get("userLogin");
-	documentos= documentoService.getRemisionesByUsuario(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId(),conCierre,server);
+	documentos= documentoService.getRemisionesByUsuarioConFecha(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId(),conCierre,server);
 	Double total=0.0;
 	for (Documento a : documentos) {
 		if (a.getTotal() != null) {
@@ -834,10 +834,10 @@ public Double getAvanceEfectivo() throws ParseException {
 	tipoDocumentoId.add(5l); //bisqieda qie avance efectivo
 	Long server=1l;
 	Boolean conCierre=Boolean.TRUE;
-	Date hoy = Calculos.fechaInicial(new Date());
-	Date hoyfin = Calculos.fechaFinal(new Date());
+	//Date hoy = Calculos.fechaInicial(new Date());
+	//Date hoyfin = Calculos.fechaFinal(new Date());
 	Usuario usuario = (Usuario) sessionMap.get("userLogin");
-	documentos= documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId(),conCierre,server);
+	documentos= documentoService.getByfacturasReales(tipoDocumentoId,usuario.getUsuarioId(),conCierre,server);
 	Double total=0.0;
 	for (Documento a : documentos) {
 		if (a.getTotal() != null) {
@@ -950,12 +950,10 @@ List<Documento> documentos = new ArrayList<>();
 	
 	List<Long> tipoDocumentoId= new ArrayList<>(); 
 	tipoDocumentoId.add(10l);//bisqieda qie vales
-	Date hoy = Calculos.fechaInicial(new Date());
-	Date hoyfin = Calculos.fechaFinal(new Date());
 	Boolean conCierre=Boolean.TRUE;
 	Long server=1l;
 	Usuario usuario = (Usuario) sessionMap.get("userLogin");
-	documentos= documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId() , conCierre,server);
+	documentos= documentoService.getByfacturasReales(tipoDocumentoId, usuario.getUsuarioId() , conCierre,server);
 	Double total=0.0;
 	for (Documento a : documentos) {
 		if (a.getDescuento() != null) {
@@ -1225,7 +1223,7 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 }
 
 public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException, IOException, PrinterException{
-	Boolean sinCierre = Boolean.FALSE;
+	Boolean sinCierre = Boolean.TRUE;
 	List<Long> tipoDocumentoId = new ArrayList<>();
 	List<Long> productosList = new ArrayList<>();
 	
@@ -1265,7 +1263,7 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 		redu3=redu2;
 	}
 	
-	documentos=documentoService.getByfacturasReales(tipoDocumentoId, hoy, hoyfin,redu.getUsuarioId().getUsuarioId() , sinCierre,server);
+	documentos=documentoService.getByfacturasReales(tipoDocumentoId, redu.getUsuarioId().getUsuarioId() , sinCierre,server);
 	if(documentos!=null && !documentos.isEmpty()){
 		 docuDetalle=documentoDetalleService.getByDocumento(documentos);
 		    //hacerlo con dos haspmap, 

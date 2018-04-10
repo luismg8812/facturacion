@@ -110,9 +110,15 @@ public class DocumentoServiceImpl implements DocumentoService{
 	}
 
 	@Override
-	public List<Documento> getRemisionesByUsuario(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,Long server)
+	public List<Documento> getRemisionesByUsuario(Long tipoDocumentoId, Long usuarioId, Boolean conCierre,Long server)
 			  {
-		return documentoDao.getRemisionesByUsuario(tipoDocumentoId,hoy,hoyFin,usuarioId, conCierre,server);
+		return documentoDao.getRemisionesByUsuario(tipoDocumentoId,usuarioId, conCierre,server);
+	}
+	
+	@Override
+	public List<Documento> getRemisionesByUsuarioConFecha(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,Long server)
+			  {
+		return documentoDao.getRemisionesByUsuarioConFecha(tipoDocumentoId,hoy,hoyFin,usuarioId, conCierre,server);
 	}
 
 	@Override
@@ -135,9 +141,9 @@ public class DocumentoServiceImpl implements DocumentoService{
 	}
 
 	@Override
-	public List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId, Boolean conCierre,Long server)
+	public List<Documento> getByfacturasReales(List<Long> tipoDocumentoId, Long usuarioId, Boolean conCierre,Long server)
 			  {
-		return documentoDao.getByfacturasReales(tipoDocumentoId,hoy,hoyFin,usuarioId,conCierre,server);
+		return documentoDao.getByfacturasReales(tipoDocumentoId,usuarioId,conCierre,server);
 	}
 
 	@Override
@@ -195,5 +201,10 @@ public class DocumentoServiceImpl implements DocumentoService{
 		return documentoDao.getByProveedor(proveedorId,tipoDocumentoId,fechaInicio,fechafin);
 	}
 
+	@Override
+	public List<Documento> getByfacturasRealesConFecha(List<Long> tipoDocumentoId,  Date hoy, Date hoyfin,Long usuarioId, Boolean conCierre,Long server)
+			  {
+		return documentoDao.getByfacturasRealesConFecha(tipoDocumentoId,hoy,hoyfin,usuarioId,conCierre,server);
+	}
 
 }
