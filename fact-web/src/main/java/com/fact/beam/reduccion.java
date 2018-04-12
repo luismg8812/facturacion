@@ -1326,7 +1326,7 @@ public class reduccion implements Serializable {
 		Long tipoDocumentoId = 2l; // tipo documento factura de salida
 		Date hoy = Calculos.fechaInicial(dia);
 		Date hoyfin = Calculos.fechaFinal(dia);
-		List<Documento> factDia = documentoService.getByTipo(tipoDocumentoId, hoy, hoyfin, usuario.getUsuarioId());
+		List<Documento> factDia = documentoService.getByTipo(tipoDocumentoId, hoy, hoyfin, usuario.getUsuarioId(),conCierre);
 		Double total = 0.0;
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {

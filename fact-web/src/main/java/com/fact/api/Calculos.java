@@ -50,7 +50,7 @@ public class Calculos {
 		calendar.setTime(hoy);
 		if (fechaCombinada == 1l) {
 			calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 1);
-			calendar.set(Calendar.HOUR_OF_DAY, 18);
+			calendar.set(Calendar.HOUR_OF_DAY, 14);
 			calendar.set(Calendar.MINUTE, 0);
 			calendar.set(Calendar.SECOND, 0);
 		} else {
@@ -77,7 +77,7 @@ public class Calculos {
 		calendar.setTime(fin);
 		// si la fecha es nula toma por defecto la fecha del sistema
 		if (fechaCombinada == 1l) {
-			calendar.set(Calendar.HOUR_OF_DAY, 17);
+			calendar.set(Calendar.HOUR_OF_DAY, 13);
 			calendar.set(Calendar.MINUTE, 59);
 			calendar.set(Calendar.SECOND, 59);
 		} else {

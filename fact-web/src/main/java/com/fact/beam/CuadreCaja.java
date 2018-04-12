@@ -646,6 +646,7 @@ public void cierreTotal() throws ParseException{
 		tipoDocumentoId.add( 5l); // tipo documento cotizacion
 		tipoDocumentoId.add( 4l); // tipo documento remision
 		tipoDocumentoId.add( 8l); // tipo documento remision
+		tipoDocumentoId.add( 2l); // tipo documento remision
 		Date hoy = Calculos.fechaInicial(new Date());
 		Date hoyfin = Calculos.fechaFinal(new Date());
 		List<Documento> factDia = documentoService.getByFacturaSinCierre(tipoDocumentoId, hoy, hoyfin);
@@ -981,7 +982,7 @@ public Double getTotalEnCaja() throws ParseException {
 				(getGastado()==null?0.0:getGastado())+
 				(getCartera()==null?0.0:getCartera())+
 				(getNomina()==null?0.0:getNomina())+
-				(getDescuentos()==null?0.0:getDescuentos())+
+				//(getDescuentos()==null?0.0:getDescuentos())+
 				(getPropinas()==null?0.0:getPropinas());
 	return totalEnCaja;
 }

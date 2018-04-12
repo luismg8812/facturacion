@@ -14,6 +14,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
+import com.fact.api.Calculos;
 import com.fact.model.Documento;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;
@@ -92,8 +93,7 @@ public class infoVentas  implements Serializable{
 			Long hoy = Long.valueOf(fhoyIni);
 			Long hoyfin = Long.valueOf(fhoyFin);
 			for(Long i = hoy; i<=hoyfin;i++){
-				List<Usuario> usu= new ArrayList<>();
-				usu= usuarioService.getByRol(2l); // se bucan cajeros(rol=2)
+				List<Usuario> usu=  usuarioService.getByRol(2l); // se bucan cajeros(rol=2)
 				for(Usuario u: usu){
 					System.out.println(df.parse(i.toString()));
 					Double cantidadOriginal = getTotalFaturasToDay(df.parse(i.toString()),u);
@@ -112,22 +112,11 @@ public class infoVentas  implements Serializable{
 	}
 	
 	public Double getTotalFaturasToDay(Date dia, Usuario usuario) throws ParseException {
-		Long tipoDocumentoId = 10l; // tipo documento factura de salida
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(dia);
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		Date hoy;
-		hoy = calendar.getTime();
-        
-		calendar.set(Calendar.HOUR_OF_DAY, 23);
-		calendar.set(Calendar.MINUTE, 59);
-		calendar.set(Calendar.SECOND, 59);
-		Date hoyfin;
-		hoyfin = calendar.getTime();
-		
-		List<Documento> factDia = documentoService.getByTipo(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId());
+		Long tipoDocumentoId = 10l; // tipo documento factura de salida	
+		Date hoy = Calculos.fechaInicial(dia);   
+		Date hoyfin = Calculos.fechaFinal(dia);
+		Boolean conCierre=Boolean.FALSE;
+		List<Documento> factDia = documentoService.getByTipo(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId(),conCierre);
 		Double total = 0.0;
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {

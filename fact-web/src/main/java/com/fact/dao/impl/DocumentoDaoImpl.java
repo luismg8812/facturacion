@@ -152,13 +152,16 @@ public class DocumentoDaoImpl implements DocumentoDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Documento> getByTipo(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId) {
+	public List<Documento> getByTipo(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId,Boolean conCierre) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Documento> documentoList = new ArrayList<>();
 		try {
-			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId =:tipoDocumentoId "
-					+ " and (d.fechaRegistro > :hoy) AND (d.fechaRegistro < :hoyFin) and d.cierreDiario is null "
-					+ " and d.usuarioId.usuarioId =:usuarioId order by d.documentoId asc";
+			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId =:tipoDocumentoId ";
+					sql+= " and (d.fechaRegistro > :hoy) AND (d.fechaRegistro < :hoyFin)  ";
+					if (conCierre) {
+						sql += " and d.cierreDiario is null ";
+					}
+					sql+= " and d.usuarioId.usuarioId =:usuarioId order by d.documentoId asc";
 			Query query = session.createQuery(sql);
 			query.setParameter("tipoDocumentoId", Long.valueOf(tipoDocumentoId));
 			query.setParameter("hoy", hoy);

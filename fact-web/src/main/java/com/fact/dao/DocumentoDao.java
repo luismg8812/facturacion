@@ -20,7 +20,7 @@ public interface DocumentoDao {
 	void update(Documento documento, Long server);
 	void delete(Documento documento);
 	Documento getById(Long documento);
-	List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId);
+	List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre);
 	List<Documento> getDocNoImp(Long usuarioId,List<Long> tipoDocumentoId,Long server);
 	Documento getByLastAndTipo(Long idFactura, Long usuarioId);
 	List<Documento> getByTipoSinUsuario(List<Long> tipoDocumentoId, Date hoy, Date hoyfin);

@@ -54,8 +54,8 @@ public class DocumentoServiceImpl implements DocumentoService{
 	}
 	
 	@Override
-	public List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId)   {		
-		return documentoDao.getByTipo(tipoDocumentoId,hoy,hoyFin,usuarioId);
+	public List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre)   {		
+		return documentoDao.getByTipo(tipoDocumentoId,hoy,hoyFin,usuarioId,conCierre);
 	}
 
 	@Override
