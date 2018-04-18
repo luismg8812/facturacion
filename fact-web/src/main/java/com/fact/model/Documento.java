@@ -127,6 +127,9 @@ public class Documento {
 	
 	@Column(name="INTERES")
 	private Double interes;
+	
+	@Column(name="TOTAL_COSTO")
+	private Double totalCosto;
 
 	public Long getDocumentoId() {
 		return documentoId;
@@ -392,6 +395,14 @@ public class Documento {
 
 	public void setRetefuente(Double retefuente) {
 		this.retefuente = retefuente;
+	}
+
+	public Double getTotalCosto() {
+		return totalCosto;
+	}
+
+	public void setTotalCosto(Double totalCosto) {
+		this.totalCosto = totalCosto;
 	}
 	
 }
