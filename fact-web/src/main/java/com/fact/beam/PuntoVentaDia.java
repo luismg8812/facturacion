@@ -281,21 +281,21 @@ public class PuntoVentaDia implements Serializable {
 	public void buscarProductoCodBarras() {
 		String completo = getCodigoBarras();
 		String codigoProducoString = "";
-		if (completo != null && !completo.isEmpty()) {
+		if (completo == null || completo.isEmpty()) {
 			return;
 		}
 		Producto p = null;
 		try {
 			codigoProducoString = completo == null ? "" : completo.substring(1, 6);
-			System.out.println("codigoP:" + codigoProducoString);
+			log.info("codigoP:" + codigoProducoString);
 			p = getProductosAllCodigo().get(Long.valueOf(codigoProducoString));
 			if (p != null) {
-				System.out.println("producto carnes: " + p.getNombre());
+				log.info("producto carnes: " + p.getNombre());
 				String pesoProducoString = completo.substring(6, 12);
 				String parte1 = pesoProducoString.substring(0, 2);
 				String parte2 = pesoProducoString.substring(2, 5);
 				Double peso = Double.valueOf(parte1 + "." + parte2);
-				System.out.println("Peso" + peso);
+				log.info("Peso" + peso);
 				setCantidad(peso);
 				productoSelect = p;
 				cantidadEnter(null);
