@@ -380,6 +380,7 @@ public class borrarFacturas implements Serializable {
 		System.out.println("Documento:" + docu.getDocumentoId());
 		Configuracion configuracion = configuracion();
 		String impresora = impresora();
+		String enPantalla = "false"; 
 		Empresa e = Login.getEmpresaLogin();
 		String tituloFactura = "";
 		docu.setImpreso(1l);
@@ -422,7 +423,7 @@ public class borrarFacturas implements Serializable {
 			break;
 		case "PDF":
 			pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora);
+					configuracion, impresora,enPantalla);
 			break;
 		case "SMALL_PDF":
 			Impresion.imprimirPDFSmall(docu, Calculos.llenarDocumentoDetalleVoList(detalles), usuario(), configuracion,

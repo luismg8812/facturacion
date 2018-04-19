@@ -9,30 +9,51 @@
 	function teclasComanda(evento,element){		
 		/////////////////////TECLA ENTER y TECLA ABAJO ///////////////////////////////////////////////
 		var elec = element.getAttribute('id').toString();
-		//alert(elec)		
-		if(evento.keyCode==40){ //cuando se presiona la tacla abajo 				
-			       document.getElementById('comandas:btnImprFactura').focus();
-			      
-			      return "";			
+		//alert(elec.name)	;	
+		if(evento.keyCode==40){ //cuando se presiona la tacla abajo 	
+			if(document.activeElement.name =='comandas:btnImprComanda'){
+				document.getElementById('comandas:btnImprFactura').focus();
+				return;
+			}			
+			if(document.activeElement.name =='comandas:btnImprFactura'){
+				document.getElementById('comandas:btnImprFacturaPantalla').focus();
+				return;
+			}      		    		     			
 		}
 		if(evento.keyCode==38){ //cuando se presiona la tacla abajo 
-			document.getElementById('comandas:btnImprComanda').focus();
+			if(document.activeElement.name =='comandas:btnImprFactura'){
+				document.getElementById('comandas:btnImprComanda').focus();
+				return;
+			}			
+			if(document.activeElement.name =='comandas:btnImprFacturaPantalla'){
+				document.getElementById('comandas:btnImprFactura').focus();
+				return;
+			} 
 		}	
 		
 }
 	</script>
 	<h:form id="comandas">
 		<table width="100%" align="center">
-		<tr>
-			<td><p:commandButton value="Imprimir Comanda" id="btnImprComanda" action="#{puntoVentaDia.imprimirComanda}"
-			onkeydown="teclasComanda(event,this)"></p:commandButton></td>
-			
-		</tr>
-		<tr>
-			<td><p:commandButton value="Imprimir Factura" id="btnImprFactura" action="#{puntoVentaDia.abrirDialogImprimir}"
-			onkeydown="teclasComanda(event,this)"></p:commandButton></td>
-			
-		</tr>		
-	</table>
+			<tr>
+				<td><p:commandButton value="Imprimir Comanda"
+						id="btnImprComanda" action="#{puntoVentaDia.imprimirComanda}"
+						onkeydown="teclasComanda(event,this)"></p:commandButton></td>
+
+			</tr>
+			<tr>
+				<td><p:commandButton value="Imprimir Factura"
+						id="btnImprFactura" action="#{puntoVentaDia.abrirDialogImprimir}"
+						onkeydown="teclasComanda(event,this)"></p:commandButton></td>
+
+			</tr>
+			<tr>
+				<td><p:commandButton value="Imprimir Factura en Pantalla"
+						id="btnImprFacturaPantalla"
+						action="#{puntoVentaDia.imprimirPantalla()}"
+						onkeydown="teclasComanda(event,this)"></p:commandButton></td>
+
+			</tr>
+		</table>
 	</h:form>
 </ui:composition>
