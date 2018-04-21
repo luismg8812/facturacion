@@ -1158,7 +1158,7 @@ public class reduccion implements Serializable {
 					cantidadReducida = cantidadOriginal - (cantidadOriginal * porcenta);
 					Date hoy2 = Calculos.fechaInicial(df.parse(i.toString()));
 					Date hoyfin2 = Calculos.fechaFinal(df.parse(i.toString()));
-					List<Documento> totalDoc = documentoService.getByFacturaByDia(10l, hoy2, hoyfin2);
+					List<Documento> totalDoc = documentoService.getByFacturaByDia(10l, hoy2, hoyfin2,false);
 					if (totalDoc != null && !totalDoc.isEmpty()) {
 						primeraFactura = totalDoc.get(0).getConsecutivoDian();
 						ultimaFactura = totalDoc.get(totalDoc.size() - 1).getConsecutivoDian();

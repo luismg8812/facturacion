@@ -924,7 +924,7 @@ public class PuntoVentaDia implements Serializable {
 			}
 			// se asigna un tipo de pago
 			TipoPago tipa = new TipoPago();
-			if (getCartera().equalsIgnoreCase("S")) {
+			if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
 				tipa.setTipoPagoId(2l);// pago a credito
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2l;
@@ -1782,7 +1782,9 @@ public class PuntoVentaDia implements Serializable {
 	
 	public void imprimirPantalla(){
 		try {
+			setImpresion("s");
 			imprimirFactura("true");
+			RequestContext.getCurrentInstance().execute("PF('dialogComanda').hide();");
 		} catch (IOException | DocumentException | PrinterException | PrintException e) {
 			System.err.println("Error en imprimir factura: "+e.getMessage());
 		}

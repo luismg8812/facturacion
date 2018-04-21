@@ -83,8 +83,8 @@ public class DocumentoServiceImpl implements DocumentoService{
 	}
 
 	@Override
-	public List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin)   {
-		return documentoDao.getByFacturaByDia(tipoDocumentoId,hoy,hoyfin);
+	public List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin,Boolean conCierre)   {
+		return documentoDao.getByFacturaByDia(tipoDocumentoId,hoy,hoyfin, conCierre);
 	}
 
 	@Override

@@ -675,7 +675,7 @@ public String getPrimeraFact() throws ParseException {
 	Long tipoDocumentoId = 10l; // tipo documento factura de salida
 	Date hoy = Calculos.fechaInicial(new Date());
 	Date hoyfin = Calculos.fechaFinal(new Date());
-	List<Documento> factDia = documentoService.getByFacturaByDia(tipoDocumentoId, hoy, hoyfin);
+	List<Documento> factDia = documentoService.getByFacturaByDia(tipoDocumentoId, hoy, hoyfin,false);
 	if(factDia!=null && !factDia.isEmpty()){
 		primeraFact = factDia.get(0).getConsecutivoDian();
 	}else{
@@ -692,7 +692,7 @@ public String getUltimaFact() throws ParseException {
 	Long tipoDocumentoId = 10l; // tipo documento factura de salida
 	Date hoy = Calculos.fechaInicial(new Date());
 	Date hoyfin = Calculos.fechaFinal(new Date());
-	List<Documento> factDia = documentoService.getByFacturaByDia(tipoDocumentoId, hoy, hoyfin);
+	List<Documento> factDia = documentoService.getByFacturaByDia(tipoDocumentoId, hoy, hoyfin,false);
 	if(factDia!=null && !factDia.isEmpty()){
 		ultimaFact = factDia.get(factDia.size()-1).getConsecutivoDian();
 	}else{
@@ -1005,25 +1005,12 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
     List<DocumentoDetalle> docuDetalleSalida = new ArrayList<>();
     List<ProductoVo> cantidadesEntradas = new ArrayList<>();
     List<ProductoVo> cantidadesSalidas = new ArrayList<>();
-    Calendar calendar = Calendar.getInstance();
-    if(redu!=null){
-    	calendar.setTime(redu.getFecha());
-    }else{
-    	calendar.setTime(new Date());
-    }
-	calendar.set(Calendar.HOUR_OF_DAY, 17);
-	calendar.set(Calendar.MINUTE, 59);
-	calendar.set(Calendar.SECOND, 59);
-	Date hoyfin= calendar.getTime();
+ 	Boolean conCierre=false;
+	Date hoyfin=Calculos.fechaFinal(redu==null?new Date():redu.getFecha());
 	
-	System.out.println(calendar.get(Calendar.DAY_OF_MONTH)-1);       
-	calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH)-1);
-	calendar.set(Calendar.HOUR_OF_DAY, 18);
-	calendar.set(Calendar.MINUTE, 0);
-	calendar.set(Calendar.SECOND, 0);
-	Date hoy = calendar.getTime();
-	documentosEntradas=documentoService.getByFacturaByDia(2l, hoy, hoyfin );
-	documentosSalidas=documentoService.getByFacturaByDia(10l, hoy, hoyfin);
+	Date hoy = Calculos.fechaInicial(redu==null?new Date():redu.getFecha());
+	documentosEntradas=documentoService.getByFacturaByDia(2l, hoy, hoyfin ,conCierre);
+	documentosSalidas=documentoService.getByFacturaByDia(10l, hoy, hoyfin,conCierre);
 	//System.out.println("documentos:"+documentos.size());		
 	if(!documentosEntradas.isEmpty()){
 		docuDetalleEntrada=documentoDetalleService.getByDocumento(documentosEntradas);

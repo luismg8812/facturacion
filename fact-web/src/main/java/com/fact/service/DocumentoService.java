@@ -25,7 +25,7 @@ public interface DocumentoService {
 	Documento getByLastAndTipo(Long idFactura,Long usuarioId);
 	List<Documento> getByTipoSinUsuario(List<Long> tipoDocumentoId, Date hoy, Date hoyfin) ;
 	List<Documento> buscarPorAbonos(Long proveedorId, Long tipoFacturas, Date fechaInicio, Date fechafin,String detalle) ;
-	List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin) ;
+	List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin,Boolean conCierre) ;
 	List<Documento> getByHoyNoImpresas(List<Long> tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId) ;
 	List<Documento> buscarPorAbonosByClient(Long clienteId, Date fechaInicio, Date fechafin);
 	List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni, Date fechaFin,String conDian,Long clienteId);
