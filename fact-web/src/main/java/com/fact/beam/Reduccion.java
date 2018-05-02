@@ -1116,7 +1116,7 @@ public class Reduccion implements Serializable {
 			String fhoyFin = df.format(getFechafin());
 			Long hoy = Long.valueOf(fhoyIni);
 			Long hoyfin = Long.valueOf(fhoyFin);		
-			List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(Calculos.fechaInicial(getFechaInicio()), Calculos.fechaInicial(getFechafin()));
+			List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(Calculos.fechaInicial(getFechaInicio()), Calculos.fechaFinal(getFechafin()));
 			System.out.println("fecha: " + getFechaInicio());
 			Double porcenta = (double) ((getReduccion() == null ? 0.0 : getReduccion()) / 100);
 			for (Long i = hoy; i <= hoyfin; i++) {
