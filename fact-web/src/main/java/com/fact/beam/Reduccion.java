@@ -1124,10 +1124,9 @@ public class Reduccion implements Serializable {
 				for (InfoDiario r : infoList) {
 					if (df.format(r.getFechaInforme()).equals(i.toString())) {
 						rvo = r;
-						Double cantidadReducida = rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta);
-						Double costoReducido = rvo.getCostoOriginal() - (rvo.getCostoOriginal() * porcenta);
-						Double ivaReducido = Math.ceil(rvo.getIva19() - (rvo.getIva19() * porcenta))
-								+ Math.ceil(rvo.getIva5() - (rvo.getIva5() * porcenta));
+						Double cantidadReducida =(rvo.getTotalReducido()==null? rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta):rvo.getTotalReducido());
+						Double costoReducido = (rvo.getCostoReducido()==null?rvo.getCostoOriginal() - (rvo.getCostoOriginal() * porcenta):rvo.getCostoReducido());
+						Double ivaReducido = (rvo.getIvaReducido()==null?(Math.ceil(rvo.getIva19() - (rvo.getIva19() * porcenta))+ Math.ceil(rvo.getIva5() - (rvo.getIva5() * porcenta))):rvo.getIvaReducido());
 						rvo.setTotalReducido(cantidadReducida);
 						rvo.setCostoReducido(costoReducido);
 						rvo.setIvaReducido(ivaReducido);
