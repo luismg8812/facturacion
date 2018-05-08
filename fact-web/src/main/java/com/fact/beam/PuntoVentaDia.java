@@ -730,7 +730,7 @@ public class PuntoVentaDia implements Serializable {
 				Producto proCantidad = productoSelect;
 				Producto proCantidad2 = productoSelect2;
 				proCantidad.setCantidad(newCantidad - docDetalle.getCantidad1());
-				restarCantidadesSubProducto(docDetalle);
+				restarCantidadesSubProducto(docDetalle,server);
 				documentoDetalleService.save(docDetalle, server);
 				productoService.update(proCantidad, 1l);
 				if (server == 2l && proCantidad2 != null) {
@@ -757,7 +757,6 @@ public class PuntoVentaDia implements Serializable {
 					}
 				}
 				if (getCantidad() != 0l) {
-
 					getProductos().add(0, docDetalleVo);
 				}
 
@@ -800,13 +799,22 @@ public class PuntoVentaDia implements Serializable {
 	 * 
 	 * @param productoSelect3
 	 */
-	private void restarCantidadesSubProducto(DocumentoDetalle productoSelect3) {
+	private void restarCantidadesSubProducto(DocumentoDetalle productoSelect3, Long server) {
 		List<SubProducto> subProductos = productoService
 				.subProductoByProducto(productoSelect3.getProductoId().getProductoId());
 		for (SubProducto s : subProductos) {
 			Double cantidadAnterior = s.getProductoHijo().getCantidad();
 			Double cantidadNueva = cantidadAnterior - (s.getCantidad() * productoSelect3.getCantidad());
 			s.getProductoHijo().setCantidad(cantidadNueva);
+			DocumentoDetalle docDetalle = new DocumentoDetalle();
+			docDetalle.setCantidad1(s.getCantidad() * productoSelect3.getCantidad());
+			docDetalle.setCantidad(s.getCantidad() * productoSelect3.getCantidad());
+			docDetalle.setDocumentoId(getDocumento());
+			docDetalle.setEstado(1l);
+			docDetalle.setFechaRegistro(new Date());
+			docDetalle.setProductoId(s.getProductoHijo());
+			//docDetalle.set
+			documentoDetalleService.save(docDetalle, server);
 			productoService.update(s.getProductoHijo(), 1l);
 		}
 	}
