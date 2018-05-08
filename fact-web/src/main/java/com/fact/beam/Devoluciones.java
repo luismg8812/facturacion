@@ -158,6 +158,7 @@ public class Devoluciones  implements Serializable{
 		System.out.println("entra a imprimir");
 		Configuracion configuracion = configuracion();
 		String impresora=impresora();
+		String enPantalla = "false"; 
 		long server =1;
 			documentoSelect.setImpreso(1l);
 			documentoService.update(documentoSelect,server);
@@ -168,7 +169,7 @@ public class Devoluciones  implements Serializable{
 				pdf=imprimirTxt();
 			}else{				
 				try {
-				pdf=Impresion.imprimirPDF(documentoSelect, getDetalles(), documentoSelect.getUsuarioId(),configuracion,impresora);
+				pdf=Impresion.imprimirPDF(documentoSelect, getDetalles(), documentoSelect.getUsuarioId(),configuracion,impresora,enPantalla);
 				} catch (PrintException e1) {
 					System.out.print("Error en impresion devolucion");
 					e1.printStackTrace();

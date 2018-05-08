@@ -520,7 +520,7 @@ public class Impresion {
 	 * @throws PrintException
 	 */
 	public static String imprimirPDF(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config,String impresora) throws DocumentException, IOException, PrinterException, PrintException {
+			Configuracion config,String impresora, String enPantalla) throws DocumentException, IOException, PrinterException, PrintException {
 		System.out.println("todo el codigo de imprimir");
 		Empresa e = Login.getEmpresaLogin();
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
@@ -741,8 +741,11 @@ public class Impresion {
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
 		documento.close();
-
-		printer(impresora, pdf, config);
+		if(enPantalla.equals("false")){
+			System.out.println("imprime en papel");
+			printer(impresora, pdf, config);
+		}
+		
 
 		return pdf;
 	}

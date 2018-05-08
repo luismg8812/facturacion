@@ -174,7 +174,7 @@
 		<tr id="campoImp" style="display: none;">
 			<td><p:outputLabel value="Continúa con la Impresión: " /></td>
 			<td><p:inputText value="#{puntoVentaDia.impresion}" size="2" id="impresion_inp">
-				<p:ajax event="keydown"  partialSubmit="true" listener="#{puntoVentaDia.imprimirFactura}" update="growl2" />
+				<p:ajax event="keydown"  partialSubmit="true" listener="#{puntoVentaDia.imprimirFactura('false')}" update="growl2" />
 				</p:inputText></td>
 		</tr>
 	</table>
