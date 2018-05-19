@@ -241,7 +241,8 @@ public class Reduccion implements Serializable {
 		folder.mkdirs();
 		FileOutputStream archivo = new FileOutputStream(carpeta + pdf);
 		Document documento = new Document();
-		float fntSize = 11f, lineSpacing = 15f;
+		float fntSize = 11f; 
+		float lineSpacing = 15f;
 		PdfWriter.getInstance(documento, archivo);
 
 		List<Long> tipoDocumentoId = new ArrayList<>();
@@ -793,11 +794,11 @@ public class Reduccion implements Serializable {
 		String totalVent = Calculos
 				.cortarCantidades(formatea.format(id.getTotalOriginal() - (id.getTotalOriginal() * redu)), 12);
 		String ivatotal = Calculos.cortarCantidades(formatea.format(id.getIvaReducido()), 10);
-		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19()), 10);
-		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5()), 10);
-		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19()), 10);
-		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5()), 10);
-		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcento()), 10);
+		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19()-(id.getIva19()*redu)), 10);
+		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5()-(id.getIva5()*redu)), 10);
+		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19()-(id.getBase19()*redu)), 10);
+		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5()-(id.getBase19()*redu)), 10);
+		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcento()-(id.getExcento()*redu)), 10);
 
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				"TOTAL VENTAS    IVA TOTAL     IVA 19        IVA 5  GRAVADO 19  GRAVADO 5   EXCLUIDO",
@@ -1117,8 +1118,8 @@ public class Reduccion implements Serializable {
 			Long hoy = Long.valueOf(fhoyIni);
 			Long hoyfin = Long.valueOf(fhoyFin);		
 			List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(Calculos.fechaInicial(getFechaInicio()), Calculos.fechaFinal(getFechafin()));
-			System.out.println("fecha: " + getFechaInicio());
-			Double porcenta = (double) ((getReduccion() == null ? 0.0 : getReduccion()) / 100);
+			log.info("fecha: " + getFechaInicio());
+			Double porcenta =  ((getReduccion() == null ? 0.0 : getReduccion()) / 100);
 			for (Long i = hoy; i <= hoyfin; i++) {
 				InfoDiario rvo = new InfoDiario();
 				for (InfoDiario r : infoList) {
@@ -1126,7 +1127,7 @@ public class Reduccion implements Serializable {
 						rvo = r;
 						Double cantidadReducida =(rvo.getTotalReducido()==null? rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta):rvo.getTotalReducido());
 						Double costoReducido = (rvo.getCostoReducido()==null?rvo.getCostoOriginal() - (rvo.getCostoOriginal() * porcenta):rvo.getCostoReducido());
-						Double ivaReducido = (rvo.getIvaReducido()==null?(Math.ceil(rvo.getIva19() - (rvo.getIva19() * porcenta))+ Math.ceil(rvo.getIva5() - (rvo.getIva5() * porcenta))):rvo.getIvaReducido());
+						Double ivaReducido = (rvo.getIvaReducido()==null?  (rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta)):rvo.getIvaReducido());
 						rvo.setTotalReducido(cantidadReducida);
 						rvo.setCostoReducido(costoReducido);
 						rvo.setIvaReducido(ivaReducido);
@@ -1166,21 +1167,21 @@ public class Reduccion implements Serializable {
 			Double totalBase19Temp = 0.0;
 			Double totalExcentoTemp = 0.0;
 			for (InfoDiario in : getReduccionList()) {
-				totalTemp = totalTemp + in.getTotalReducido();
-				totalIvaTemp = totalIvaTemp + in.getIvaReducido();
-				totalIva19Temp = totalIva19Temp + in.getIva19();
-				totalIva5Temp = totalIva5Temp + in.getIva5();
-				totalBase5Temp = totalBase5Temp + in.getBase5();
-				totalBase19Temp = totalBase19Temp + in.getBase19();
-				totalExcentoTemp = totalExcentoTemp + in.getExcento();
+				totalTemp +=   in.getTotalReducido();
+				totalIvaTemp += in.getIvaReducido();
+				totalIva19Temp += in.getIva19();
+				totalIva5Temp  += in.getIva5();
+				totalBase5Temp += in.getBase5();
+				totalBase19Temp += in.getBase19();
+				totalExcentoTemp += in.getExcento();
 			}
 			setTotal(totalTemp);
 			setTotalIva(totalIvaTemp);
-			setTotalIva19(totalIva19Temp);
-			setTotalIva5(totalIva5Temp);
-			setTotalbase19(totalBase19Temp);
-			setTotalbase5(totalBase5Temp);
-			setTotalExcento(totalExcentoTemp);
+			setTotalIva19(totalIva19Temp+(totalIva19Temp*porcenta));
+			setTotalIva5(totalIva5Temp+(totalIva5Temp*porcenta));
+			setTotalbase19(totalBase19Temp+(totalBase19Temp*porcenta));
+			setTotalbase5(totalBase5Temp+(totalBase5Temp*porcenta));
+			setTotalExcento(totalExcentoTemp+(totalExcentoTemp*porcenta));
 			if (userPropietario.equals("true")) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(userPropietario.equals("true")?"Reducción Completa":"Busqueda  Completa"));
 			} 
