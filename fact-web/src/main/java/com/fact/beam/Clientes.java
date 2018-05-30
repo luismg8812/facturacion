@@ -12,6 +12,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+
+import com.fact.api.Calculos;
 import com.fact.model.Ciudad;
 import com.fact.model.Cliente;
 import com.fact.model.Departamento;
@@ -117,7 +119,7 @@ public class Clientes implements Serializable {
 		}
 		for (Cliente c : clientesTemp) {
 				
-				List<Documento> facturas = documentoService.getByCliente(c.getClienteId(),tipoDocumentoId,getFechaInicio(), getFechafin());
+				List<Documento> facturas = documentoService.getByCliente(c.getClienteId(),tipoDocumentoId,Calculos.fechaInicial(getFechaInicio()),Calculos.fechaFinal(getFechafin()));
 				Double total=0.0;
 				Double excento=0.0;
 				Double base19=0.0;

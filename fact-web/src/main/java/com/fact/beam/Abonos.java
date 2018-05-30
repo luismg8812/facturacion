@@ -12,6 +12,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 
 import com.fact.model.Abono;
@@ -37,6 +39,7 @@ public class Abonos implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 7074628949042545489L;
+	private static Logger log = Logger.getLogger(Abonos.class);
 
 	@EJB
 	private ProveedorService proveedorService;
@@ -181,7 +184,7 @@ public class Abonos implements Serializable {
 										// efectivo
 		docu.setTipoDocumentoId(tido);
 		Double interesG = (getInteres()!=null?(getInteres()/100):getInteres());
-		System.out.println("interesg"+interesG);
+		log.info("interesg"+interesG);
 		Double totalG=getCantidadTotal()+(getCantidadTotal()*interesG);
 		docu.setSaldo(totalG);
 		docu.setTotal(totalG);
@@ -192,9 +195,9 @@ public class Abonos implements Serializable {
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage("Error Creando Avance efectivo, por favor consulte a su proveedor del programa"));
-			System.out.println("Server two desactivate: ");
+			log.info("Server two desactivate: ");
 		}
-		System.out.println("se crea el adelanto efectivo: " + docu.getDocumentoId());
+		log.info("se crea el adelanto efectivo: " + docu.getDocumentoId());
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Avance efectivo Creado exitosamente"));
 	}
 
@@ -217,7 +220,7 @@ public class Abonos implements Serializable {
 		Cliente cli = new Cliente();
 		TipoDocumento tido = new TipoDocumento();
 		TipoPago pago = new TipoPago();
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		Usuario usuario = usuario();
 		long server = 1;
 		docu.setFechaRegistro(new Date());
 		cli.setClienteId(getClienteId());
@@ -233,7 +236,7 @@ public class Abonos implements Serializable {
 		docu.setUsuarioId(usuario);
 		docu.setDetalleEntrada(getDetalleNew());
 		documentoService.save(docu, server);
-		System.out.println("se crea el vale por abonos Cliente:" + docu.getDocumentoId());
+		log.info("se crea el vale por abonos Cliente:" + docu.getDocumentoId());
 		RequestContext.getCurrentInstance().execute("PF('crearVale').hide();");
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
 	}
@@ -242,7 +245,7 @@ public class Abonos implements Serializable {
 		Documento docu = new Documento();
 		Proveedor pro = new Proveedor();
 		TipoDocumento tido = new TipoDocumento();
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		Usuario usuario = usuario();
 		long server = 1;
 		docu.setFechaRegistro(new Date());
 		pro.setProveedorId(getProveedorId());
@@ -255,7 +258,7 @@ public class Abonos implements Serializable {
 		docu.setUsuarioId(usuario);
 		docu.setDetalleEntrada(getDetalleNew());
 		documentoService.save(docu, server);
-		System.out.println("se crea el documento por abonos:" + docu.getDocumentoId());
+		log.info("se crea el documento por abonos:" + docu.getDocumentoId());
 		RequestContext.getCurrentInstance().execute("PF('crearDocumento').hide();");
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Documento Creado exitosamente"));
 	}
@@ -264,7 +267,7 @@ public class Abonos implements Serializable {
 		getAbonoNew().setCantidadAbono(getCantidadNew());
 		TipoPago tipa = new TipoPago();
 		tipa.setTipoPagoId(getTipoPago());
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		Usuario usuario = usuario();
 		long server = 1;
 		getAbonoNew().setUsuarioId(usuario);
 		getAbonoNew().setTipoPagoId(tipa);
@@ -273,7 +276,7 @@ public class Abonos implements Serializable {
 		Double saldoNew = docu.getSaldo() == null ? 0.0 : docu.getSaldo();
 		docu.setSaldo(saldoNew - getCantidadNew());
 		documentoService.update(docu, server);
-		System.out.println("se crea el abono:" + getAbonoNew().getAbonoId());
+		log.info("se crea el abono:" + getAbonoNew().getAbonoId());
 		RequestContext.getCurrentInstance().execute("PF('crearAbono').hide();");
 		RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').hide();");
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Abono Creado exitosamente"));
@@ -288,14 +291,14 @@ public class Abonos implements Serializable {
 
 	public void consultarAbonosCliente(Documento docu) {
 		setDocumentoSelect(docu);
-		System.out.println("documento id" + docu.getDocumentoId());
+		log.info("documento id" + docu.getDocumentoId());
 		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()));
 		RequestContext.getCurrentInstance().execute("PF('consultarAbonoCliente').show();");
 		RequestContext.getCurrentInstance().update("consultarAbono");
 	}
 
 	public void abrirPopupAbono(Documento docu) {
-		System.out.println("entra a popup crear abono:" + docu.getDocumentoId());
+		log.info("entra a popup crear abono:" + docu.getDocumentoId());
 		getAbonoNew().setDocumentoId(docu);
 		getAbonoNew().setFechaRegistro(new Date());
 		setCantidadNew(null);
@@ -304,7 +307,7 @@ public class Abonos implements Serializable {
 	}
 
 	public void abrirPopupAbonoCliente(Documento docu) {
-		System.out.println("entra a popup crear abono:" + docu.getDocumentoId());
+		log.info("entra a popup crear abono:" + docu.getDocumentoId());
 		getAbonoNew().setDocumentoId(docu);
 		getAbonoNew().setFechaRegistro(new Date());
 		setCantidadNew(null);
@@ -313,7 +316,7 @@ public class Abonos implements Serializable {
 	}
 
 	public void borrarVale(Documento docu) {
-		System.out.println("entra a borrar vale:" + docu.getDocumentoId());
+		log.info("entra a borrar vale:" + docu.getDocumentoId());
 		if (docu.getTipoDocumentoId().getTipoDocumentoId() == 8l) {
 			documentoService.delete(docu);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale borrado exitosamente"));

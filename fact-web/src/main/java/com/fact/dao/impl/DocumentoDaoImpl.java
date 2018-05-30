@@ -139,7 +139,6 @@ public class DocumentoDaoImpl implements DocumentoDao {
 	@Override
 	public Documento getById(Long id) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		;
 		session.beginTransaction();
 		Documento documento = null;
 		try {

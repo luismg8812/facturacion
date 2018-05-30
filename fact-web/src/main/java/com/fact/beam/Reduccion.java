@@ -115,12 +115,7 @@ public class Reduccion implements Serializable {
 	private Date fechaHoy;
 	private Usuario usuarioDia;
 	public Empresa empresa;
-	private Double ivaTotal = 0.0;
-	private Double iva19 = 0.0;
-	private Double iva5 = 0.0;
-	private Double base5 = 0.0;
-	private Double base19 = 0.0;
-	private Double execento = 0.0;
+	
 	// entradas
 	private Double ivaTotalEntrada = 0.0;
 	private Double iva19Entrada = 0.0;
@@ -129,10 +124,9 @@ public class Reduccion implements Serializable {
 	private Double base19Entrada = 0.0;
 	private Double execentoEntrada = 0.0;
 	//
-	private String primeraFactura;
+	
 	private String ultimaFactura;
-	private Double costoTotal = 0.0;
-	private Double numeroDocumentos;
+	
 	private Double numeroDocumentosMac;
 
 	private Double total;
@@ -721,7 +715,8 @@ public class Reduccion implements Serializable {
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		// se trae la lista de las mac que facturaron
 		List<String> macs = documentoService.getMagList();
-		Double redu = (id.getPorcReduccion() / 100.0);
+		Long porcenReduccion = id.getPorcReduccion()==null?getReduccion() :id.getPorcReduccion();
+		Double redu = (porcenReduccion==null?0.0:porcenReduccion / 100.0);
 		for (String m : macs) {
 			
 
@@ -792,16 +787,16 @@ public class Reduccion implements Serializable {
 		}
 
 		String totalVent = Calculos
-				.cortarCantidades(formatea.format(id.getTotalOriginal() - (id.getTotalOriginal() * redu)), 12);
+				.cortarCantidades(formatea.format(id.getTotalReducido()), 12);
 		String ivatotal = Calculos.cortarCantidades(formatea.format(id.getIvaReducido()), 10);
-		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19()-(id.getIva19()*redu)), 10);
-		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5()-(id.getIva5()*redu)), 10);
-		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19()-(id.getBase19()*redu)), 10);
-		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5()-(id.getBase19()*redu)), 10);
-		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcento()-(id.getExcento()*redu)), 10);
+		String iva19t = Calculos.cortarCantidades(formatea.format(id.getIva19Reducido()), 10);
+		String iva5t = Calculos.cortarCantidades(formatea.format(id.getIva5Reducido()), 10);
+		String base19t = Calculos.cortarCantidades(formatea.format(id.getBase19Reducido()), 12);
+		String base5t = Calculos.cortarCantidades(formatea.format(id.getBase5Reducido()), 10);
+		String execnto = Calculos.cortarCantidades(formatea.format(id.getExcentorReducido()), 10);
 
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"TOTAL VENTAS    IVA TOTAL     IVA 19        IVA 5  GRAVADO 19  GRAVADO 5   EXCLUIDO",
+				"TOTAL VENTAS    IVA TOTAL     IVA 19      IVA 5    GRAVADO 19  GRAVADO 5   EXCLUIDO",
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		documento
 				.add(new Paragraph(
@@ -811,26 +806,26 @@ public class Reduccion implements Serializable {
 								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 
 		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REAL: " + id.getTotalOriginal(),
+			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REAL: " + formatea.format(id.getTotalOriginal()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
 		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "IVA TOTAL REAL: " + id.getIvaOriginal(),
+			documento.add(new Paragraph(new Phrase(lineSpacing, "IVA TOTAL REAL: " + formatea.format(id.getIvaOriginal()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
 		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "COSTO REAL: " + id.getCostoOriginal(),
+			documento.add(new Paragraph(new Phrase(lineSpacing, "COSTO REAL: " + formatea.format(id.getCostoOriginal()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
 		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REMISIONES: " + id.getTotalRemisiones(),
+			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REMISIONES: " + formatea.format(id.getTotalRemisiones()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 		}
 
 		List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
 															// los// cajeros
 
-		System.out.println(redu);
+		log.info("redu: "+redu);
 		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
 		Long server = configuracion.getServer();
 		for (Usuario u : uList) {
@@ -841,28 +836,28 @@ public class Reduccion implements Serializable {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "CAJERO: " + u.getNombre() + " " + u.getApellido(),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			documento.add(new Paragraph(new Phrase(lineSpacing,
-					"TOTAL VENTAS x CAJERO: " + (totalCajero
-							- (totalCajero * redu)),
+					"TOTAL VENTAS x CAJERO: " + formatea.format((totalCajero
+							- (totalCajero * redu))),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			if (userPropietario.equals("true")) {
 				documento
 						.add(new Paragraph(new Phrase(lineSpacing,
 								"TOTAL VENTAS X CAJERO REAL: "
-										+ totalCajero,
+										+ formatea.format(totalCajero),
 								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			}
 			if (userPropietario.equals("true")) {
 				Double totalRemisionesCajero = getTotalRemisionesToDay(id.getFechaInforme(), u, conCierre, server);
 				documento.add(new Paragraph(new Phrase(lineSpacing,
 						"TOTAL REMISIONES X CAJERO : "
-								+ totalRemisionesCajero,
+								+ formatea.format(totalRemisionesCajero),
 						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			}
 			if (userPropietario.equals("true")) {
 				Double avanceEfectivoCajero =getTotalAvanceEfectivoToDay(id.getFechaInforme(), u, conCierre, server);
 				documento.add(new Paragraph(new Phrase(lineSpacing,
 						"TOTAL ADELANTO EFECTIVO X CAJERO: "
-								+ avanceEfectivoCajero,
+								+ formatea.format(avanceEfectivoCajero),
 						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			}
 
@@ -888,9 +883,9 @@ public class Reduccion implements Serializable {
 				totalBolsas += d.getParcial();
 				cantidadBolsas += d.getCantidad();
 			}
-			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL DE BOLSAS: " + totalBolsas,
+			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL DE BOLSAS: " +cantidadBolsas ,
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-			documento.add(new Paragraph(new Phrase(lineSpacing, "VALOR: " + cantidadBolsas,
+			documento.add(new Paragraph(new Phrase(lineSpacing, "VALOR: " +formatea.format(totalBolsas) ,
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			documento.add(new Paragraph(
 					new Phrase(lineSpacing, "------------------------------------------------------------------",
@@ -1125,14 +1120,24 @@ public class Reduccion implements Serializable {
 				for (InfoDiario r : infoList) {
 					if (df.format(r.getFechaInforme()).equals(i.toString())) {
 						rvo = r;
-						Double cantidadReducida =(rvo.getTotalReducido()==null? rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta):rvo.getTotalReducido());
+						Double cantidadReducida =(rvo.getTotalReducido()==null? (rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta)):rvo.getTotalReducido());
 						Double costoReducido = (rvo.getCostoReducido()==null?rvo.getCostoOriginal() - (rvo.getCostoOriginal() * porcenta):rvo.getCostoReducido());
-						Double ivaReducido = (rvo.getIvaReducido()==null?  (rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta)):rvo.getIvaReducido());
+						Double ivaReducido = (rvo.getIvaReducido()==null?  (rvo.getIvaOriginal() - (rvo.getIvaOriginal() * porcenta)):rvo.getIvaReducido());
+						Double iva19Reducido =(rvo.getIva19Reducido()==null?  (rvo.getIva19() - (rvo.getIva19() * porcenta)):rvo.getIva19Reducido());
+						Double iva5Reducido =(rvo.getIva5Reducido()==null?  (rvo.getIva5() - (rvo.getIva5() * porcenta)):rvo.getIva5Reducido());
+						Double base19Reducido =(rvo.getBase19Reducido()==null?  (rvo.getBase19() - (rvo.getBase19() * porcenta)):rvo.getBase19Reducido());
+						Double base5Reducido =(rvo.getBase5Reducido()==null?  (rvo.getBase5() - (rvo.getBase5() * porcenta)):rvo.getBase5Reducido());
+						Double excentoReducido =(rvo.getExcentorReducido()==null?  (rvo.getExcento() - (rvo.getExcento() * porcenta)):rvo.getExcentorReducido());
+						Long porcenReduccion = rvo.getPorcReduccion()==null?getReduccion() :rvo.getPorcReduccion(); 
 						rvo.setTotalReducido(cantidadReducida);
 						rvo.setCostoReducido(costoReducido);
 						rvo.setIvaReducido(ivaReducido);
-						rvo.setPorcReduccion(getReduccion() == null ? 0l : getReduccion());
-
+						rvo.setPorcReduccion(porcenReduccion);
+						rvo.setIva19Reducido(iva19Reducido);
+						rvo.setIva5Reducido(iva5Reducido);
+						rvo.setBase19Reducido(base19Reducido);
+						rvo.setBase5Reducido(base5Reducido);
+						rvo.setExcentorReducido(excentoReducido);						
 						break;
 					}
 				}
@@ -1156,6 +1161,11 @@ public class Reduccion implements Serializable {
 					rvo.setDocumentoFin("");
 					rvo.setCantidadDocumentos(0.0);
 					rvo.setAvanceEfectivo(0.0);
+					rvo.setIva19Reducido(0.0);
+					rvo.setIva5Reducido(0.0);
+					rvo.setBase19Reducido(0.0);
+					rvo.setBase5Reducido(0.0);
+					rvo.setExcentorReducido(0.0);	
 				}
 				getReduccionList().add(rvo);
 			}
@@ -1166,22 +1176,27 @@ public class Reduccion implements Serializable {
 			Double totalBase5Temp = 0.0;
 			Double totalBase19Temp = 0.0;
 			Double totalExcentoTemp = 0.0;
+			Double iva19ReducidoTemp = 0.0;
+			Double iva5ReducidoTemp = 0.0;
+			Double base19ReducidoTemp = 0.0;
+			Double base5ReducidoTemp = 0.0;
+			Double excentoReducidoTemp = 0.0;
 			for (InfoDiario in : getReduccionList()) {
 				totalTemp +=   in.getTotalReducido();
 				totalIvaTemp += in.getIvaReducido();
-				totalIva19Temp += in.getIva19();
-				totalIva5Temp  += in.getIva5();
-				totalBase5Temp += in.getBase5();
-				totalBase19Temp += in.getBase19();
-				totalExcentoTemp += in.getExcento();
+				totalIva19Temp += in.getIva19Reducido();
+				totalIva5Temp  += in.getIva5Reducido();
+				totalBase5Temp += in.getBase5Reducido();
+				totalBase19Temp += in.getBase19Reducido();
+				totalExcentoTemp += in.getExcentorReducido();
 			}
 			setTotal(totalTemp);
 			setTotalIva(totalIvaTemp);
-			setTotalIva19(totalIva19Temp+(totalIva19Temp*porcenta));
-			setTotalIva5(totalIva5Temp+(totalIva5Temp*porcenta));
-			setTotalbase19(totalBase19Temp+(totalBase19Temp*porcenta));
-			setTotalbase5(totalBase5Temp+(totalBase5Temp*porcenta));
-			setTotalExcento(totalExcentoTemp+(totalExcentoTemp*porcenta));
+			setTotalIva19(totalIva19Temp);
+			setTotalIva5(totalIva5Temp);
+			setTotalbase19(totalBase19Temp);
+			setTotalbase5(totalBase5Temp);
+			setTotalExcento(totalExcentoTemp);
 			if (userPropietario.equals("true")) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(userPropietario.equals("true")?"Reducción Completa":"Busqueda  Completa"));
 			} 

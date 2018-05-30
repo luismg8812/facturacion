@@ -81,6 +81,21 @@ public class InfoDiario {
 
 	@Column(name="EXCENTO")
 	private Double excento;
+	
+	@Column(name="IVA_19_REDUCIDO")
+	private Double iva19Reducido;
+	
+	@Column(name="IVA_5_REDUCIDO")
+	private Double iva5Reducido;
+	
+	@Column(name="BASE_5_REDUCIDO")
+	private Double base5Reducido;
+	
+	@Column(name="BASE_19_REDUCIDO")
+	private Double base19Reducido;
+
+	@Column(name="EXCENTO_REDUCIDO")
+	private Double excentorReducido;
 
 	public Long getInfoDiarioId() {
 		return infoDiarioId;
@@ -240,6 +255,46 @@ public class InfoDiario {
 
 	public void setExcento(Double excento) {
 		this.excento = excento;
+	}
+
+	public Double getIva19Reducido() {
+		return iva19Reducido;
+	}
+
+	public void setIva19Reducido(Double iva19Reducido) {
+		this.iva19Reducido = iva19Reducido;
+	}
+
+	public Double getIva5Reducido() {
+		return iva5Reducido;
+	}
+
+	public void setIva5Reducido(Double iva5Reducido) {
+		this.iva5Reducido = iva5Reducido;
+	}
+
+	public Double getBase5Reducido() {
+		return base5Reducido;
+	}
+
+	public void setBase5Reducido(Double base5Reducido) {
+		this.base5Reducido = base5Reducido;
+	}
+
+	public Double getBase19Reducido() {
+		return base19Reducido;
+	}
+
+	public void setBase19Reducido(Double base19Reducido) {
+		this.base19Reducido = base19Reducido;
+	}
+
+	public Double getExcentorReducido() {
+		return excentorReducido;
+	}
+
+	public void setExcentorReducido(Double excentorReducido) {
+		this.excentorReducido = excentorReducido;
 	}
 
 	
