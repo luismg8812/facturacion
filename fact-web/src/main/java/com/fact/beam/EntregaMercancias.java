@@ -334,7 +334,7 @@ public class EntregaMercancias implements Serializable {
 				String cliente= cantidadFacturas.get(0).getDocumentoId().getClienteId().getNombre();
 				b.setNombreCliente(cliente);
 				//factura
-				String factura = cantidadFacturas.get(0).getDocumentoId().getConsecutivoDian();
+				String factura = ""+cantidadFacturas.get(0).getDocumentoId().getConsecutivoDian();
 				b.setFactura(factura);
 				b.setEntregaMercancia(cantidadFacturas.get(0));
 			}else{

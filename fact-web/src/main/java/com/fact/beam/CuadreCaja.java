@@ -98,8 +98,8 @@ public class CuadreCaja implements Serializable {
 	
 	
 	public Empresa empresa;
-	public String primeraFact;
-	public String ultimaFact;
+	public Long primeraFact;
+	public Long ultimaFact;
 	public Double abonosDia;
 	public Double base;
 	public Double recargas;
@@ -301,8 +301,8 @@ public void limpiar(){
 			documento.add(new Paragraph(new Phrase(lineSpacing, "" + getFechaHoy(),
 					FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // fecha
 			documento.add(new Paragraph(new Phrase(lineSpacing, "ENTREGO:______________________________" , FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
-			documento.add(new Paragraph(new Phrase(lineSpacing, "Factura inicial:.......: "+getPrimeraFact(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
-			documento.add(new Paragraph(new Phrase(lineSpacing, "Factura final:.........: "+getUltimaFact(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Factura inicial:.......: "+e.getLetraConsecutivo()+getPrimeraFact(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
+			documento.add(new Paragraph(new Phrase(lineSpacing, "Factura final:.........: "+e.getLetraConsecutivo()+getUltimaFact(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------", FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 			documento.add(new Paragraph(new Phrase(lineSpacing, "Descripción.................Valor", FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 			documento.add(new Paragraph(new Phrase(lineSpacing, "---------------------------------------------", FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
@@ -671,7 +671,7 @@ public void setEmpresa(Empresa empresa) {
 	this.empresa = empresa;
 }
 
-public String getPrimeraFact() throws ParseException {
+public Long getPrimeraFact() throws ParseException {
 	Long tipoDocumentoId = 10l; // tipo documento factura de salida
 	Date hoy = Calculos.fechaInicial(new Date());
 	Date hoyfin = Calculos.fechaFinal(new Date());
@@ -679,16 +679,16 @@ public String getPrimeraFact() throws ParseException {
 	if(factDia!=null && !factDia.isEmpty()){
 		primeraFact = factDia.get(0).getConsecutivoDian();
 	}else{
-		primeraFact="0";
+		primeraFact=0l;
 	}
 	return primeraFact;
 }
 
-public void setPrimeraFact(String primeraFact) {
+public void setPrimeraFact(Long primeraFact) {
 	this.primeraFact = primeraFact;
 }
 
-public String getUltimaFact() throws ParseException {
+public Long getUltimaFact() throws ParseException {
 	Long tipoDocumentoId = 10l; // tipo documento factura de salida
 	Date hoy = Calculos.fechaInicial(new Date());
 	Date hoyfin = Calculos.fechaFinal(new Date());
@@ -696,13 +696,13 @@ public String getUltimaFact() throws ParseException {
 	if(factDia!=null && !factDia.isEmpty()){
 		ultimaFact = factDia.get(factDia.size()-1).getConsecutivoDian();
 	}else{
-		ultimaFact="0";
+		ultimaFact=0l;
 	}
 
 	return ultimaFact;
 }
 
-public void setUltimaFact(String ultimaFact) {
+public void setUltimaFact(Long ultimaFact) {
 	this.ultimaFact = ultimaFact;
 }
 

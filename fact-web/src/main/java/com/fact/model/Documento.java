@@ -57,7 +57,7 @@ public class Documento {
 	private Date fechaActualiza;
 	
 	@Column(name="CONSECUTIVO_DIAN")
-	private String consecutivoDian;
+	private Long consecutivoDian;
 	
 	@Column(name="IMPRESO")
 	private Long impreso;
@@ -189,11 +189,11 @@ public class Documento {
 		this.interes = interes;
 	}
 
-	public String getConsecutivoDian() {
+	public Long getConsecutivoDian() {
 		return consecutivoDian;
 	}
 
-	public void setConsecutivoDian(String consecutivoDian) {
+	public void setConsecutivoDian(Long consecutivoDian) {
 		this.consecutivoDian = consecutivoDian;
 	}
 

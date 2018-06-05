@@ -503,9 +503,11 @@ public class Calculos {
 		Double iva5 =(info.getIva5()==null?0.0:info.getIva5())+(documento.getIva5()==null?0.0:documento.getIva5());
 		Double iva19 =(info.getIva19()==null?0.0:info.getIva19())+(documento.getIva19()==null?0.0:documento.getIva19());
 		Double cantidadOriginal =(info.getTotalOriginal()==null?0.0:info.getTotalOriginal())+(documento.getTotal()==null?0.0:documento.getTotal());
+		Double ivaTootalOriginal =(info.getIvaOriginal()==null?0.0:info.getIvaOriginal())+(documento.getIva()==null?0.0:documento.getIva());
 		Double excento = (info.getExcento()==null?0.0:info.getExcento())+(documento.getExcento()==null?0.0:documento.getExcento());
 		Double totalCosto=(info.getCostoOriginal()==null?0.0:info.getCostoOriginal())+(documento.getTotalCosto()==null?0.0:documento.getTotalCosto());
 		Double totalDocumentos = (info.getCantidadDocumentos()==null?0:info.getCantidadDocumentos())+1;
+		//Double
 		info.setBase19(base19);
 		info.setBase5(base5);
 		info.setIva19(iva19);
@@ -514,11 +516,14 @@ public class Calculos {
 		info.setTotalOriginal(cantidadOriginal);
 		info.setCostoOriginal(totalCosto);
 		info.setCantidadDocumentos(totalDocumentos);
-		info.setIvaOriginal(iva19+iva5);
+		info.setIvaOriginal(ivaTootalOriginal);
 		if(info.getInfoDiarioId()==null){
-			info.setDocumentoInicio(documento.getConsecutivoDian()) ;
-		}else{
+			info.setDocumentoInicio(""+documento.getConsecutivoDian()) ;
 			info.setDocumentoFin(documento.getConsecutivoDian()) ;
+		}else{
+			if(documento.getConsecutivoDian()>info.getDocumentoFin()){
+				info.setDocumentoFin(documento.getConsecutivoDian()) ;
+			}		
 		}
 		return info;
 	}

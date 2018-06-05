@@ -461,7 +461,7 @@ public class Reduccion implements Serializable {
 			bw.write("N° Factura Inicial  N° de Factura Final  Cantidad Fac.  Valor Total Facturado\n");
 			bw.write("______________________________________________________________________________\n");
 			bw.write("" + Calculos.cortarDescripcion(id.getDocumentoInicio(), 18) + "  "
-					+ Calculos.cortarDescripcion(id.getDocumentoFin(), 19) + "  "
+					+ Calculos.cortarDescripcion(e.getLetraConsecutivo()+id.getDocumentoFin(), 19) + "  "
 					+ Calculos.cortarCantidades(id.getCantidadDocumentos(), 13) + "  "
 					+ Calculos.cortarCantidades(formatea.format(id.getTotalReducido()), 21) + "\n");
 			bw.write("                                        \n");
@@ -700,7 +700,7 @@ public class Reduccion implements Serializable {
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				Calculos.cortarDescripcion(id.getDocumentoInicio(), 18) + "  "
-						+ Calculos.cortarDescripcion(id.getDocumentoFin(), 19) + "  "
+						+ Calculos.cortarDescripcion(e.getLetraConsecutivo()+id.getDocumentoFin(), 19) + "  "
 						+ Calculos.cortarCantidades(id.getCantidadDocumentos(), 13) + "  "
 						+ Calculos.cortarCantidades(formatea.format(id.getTotalReducido()), 21),
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
@@ -731,7 +731,7 @@ public class Reduccion implements Serializable {
 								+ Calculos.cortarCantidades(numeroDocumentosMac, 10) + "  " + totalMac,
 						FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 			} catch (ParseException e1) {
-				e1.printStackTrace();
+				log.error(e1.getMessage());
 			}
 		}
 		documento.add(new Paragraph(new Phrase(lineSpacing, "______________________________________________________",
@@ -1119,19 +1119,17 @@ public class Reduccion implements Serializable {
 				InfoDiario rvo = new InfoDiario();
 				for (InfoDiario r : infoList) {
 					if (df.format(r.getFechaInforme()).equals(i.toString())) {
-						rvo = r;
-						Double cantidadReducida =(rvo.getTotalReducido()==null? (rvo.getTotalOriginal() - (rvo.getTotalOriginal() * porcenta)):rvo.getTotalReducido());
+						rvo = r;					
 						Double costoReducido = (rvo.getCostoReducido()==null?rvo.getCostoOriginal() - (rvo.getCostoOriginal() * porcenta):rvo.getCostoReducido());
-						Double ivaReducido = (rvo.getIvaReducido()==null?  (rvo.getIvaOriginal() - (rvo.getIvaOriginal() * porcenta)):rvo.getIvaReducido());
 						Double iva19Reducido =(rvo.getIva19Reducido()==null?  (rvo.getIva19() - (rvo.getIva19() * porcenta)):rvo.getIva19Reducido());
 						Double iva5Reducido =(rvo.getIva5Reducido()==null?  (rvo.getIva5() - (rvo.getIva5() * porcenta)):rvo.getIva5Reducido());
 						Double base19Reducido =(rvo.getBase19Reducido()==null?  (rvo.getBase19() - (rvo.getBase19() * porcenta)):rvo.getBase19Reducido());
 						Double base5Reducido =(rvo.getBase5Reducido()==null?  (rvo.getBase5() - (rvo.getBase5() * porcenta)):rvo.getBase5Reducido());
 						Double excentoReducido =(rvo.getExcentorReducido()==null?  (rvo.getExcento() - (rvo.getExcento() * porcenta)):rvo.getExcentorReducido());
 						Long porcenReduccion = rvo.getPorcReduccion()==null?getReduccion() :rvo.getPorcReduccion(); 
-						rvo.setTotalReducido(cantidadReducida);
+						rvo.setTotalReducido(iva19Reducido+iva5Reducido+base19Reducido+base5Reducido+excentoReducido);
 						rvo.setCostoReducido(costoReducido);
-						rvo.setIvaReducido(ivaReducido);
+						rvo.setIvaReducido(iva19Reducido+iva5Reducido);
 						rvo.setPorcReduccion(porcenReduccion);
 						rvo.setIva19Reducido(iva19Reducido);
 						rvo.setIva5Reducido(iva5Reducido);
@@ -1158,7 +1156,7 @@ public class Reduccion implements Serializable {
 					rvo.setTotalRemisiones(0.0);
 					rvo.setPorcReduccion(0l);
 					rvo.setDocumentoInicio("");
-					rvo.setDocumentoFin("");
+					rvo.setDocumentoFin(0l);
 					rvo.setCantidadDocumentos(0.0);
 					rvo.setAvanceEfectivo(0.0);
 					rvo.setIva19Reducido(0.0);
@@ -1175,12 +1173,7 @@ public class Reduccion implements Serializable {
 			Double totalIva5Temp = 0.0;
 			Double totalBase5Temp = 0.0;
 			Double totalBase19Temp = 0.0;
-			Double totalExcentoTemp = 0.0;
-			Double iva19ReducidoTemp = 0.0;
-			Double iva5ReducidoTemp = 0.0;
-			Double base19ReducidoTemp = 0.0;
-			Double base5ReducidoTemp = 0.0;
-			Double excentoReducidoTemp = 0.0;
+			Double totalExcentoTemp = 0.0;			
 			for (InfoDiario in : getReduccionList()) {
 				totalTemp +=   in.getTotalReducido();
 				totalIvaTemp += in.getIvaReducido();

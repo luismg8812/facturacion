@@ -169,7 +169,7 @@ public class Impresion {
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, TituloFactura1, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)), 430f, 350, 0);// tituo
 																												// factura1
-			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,e.getLetraConsecutivo()+
 					documentoImp.getConsecutivoDian(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize + 2)),
 					500f, 355, 0);// # DOCUMENTO
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
