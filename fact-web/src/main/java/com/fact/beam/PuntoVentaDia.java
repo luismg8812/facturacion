@@ -266,7 +266,7 @@ public class PuntoVentaDia implements Serializable {
 		Producto p = null;
 		p = getProductosAllCodigo().get(Long.valueOf(completo));
 		if (p != null) {
-			System.out.println("entra al else");
+			log.info("entra al else");
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
 			setCodigoInterno(p.getProductoId().toString());
 			setArticulo(p);
@@ -289,7 +289,7 @@ public class PuntoVentaDia implements Serializable {
 		}
 		Producto p = null;
 		try {
-			codigoProducoString = completo == null ? "" : completo.substring(1, 6);
+			codigoProducoString = completo.substring(1, 6);
 			log.info("codigoP:" + codigoProducoString);
 			p = getProductosAllCodigo().get(Long.valueOf(codigoProducoString));
 			if (p != null) {
@@ -299,7 +299,6 @@ public class PuntoVentaDia implements Serializable {
 				String parte2 = pesoProducoString.substring(2, 5);
 				Double peso = Double.valueOf(parte1 + "." + parte2);
 				log.info("Peso" + peso);
-				System.out.println("Peso" + peso);
 				setCantidad(peso);
 				productoSelect = p;
 				cantidadEnter(null);
@@ -385,7 +384,8 @@ public class PuntoVentaDia implements Serializable {
 		for (Producto p : getProductosAll()) {
 			if (p.getNombre() != null) {
 				String articul = p.getNombre().toUpperCase().trim();
-				// if (articul.indexOf(query.toUpperCase()) != -1) {
+				// si en algun momento se necesita
+				// if(articul.indexOf(query.toUpperCase()) != -1) {
 				if (articul.startsWith(query.toUpperCase().trim())) {
 					nombProductos.add(p);
 				}
@@ -421,7 +421,7 @@ public class PuntoVentaDia implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("no found product server thow");
+			log.info("no found product server thow");
 			return nombProductos;
 		}
 		return nombProductos;
@@ -449,7 +449,7 @@ public class PuntoVentaDia implements Serializable {
 			setParcial(canti * costoP);
 		} catch (Exception e) {
 			setCantidad(0.0);
-			e.printStackTrace();
+			log.error(e.getMessage());
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage("Error en el uso de la Gramera, por favor vuelva a pesar: " + e.getMessage()));
 		}
@@ -459,7 +459,7 @@ public class PuntoVentaDia implements Serializable {
 	public String precioX01() {
 		if (getPx01() != null) {
 			Long server = 1l;
-			System.out.println("dio enter en presio x01");
+			log.info("dio enter en presio x01");
 			if (getDocumento().getDocumentoId() == null) {
 				Documento docOjb = new Documento();
 				TipoDocumento td = new TipoDocumento();
@@ -478,8 +478,8 @@ public class PuntoVentaDia implements Serializable {
 				}
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento: " + getDocumento().getDocumentoId());
+				log.info("Usuario: " + usuario().getLogin());
 			}
 			RequestContext.getCurrentInstance().execute("PF('px01').hide();");
 			DocumentoDetalle docDetalle = new DocumentoDetalle();
@@ -554,15 +554,10 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public String cantidadBalanza(AjaxBehaviorEvent event) {
-		// RequestContext.getCurrentInstance().execute("PF('cantidadPopup').hide();");
-		if (getParciaPopup().toUpperCase().equals("S")) {
+		if (getParciaPopup().equalsIgnoreCase("S")) {
 			cantidadEnter(null);
 		} else {
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').value='';");
-			// RequestContext.getCurrentInstance().update(LISTA_PRODUCTOS);
-			// RequestContext.getCurrentInstance().execute("document.getElementById('busquedaCodBarras1').style.display='inline';");
-			// RequestContext.getCurrentInstance().update("codBarras_input1");
-			// RequestContext.getCurrentInstance().update("busquedaCodBarras1");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').value='';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').select();");
@@ -586,7 +581,7 @@ public class PuntoVentaDia implements Serializable {
 	 */
 	public String cantidadEnter(AjaxBehaviorEvent event) {
 		if (getCantidad() != null) {
-			System.out.println("dio enter en cantidad");
+			log.info("dio enter en cantidad");
 			RequestContext.getCurrentInstance().execute(LISTA_PRODUCTOS_INLINE); // campos
 
 			Configuracion configuracion = configuracion();
@@ -603,7 +598,6 @@ public class PuntoVentaDia implements Serializable {
 			}
 			if (getCantidad() == 0 || getCantidad() < 0) {
 				return "";
-				// getProductos().add(docDetalleVo);
 			}
 			// se agrega un tope maximo de cantidad de 1500
 			if (getCantidad() > 1500) {
@@ -655,8 +649,8 @@ public class PuntoVentaDia implements Serializable {
 
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento:" + getDocumento().getDocumentoId());
+				log.info("Usuario:" + usuario().getLogin());
 			}
 			// se agrega la logica del c cambia
 			DocumentoDetalle docDetalle = new DocumentoDetalle();
@@ -736,7 +730,7 @@ public class PuntoVentaDia implements Serializable {
 				Producto proCantidad = productoSelect;
 				Producto proCantidad2 = productoSelect2;
 				proCantidad.setCantidad(newCantidad - docDetalle.getCantidad1());
-				restarCantidadesSubProducto(docDetalle,server);
+				restarCantidadesSubProducto(docDetalle, server);
 				documentoDetalleService.save(docDetalle, server);
 				productoService.update(proCantidad, 1l);
 				if (server == 2l && proCantidad2 != null) {
@@ -818,21 +812,19 @@ public class PuntoVentaDia implements Serializable {
 			docDetalle.setEstado(1l);
 			docDetalle.setFechaRegistro(new Date());
 			docDetalle.setProductoId(s.getProductoHijo());
-			//docDetalle.set
 			documentoDetalleService.save(docDetalle, server);
 			productoService.update(s.getProductoHijo(), 1l);
 		}
 	}
 
 	public String efectivoFactura(AjaxBehaviorEvent event) {
-		// RequestContext.getCurrentInstance().execute("document.getElementById('impresion1').value='';");
-		System.out.println("efectivo:" + getEfectivo());
+		log.info("efectivo:" + getEfectivo());
 		Double vefectivo = getEfectivo() == null ? 0.0 : getEfectivo().doubleValue();
 		getDocumento().setEfectivo(vefectivo);
 		if (getTotal() == null) {
 			setTotal(0.0);
 		}
-		Double vtotal = getTotal().doubleValue();
+		Double vtotal = getTotal();
 		Double vvalortarget = getValorTargeta() == null ? 0.0 : getValorTargeta().doubleValue();
 		getDocumento().setValorTarjeta(vvalortarget);
 		Double vcambio = vefectivo + vvalortarget - vtotal;
@@ -843,20 +835,19 @@ public class PuntoVentaDia implements Serializable {
 			setCambio(vcambio);
 		}
 		getDocumento().setCambio(vcambio);
-		// RequestContext.getCurrentInstance().execute("document.getElementById('impresionForm:impresion1').style.display='inline';");
-		// RequestContext.getCurrentInstance().execute("document.getElementById('impresionForm:impresion1').focus();");
 		return "";
 	}
 
 	public String valorTargeta(AjaxBehaviorEvent event) {
-		System.out.println("valor targeta:" + getEfectivo());
+		log.info("valor targeta:" + getEfectivo());
 		Double vtotal = getTotal().doubleValue();
 		Double vvalortarget = getValorTargeta() == null ? 0.0 : getValorTargeta().doubleValue();
 		setCambio(vtotal - vvalortarget);
 		return "";
 	}
 
-	public String imprimirFactura(String enPantalla) throws IOException, DocumentException, PrinterException, PrintException {
+	public String imprimirFactura(String enPantalla)
+			throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null) {
 			return "";
 		}
@@ -869,75 +860,9 @@ public class PuntoVentaDia implements Serializable {
 			String tituloFactura = "";
 			getDocumento().setImpreso(1l);
 			getDocumento().setEntregado(0l);
-			if (getDocumento().getTipoDocumentoId() == null) {
-				if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
-					getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());// es
-																							// necesario
-																							// asignar
-																							// el
-																							// consecutivo
-																							// dian
-					System.out.println("consecutivo documentoId: " + getDocumento().getDocumentoId());
-					tituloFactura = "No. DE GUIA";
-					getDocumento().setReduccion(1l);
-					// server=2l; //facturacion en el server 2
-				} else {
-					String con = documentoService.getByUltimoId();
-					String consecutivoDian = e.getLetraConsecutivo() + " " + con;
-					System.out.println("consecutivo Dian: " + consecutivoDian);
-					getDocumento().setConsecutivoDian(consecutivoDian);
-					tituloFactura = "FACTURA DE VENTA";
-					getDocumento().setReduccion(0l);
-				}
-			} else {
-				switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
-				case "9":
-					getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());
-					System.out.println("consecutivo documentoId: " + getDocumento().getDocumentoId());
-					tituloFactura = "No. DE GUIA";
-					getDocumento().setReduccion(1l);
-					// server=2l;
-					break;
-				case "10":
-					String con = documentoService.getByUltimoId();
-					// dentro de try se valida si faltan 500 facturas para
-					// llegar hasta el tope
-					try {
-						Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
-						Long consegutivo = Long.valueOf(con);
-						if (consegutivo + 500 > topeConsecutivo) {
-							FacesContext.getCurrentInstance().addMessage(null,
-									new FacesMessage(" se esta agotando el consegutivo DIAN "));
-						}
-
-					} catch (Exception e2) {
-						e2.printStackTrace();
-					}
-					String consecutivoDian = e.getLetraConsecutivo() + " " + con;
-					System.out.println("consecutivo Dian: " + consecutivoDian);
-					getDocumento().setConsecutivoDian(consecutivoDian);
-					tituloFactura = "FACTURA DE VENTA";
-					getDocumento().setReduccion(0l);
-					server = 1l;
-					break;
-				case "4":
-					getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());// es
-																							// necesario
-																							// asignar
-																							// el
-																							// consecutivo
-																							// dian
-					System.out.println("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
-					tituloFactura = "No. DE COTIZACIÓN";
-					server = 1l;
-					break;
-				default:
-					break;
-				}
-			}
 			// se asigna un tipo de pago
 			TipoPago tipa = new TipoPago();
-			if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
+			if (getCartera() != null && getCartera().equalsIgnoreCase("S")) {
 				tipa.setTipoPagoId(2l);// pago a credito
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2l;
@@ -958,11 +883,11 @@ public class PuntoVentaDia implements Serializable {
 				if (getDescuento() < -100.0 || getDescuento() > 100.0) {
 					getDocumento().setDescuento(getDescuento());
 					desTemp = (getDescuento() * 100) / getDocumento().getTotal();
-					System.out.println("% descuento:" + desTemp);
+					log.info("% descuento:" + desTemp);
 				} else {
 					getDocumento().setDescuento((getDocumento().getTotal() * getDescuento()) / 100);
 					desTemp = getDescuento();
-					System.out.println("% descuento:" + desTemp);
+					log.info("% descuento:" + desTemp);
 				}
 				if (desTemp < -15 || desTemp > 15) {
 					FacesContext.getCurrentInstance().addMessage(null,
@@ -981,13 +906,13 @@ public class PuntoVentaDia implements Serializable {
 			}
 			// se busca la mac del equipo y se le asigna a la factura
 			getDocumento().setMac(Calculos.conseguirMAC2());
-			System.out.println("mac:" + getDocumento().getMac());
+			log.info("mac:" + getDocumento().getMac());
 			documentoService.update(getDocumento(), server);
 			// se manda a que se agregue el documento a la suma del informe
 			// diario parcial
 			calcularInfoDiario();
+			
 			String imp = e.getImpresion().toUpperCase();
-			// System.out.println("numero de impresiones: "+numeroImpresiones);
 			for (int i = 0; i < numeroImpresiones; i++) { // si la factura fue
 															// a// credito se//
 															// imprime dos veces
@@ -1002,7 +927,8 @@ public class PuntoVentaDia implements Serializable {
 					// pdf = imprimirBig(tituloFactura);
 					break;
 				case "PDF":
-					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla);
+					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+							enPantalla);
 					break;
 				case "BIG_PDF":
 					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
@@ -1015,47 +941,32 @@ public class PuntoVentaDia implements Serializable {
 					break;
 
 				}
-
 			}
-
 			limpiar();
-			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
-			RequestContext.getCurrentInstance().execute("pagina='submenu';");
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
-			// RequestContext.getCurrentInstance().execute("opciones:Imp_movi_mes1");
-			RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('total_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('valorTargeta_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('efectivo_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cambio_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
-
+			despuesImprimir();
 		}
 		if (getImpresion() == null || getImpresion().equalsIgnoreCase("N")) {
 			limpiar();
-			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
-			RequestContext.getCurrentInstance().execute("pagina='submenu';");
-			RequestContext.getCurrentInstance()
-					.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
-			// RequestContext.getCurrentInstance().execute("opciones:Imp_movi_mes1");
-			RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('total_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('valorTargeta_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('efectivo_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('cambio_input').value='';");
-			RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
+			despuesImprimir();
 		}
-		// falta auto incrementable dian
 		return "";
+	}
+
+	public void despuesImprimir() {
+		RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
+		RequestContext.getCurrentInstance().execute("pagina='submenu';");
+		RequestContext.getCurrentInstance()
+				.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('total_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('valorTargeta_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('efectivo_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('cambio_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
 	}
 
 	private void calcularInfoDiario() {
@@ -1064,17 +975,17 @@ public class PuntoVentaDia implements Serializable {
 		Date fechaFinal = Calculos.fechaFinal(fechaDocumento);
 		List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(fechaInicio, fechaFinal);
 		try {
-			InfoDiario infoDiario=Calculos.calcularInfoDiario(getDocumento(), infoList);
-			
-			if(infoDiario.getInfoDiarioId()==null){
+			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList);
+
+			if (infoDiario.getInfoDiarioId() == null) {
 				documentoService.save(infoDiario);
-			}else{
+			} else {
 				documentoService.update(infoDiario);
 			}
 
 		} catch (FactException e) {
-			log.error("Error calculando registro de informe diario"+ e.getMessage());
-		}	
+			log.error("Error calculando registro de informe diario" + e.getMessage());
+		}
 	}
 
 	// funcion encargada de aplicar el descuento si el valor getdescuento es
@@ -1087,11 +998,11 @@ public class PuntoVentaDia implements Serializable {
 		if (getDescuento() < -100.0 || getDescuento() > 100.0) {
 			getDocumento().setDescuento(getDescuento());
 			desTemp = (getDescuento() * 100) / getDocumento().getTotal();
-			System.out.println("% descuento:" + desTemp);
+			log.info("% descuento:" + desTemp);
 		} else {
 			getDocumento().setDescuento((getDocumento().getTotal() * getDescuento()) / 100);
 			desTemp = getDescuento();
-			System.out.println("% descuento:" + desTemp);
+			log.info("% descuento:" + desTemp);
 		}
 		if (desTemp < -15 || desTemp > 15) {
 			return;
@@ -1105,17 +1016,7 @@ public class PuntoVentaDia implements Serializable {
 			d.setUnitario(unitarioDescuento);
 			temp.add(d);
 		}
-		// Double totalTemp = getDocumento().getTotal() +
-		// (getDocumento().getTotal() * des);
 		Double totalTemp = getDocumento().getTotal();
-		// Long tem = Long.valueOf(
-		// totalTemp.toString().substring(totalTemp.toString().length() - 4,
-		// totalTemp.toString().length() - 2));
-		// if (tem < 50) {
-		// totalTemp = totalTemp + (50 - tem);
-		// } else {
-		// totalTemp = totalTemp + (100 - tem);
-		// }
 		Double ivaTemp = getDocumento().getIva() + (getDocumento().getIva() * des);
 		Double excentoTemp = getDocumento().getExcento() + (getDocumento().getExcento() * des);
 		Double gravadoTemp = getDocumento().getGravado() + (getDocumento().getGravado() * des);
@@ -1143,7 +1044,7 @@ public class PuntoVentaDia implements Serializable {
 
 	private String imprimirTemporal(String tituloFactura) throws IOException {
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
-		// System.out.println("entra a imprimir");
+		// log.info("entra a imprimir");
 		Empresa e = Login.getEmpresaLogin();
 		String pdf = "C:\\facturas\\factura_" + getDocumento().getDocumentoId() + ".txt";
 		File archivo = new File(pdf);
@@ -1276,7 +1177,7 @@ public class PuntoVentaDia implements Serializable {
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(pdf);
-			System.out.println(pdf);
+			log.info(pdf);
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -1289,13 +1190,13 @@ public class PuntoVentaDia implements Serializable {
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
 		String impresara = usuario().getImpresora();
-		System.out.println("impresoraUsuario: " + impresara);
+		log.info("impresoraUsuario: " + impresara);
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured: " + printServices.length);
+		log.info("Number of printers configured: " + printServices.length);
 		for (PrintService printer : printServices) {
-			System.out.println("Printer:" + printer.getName());
+			log.info("Printer:" + printer.getName());
 			if (printer.getName().equals(impresara)) {
-				System.out.println("Comparacion:" + printer.getName() + ":" + impresara);
+				log.info("Comparacion:" + printer.getName() + ":" + impresara);
 				defaultPrintService = printer;
 			}
 		}
@@ -1323,7 +1224,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public void preAccion(String op) {
 		limpiar();
-		System.out.println("entra: " + op);
+		log.info("entra: " + op);
 		Usuario usuario = usuario();
 		List<String> rutas = new ArrayList<>();
 		Map<String, OpcionUsuario> opcionesActivas = new HashMap<>();
@@ -1530,7 +1431,7 @@ public class PuntoVentaDia implements Serializable {
 	public void activarAsignacionEmpleadoFactura(Usuario usuario, Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "ASIGNAR_EMPLEADO_FACTURA";
 		if (opcionesActivas.containsKey(ruta)) {
-			System.out.println("tiene asignarEmpleadoFactura  activo");
+			log.info("tiene asignarEmpleadoFactura  activo");
 			RequestContext.getCurrentInstance().execute("asignarEmpleadoFactura=1;");
 			asignarEmpleadoFactura = opcionesActivas.get(ruta);
 		} else {
@@ -1542,7 +1443,7 @@ public class PuntoVentaDia implements Serializable {
 	public void activarComandas(Usuario usuario, Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "ACTIVAR_COMANDAS";
 		if (opcionesActivas.containsKey(ruta)) {
-			System.out.println("tiene comanda  activo");
+			log.info("tiene comanda  activo");
 			RequestContext.getCurrentInstance().execute("activarComandas=1;");
 			activarComandas = opcionesActivas.get(ruta);
 		} else {
@@ -1554,7 +1455,7 @@ public class PuntoVentaDia implements Serializable {
 	public void activarImpresionPantalla(Usuario usuario, Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "ACTIVAR_IMPRESION_PANTALLA";
 		if (opcionesActivas.containsKey(ruta)) {
-			System.out.println("tiene ImpresionPantalla  activo");
+			log.info("tiene ImpresionPantalla  activo");
 			RequestContext.getCurrentInstance().execute("activarImpresionPantalla=1;");
 			activarImpresionPantalla = opcionesActivas.get(ruta);
 		} else {
@@ -1563,9 +1464,8 @@ public class PuntoVentaDia implements Serializable {
 		}
 	}
 
-
 	public void limpiar() {
-		System.out.println("limpiar");
+		log.info("limpiar");
 		setProductos(null);
 		setArticulo(null);
 		setCantidad(null);
@@ -1652,7 +1552,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public void popupImprimir() {
 		if (actModFactura) {
-			System.out.println("i en modificar factura");
+			log.info("i en modificar factura");
 			// todo lo de modificar, activar cosas y asi....
 
 			RequestContext.getCurrentInstance()
@@ -1677,7 +1577,7 @@ public class PuntoVentaDia implements Serializable {
 
 			actModFactura = Boolean.FALSE;
 		} else {
-			if (activarComandas != null || activarImpresionPantalla!=null) {
+			if (activarComandas != null || activarImpresionPantalla != null) {
 				RequestContext.getCurrentInstance().execute("PF('dialogComanda').show();");
 			} else {
 				abrirDialogImprimir();
@@ -1686,7 +1586,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void imprimirComanda() throws FileNotFoundException, DocumentException {
-		System.out.println("imprimir comanda");
+		log.info("imprimir comanda");
 		if (getDocumento().getDocumentoId() == null) {
 			return;
 		}
@@ -1706,10 +1606,10 @@ public class PuntoVentaDia implements Serializable {
 		for (Long g : gruposId) {
 			switch (imp) {
 			case "TXT":
-				System.out.println("no se imprime comandas en txt");
+				log.info("no se imprime comandas en txt");
 				break;
 			case "BIG":
-				System.out.println("no se imprime comandas en big");
+				log.info("no se imprime comandas en big");
 				break;
 			case "PDF":
 				Grupo g2 = grupoService.getById(g);
@@ -1758,14 +1658,14 @@ public class PuntoVentaDia implements Serializable {
 				documento.close();
 				PrinterJob job = PrinterJob.getPrinterJob();
 				PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-				System.out.println("Number of printers configured1: " + printServices.length);
+				log.info("Number of printers configured1: " + printServices.length);
 				for (PrintService printer : printServices) {
-					System.out.println("Printer: " + printer.getName());
-					System.out.println("comparacion:" + impresora + ":" + printer.getName());
+					log.info("Printer: " + printer.getName());
+					log.info("comparacion:" + impresora + ":" + printer.getName());
 					if (printer.getName().toString().equals(impresora)) {
 						try {
 							job.setPrintService(printer);
-							System.out.println(impresora + " : " + printer.getName());
+							log.info(impresora + " : " + printer.getName());
 							break;
 						} catch (PrinterException ex) {
 							ex.printStackTrace();
@@ -1790,17 +1690,17 @@ public class PuntoVentaDia implements Serializable {
 					if (!borrar.delete()) {
 						System.out.println("Error borrando facturas");
 					} else {
-						System.out.println("Documento borrado");
+						log.info("Documento borrado");
 					}
 				}
 
 				break;
 			case "BIG_PDF":
-				System.out.println("no se imprime comandas en big_pdf");
+				log.info("no se imprime comandas en big_pdf");
 
 				break;
 			case "SMALL_PDF":
-				System.out.println("no se imprime comandas en small_pdf");
+				log.info("no se imprime comandas en small_pdf");
 
 				break;
 			default:
@@ -1814,19 +1714,19 @@ public class PuntoVentaDia implements Serializable {
 		RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').select();");
 		RequestContext.getCurrentInstance().update("art_11");
 	}
-	
-	public void imprimirPantalla(){
+
+	public void imprimirPantalla() {
 		try {
 			setImpresion("s");
 			imprimirFactura("true");
 			RequestContext.getCurrentInstance().execute("PF('dialogComanda').hide();");
 		} catch (IOException | DocumentException | PrinterException | PrintException e) {
-			System.err.println("Error en imprimir factura: "+e.getMessage());
+			System.err.println("Error en imprimir factura: " + e.getMessage());
 		}
 	}
 
 	public void abrirDialogImprimir() {
-		System.out.println("imprimir");
+		log.info("imprimir");
 		RequestContext.getCurrentInstance().execute("PF('dialogComanda').hide();");
 		RequestContext.getCurrentInstance().execute("PF('imprimir').show();");
 		RequestContext.getCurrentInstance().execute("document.getElementById('pogoTargeta').value='N';");
@@ -1855,7 +1755,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void buscarUltimaFactura() {
-		System.out.println("buscar ultima factura");
+		log.info("buscar ultima factura");
 		Documento ultimoFactura;
 		Usuario usuario = usuario();
 		Long idFactura = 10l; // id de tipo documento factura
@@ -1877,14 +1777,14 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void siguienteFactura() throws ParseException {
-		System.out.println("siguiente_factura");
+		log.info("siguiente_factura");
 		List<DocumentoDetalle> dd = new ArrayList<>();
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
 		if (getDocumentoActual() == null) {
 			if (!getListaDocumento().isEmpty()) {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
-				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				if (server == 2l) {
@@ -1898,7 +1798,7 @@ public class PuntoVentaDia implements Serializable {
 			Integer pos = getListaDocumento().indexOf(getDocumentoActual());
 			if (pos > 0) {
 				setDocumentoActual(getListaDocumento().get(pos - 1));
-				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				if (server == 2l) {
@@ -1913,14 +1813,14 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void anteriorFactura() throws ParseException {
-		System.out.println("anterior_factura");
+		log.info("anterior_factura");
 		List<DocumentoDetalle> dd = new ArrayList<>();
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
 		if (getDocumentoActual() == null) {
 			if (!getListaDocumento().isEmpty()) {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
-				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				if (server == 2l) {
@@ -1934,7 +1834,7 @@ public class PuntoVentaDia implements Serializable {
 			Integer pos = getListaDocumento().indexOf(getDocumentoActual());
 			if (pos < getListaDocumento().size() - 1) {
 				setDocumentoActual(getListaDocumento().get(pos + 1));
-				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				if (server == 2l) {
@@ -1957,7 +1857,7 @@ public class PuntoVentaDia implements Serializable {
 			vo.setFechaRegistro(d1.getFechaRegistro());
 			vo.setParcial(d1.getParcial());
 			vo.setProductoId(d1.getProductoId());
-			System.out.println("productos:" + d1.getProductoId().getNombre());
+			log.info("productos:" + d1.getProductoId().getNombre());
 			if (Calculos.validarPromo(d1.getProductoId(), cantidad)) {
 				Double precioPromo = d1.getProductoId().getPubPromo();
 				Double cantidadPromo = d1.getProductoId().getkGPromo();
@@ -1994,7 +1894,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void activarBorrado() {
-		System.out.println("presiona b para borrar factura");
+		log.info("presiona b para borrar factura");
 		setProductosBorrar(Boolean.TRUE);
 		setProductosBorrarList(getProductos());
 		RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
@@ -2018,7 +1918,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void verificarClaveBorrado() {
-		System.out.println("verificando clave borrado" + getModFactura());
+		log.info("verificando clave borrado" + getModFactura());
 		List<Usuario> uList = new ArrayList<>();
 		uList = usuarioService.getByRol(1l);// busca usuarios administradores
 		Boolean correcto = Boolean.FALSE;
@@ -2053,7 +1953,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public void cCambia() {
 		if (getDocumento() != null && getDocumento().getTipoDocumentoId() != null) {
-			System.out.println("presiona b para borrar factura");
+			log.info("presiona b para borrar factura");
 			setProductosBorrar(Boolean.TRUE);
 			setProductosBorrarList(getProductos());
 			RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
@@ -2072,7 +1972,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void recalcularPrecio() {
-		System.out.println("cambio de precio:" + getCambioTemp());
+		log.info("cambio de precio:" + getCambioTemp());
 		// se comenta el pedaso de codigo que hace que se pueda bajar el precio
 		int pos = getProductos().indexOf(dCambio);
 		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
@@ -2105,7 +2005,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void modificarUltimaFactura() {
-		System.out.println("buscar ultima factura");
+		log.info("buscar ultima factura");
 		if (getDocumento() != null && getDocumento().getTipoDocumentoId() != null) {
 			RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='inline';");
 			actModFactura = Boolean.TRUE;
@@ -2160,7 +2060,7 @@ public class PuntoVentaDia implements Serializable {
 					.execute("document.getElementById('borrarTabla:checkboxDT:0:rowDelete_').focus();");
 		}
 		RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
-		System.out.println("documentoDetalle borrado:" + d.getDocumentoDetalleId());
+		log.info("documentoDetalle borrado:" + d.getDocumentoDetalleId());
 	}
 
 	public List<Cliente> completeTextCliente(String query) {
@@ -2221,21 +2121,21 @@ public class PuntoVentaDia implements Serializable {
 		if (getTipoDocumentoFactura() != null && !getTipoDocumentoFactura().equals("")) {
 			switch (getTipoDocumentoFactura().toUpperCase()) {
 			case "F":
-				System.out.println("tipo documento igual a factura de venta");
+				log.info("tipo documento igual a factura de venta");
 				td.setTipoDocumentoId(10l); // tipo documento igual a factura de
 											// venta
 				setTipoDocumentoFacturaNombre("Factura de venta");
 				server = 1l;
 				break;
 			case "R":
-				System.out.println("tipo documento igual a factura de venta con remision");
+				log.info("tipo documento igual a factura de venta con remision");
 				setTipoDocumentoFacturaNombre("Remisión");
 				td.setTipoDocumentoId(9l); // tipo documento igual a factura
 											// de// venta con remision
 				server = configuracion().getServer();
 				break;
 			case "C":
-				System.out.println("tipo documento igual a cotizacion");
+				log.info("tipo documento igual a cotizacion");
 				setTipoDocumentoFacturaNombre("Cotización");
 				td.setTipoDocumentoId(4l); // tipo documento igual a cotizacion
 				server = 1l;
@@ -2262,8 +2162,8 @@ public class PuntoVentaDia implements Serializable {
 				// docOjb.setClienteId(clienteSelect);
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento:" + getDocumento().getDocumentoId());
+				log.info("Usuario:" + usuario().getLogin());
 			} else {
 
 				Documento docOjb = getDocumento();
@@ -2276,8 +2176,8 @@ public class PuntoVentaDia implements Serializable {
 					clienteSelect.setNombre("Varios");
 					docOjb.setClienteId(clienteSelect);
 				}
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento:" + getDocumento().getDocumentoId());
+				log.info("Usuario:" + usuario().getLogin());
 				if (server == 2l) {
 					Long idBorrar = getDocumento().getDocumentoId();
 					documentoService.save(docOjb, server);
@@ -2293,7 +2193,7 @@ public class PuntoVentaDia implements Serializable {
 			}
 			RequestContext.getCurrentInstance().update("tipoNombre");
 		} else {
-			System.out.println("tipo documento igual a factura de venta por defecto");
+			log.info("tipo documento igual a factura de venta por defecto");
 			setNombreCliente2("Factura de venta");
 			Documento docOjb = new Documento();
 			if (getDocumento().getDocumentoId() == null) {
@@ -2305,21 +2205,21 @@ public class PuntoVentaDia implements Serializable {
 				// docOjb.setClienteId(clienteSelect);
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento:" + getDocumento().getDocumentoId());
+				log.info("Usuario:" + usuario().getLogin());
 			} else {
 				td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que
 											// es igual a factura
 				getDocumento().setTipoDocumentoId(td);
 				documentoService.update(getDocumento(), server);
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento:" + getDocumento().getDocumentoId());
+				log.info("Usuario:" + usuario().getLogin());
 			}
 		}
-		// RequestContext.getCurrentInstance().execute("document.getElementById('prod').style.display='inline';");
+		
 		// // campos
 		if (asignarEmpleadoFactura != null) {
-			System.out.println("po aqui pasa");
+			log.info("po aqui pasa");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('nombreEmpleado').style.display='inline';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('nombreEmpleado_input').focus();");
@@ -2339,20 +2239,17 @@ public class PuntoVentaDia implements Serializable {
 				RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 			}
 		}
-
 	}
 
-	public void buscarCliente(SelectEvent event) throws IOException {
+	public void buscarCliente(SelectEvent event)  {
 		Long server = 1l;
 		clienteSelect = (Cliente) event.getObject();
 		setDisplayTipoDocumento("inline");
-		System.out.println("Cliente select:" + clienteSelect.getNombre());
+		log.info("Cliente select:" + clienteSelect.getNombre());
 		setNombreCliente2(clienteSelect.getNombre());
-		setCodigoCiente(clienteSelect.getClienteId());
-		// setTipoDocumentoFactura("Factura de venta");
+		setCodigoCiente(clienteSelect.getClienteId());		
 		setIdentificacionCliente(clienteSelect.getDocumento());
-		setFechaCreacion(new Date());
-		// RequestContext.getCurrentInstance().execute("revisar3();");
+		setFechaCreacion(new Date());		
 		if (getDocumento().getDocumentoId() == null) {
 			Documento docOjb = new Documento();
 			TipoDocumento td = new TipoDocumento();
@@ -2372,7 +2269,7 @@ public class PuntoVentaDia implements Serializable {
 	public void buscarEmpleado(SelectEvent event) throws IOException {
 		Long server = 1l;
 		empleadoSelect = (Empleado) event.getObject();
-		System.out.println("Empleado select:" + empleadoSelect.getNombre());
+		log.info("Empleado select:" + empleadoSelect.getNombre());
 		setNombreEmpelado2(empleadoSelect.getNombre());
 		setCodigoEmpleado(empleadoSelect.getEmpleadoId());
 		if (getDocumento().getDocumentoId() == null) {
@@ -2386,7 +2283,7 @@ public class PuntoVentaDia implements Serializable {
 			docOjb.setEmpleadoId(empleadoSelect);
 			documentoService.save(docOjb, server);
 			setDocumento(docOjb);
-			System.out.println("Documento:" + getDocumento().getDocumentoId());
+			log.info("Documento:" + getDocumento().getDocumentoId());
 		} else {
 			getDocumento().setEmpleadoId(empleadoSelect);
 		}
@@ -2399,24 +2296,24 @@ public class PuntoVentaDia implements Serializable {
 			if (getDirecionClienteNew() == null || getDocumentoClienteNew().isEmpty()) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El documento es obligatorio"));
 				return;
-			} else {
-				List<Cliente> temp = clienteService.getByDocumento(getDocumentoClienteNew());
-				if (!temp.isEmpty()) {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage("El cliente con el documento " + getDocumentoClienteNew() + " ya existe"));
-					return;
-				}
+			}
+
+			List<Cliente> temp = clienteService.getByDocumento(getDocumentoClienteNew());
+			if (!temp.isEmpty()) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("El cliente con el documento " + getDocumentoClienteNew() + " ya existe"));
+				return;
 			}
 
 			RequestContext.getCurrentInstance().execute("revisar3();");
-			System.out.println("crear cliente desde punto de venta");
+			log.info("crear cliente desde punto de venta");
 			RequestContext.getCurrentInstance().execute("PF('nuevoCliente').hide();");
 			Long server = 1l;
 			Cliente cNew = new Cliente();
 			cNew.setBarrio(getBarrioClienteNew() == null ? "" : getBarrioClienteNew());
 			cNew.setCelular(getCelularClienteNew() == null ? 0l : getCelularClienteNew());
 			if (getCreditoActivoClienteNew() != null) {
-				cNew.setCreditoActivo(getCreditoActivoClienteNew().toUpperCase().equals("S") ? 1l : 0l);
+				cNew.setCreditoActivo(getCreditoActivoClienteNew().equalsIgnoreCase("S") ? 1l : 0l);
 			} else {
 				cNew.setCreditoActivo(0l);
 			}
@@ -2427,14 +2324,14 @@ public class PuntoVentaDia implements Serializable {
 			cNew.setFechaRegistro(new Date());
 			cNew.setFijo(getFijoClienteNew() == null ? 0l : getFijoClienteNew());
 			if (getGuiaTransporteClienteNew() != null) {
-				cNew.setGuiaTransporte(getGuiaTransporteClienteNew().toUpperCase().equals("S") ? 1l : 0l);
+				cNew.setGuiaTransporte(getGuiaTransporteClienteNew().equalsIgnoreCase("S") ? 1l : 0l);
 			} else {
 				cNew.setGuiaTransporte(0l);
 			}
 			cNew.setNombre(getNombreClienteNew() == null ? "" : getNombreClienteNew());
 			setNombreCliente2(cNew.getNombre());
 			if (getRetencionClienteNew() != null) {
-				cNew.setRetencion(getRetencionClienteNew().toUpperCase().equals("S") ? 1.0 : 0.0);
+				cNew.setRetencion(getRetencionClienteNew().equalsIgnoreCase("S") ? 1.0 : 0.0);
 			} else {
 				cNew.setRetencion(0.0);
 			}
@@ -2455,8 +2352,8 @@ public class PuntoVentaDia implements Serializable {
 				documentoService.save(docOjb, server);
 
 				setDocumento(docOjb);
-				System.out.println("Documento:" + getDocumento().getDocumentoId());
-				System.out.println("Usuario:" + usuario().getLogin());
+				log.info("Documento:" + getDocumento().getDocumentoId());
+				log.info("Usuario:" + usuario().getLogin());
 			} else {
 				Documento docOjb = getDocumento();
 				if (getDocumento().getTipoDocumentoId() != null
