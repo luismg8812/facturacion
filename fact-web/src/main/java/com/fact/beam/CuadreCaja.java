@@ -98,8 +98,8 @@ public class CuadreCaja implements Serializable {
 	
 	
 	public Empresa empresa;
-	public Long primeraFact;
-	public Long ultimaFact;
+	public String primeraFact;
+	public String ultimaFact;
 	public Double abonosDia;
 	public Double base;
 	public Double recargas;
@@ -671,7 +671,7 @@ public void setEmpresa(Empresa empresa) {
 	this.empresa = empresa;
 }
 
-public Long getPrimeraFact() throws ParseException {
+public String getPrimeraFact() throws ParseException {
 	Long tipoDocumentoId = 10l; // tipo documento factura de salida
 	Date hoy = Calculos.fechaInicial(new Date());
 	Date hoyfin = Calculos.fechaFinal(new Date());
@@ -679,16 +679,16 @@ public Long getPrimeraFact() throws ParseException {
 	if(factDia!=null && !factDia.isEmpty()){
 		primeraFact = factDia.get(0).getConsecutivoDian();
 	}else{
-		primeraFact=0l;
+		primeraFact="0";
 	}
 	return primeraFact;
 }
 
-public void setPrimeraFact(Long primeraFact) {
+public void setPrimeraFact(String primeraFact) {
 	this.primeraFact = primeraFact;
 }
 
-public Long getUltimaFact() throws ParseException {
+public String getUltimaFact() throws ParseException {
 	Long tipoDocumentoId = 10l; // tipo documento factura de salida
 	Date hoy = Calculos.fechaInicial(new Date());
 	Date hoyfin = Calculos.fechaFinal(new Date());
@@ -696,13 +696,13 @@ public Long getUltimaFact() throws ParseException {
 	if(factDia!=null && !factDia.isEmpty()){
 		ultimaFact = factDia.get(factDia.size()-1).getConsecutivoDian();
 	}else{
-		ultimaFact=0l;
+		ultimaFact="0";
 	}
 
 	return ultimaFact;
 }
 
-public void setUltimaFact(Long ultimaFact) {
+public void setUltimaFact(String ultimaFact) {
 	this.ultimaFact = ultimaFact;
 }
 

@@ -59,7 +59,7 @@ public class InfoDiario {
 	private String documentoInicio;
 	
 	@Column(name="DOCUMENTO_FIN")
-	private Long documentoFin;
+	private String documentoFin;
 	
 	@Column(name="AVANCE_EFECTIVO")
 	private Double avanceEfectivo;
@@ -193,11 +193,11 @@ public class InfoDiario {
 		this.documentoInicio = documentoInicio;
 	}
 
-	public Long getDocumentoFin() {
+	public String getDocumentoFin() {
 		return documentoFin;
 	}
 
-	public void setDocumentoFin(Long documentoFin) {
+	public void setDocumentoFin(String documentoFin) {
 		this.documentoFin = documentoFin;
 	}
 

@@ -22,6 +22,7 @@ import org.primefaces.context.RequestContext;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
+import com.fact.model.Empresa;
 import com.fact.model.InfoDiario;
 import com.fact.model.Producto;
 import com.fact.model.Proveedor;
@@ -463,7 +464,7 @@ public class Calculos {
 	 * Metodo que calcula dependiendo del tipo de docuemnto una suma parcial al informe diario
 	 * @param documento
 	 */
-	public static InfoDiario calcularInfoDiario(Documento documento,List<InfoDiario> infoDiarioList) {
+	public static InfoDiario calcularInfoDiario(Documento documento,List<InfoDiario> infoDiarioList,Empresa e) {
 		InfoDiario info;
 		String tipoDocumento=documento.getTipoDocumentoId().getTipoDocumentoId().toString();
 		if(infoDiarioList==null || infoDiarioList.isEmpty()){
@@ -476,7 +477,7 @@ public class Calculos {
 		}
 		switch (tipoDocumento) {
 		case "10":
-			info=asignarValorInfoDiario(documento,info);
+			info=asignarValorInfoDiario(documento,info,e);
 			break;
 		case "5":
 			//avances efectivo
@@ -496,7 +497,7 @@ public class Calculos {
 		return info;
 	}
 
-	private static InfoDiario asignarValorInfoDiario(Documento documento, InfoDiario info) {
+	private static InfoDiario asignarValorInfoDiario(Documento documento, InfoDiario info, Empresa e) {
 		//facturas
 		Double base19 = (info.getBase19()==null?0.0:info.getBase19())+documento.getBase19();
 		Double base5 = (info.getBase5()==null?0.0:info.getBase5())+documento.getBase5();
@@ -519,9 +520,13 @@ public class Calculos {
 		info.setIvaOriginal(ivaTootalOriginal);
 		if(info.getInfoDiarioId()==null){
 			info.setDocumentoInicio(""+documento.getConsecutivoDian()) ;
-			info.setDocumentoFin(documento.getConsecutivoDian()) ;
+			info.setDocumentoFin(e.getLetraConsecutivo()+documento.getConsecutivoDian()) ;
 		}else{
-			if(documento.getConsecutivoDian()>info.getDocumentoFin()){
+			String documentoE=documento.getConsecutivoDian().replace(" ","");
+			documentoE=documentoE.replace(e.getLetraConsecutivo(),"");
+			String infoE=info.getDocumentoFin().replace(" ","");
+			infoE=infoE.replace(e.getLetraConsecutivo(),"");
+			if(Long.valueOf(documentoE)>Long.valueOf(infoE)){
 				info.setDocumentoFin(documento.getConsecutivoDian()) ;
 			}		
 		}

@@ -803,12 +803,12 @@ panel1 {
 							<td width="30%" style="text-align: left"><p:outputLabel style="text-align: left"
 									value="#{prod1.productoId.nombre}" /></td>
 							<td width="7%" style="text-align: right"><p:outputLabel value="#{prod1.cantidad}" style="text-align: right" >
-												<f:convertNumber pattern="¤#,##0"  />
+												<f:convertNumber pattern="#000.000" currencySymbol=" " />
 											</p:outputLabel> </td>
 							<td width="9%" style="text-align: right" ><p:outputLabel id="unitarioLabel" style="text-align: right"
 									value="#{prod1.unitario}" 
 									rendered="#{!puntoVentaDia.cambioPrecio}">
-									<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+									<f:convertNumber pattern="#000.000" currencySymbol=" " />
 								</p:outputLabel> <p:inputNumber value="#{prod1.unitario}"
 									rendered="#{puntoVentaDia.cambioPrecio}" symbol="$"
 									decimalPlaces="0" id="precioVariable" minValue="0"

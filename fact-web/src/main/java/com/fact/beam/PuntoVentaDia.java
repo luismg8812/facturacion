@@ -846,13 +846,12 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
-	public String imprimirFactura(String enPantalla)
-			throws IOException, DocumentException, PrinterException, PrintException {
+	public String imprimirFactura(String enPantalla) throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null) {
 			return "";
 		}
 		Configuracion configuracion = configuracion();
-		Long numeroImpresiones = configuracion.getNumImpresion();
+		Long numeroImpresiones = configuracion.getNumImpresion()==null?1l:configuracion.getNumImpresion();		
 		Long server = configuracion.getServer();
 		String impresora = impresora();
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
@@ -860,9 +859,75 @@ public class PuntoVentaDia implements Serializable {
 			String tituloFactura = "";
 			getDocumento().setImpreso(1l);
 			getDocumento().setEntregado(0l);
+			if (getDocumento().getTipoDocumentoId() == null) {
+				if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
+					getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());// es
+																							// necesario
+																							// asignar
+																							// el
+																							// consecutivo
+																							// dian
+					System.out.println("consecutivo documentoId: " + getDocumento().getDocumentoId());
+					tituloFactura = "No. DE GUIA";
+					getDocumento().setReduccion(1l);
+					// server=2l; //facturacion en el server 2
+				} else {
+					String con = documentoService.getByUltimoId();
+					String consecutivoDian = e.getLetraConsecutivo()+con ;
+					
+					log.info("consecutivo Dian: " + consecutivoDian);
+					getDocumento().setConsecutivoDian(consecutivoDian);
+					tituloFactura = "FACTURA DE VENTA";
+					getDocumento().setReduccion(0l);
+				}
+			} else {
+				switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
+				case "9":
+					getDocumento().setConsecutivoDian( ""+getDocumento().getDocumentoId());
+					log.info("consecutivo documentoId: " + getDocumento().getDocumentoId());
+					tituloFactura = "No. DE GUIA";
+					getDocumento().setReduccion(1l);					
+					break;
+				case "10":
+					String con = documentoService.getByUltimoId();
+					// dentro de try se valida si faltan 500 facturas para
+					// llegar hasta el tope
+					try {
+						Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
+						Long consegutivo = Long.valueOf(con);
+						if (consegutivo + 500 > topeConsecutivo) {
+							FacesContext.getCurrentInstance().addMessage(null,
+									new FacesMessage(" se esta agotando el consegutivo DIAN "));
+						}
+
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}					
+					String consecutivoDian=e.getLetraConsecutivo()+con;
+					log.info("consecutivo Dian: " + consecutivoDian);
+					getDocumento().setConsecutivoDian(consecutivoDian);
+					tituloFactura = "FACTURA DE VENTA";
+					getDocumento().setReduccion(0l);
+					server = 1l;
+					break;
+				case "4":
+					getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());// es
+																							// necesario
+																							// asignar
+																							// el
+																							// consecutivo
+																							// dian
+					log.info("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
+					tituloFactura = "No. DE COTIZACIÓN";
+					server = 1l;
+					break;
+				default:
+					break;
+				}
+			}
 			// se asigna un tipo de pago
 			TipoPago tipa = new TipoPago();
-			if (getCartera() != null && getCartera().equalsIgnoreCase("S")) {
+			if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
 				tipa.setTipoPagoId(2l);// pago a credito
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2l;
@@ -883,11 +948,11 @@ public class PuntoVentaDia implements Serializable {
 				if (getDescuento() < -100.0 || getDescuento() > 100.0) {
 					getDocumento().setDescuento(getDescuento());
 					desTemp = (getDescuento() * 100) / getDocumento().getTotal();
-					log.info("% descuento:" + desTemp);
+					System.out.println("% descuento:" + desTemp);
 				} else {
 					getDocumento().setDescuento((getDocumento().getTotal() * getDescuento()) / 100);
 					desTemp = getDescuento();
-					log.info("% descuento:" + desTemp);
+					System.out.println("% descuento:" + desTemp);
 				}
 				if (desTemp < -15 || desTemp > 15) {
 					FacesContext.getCurrentInstance().addMessage(null,
@@ -906,13 +971,13 @@ public class PuntoVentaDia implements Serializable {
 			}
 			// se busca la mac del equipo y se le asigna a la factura
 			getDocumento().setMac(Calculos.conseguirMAC2());
-			log.info("mac:" + getDocumento().getMac());
+			System.out.println("mac:" + getDocumento().getMac());
 			documentoService.update(getDocumento(), server);
 			// se manda a que se agregue el documento a la suma del informe
 			// diario parcial
-			calcularInfoDiario();
-			
+			calcularInfoDiario(e);
 			String imp = e.getImpresion().toUpperCase();
+			// System.out.println("numero de impresiones: "+numeroImpresiones);
 			for (int i = 0; i < numeroImpresiones; i++) { // si la factura fue
 															// a// credito se//
 															// imprime dos veces
@@ -927,8 +992,7 @@ public class PuntoVentaDia implements Serializable {
 					// pdf = imprimirBig(tituloFactura);
 					break;
 				case "PDF":
-					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-							enPantalla);
+					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla);
 					break;
 				case "BIG_PDF":
 					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
@@ -941,41 +1005,56 @@ public class PuntoVentaDia implements Serializable {
 					break;
 
 				}
+
 			}
+
 			limpiar();
-			despuesImprimir();
+			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
+			RequestContext.getCurrentInstance().execute("pagina='submenu';");
+			RequestContext.getCurrentInstance()
+					.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
+			// RequestContext.getCurrentInstance().execute("opciones:Imp_movi_mes1");
+			RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('total_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('valorTargeta_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('efectivo_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('cambio_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
+
 		}
 		if (getImpresion() == null || getImpresion().equalsIgnoreCase("N")) {
 			limpiar();
-			despuesImprimir();
+			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
+			RequestContext.getCurrentInstance().execute("pagina='submenu';");
+			RequestContext.getCurrentInstance()
+					.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
+			// RequestContext.getCurrentInstance().execute("opciones:Imp_movi_mes1");
+			RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('total_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('valorTargeta_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('efectivo_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('cambio_input').value='';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
 		}
+		// falta auto incrementable dian
 		return "";
 	}
 
-	public void despuesImprimir() {
-		RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
-		RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
-		RequestContext.getCurrentInstance().execute("pagina='submenu';");
-		RequestContext.getCurrentInstance()
-				.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('total_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('valorTargeta_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('efectivo_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('cambio_input').value='';");
-		RequestContext.getCurrentInstance().execute("document.getElementById('opciones:Sig_movi_mes1').focus();");
-	}
-
-	private void calcularInfoDiario() {
+	private void calcularInfoDiario(Empresa e) {
 		Date fechaDocumento = getDocumento().getFechaRegistro();
 		Date fechaInicio = Calculos.fechaInicial(fechaDocumento);
 		Date fechaFinal = Calculos.fechaFinal(fechaDocumento);
 		List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(fechaInicio, fechaFinal);
 		try {
-			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList);
+			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList,e);
 
 			if (infoDiario.getInfoDiarioId() == null) {
 				documentoService.save(infoDiario);
@@ -983,8 +1062,8 @@ public class PuntoVentaDia implements Serializable {
 				documentoService.update(infoDiario);
 			}
 
-		} catch (FactException e) {
-			log.error("Error calculando registro de informe diario" + e.getMessage());
+		} catch (FactException e1) {
+			log.error("Error calculando registro de informe diario" + e1.getMessage());
 		}
 	}
 
@@ -1968,6 +2047,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void recalcularPrecio(DocumentoDetalleVo d) {
+		log.info("cambia de precio antes");
 		dCambio = d;
 	}
 

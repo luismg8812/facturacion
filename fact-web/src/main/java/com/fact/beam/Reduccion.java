@@ -700,7 +700,7 @@ public class Reduccion implements Serializable {
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				Calculos.cortarDescripcion(id.getDocumentoInicio(), 18) + "  "
-						+ Calculos.cortarDescripcion(e.getLetraConsecutivo()+id.getDocumentoFin(), 19) + "  "
+						+ Calculos.cortarDescripcion(id.getDocumentoFin(), 19) + "  "
 						+ Calculos.cortarCantidades(id.getCantidadDocumentos(), 13) + "  "
 						+ Calculos.cortarCantidades(formatea.format(id.getTotalReducido()), 21),
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
@@ -1156,7 +1156,7 @@ public class Reduccion implements Serializable {
 					rvo.setTotalRemisiones(0.0);
 					rvo.setPorcReduccion(0l);
 					rvo.setDocumentoInicio("");
-					rvo.setDocumentoFin(0l);
+					rvo.setDocumentoFin("");
 					rvo.setCantidadDocumentos(0.0);
 					rvo.setAvanceEfectivo(0.0);
 					rvo.setIva19Reducido(0.0);

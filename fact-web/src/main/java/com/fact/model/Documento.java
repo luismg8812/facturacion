@@ -57,7 +57,7 @@ public class Documento {
 	private Date fechaActualiza;
 	
 	@Column(name="CONSECUTIVO_DIAN")
-	private Long consecutivoDian;
+	private String consecutivoDian;
 	
 	@Column(name="IMPRESO")
 	private Long impreso;
@@ -130,6 +130,7 @@ public class Documento {
 	
 	@Column(name="TOTAL_COSTO")
 	private Double totalCosto;
+		
 
 	public Long getDocumentoId() {
 		return documentoId;
@@ -189,11 +190,11 @@ public class Documento {
 		this.interes = interes;
 	}
 
-	public Long getConsecutivoDian() {
+	public String getConsecutivoDian() {
 		return consecutivoDian;
 	}
 
-	public void setConsecutivoDian(Long consecutivoDian) {
+	public void setConsecutivoDian(String consecutivoDian) {
 		this.consecutivoDian = consecutivoDian;
 	}
 
@@ -404,5 +405,4 @@ public class Documento {
 	public void setTotalCosto(Double totalCosto) {
 		this.totalCosto = totalCosto;
 	}
-	
 }
