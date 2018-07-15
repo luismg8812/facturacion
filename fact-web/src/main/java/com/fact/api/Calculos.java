@@ -524,7 +524,7 @@ public class Calculos {
 		}else{
 			String documentoE=documento.getConsecutivoDian().replace(" ","");
 			documentoE=documentoE.replace(e.getLetraConsecutivo(),"");
-			String infoE=info.getDocumentoFin().replace(" ","");
+			String infoE=info.getDocumentoFin()==null?"1":info.getDocumentoFin().replace(" ","");
 			infoE=infoE.replace(e.getLetraConsecutivo(),"");
 			if(Long.valueOf(documentoE)>Long.valueOf(infoE)){
 				info.setDocumentoFin(documento.getConsecutivoDian()) ;
