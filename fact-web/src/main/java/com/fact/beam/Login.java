@@ -172,7 +172,9 @@ public class Login implements Serializable {
 			//setImpresora(getUsuarioLogin().getImpresora() == null ? "" : getUsuarioLogin().getImpresora());
 			sessionMap.put("impresora",leerArchivoImpresora());
 			//System.out.println("impresora:" +(String) sessionMap.get("impresora"));
-			setEmpresaLogin(usuarioService.getByEmpresa()); // consulta la // empresa
+			sessionMap.put("empresa",usuarioService.getByEmpresa(getUsuarioLogin().getUsuarioId()));
+			//setEmpresaLogin(); // consulta la // empresa
+			
 			String url = "/fact-web/pages/administracion/menu/menuPrincipal.jsf"; //url donde se redirige la pantalla
 			FacesContext fc = FacesContext.getCurrentInstance();
 			fc.getExternalContext().redirect(url);// redirecciona la página

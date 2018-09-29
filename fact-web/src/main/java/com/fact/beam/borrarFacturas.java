@@ -104,6 +104,10 @@ public class borrarFacturas implements Serializable {
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
+	
+	private Empresa getEmpresa() {
+		return (Empresa) sessionMap.get("empresa");
+	}
 
 	public void imprimirPantalla(DocumentoVo rvo) throws DocumentException, IOException, PrinterException {
 		documentoSelect = rvo;
@@ -115,7 +119,7 @@ public class borrarFacturas implements Serializable {
 		System.out.println("entra a imprimir");
 		documentoSelect.getDocumentoId().setImpreso(1l);
 		documentoService.update(documentoSelect.getDocumentoId(), 1l);
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e =getEmpresa();
 		String pdf = "";
 		String imp = e.getImpresion().toUpperCase();
 		if (imp.equals("TXT")) {
@@ -241,7 +245,7 @@ public class borrarFacturas implements Serializable {
 
 	public String imprimirTxt() throws IOException {
 		System.out.println("entra a imprimir");
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		String pdf = "factura_" + documentoSelect.getDocumentoId() + ".txt";
 		File archivo = new File("C:\\facturacion\\" + pdf);
 		BufferedWriter bw;
@@ -381,7 +385,7 @@ public class borrarFacturas implements Serializable {
 		Configuracion configuracion = configuracion();
 		String impresora = impresora();
 		String enPantalla = "false"; 
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		String tituloFactura = "";
 		docu.setImpreso(1l);
 		// se agrega evento copia factura
@@ -423,7 +427,7 @@ public class borrarFacturas implements Serializable {
 			break;
 		case "PDF":
 			pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora,enPantalla);
+					configuracion, impresora,enPantalla,e);
 			break;
 		case "SMALL_PDF":
 			Impresion.imprimirPDFSmall(docu, Calculos.llenarDocumentoDetalleVoList(detalles), usuario(), configuracion,
@@ -446,7 +450,7 @@ public class borrarFacturas implements Serializable {
 
 	private String imprimirTemporal(String tituloFactura, Documento docu) throws IOException {
 		System.out.println("entra a imprimir");
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		String pdf = "C:\\facturas\\factura_" + docu.getDocumentoId() + "Copia.txt";
 		File archivo = new File(pdf);
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

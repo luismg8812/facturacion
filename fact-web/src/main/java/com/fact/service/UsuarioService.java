@@ -22,7 +22,7 @@ public interface UsuarioService {
 	Usuario getByName(String nombre) throws FactException;
 	List<Usuario> getByAll() throws FactException;
 	List<Empresa> getByAllEmpresa() throws FactException;
-	Empresa getByEmpresa()throws FactException;
+	Empresa getByEmpresa(Long usuarioId)throws FactException;
 	List<Usuario> getByRol(Long rol)throws FactException;
 	Configuracion getConfiguracion()throws FactException;
 	List<Empleado> getByFiltrosEmpleados(String nombreEmpleado, String aplellidoEmpleado, String correoEmpleado,

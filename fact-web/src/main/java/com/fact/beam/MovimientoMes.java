@@ -222,6 +222,10 @@ public class MovimientoMes implements Serializable {
 	private String impresora() {
 		return (String) sessionMap.get("impresora");
 	}
+	
+	private Empresa getEmpresa() {
+		return (Empresa) sessionMap.get("empresa");
+	}
 
 	public List<Producto> completeText(String query) {
 		List<Producto> nombProductos = new ArrayList<>();
@@ -610,6 +614,8 @@ public class MovimientoMes implements Serializable {
 		// se agrega re
 		if (proveedorSelect != null && proveedorSelect.getRetencion() != null) {
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorSelect));
+		}else {
+			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
 		}
 		setTotal(getDocumento().getTotal());
 		setIva(getDocumento().getIva());
@@ -1011,7 +1017,7 @@ public class MovimientoMes implements Serializable {
 		Long numeroImpresiones = configuracion.getNumImpresion();
 		Long server = configuracion.getServer();
 		String impresora = impresora();
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		getDocumento().setImpreso(1l);
 		getDocumento().setEntregado(0l);
 
@@ -1042,7 +1048,7 @@ public class MovimientoMes implements Serializable {
 				// pdf = imprimirBig(tituloFactura);
 				break;
 			case "PDF":
-				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
 				break;
 			case "BIG_PDF":
 				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora);

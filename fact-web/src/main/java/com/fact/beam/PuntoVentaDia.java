@@ -257,6 +257,10 @@ public class PuntoVentaDia implements Serializable {
 	private Configuracion configuracion() {
 		return (Configuracion) sessionMap.get("configuracion");
 	}
+	
+	private Empresa getEmpresa() {
+		return (Empresa) sessionMap.get("empresa");
+	}
 
 	private String impresora() {
 		return (String) sessionMap.get("impresora");
@@ -855,7 +859,7 @@ public class PuntoVentaDia implements Serializable {
 		Long server = configuracion.getServer();
 		String impresora = impresora();
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
-			Empresa e = Login.getEmpresaLogin();
+			Empresa e = getEmpresa();
 			String tituloFactura = "";
 			getDocumento().setImpreso(1l);
 			getDocumento().setEntregado(0l);
@@ -992,7 +996,7 @@ public class PuntoVentaDia implements Serializable {
 					// pdf = imprimirBig(tituloFactura);
 					break;
 				case "PDF":
-					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla);
+					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
 					break;
 				case "BIG_PDF":
 					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,

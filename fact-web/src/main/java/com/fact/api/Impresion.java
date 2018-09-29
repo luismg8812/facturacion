@@ -338,9 +338,8 @@ public class Impresion {
 	}
 	
 	public static String imprimirEntadaAlmacenPDF(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config,String impresora) throws MalformedURLException, IOException, DocumentException{
+			Configuracion config,String impresora, Empresa e) throws MalformedURLException, IOException, DocumentException{
 		log.info("imprimir entrada almacen");
-		Empresa e = Login.getEmpresaLogin();
 		String pdf = "C:\\facturas\\entradas\\entrada_" + documentoImp.getDocumentoId() + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
@@ -367,7 +366,7 @@ public class Impresion {
 		documento.add(new Paragraph(
 				new Phrase(lineSpacing, "" + e.getNombre(), FontFactory.getFont(FontFactory.COURIER_BOLD, 13f)))); // NOMBRE
 																													// EMPRESA
-		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getSlogan().toUpperCase() == null ? "" : e.getSlogan(),
+		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getSlogan() == null ? "" : e.getSlogan(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // slogan
 		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getRepresentante(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
@@ -520,9 +519,9 @@ public class Impresion {
 	 * @throws PrintException
 	 */
 	public static String imprimirPDF(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config,String impresora, String enPantalla) throws DocumentException, IOException, PrinterException, PrintException {
+			Configuracion config,String impresora, String enPantalla ,Empresa empresa) throws DocumentException, IOException, PrinterException, PrintException {
 		System.out.println("todo el codigo de imprimir");
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = empresa;
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
 		DecimalFormat formatea = new DecimalFormat("###,###.##");

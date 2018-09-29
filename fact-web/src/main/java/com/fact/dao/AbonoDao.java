@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import com.fact.api.FactException;
 import com.fact.model.Abono;
 import com.fact.model.Usuario;
 

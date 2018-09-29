@@ -40,5 +40,6 @@
     	<mapping class="com.fact.model.ProductoEmpresa" />
     	<mapping class="com.fact.model.TransferenciaEmpresaDetalle" />
     	<mapping class="com.fact.model.TipoEmpresa" />
+    	<mapping class="com.fact.model.UsuarioEmpresa" />
     </session-factory>
 </hibernate-configuration>

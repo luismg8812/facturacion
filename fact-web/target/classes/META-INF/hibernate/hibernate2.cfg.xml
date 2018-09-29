@@ -6,8 +6,8 @@
 	<session-factory name="oracle_2">
 		<property name="hibernate.connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
 		<property name="hibernate.connection.password">nuevof</property>
-		<property name="hibernate.connection.url">jdbc:oracle:thin:@192.168.0.12:1521:xe</property>
-<!-- 		<property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:xe</property> -->
+<!-- 		<property name="hibernate.connection.url">jdbc:oracle:thin:@192.168.0.12:1521:xe</property> -->
+		<property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:xe</property>
 		<property name="hibernate.connection.username">facturacion2</property>
 		<property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
 		<mapping class="com.fact.model.Usuario" />

@@ -185,13 +185,14 @@ public class UsuarioDaoImpl implements UsuarioDao{
 	}
 
 	@Override
-	public Empresa getByEmpresa() throws FactException {
+	public Empresa getByEmpresa(Long usuarioId) throws FactException {
 		Session session = HibernateUtil.getSessionFactory().openSession();;
 		session.beginTransaction();
 		Empresa empresa=null;
 		try {
-			String sql = "select e from Empresa e where e.empresaId = 1";
+			String sql = "select ue.empresaId from UsuarioEmpresa ue where ue.usuarioId.usuarioId = :usuarioId";
 			Query query = session.createQuery(sql);
+			query.setParameter("usuarioId", usuarioId);
 			empresa = (Empresa) query.uniqueResult(); 
 			session.close();
 		} catch (Exception e) {

@@ -134,6 +134,10 @@ public class CuadreCaja implements Serializable {
 		return yourVariable;
 	}
 	
+	private Empresa empresa() {
+		return (Empresa) sessionMap.get("empresa");
+	}
+	
 	public Double getTotalFaturasToDay() throws ParseException {
 		List<Long> tipoDocumentoId = new ArrayList<>(); 
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
@@ -221,7 +225,7 @@ public void limpiar(){
 		// falta agregar el pgrow en la pantalla de opcion, para que salga el
 		// mensaje
 		Configuracion con=configuracion();
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = empresa();
 		String imp = e.getImpresion().toUpperCase();
 		String pdf = "";
 		switch (imp) {
@@ -253,7 +257,7 @@ public void limpiar(){
 	}
 
 	private String imprimirCuadrePDF() throws ParseException, DocumentException, IOException, PrinterException {
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = empresa();
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
@@ -417,7 +421,7 @@ public void limpiar(){
 	}
 	
 	private String imprimirCuadrePDFSmall() throws ParseException, DocumentException, IOException, PrinterException {
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = empresa();
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
@@ -662,7 +666,7 @@ public void cierreTotal() throws ParseException{
 
 public Empresa getEmpresa() {
 	if(empresa==null){
-		empresa =Login.getEmpresaLogin();
+		empresa =empresa();
 	}
 	return empresa;
 }
@@ -1056,7 +1060,7 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 			}
 		}
     }
-    Empresa e = Login.getEmpresaLogin();
+    Empresa e = empresa();
 	SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 	SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 	String fhoyname = df.format(hoyfin);
@@ -1277,7 +1281,7 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 	}
 	System.out.println("documentos:"+documentos.size());			
    
-	Empresa e = Login.getEmpresaLogin();
+	Empresa e = empresa();
 	SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 	String fhoyname = df.format(hoyfin);
 	String carpeta = "C:\\facturas\\productosXcajero";

@@ -79,8 +79,8 @@ public class UsuarioServiceImpl implements UsuarioService{
 	}
 
 	@Override
-	public Empresa getByEmpresa() throws FactException {
-		return usuarioDao.getByEmpresa();
+	public Empresa getByEmpresa(Long usuarioId) throws FactException {
+		return usuarioDao.getByEmpresa(usuarioId);
 	}
 
 	@Override
