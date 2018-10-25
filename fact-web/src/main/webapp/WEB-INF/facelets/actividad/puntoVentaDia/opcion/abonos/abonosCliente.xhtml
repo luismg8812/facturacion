@@ -8,12 +8,12 @@
 	<script type="text/javascript">
 	function showDialogoVale(){
 		console.log("showDialogoVale");
-		document.getElementById('j_idt1579:crearVale1').style.display = 'block';
-		document.getElementById('j_idt1579:crearAbonoCliente').style.display = 'none';
+		document.getElementById('abonos123:crearVale1').style.display = 'block';
+		document.getElementById('abonos123:crearAbonoCliente').style.display = 'none';
 	}
 	function showDialocrearAbonoCliente(){
-		document.getElementById('j_idt1579:crearAbonoCliente').style.display = 'inline';
-		document.getElementById('j_idt1579:crearVale1').style.display = 'none';
+		document.getElementById('abonos123:crearAbonoCliente').style.display = 'inline';
+		document.getElementById('abonos123:crearVale1').style.display = 'none';
 	}
 	</script>
 	<h:form  id="abonos123" >
@@ -81,8 +81,8 @@
 			</p:column>
 
 		</p:dataTable>
-		<p:blockUI block="j_idt1579"
-			trigger="j_idt1579:buscar">
+		<p:blockUI block="abonos123"
+			trigger="abonos123:buscar">
 					CARGANDO<br />
 			<p:graphicImage url="/images/bloqBar.gif" />
 		</p:blockUI>

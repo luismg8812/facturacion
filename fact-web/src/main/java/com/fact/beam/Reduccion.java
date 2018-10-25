@@ -164,7 +164,7 @@ public class Reduccion implements Serializable {
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 
 	public void imprimirinforme(InfoDiario id) throws DocumentException, IOException, PrinterException, ParseException {
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		int numeroImpresiones = 1;
 		for (int i = 0; i < numeroImpresiones; i++) {
@@ -193,7 +193,7 @@ public class Reduccion implements Serializable {
 
 	public void imprimirinformePropietario(InfoDiario id)
 			throws DocumentException, IOException, PrinterException, ParseException {
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
@@ -437,7 +437,7 @@ public class Reduccion implements Serializable {
 		String userPropietario = (String) sessionMap.get("userPropietario");
 		Boolean conCierre = Boolean.FALSE;
 		int maxTamaño = 15;
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 		String fhoyIni = df.format(id.getFechaInforme());
@@ -660,7 +660,7 @@ public class Reduccion implements Serializable {
 	private void imprimirInfoPDF(InfoDiario id)
 			throws DocumentException, ParseException, IOException, PrinterException {		
 		String userPropietario = (String) sessionMap.get("userPropietario");
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 		String fhoyIni = df.format(id.getFechaInforme());
@@ -1486,10 +1486,7 @@ public class Reduccion implements Serializable {
 	}
 
 	public Empresa getEmpresa() {
-		if (empresa == null) {
-			empresa = Login.getEmpresaLogin();
-		}
-		return empresa;
+		return (Empresa) sessionMap.get("empresa");		
 	}
 
 	public void setEmpresa(Empresa empresa) {
