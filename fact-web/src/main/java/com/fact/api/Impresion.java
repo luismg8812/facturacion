@@ -762,9 +762,9 @@ public class Impresion {
 	 * @throws PrintException
 	 */
 	public static String imprimirPDFSmall(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config, String impresora) throws DocumentException, IOException, PrinterException, PrintException {
+			Configuracion config, String impresora,Empresa empresa) throws DocumentException, IOException, PrinterException, PrintException {
 		System.out.println("todo el codigo de imprimir");
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = empresa;
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
 		DecimalFormat formatea = new DecimalFormat("###,###.##");

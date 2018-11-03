@@ -1054,7 +1054,7 @@ public class MovimientoMes implements Serializable {
 				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora);
 				break;
 			case "SMALL_PDF":
-				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,e);
 				break;
 			default:
 				break;

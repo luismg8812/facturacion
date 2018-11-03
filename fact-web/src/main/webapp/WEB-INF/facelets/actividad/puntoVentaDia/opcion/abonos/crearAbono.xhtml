@@ -7,7 +7,7 @@
 	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
 	function ocultarDialocrearAbonoCliente(){
-		document.getElementById('abonos123:crearAbonoCliente').style.display = 'none';
+		document.getElementById('j_idt1604:crearAbonoCliente').style.display = 'none';
 	}
 	</script>
 	<h:form id="crearAbono">
@@ -49,7 +49,7 @@
 			</tr>
 			<tr>
 				<td><p:commandButton value="Guardar" id="guardar"
-						process="@form" update="growl1,abonos123" onclick="ocultarDialocrearAbonoCliente()"
+						process="@form" update="growl1,j_idt1604" onclick="ocultarDialocrearAbonoCliente()"
 						actionListener="#{abonos.crearAbono()}" /></td>
 				<td><p:commandButton value="Salir" onclick="ocultarDialocrearAbonoCliente()"/></td>
 				<p:commandButton value="Actualizar" update="@form" />
