@@ -18,6 +18,5 @@ public interface AbonoDao {
 	void delete(Abono abono);
 	Abono getById(Long abono);
 	List<Abono> getByDocumento(Long documentoId) ;
-	List<Abono> abonosDia(Date hoy, Date hoyfin, Usuario usuario,List<Long> tipoDocumentoId);
-		
+	List<Abono> abonosDia(Date hoy, Date hoyfin, Usuario usuario,List<Long> tipoDocumentoId);	
 }
