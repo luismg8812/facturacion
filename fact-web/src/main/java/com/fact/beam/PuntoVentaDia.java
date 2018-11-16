@@ -2127,18 +2127,19 @@ public class PuntoVentaDia implements Serializable {
 			setTotal(getDocumento().getTotal());
 			setPesoTotal(getDocumento().getPesoTotal());
 			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
-			Producto productoEdit = d.getProductoId();
-			Double cantidad = productoEdit.getCantidad() + d.getCantidad1();
-			productoEdit.setCantidad(cantidad);
-			productoService.update(productoEdit, 1l);
+			ProductoEmpresa productoEmpresa= productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), d.getProductoId().getProductoId());		
+			Double cantidad1 = productoEmpresa.getCantidad() + d.getCantidad1();
+			productoEmpresa.setCantidad(cantidad1);
+			productoEmpresaService.update(productoEmpresa);
+			
 			if (server == 2l) {
-				productoEdit = productoService.getById(d.getProductoId().getProductoId());
-				cantidad = productoEdit.getCantidad() + d.getCantidad2();
-				productoEdit.setCantidad(cantidad);
-				productoService.update(productoEdit, server);
+				productoEmpresa = productoEmpresaService.getById(d.getProductoId().getProductoId());
+				cantidad = productoEmpresa.getCantidad() + d.getCantidad2();
+				productoEmpresa.setCantidad(cantidad);
+				productoEmpresaService.update(productoEmpresa);
 			}
 		} catch (Exception e) {
-			System.out.print("!!error borrando el producto:" + d.getProductoId().getProductoId());
+			log.info("!!error borrando el producto:" + d.getProductoId().getProductoId());
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error borrando Productos"));
 		}
 		RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");

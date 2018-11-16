@@ -36,6 +36,7 @@ import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
+import javax.sound.sampled.Port.Info;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
@@ -50,6 +51,7 @@ import org.primefaces.model.StreamedContent;
 
 import com.fact.api.Calculos;
 import com.fact.api.FactException;
+import com.fact.api.Impresion;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
@@ -162,8 +164,16 @@ public class Reduccion implements Serializable {
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
+	
+	private String impresora() {
+		return (String) sessionMap.get("impresora");
+	}
+	
+	private Configuracion configuracion() {
+		return (Configuracion) sessionMap.get("configuracion");
+	}
 
-	public void imprimirinforme(InfoDiario id) throws DocumentException, IOException, PrinterException, ParseException {
+	public void imprimirinforme(InfoDiario id,boolean imprimir) throws DocumentException, IOException, PrinterException, ParseException {
 		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		int numeroImpresiones = 1;
@@ -176,14 +186,14 @@ public class Reduccion implements Serializable {
 				imprimirBig(id);
 				break;
 			case "PDF":
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,imprimir);
 				break;
 			case "BIG_PDF":
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,imprimir);
 				break;
 
 			default:
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,imprimir);
 				break;
 			}
 		}
@@ -197,7 +207,7 @@ public class Reduccion implements Serializable {
 		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
+		Configuracion configuracion = configuracion();
 		String numeroInforme = informeDiarioService.consecutivoInformePropietario();
 		List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
 		// los
@@ -212,7 +222,7 @@ public class Reduccion implements Serializable {
 				// imprimirBig(id);
 				break;
 			case "PDF":
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,true);
 				break;
 			case "BIG_PDF":
 				imprimirInformePropietarioPDF(id, numeroInforme, usuario, configuracion, uList);
@@ -530,7 +540,7 @@ public class Reduccion implements Serializable {
 						+ Calculos.cortarCantidades(formatea.format(id.getTotalRemisiones()), maxTamaño) + "\n");
 			}
 			Double redu = (id.getPorcReduccion() == 0 ? 0.0 : id.getPorcReduccion()) / 100;
-			Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
+			Configuracion configuracion = configuracion();
 			Long server = configuracion.getServer();
 			List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
 																// los
@@ -658,10 +668,11 @@ public class Reduccion implements Serializable {
 
 	}
 
-	private void imprimirInfoPDF(InfoDiario id)
+	private void imprimirInfoPDF(InfoDiario id,boolean imprimir)
 			throws DocumentException, ParseException, IOException, PrinterException {		
 		String userPropietario = (String) sessionMap.get("userPropietario");
 		Empresa e = getEmpresa();
+		String impresora = impresora();
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 		String fhoyIni = df.format(id.getFechaInforme());
@@ -827,7 +838,7 @@ public class Reduccion implements Serializable {
 															// los// cajeros
 
 		log.info("redu: "+redu);
-		Configuracion configuracion = (Configuracion) sessionMap.get("configuracion");
+		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
 		for (Usuario u : uList) {
 			Double totalCajero = getTotalFaturasToDay(id.getFechaInforme(), u, conCierre, 1l); 
@@ -876,7 +887,7 @@ public class Reduccion implements Serializable {
 																										// con
 																										// producto
 																										// 5=bolsas
-		System.out.println("cantidad bolsas:" + bolsas.size());
+		log.info("cantidad bolsas:" + bolsas.size());
 		if (bolsas != null && !bolsas.isEmpty()) {
 			Double totalBolsas = 0.0;
 			Double cantidadBolsas = 0.0;
@@ -965,25 +976,11 @@ public class Reduccion implements Serializable {
 				}
 			}
 		}
-		documento.close();
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		String impresara = usuario.getImpresora();
-		PrinterJob job = PrinterJob.getPrinterJob();
-		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured: " + printServices.length);
-		for (PrintService printer : printServices) {
-			System.out.println("Printer: " + printer.getName());
-			if (printer.getName().equals(impresara)) {
-				try {
-					job.setPrintService(printer);
-				} catch (PrinterException ex) {
-				}
-			}
+		
+		if(imprimir) {
+			Impresion.printer(impresora, pdf, configuracion);
 		}
-		PDDocument document = PDDocument.load(new File(carpeta + pdf));
-		job.setPageable(new PDFPageable(document));
-		job.print();
-		document.close();
+		
 
 	}
 
@@ -1000,7 +997,7 @@ public class Reduccion implements Serializable {
 	}
 
 	public void buscar() throws ParseException {
-		System.out.println("informe diario usuario no propietario");
+		log.info("informe diario usuario no propietario");
 		reducir();
 	}
 
@@ -1405,7 +1402,7 @@ public class Reduccion implements Serializable {
 	public StreamedContent getFileXls(InfoDiario info)
 			throws DocumentException, IOException, PrinterException, ParseException {
 		StreamedContent file = null;
-		imprimirinforme(info);
+		imprimirinforme(info,false);
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String fhoyIni = df.format(info.getFechaInforme());
 		String carpeta = "C:\\facturas\\infoDiario";

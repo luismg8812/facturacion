@@ -959,14 +959,14 @@ public class Impresion {
 	public static void printer(String impresora, String rutaArchivo, Configuracion configuracion) {
 		PrinterJob job = PrinterJob.getPrinterJob();
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured1: " + printServices.length);
+		log.info("Number of printers configured1: " + printServices.length);
 		for (PrintService printer : printServices) {
-			System.out.println("Printer: " + printer.getName());
-			System.out.println("comparacion:"+impresora+":"+printer.getName());
-			if (printer.getName().toString().equals(impresora)) {
+			log.info("Printer: " + printer.getName());
+			log.info("comparacion:"+impresora+":"+printer.getName());
+			if (printer.getName().equals(impresora)) {
 				try {
 					job.setPrintService(printer);
-					System.out.println( impresora+" : " + printer.getName());
+					log.info("coincide:"+ impresora+" : " + printer.getName());
 					break;
 				} catch (PrinterException ex) {
 					ex.printStackTrace();
@@ -989,9 +989,9 @@ public class Impresion {
 		if (configuracion.getGuardarFacturas() == 0l) {
 			File borrar = new File(rutaArchivo);
 			if (!borrar.delete()) {
-				System.out.println("Error borrando facturas");
+				log.error("Error borrando facturas");
 			} else {
-				System.out.println("Documento borrado");
+				log.info("Documento borrado");
 			}
 		}
 

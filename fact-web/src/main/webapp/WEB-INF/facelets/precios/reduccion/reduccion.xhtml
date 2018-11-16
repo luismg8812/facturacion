@@ -99,7 +99,7 @@
 						update="detallesForm"
 						actionListener="#{reduccion.detalleInforme(docu)}" />
 					<p:commandButton value="Imprimir" title="Imprimir"
-						actionListener="#{reduccion.imprimirinforme(docu)}" />
+						actionListener="#{reduccion.imprimirinforme(docu,true)}" />
 				</p:column>
 				<p:column headerText="Info. propietario" width="8%"
 					visible="#{login.propietario}">
