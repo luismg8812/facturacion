@@ -20,6 +20,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jboss.logging.Logger;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
@@ -36,7 +37,8 @@ public class Login implements Serializable {
 	 * luis Miguel gonzalez
 	 */
 	private static final long serialVersionUID = 1L;
-
+	private static Logger log = Logger.getLogger(Login.class);
+	
 	String usuario;
 	String password;
 
@@ -64,7 +66,6 @@ public class Login implements Serializable {
 				graphicImage=new DefaultStreamedContent(new FileInputStream(path), "image/png");
 			} catch (FileNotFoundException e) {
 				System.out.println("Error cargando imagen principal");
-				e.printStackTrace();
 			}
 	        return graphicImage;
 	    }
@@ -174,9 +175,11 @@ public class Login implements Serializable {
 			//System.out.println("impresora:" +(String) sessionMap.get("impresora"));
 			sessionMap.put("empresa",usuarioService.getByEmpresa(getUsuarioLogin().getUsuarioId()));
 			//setEmpresaLogin(); // consulta la // empresa
-			
-			String url = "/fact-web/pages/administracion/menu/menuPrincipal.jsf"; //url donde se redirige la pantalla
+			String contex=FacesContext.getCurrentInstance().getExternalContext().getContextName();
+			String url = "/"+contex+"/pages/administracion/menu/menuPrincipal.jsf"; //url donde se redirige la pantalla
+			log.info(url);
 			FacesContext fc = FacesContext.getCurrentInstance();
+			
 			fc.getExternalContext().redirect(url);// redirecciona la página
 		}
 	}

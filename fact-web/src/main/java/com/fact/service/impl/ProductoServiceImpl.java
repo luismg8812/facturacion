@@ -10,7 +10,9 @@ import javax.ejb.Stateless;
 
 import com.fact.api.FactException;
 import com.fact.dao.ProductoDao;
+import com.fact.model.Empresa;
 import com.fact.model.Producto;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.SubProducto;
 import com.fact.service.ProductoService;
 
@@ -104,6 +106,16 @@ public class ProductoServiceImpl implements ProductoService{
 			throw new FactException("El id del grupo es obligatorio");
 		}
 		return productoDao.getByGrupo(grupoId);
+	}
+
+	@Override
+	public List<Producto> getAllByCompany(Empresa empresa) throws FactException {
+		return productoDao.getAllByCompany(empresa);
+	}
+
+	@Override
+	public List<ProductoEmpresa> getProductoByEmpresa(Long empresaId) throws FactException {
+		return productoDao.getProductoByEmpresa(empresaId);
 	}
 	
 }
