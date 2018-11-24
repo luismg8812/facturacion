@@ -163,7 +163,7 @@ public class Reduccion implements Serializable {
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 
-	public void imprimirinforme(InfoDiario id) throws DocumentException, IOException, PrinterException, ParseException {
+	public void imprimirinforme(InfoDiario id,String exportar) throws DocumentException, IOException, PrinterException, ParseException {
 		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		int numeroImpresiones = 1;
@@ -176,14 +176,14 @@ public class Reduccion implements Serializable {
 				imprimirBig(id);
 				break;
 			case "PDF":
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,exportar);
 				break;
 			case "BIG_PDF":
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,exportar);
 				break;
 
 			default:
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,exportar);
 				break;
 			}
 		}
@@ -212,7 +212,7 @@ public class Reduccion implements Serializable {
 				// imprimirBig(id);
 				break;
 			case "PDF":
-				imprimirInfoPDF(id);
+				imprimirInfoPDF(id,"false");
 				break;
 			case "BIG_PDF":
 				imprimirInformePropietarioPDF(id, numeroInforme, usuario, configuracion, uList);
@@ -658,7 +658,7 @@ public class Reduccion implements Serializable {
 
 	}
 
-	private void imprimirInfoPDF(InfoDiario id)
+	private void imprimirInfoPDF(InfoDiario id,String exportar)
 			throws DocumentException, ParseException, IOException, PrinterException {		
 		String userPropietario = (String) sessionMap.get("userPropietario");
 		Empresa e = getEmpresa();
@@ -966,24 +966,27 @@ public class Reduccion implements Serializable {
 			}
 		}
 		documento.close();
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		String impresara = usuario.getImpresora();
-		PrinterJob job = PrinterJob.getPrinterJob();
-		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured: " + printServices.length);
-		for (PrintService printer : printServices) {
-			System.out.println("Printer: " + printer.getName());
-			if (printer.getName().equals(impresara)) {
-				try {
-					job.setPrintService(printer);
-				} catch (PrinterException ex) {
+		if("false".equals(exportar)) {
+			Usuario usuario = (Usuario) sessionMap.get("userLogin");
+			String impresara = usuario.getImpresora();
+			PrinterJob job = PrinterJob.getPrinterJob();
+			PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+			log.info("Number of printers configured: " + printServices.length);
+			for (PrintService printer : printServices) {
+				log.info("Printer: " + printer.getName());
+				if (printer.getName().equals(impresara)) {
+					try {
+						job.setPrintService(printer);
+					} catch (PrinterException ex) {
+					}
 				}
 			}
+			PDDocument document = PDDocument.load(new File(carpeta + pdf));
+			job.setPageable(new PDFPageable(document));
+			job.print();
+			document.close();
 		}
-		PDDocument document = PDDocument.load(new File(carpeta + pdf));
-		job.setPageable(new PDFPageable(document));
-		job.print();
-		document.close();
+		
 
 	}
 
@@ -1405,7 +1408,7 @@ public class Reduccion implements Serializable {
 	public StreamedContent getFileXls(InfoDiario info)
 			throws DocumentException, IOException, PrinterException, ParseException {
 		StreamedContent file = null;
-		imprimirinforme(info);
+		imprimirinforme(info,"true");
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String fhoyIni = df.format(info.getFechaInforme());
 		String carpeta = "C:\\facturas\\infoDiario";
