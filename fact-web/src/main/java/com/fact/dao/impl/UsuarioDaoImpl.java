@@ -20,6 +20,7 @@ import com.fact.model.Configuracion;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
 import com.fact.model.Usuario;
+import com.fact.model.UsuarioEmpresa;
 import com.fact.utils.HibernateUtil;
 
 @Stateful()
@@ -267,6 +268,29 @@ public class UsuarioDaoImpl implements UsuarioDao{
 			}
 		}
 		return productoList;
+	}
+
+	@Override
+	public void save(UsuarioEmpresa usuarioEmpresa) {
+		Session session = HibernateUtil.getSessionFactory().openSession();;
+		Transaction transaction= session.beginTransaction();
+		try {
+			if(usuarioEmpresa.getUsuarioEmpresaId()==null) {
+				session.save(usuarioEmpresa);
+			}else {
+				session.update(usuarioEmpresa);			
+			}	
+			transaction.commit();
+		} catch (Exception e) {
+			if (transaction!=null) {
+				transaction.rollback();
+			}
+			throw e;
+		}finally{
+			if (session!=null) {
+				session.close();
+			}
+		}
 	}
 	
 	

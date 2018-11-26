@@ -13,6 +13,7 @@ import com.fact.model.Configuracion;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
 import com.fact.model.Usuario;
+import com.fact.model.UsuarioEmpresa;
 import com.fact.service.UsuarioService;
 
 @Stateless
@@ -102,6 +103,12 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Override
 	public List<Empleado> getByEmpleadosAll() throws FactException {
 		return usuarioDao.getByEmpleadosAll();
+	}
+
+	@Override
+	public void save(UsuarioEmpresa usuarioEmpresa) {
+		usuarioDao.save(usuarioEmpresa);
+		
 	}
 
 	

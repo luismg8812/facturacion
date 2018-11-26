@@ -11,11 +11,14 @@ import com.fact.model.Configuracion;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
 import com.fact.model.Usuario;
+import com.fact.model.UsuarioEmpresa;
 
 @Local
 public interface UsuarioService {
 
 	void save(Usuario usuario)throws FactException;
+	void save(Empleado emp)throws FactException;
+	void save(UsuarioEmpresa usuarioEmpresa);
 	void update(Usuario usuario)throws FactException;
 	void delete(Usuario usuario)throws FactException;
 	Usuario getById(Long id)throws FactException;
@@ -27,7 +30,9 @@ public interface UsuarioService {
 	Configuracion getConfiguracion()throws FactException;
 	List<Empleado> getByFiltrosEmpleados(String nombreEmpleado, String aplellidoEmpleado, String correoEmpleado,
 			String identificacionEmpleado)throws FactException;
-	void save(Empleado emp)throws FactException;
+	
 	List<Empleado> getByEmpleadosAll()throws FactException;
+	
+	
 	
 }

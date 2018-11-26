@@ -13,13 +13,16 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 
 import com.fact.model.Empleado;
+import com.fact.model.Empresa;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Rol;
 import com.fact.model.SubMenu;
 import com.fact.model.Usuario;
+import com.fact.model.UsuarioEmpresa;
 import com.fact.service.OpcionUsuarioService;
 import com.fact.service.RolService;
 import com.fact.service.SubMenuService;
@@ -27,12 +30,13 @@ import com.fact.service.UsuarioService;
 
 @ManagedBean
 @SessionScoped
-public class Usuarios<hacer> implements Serializable {
+public class Usuarios implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 7205428076166979495L;
+	private static Logger log = Logger.getLogger(Abonos.class);
 	
 	@EJB
 	private SubMenuService subMenuService;
@@ -45,6 +49,8 @@ public class Usuarios<hacer> implements Serializable {
 	
 	@EJB
 	private OpcionUsuarioService opcionUsuarioService;
+	
+	
 	
 	
 	List<SubMenu> subMenuSource; 
@@ -61,6 +67,8 @@ public class Usuarios<hacer> implements Serializable {
 	String clave;
 	String usuarioSelect;
 	String usuarioOpcion;
+	Long sucursal;
+	List<Empresa> sucursales;
 	
 	//empleados
 	private String nombreEmpleado;
@@ -74,6 +82,10 @@ public class Usuarios<hacer> implements Serializable {
     	boolean valido= true;
     	if (getRol() == null ||getRol()==0l) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, El Rol es obligatorio",""));
+            valido = false;         
+        }
+    	if (getSucursal() == null ||getSucursal()==0l) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, La Sucursal es obligatoria",""));
             valido = false;         
         }
     	if (getClave() == null || getClave().equals("")) {
@@ -115,7 +127,7 @@ public class Usuarios<hacer> implements Serializable {
 	}
 	
 	public String guardarUsuario(){
-		System.out.println("entra a guardar");
+		log.info("entra a guardar usuario");
 		if(validar()){
 			Usuario usuario = new Usuario();
 			usuario.setClave(getClave());
@@ -126,11 +138,18 @@ public class Usuarios<hacer> implements Serializable {
 			usuario.setLogin(getLogin().toUpperCase());
 			usuario.setIdentificacion(getIdentificacion()==null?"":getIdentificacion().toString());
 			Rol ro =new Rol();
-			ro.setRolId(getRol());;
+			ro.setRolId(getRol());
 			usuario.setRolId(ro);
 			usuario.setFechaRegistro(new Date());
 			usuarioService.save(usuario);
 			getUsuarios().add(usuario);
+			
+			UsuarioEmpresa usuarioEmpresa = new UsuarioEmpresa();
+			Empresa empresa = new Empresa();
+			empresa.setEmpresaId(getSucursal());
+			usuarioEmpresa.setEmpresaId(empresa);
+			usuarioEmpresa.setUsusarioId(usuario);
+			usuarioService.save(usuarioEmpresa);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Usuario Creado exitosamente"));
 		}
 		return "";
@@ -171,7 +190,7 @@ public class Usuarios<hacer> implements Serializable {
 	}
 	
 	public String editarUsuario(){
-		System.out.println("entra a guardar");
+		log.info("entra a guardar");
 		if(validarEdicion()){
 			Usuario usuario = new Usuario();
 			usuario.setUsuarioId(Long.valueOf(getUsuarioSelect()));
@@ -182,7 +201,7 @@ public class Usuarios<hacer> implements Serializable {
 			usuario.setNombre(getNombre()==null?"":getNombre());
 			usuario.setLogin(getLogin().toUpperCase());
 			Rol ro =new Rol();
-			ro.setRolId(getRol());;
+			ro.setRolId(getRol());
 			usuario.setRolId(ro);
 			usuarioService.update(usuario);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Usuario Editado exitosamente"));
@@ -406,6 +425,25 @@ public class Usuarios<hacer> implements Serializable {
 
 	public void setEmpleadoList(List<Empleado> empleadoList) {
 		this.empleadoList = empleadoList;
+	}
+
+	public Long getSucursal() {
+		return sucursal;
+	}
+
+	public void setSucursal(Long sucursal) {
+		this.sucursal = sucursal;
+	}
+
+	public List<Empresa> getSucursales() {
+		if(sucursales==null||sucursales.isEmpty()){
+			sucursales= usuarioService.getByAllEmpresa();
+		}
+		return sucursales;
+	}
+
+	public void setSucursales(List<Empresa> sucursales) {
+		this.sucursales = sucursales;
 	}
 	
 	

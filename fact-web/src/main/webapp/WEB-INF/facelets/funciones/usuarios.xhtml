@@ -51,12 +51,23 @@
 						<td><p:outputLabel value="Login: " /></td>
 						<td><p:inputText value="#{usuarios.login}" id="loginGuardar">
 							</p:inputText></td>
+						<td><p:outputLabel value="Sucursal:" /></td>
+						<td><p:selectOneMenu value="#{usuarios.sucursal}">
+								<f:selectItem itemLabel="Seccionar Sucursal" itemValue="0" />
+								<f:selectItems value="#{usuarios.sucursales}"
+									noSelectionValue="Seleccione SUcuersal" var="sucursal"
+									itemLabel="#{sucursal.nombre}" itemValue="#{sucursal.empresaId}" />
+							</p:selectOneMenu></td>	
+						
+					</tr>
+					<tr>
 						<td></td>
 						<td><p:commandButton value="Guardar" id="guardarBotton"  process="@form" 
 						update="growl1,creacionUsuarios:acord:guardarForm:usuarioEdictSelect,creacionUsuarios:acord:usuarioSelect" 
 						 actionListener ="#{usuarios.guardarUsuario}">
 							</p:commandButton>
 							<p:commandButton value="Salir" onclick="salirUsuarios" /></td>
+							
 					</tr>
 <!-- 					guardarForm:usuarioEdictSelect, guardarForm:usuarioSelect -->
 				</table>
