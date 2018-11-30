@@ -437,7 +437,7 @@ public class borrarFacturas implements Serializable {
 			List<DocumentoDetalle> detalles1 = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l);
 			OpcionUsuario descuentoEnFactura = (OpcionUsuario) sessionMap.get("descuentoEnFactura");
 			Impresion.imprimirBig(docu, Calculos.llenarDocumentoDetalleVoList(detalles1), docu.getUsuarioId(),
-					configuracion, descuentoEnFactura, impresora);
+					configuracion, descuentoEnFactura, impresora,e);
 			break;
 		default:
 			break;

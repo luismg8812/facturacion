@@ -299,12 +299,12 @@ public class PuntoVentaDia implements Serializable {
 		}
 		Producto p = null;
 		try {
-			codigoProducoString = completo.substring(1, 6);
+			codigoProducoString = completo.substring(0, 7);
 			log.info("codigoP:" + codigoProducoString);
 			p = getProductosAllCodigo().get(Long.valueOf(codigoProducoString));
 			if (p != null) {
 				log.info("producto carnes: " + p.getNombre());
-				String pesoProducoString = completo.substring(6, 12);
+				String pesoProducoString = completo.substring(7, 12);
 				String parte1 = pesoProducoString.substring(0, 2);
 				String parte2 = pesoProducoString.substring(2, 5);
 				Double peso = Double.valueOf(parte1 + "." + parte2);
@@ -1006,7 +1006,7 @@ public class PuntoVentaDia implements Serializable {
 					break;
 				case "BIG_PDF":
 					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
-							impresora);
+							impresora,e);
 					break;
 				case "SMALL_PDF":
 					Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,e);
@@ -2128,7 +2128,7 @@ public class PuntoVentaDia implements Serializable {
 			setPesoTotal(getDocumento().getPesoTotal());
 			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
 			ProductoEmpresa productoEmpresa= productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), d.getProductoId().getProductoId());		
-			Double cantidad1 = productoEmpresa.getCantidad() + d.getCantidad1();
+			Double cantidad1 = productoEmpresa.getCantidad() + d.getCantidad();
 			productoEmpresa.setCantidad(cantidad1);
 			productoEmpresaService.update(productoEmpresa);
 			
