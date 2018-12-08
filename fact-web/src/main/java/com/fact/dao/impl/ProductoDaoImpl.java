@@ -16,7 +16,9 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fact.api.FactException;
 import com.fact.dao.ProductoDao;
+import com.fact.model.Empresa;
 import com.fact.model.Producto;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.SubProducto;
 import com.fact.utils.HibernateUtil;
 
@@ -298,6 +300,39 @@ public class ProductoDaoImpl implements ProductoDao{
 			String sql = "select m from Producto m where m.estado=1 and m.grupoId.grupoId =:grupoId";
 			Query query = session.createQuery(sql);
 			query.setParameter("grupoId",grupoId);
+			menuList=  query.list(); 
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return menuList;
+	}
+
+	@Override
+	public List<Producto> getAllByCompany(Empresa empresa) throws FactException {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Producto> menuList = new ArrayList<>(); 
+		try {
+			String sql = "select m.productoId from ProductoEmpresa m where m.productoId.estado=1 and m.empresaId.empresaId= :empresaId order by m.productoId.nombre";
+			Query query = session.createQuery(sql);
+			query.setParameter("empresaId",empresa.getEmpresaId());
+			menuList=  query.list(); 
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return menuList;
+	}
+
+	
+	@Override
+	public List<ProductoEmpresa> getProductoByEmpresa(Long empresaId) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<ProductoEmpresa> menuList = new ArrayList<>(); 
+		try {
+			String sql = "select m from ProductoEmpresa m where m.productoId.estado=1 and m.empresaId.empresaId= :empresaId order by m.productoId.nombre";
+			Query query = session.createQuery(sql);
+			query.setParameter("empresaId",empresaId);
 			menuList=  query.list(); 
 			session.close();
 		} catch (FactException e) {

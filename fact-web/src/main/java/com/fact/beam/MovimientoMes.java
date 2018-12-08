@@ -38,6 +38,7 @@ import com.fact.model.Grupo;
 import com.fact.model.Marca;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
@@ -48,6 +49,7 @@ import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
 import com.fact.service.GrupoService;
 import com.fact.service.MarcaService;
+import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
 import com.fact.service.ProveedorService;
 import com.fact.service.TipoDocumentoService;
@@ -96,6 +98,9 @@ public class MovimientoMes implements Serializable {
 
 	@EJB
 	private EventoService eventoService;
+	
+	@EJB
+	private ProductoEmpresaService productoEmpresaService;
 
 	public static final String FOCUS_CANTIDAD = "document.getElementById('cantidad_in').focus();";
 	public static final String SELECT_CANTIDAD = "document.getElementById('cantidad_in').select();";
@@ -105,7 +110,7 @@ public class MovimientoMes implements Serializable {
 
 	private List<TipoDocumento> tipoDocumentos;
 	List<DocumentoDetalleVo> productos;
-	List<Producto> productosAll;
+	List<ProductoEmpresa> productosAll;
 	List<Proveedor> proveedoresAll;
 	List<Grupo> gruposAll;
 	List<Marca> marcasAll;
@@ -229,12 +234,15 @@ public class MovimientoMes implements Serializable {
 
 	public List<Producto> completeText(String query) {
 		List<Producto> nombProductos = new ArrayList<>();
-		for (Producto p : getProductosAll()) {
-			if (p.getNombre() != null) {
-				String articul = p.getNombre().toUpperCase().trim();
+		for (ProductoEmpresa p : getProductosAll()) {
+			if (p.getProductoId().getNombre() != null) {
+				String articul = p.getProductoId().getNombre().toUpperCase().trim();
 				// if (articul.indexOf(query.toUpperCase()) != -1) {
 				if (articul.startsWith(query.toUpperCase().trim())) {
-					nombProductos.add(p);
+					 Producto producto = p.getProductoId();
+					 producto.setCantidad(p.getCantidad());
+					 producto.setCostoPublico(p.getPrecio());
+					nombProductos.add(producto);
 				}
 			}
 		}
@@ -317,9 +325,9 @@ public class MovimientoMes implements Serializable {
 
 	public List<String> completeCodigo(String query) {
 		List<String> codProductos = new ArrayList<>();
-		for (Producto p : getProductosAll()) {
-			if (p.getProductoId() != null) {
-				String articul = p.getProductoId().toString();
+		for (ProductoEmpresa p : getProductosAll()) {
+			if (p.getProductoId().getProductoId() != null) {
+				String articul = p.getProductoId().getProductoId().toString();
 				if (articul.indexOf(query) != -1) {
 					codProductos.add(articul);
 				}
@@ -330,12 +338,12 @@ public class MovimientoMes implements Serializable {
 
 	public String buscarProductoCodBarras(AjaxBehaviorEvent event) {
 		String completo = getCodigoBarras();
-		for (Producto p : getProductosAll()) {
-			if (p.getCodigoBarras() != null && completo.equals(p.getCodigoBarras().toString())) {
+		for (ProductoEmpresa p : getProductosAll()) {
+			if (p.getProductoId().getCodigoBarras() != null && completo.equals(p.getProductoId().getCodigoBarras().toString())) {
 				setCodigoInterno(p.getProductoId().toString());
-				setArticulo(p);
-				setUnidad(p.getCosto());
-				productoSelect = p;
+				setArticulo(p.getProductoId());
+				setUnidad(p.getProductoId().getCosto());
+				productoSelect = p.getProductoId();
 				break;
 			}
 		}
@@ -412,12 +420,12 @@ public class MovimientoMes implements Serializable {
 
 	public void buscarProductoCodigo(SelectEvent event) {
 		String completo = event.getObject().toString();
-		for (Producto p : getProductosAll()) {
+		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId().toString().contains(completo)) {
 				setCodigoInterno(p.getProductoId().toString());
-				setArticulo(p);
-				setUnidad(p.getCosto());
-				productoSelect = p;
+				setArticulo(p.getProductoId());
+				setUnidad(p.getProductoId().getCosto());
+				productoSelect = p.getProductoId();
 				break;
 			}
 		}
@@ -534,7 +542,7 @@ public class MovimientoMes implements Serializable {
 		} else {
 			server = 1l;
 		}
-		System.out.println("dio enter en cantidad");
+		log.info("dio enter en cantidad");
 		DocumentoDetalle docDetalle = new DocumentoDetalle();
 		DocumentoDetalleVo docDetalleVo = new DocumentoDetalleVo();
 		docDetalle.setCantidad(getCantidad());
@@ -546,8 +554,9 @@ public class MovimientoMes implements Serializable {
 		docDetalle.setParcial(getCantidad() * productoSelect.getCosto());
 		documentoDetalleService.save(docDetalle, server);
 		Producto productEdit = productoSelect;
-		cantidadTemp = productoSelect.getCantidad() == null ? 0.0 : productoSelect.getCantidad();
-		System.out.println("cantidad actual:" + cantidadTemp);
+		 ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), productoSelect.getProductoId());
+		cantidadTemp =    productoEmpresa.getCantidad() == null ? 0.0 : productoEmpresa.getCantidad();
+		log.info("cantidad actual:" + cantidadTemp);
 		OpcionUsuario stock;
 		switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
 		case "6": // tipo documento igual a salida de almacen
@@ -564,7 +573,7 @@ public class MovimientoMes implements Serializable {
 						+ productoSelect.getNombre() + " " + productoSelect.getStockMax()));
 			}
 			RequestContext.getCurrentInstance().update("growl");
-			System.out.println("cantidad actualizada:" + cantidadTemp);
+			log.info("cantidad actualizada:" + cantidadTemp);
 			break;
 		case "1":// tipo documento igual a entrada de almacen
 			cantidadTemp = cantidadTemp + getCantidad();
@@ -575,7 +584,7 @@ public class MovimientoMes implements Serializable {
 						+ productoSelect.getNombre() + " " + productoSelect.getStockMax()));
 			}
 			RequestContext.getCurrentInstance().update("growl");
-			System.out.println("cantidad actualizada:" + cantidadTemp);
+			log.info("cantidad actualizada:" + cantidadTemp);
 			break;
 		default:
 			break;
@@ -590,11 +599,12 @@ public class MovimientoMes implements Serializable {
 		evento.setFechaRegistro(new Date());
 		evento.setUsuarioId(usuario());
 		evento.setValorActual("" + cantidadTemp);
-		evento.setValorAnterior("" + productoSelect.getCantidad());
+		evento.setValorAnterior("" + productoEmpresa.getCantidad());
 		eventoService.save(evento);
 
-		productEdit.setCantidad(cantidadTemp);
-		productoService.update(productEdit, server);
+		productoEmpresa.setCantidad(cantidadTemp);
+		productoEmpresaService.update(productoEmpresa);
+		//productoService.update(productEdit, server);
 		docDetalleVo.setCantidad(getCantidad());
 		docDetalleVo.setProductoId(productoSelect);
 		docDetalleVo.setDocumentoId(getDocumento());
@@ -763,7 +773,17 @@ public class MovimientoMes implements Serializable {
 		setCodigoInterno(prodNew.getProductoId().toString());
 		setArticulo(prodNew);
 		setUnidad(prodNew.getCosto());
-		getProductosAll().add(productoSelect);
+		ProductoEmpresa productoEmpresa = new ProductoEmpresa();
+		productoEmpresa.setCantidad(0.0);
+		productoEmpresa.setEmpresaId(getEmpresa());
+		productoEmpresa.setFechaRegistro(new Date());
+		productoEmpresa.setProductoId(prodNew);
+		if (getPublicoNew() != null) {
+			productoEmpresa.setPrecio(getPublicoNew());
+		} else {
+			productoEmpresa.setPrecio(0.0);
+		}
+		productoEmpresaService.save(productoEmpresa);
 		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
 		RequestContext.getCurrentInstance().update("art_1_input");
 		RequestContext.getCurrentInstance().update("cod_");
@@ -1051,7 +1071,7 @@ public class MovimientoMes implements Serializable {
 				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
 				break;
 			case "BIG_PDF":
-				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora);
+				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora,e);
 				break;
 			case "SMALL_PDF":
 				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,e);
@@ -1788,14 +1808,13 @@ public class MovimientoMes implements Serializable {
 		this.valanzaNew = valanzaNew;
 	}
 
-	public List<Producto> getProductosAll() {
-		// if (productosAll == null || productosAll.isEmpty()) {
-		productosAll = productoService.getByAll();
-		// }
+	public List<ProductoEmpresa> getProductosAll() {
+		productosAll = productoService.getProductoByEmpresa(getEmpresa().getEmpresaId());
+
 		return productosAll;
 	}
 
-	public void setProductosAll(List<Producto> productosAll) {
+	public void setProductosAll(List<ProductoEmpresa> productosAll) {
 		this.productosAll = productosAll;
 	}
 

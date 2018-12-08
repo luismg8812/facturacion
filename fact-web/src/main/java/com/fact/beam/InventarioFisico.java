@@ -14,6 +14,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
@@ -25,12 +26,14 @@ import com.fact.model.Evento;
 import com.fact.model.Grupo;
 import com.fact.model.Marca;
 import com.fact.model.Producto;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoEvento;
 import com.fact.model.Usuario;
 import com.fact.service.EventoService;
 import com.fact.service.GrupoService;
 import com.fact.service.MarcaService;
+import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
 import com.fact.service.ProveedorService;
 import com.fact.vo.ProductoVo;
@@ -43,6 +46,7 @@ public class InventarioFisico implements Serializable {
 	 * luis Miguel gonzalez
 	 */
 	private static final long serialVersionUID = 1L;
+	private static Logger log = Logger.getLogger(PuntoVentaDia.class);
 
 	@EJB
 	private ProductoService productoService;
@@ -58,6 +62,9 @@ public class InventarioFisico implements Serializable {
 	
 	@EJB
 	private GrupoService grupoService;
+	
+	@EJB
+	private ProductoEmpresaService productoEmpresaService;
 
 	// filtros
 	private List<Long> productoFilter;
@@ -75,32 +82,31 @@ public class InventarioFisico implements Serializable {
 	private List<Proveedor> proveedorList;
 	private List<Marca> marcaList;
 	private List<Grupo> grupoList;
-	private List<Integer> productosSelect = new ArrayList<>();;
+	private List<Integer> productosSelect = new ArrayList<>();
 	List<ProductoVo> selected;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 
 	private Configuracion configuracion() {
-		Configuracion yourVariable = (Configuracion) sessionMap.get("configuracion");
-		return yourVariable;
+		return  (Configuracion) sessionMap.get("configuracion");
 	}
 	
-	private String impresora() {
-		String yourVariable = (String) sessionMap.get("impresora");
-		return yourVariable;
+	private String impresora() {		
+		return (String) sessionMap.get("impresora");
+	}
+	
+	private Empresa getEmpresa() {
+		return (Empresa) sessionMap.get("empresa");
 	}
 
 	public void onRowEdit(RowEditEvent event) {
 		ProductoVo vo = (ProductoVo) event.getObject();
-		System.out.println("celda:" + vo.getNombre());
+		log.info("celda:" + vo.getNombre());
 	}
 
-	public Usuario usuario() {
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-		Map<String, Object> sessionMap = externalContext.getSessionMap();
-		Usuario usaurio = (Usuario) sessionMap.get("userLogin");
-		return usaurio;
+	public Usuario usuario() {	
+		return (Usuario) sessionMap.get("userLogin");
 	}
 
 	public void guardarInventarioFisico2() {
@@ -136,28 +142,27 @@ public class InventarioFisico implements Serializable {
 				evento.setValorActual("" + pVo.getCantidad());
 				evento.setValorAnterior("" + pVo.getProducto().getCantidad());
 				eventoService.save(evento);
-			}
-			// System.out.println("borrar: "+pVo.getBorrar());
-			// System.out.println(pVo.getProducto().getBalanza());
+			}			
+			
 			Producto p = pVo.getProducto();
-			p = pVo.getProducto();
-			if (pVo.getBorrar().toUpperCase().equals("B")) {
+			ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),p.getProductoId());
+			if (pVo.getBorrar().equalsIgnoreCase("B")) {
 				p.setEstado(0l);
 			}
 			p.setCosto(pVo.getCosto() == null ? 0.0 : pVo.getCosto());
-			p.setCostoPublico(pVo.getPublico() == null ? 0.0 : pVo.getPublico());
-			p.setCantidad(pVo.getCantidad() == null ? 0.0 : pVo.getCantidad());
+			productoEmpresa.setPrecio(pVo.getPublico() == null ? 0.0 : pVo.getPublico());
+			productoEmpresa.setCantidad(pVo.getCantidad() == null ? 0.0 : pVo.getCantidad());
 			p.setIva(pVo.getIva() == null ? 0.0 : pVo.getIva());
 			p.setHipoconsumo(pVo.getHipoconsumo() == null ? 0.0 : pVo.getHipoconsumo());
 			p.setkGPromo(pVo.getkGPromo() == null ? 0.0 : pVo.getkGPromo());
 			p.setPubPromo(pVo.getPubPromo() == null ? 0l : pVo.getPubPromo());
 			if (pVo.getBalanza() != null) {
-				p.setBalanza(pVo.getBalanza().toUpperCase().equals("N") ? 0l : 1l);
+				p.setBalanza(pVo.getBalanza().equalsIgnoreCase("N") ? 0l : 1l);
 			} else {
 				p.setBalanza(0l);
 			}
 			if (pVo.getPromo() != null) {
-				p.setPromo(pVo.getPromo().toUpperCase().equals("N") ? 0l : 1l);
+				p.setPromo(pVo.getPromo().equalsIgnoreCase("N") ? 0l : 1l);
 			} else {
 				p.setBalanza(0l);
 			}
@@ -165,13 +170,12 @@ public class InventarioFisico implements Serializable {
 			p.setUtilidadSugerida(pVo.getUtilidadSugerida());
 			p.setCostoSugerida(pVo.getCostoSugerida());
 			Double stock =p.getStockMax()==null?0.0:p.getCantidad();
-			// if(stock!=null){
 			if (p.getCantidad() > stock) {
-				System.out.println("entro");
+				log.info("entro");
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage("La cantidad max sugerida para " + p.getNombre() + " es " + p.getStockMax()));
 			}
-			// }
+			productoEmpresaService.update(productoEmpresa);
 			productoService.update(p,1l);
 			Configuracion configuracion = configuracion();
 			Long server = configuracion.getServer();
@@ -184,53 +188,43 @@ public class InventarioFisico implements Serializable {
 
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(edits.size() + " Productos editados exitosamente"));
-		System.out.println("tamaño edit:" + edits.size());
+		log.info("tamaño edit:" + edits.size());
 	}
 
 	public void limpiar() {
 		setProductosAll(null);
 	}
 
-	private List<Long> convertir(String[] lista) {
-		List<String> stri = Arrays.asList(lista);
-		List<Long> lista2 = new ArrayList<>();
-		for (String s : stri) {
-			lista2.add(Long.valueOf(s));
-		}
-		return lista2;
-	}
 
 	public void actualizar() {
 		setProductosAll(null);
 		productosAll = new ArrayList<>();
-		try {
-			// List<Producto> productos=productoService.getByAll();
-			List<Producto> productos = productoService.find(convertir(getMarcaFilter()), getIva(), getCodigo(),
-					getTipoPeso(), convertir(getProveedorFilter()),convertir(getGrupoFilter()));
-			for (Producto p : productos) {
+		try {	
+			List<ProductoEmpresa> productos = productoEmpresaService.getByEmpresa(getEmpresa().getEmpresaId());
+			for (ProductoEmpresa p : productos) {
 				ProductoVo pVo = new ProductoVo();
 				pVo.setBorrar("");
-				pVo.setNombre(p.getNombre() == null ? "" : p.getNombre().toUpperCase().trim());
-				pVo.setPublico(p.getCostoPublico() == null ? 0.0 : p.getCostoPublico());
-				pVo.setCosto(p.getCosto() == null ? 0.0 : p.getCosto());
+				pVo.setNombre(p.getProductoId().getNombre() == null ? "" : p.getProductoId().getNombre().toUpperCase().trim());
+				pVo.setPublico(p.getProductoId().getCostoPublico() == null ? 0.0 : p.getProductoId().getCostoPublico());
+				pVo.setCosto(p.getProductoId().getCosto() == null ? 0.0 : p.getProductoId().getCosto());
 				pVo.setCantidad(p.getCantidad() == null ? 0.0 : p.getCantidad());
-				pVo.setIva(p.getIva() == null ? 0.0 : p.getIva());
-				pVo.setHipoconsumo(p.getHipoconsumo() == null ? 0.0 : p.getHipoconsumo());
-				pVo.setPubPromo(p.getPubPromo() == null ? 0l : p.getPubPromo());
-				pVo.setkGPromo(p.getkGPromo() == null ? 0l : p.getkGPromo());
-				if (p.getBalanza() != null) {
-					pVo.setBalanza(p.getBalanza() == 1l ? "S" : "N");
+				pVo.setIva(p.getProductoId().getIva() == null ? 0.0 : p.getProductoId().getIva());
+				pVo.setHipoconsumo(p.getProductoId().getHipoconsumo() == null ? 0.0 : p.getProductoId().getHipoconsumo());
+				pVo.setPubPromo(p.getProductoId().getPubPromo() == null ? 0l : p.getProductoId().getPubPromo());
+				pVo.setkGPromo(p.getProductoId().getkGPromo() == null ? 0l : p.getProductoId().getkGPromo());
+				if (p.getProductoId().getBalanza() != null) {
+					pVo.setBalanza(p.getProductoId().getBalanza() == 1l ? "S" : "N");
 				}
-				if (p.getPromo() != null) {
-					pVo.setPromo(p.getPromo() == 1l ? "S" : "N");
+				if (p.getProductoId().getPromo() != null) {
+					pVo.setPromo(p.getProductoId().getPromo() == 1l ? "S" : "N");
 				} else {
 					pVo.setPromo("N");
 				}
 
-				Double utilidadSugerida = p.getUtilidadSugerida() == null ? 0.0 : p.getUtilidadSugerida();
-				Double costoSugerida = p.getCostoSugerida() == null ? 0.0 : p.getCostoSugerida();
-				Double costo = p.getCosto() == null ? 0.0 : p.getCosto();
-				Double publico = p.getCostoPublico() == null ? 0.0 : p.getCostoPublico();
+				Double utilidadSugerida = p.getProductoId().getUtilidadSugerida() == null ? 0.0 : p.getProductoId().getUtilidadSugerida();
+				Double costoSugerida = p.getProductoId().getCostoSugerida() == null ? 0.0 : p.getProductoId().getCostoSugerida();
+				Double costo = p.getProductoId().getCosto() == null ? 0.0 : p.getProductoId().getCosto();
+				Double publico = p.getProductoId().getCostoPublico() == null ? 0.0 : p.getProductoId().getCostoPublico();
 				Double publicoSugerido = costo + (costo * (utilidadSugerida / 100));
 				Double utilidadReal = ((publico - costo) * 100) / costo;
 				Double diferencia = publico - costo;
@@ -238,7 +232,7 @@ public class InventarioFisico implements Serializable {
 				pVo.setPublicoSugerida(publicoSugerido);
 				pVo.setUtilidadReal(utilidadReal);
 				pVo.setDiferencia(diferencia);
-				pVo.setProducto(p);
+				pVo.setProducto(p.getProductoId());
 				pVo.setCostoSugerida(costoSugerida);
 				productosAll.add(pVo);
 				productosSelect = new ArrayList<>();
@@ -254,10 +248,9 @@ public class InventarioFisico implements Serializable {
 		Object newValue = event.getNewValue();
 		int rowIndex = event.getRowIndex();
 		// con el row index ir a buscarlo en la lista e agregarlo en una nueva
-		// lista para editar cuando se unda el boton guardar;
+		// lista para editar cuando se unda el boton guardar
 		if (newValue != null && !newValue.equals(oldValue)) {
-			System.out.println("producto editado: " + newValue);
-			// ProductoVo pEdict = productosAll.get(rowIndex);
+			log.info("producto editado: " + newValue);		
 			int esta = 0;
 			for (Integer p : productosSelect) {
 				if (p.toString().equals("" + rowIndex)) {

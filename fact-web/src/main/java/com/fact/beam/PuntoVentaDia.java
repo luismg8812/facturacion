@@ -59,6 +59,7 @@ import com.fact.model.Grupo;
 import com.fact.model.InfoDiario;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.SubProducto;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
@@ -70,6 +71,7 @@ import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
 import com.fact.service.GrupoService;
 import com.fact.service.OpcionUsuarioService;
+import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Conector;
@@ -106,6 +108,9 @@ public class PuntoVentaDia implements Serializable {
 
 	@EJB
 	private ProductoService productoService;
+	
+	@EJB
+	private ProductoEmpresaService productoEmpresaService;
 
 	@EJB
 	private DocumentoService documentoService;
@@ -130,7 +135,8 @@ public class PuntoVentaDia implements Serializable {
 
 	String codigoBarras;
 	Map<Long, Producto> productosAllCodigo;
-	List<Producto> productosAll;
+	List<ProductoEmpresa> productosAll;
+	List<Producto> productosAll2;
 	List<Cliente> clientesAll;
 	List<Empleado> empleadosAll;
 	String codigoInterno;
@@ -293,12 +299,12 @@ public class PuntoVentaDia implements Serializable {
 		}
 		Producto p = null;
 		try {
-			codigoProducoString = completo.substring(1, 6);
+			codigoProducoString = completo.substring(0, 7);
 			log.info("codigoP:" + codigoProducoString);
 			p = getProductosAllCodigo().get(Long.valueOf(codigoProducoString));
 			if (p != null) {
 				log.info("producto carnes: " + p.getNombre());
-				String pesoProducoString = completo.substring(6, 12);
+				String pesoProducoString = completo.substring(7, 12);
 				String parte1 = pesoProducoString.substring(0, 2);
 				String parte2 = pesoProducoString.substring(2, 5);
 				Double peso = Double.valueOf(parte1 + "." + parte2);
@@ -320,10 +326,9 @@ public class PuntoVentaDia implements Serializable {
 
 	public List<String> completeCodigo(String query) {
 		List<String> codProductos = new ArrayList<String>();
-		for (Producto p : getProductosAll()) {
+		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId() != null) {
-				String articul = p.getProductoId().toString();
-
+				String articul = p.getProductoId().getProductoId().toString();
 				// if (articul.indexOf(query) != -1) {
 				if (articul.startsWith(query.toUpperCase().trim())) {
 					codProductos.add(articul);
@@ -335,12 +340,12 @@ public class PuntoVentaDia implements Serializable {
 
 	public void buscarProductoCodigo(SelectEvent event) {
 		String completo = event.getObject().toString();
-		for (Producto p : getProductosAll()) {
+		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId().toString().contains(completo)) {
-				setCodigoInterno(p.getProductoId().toString());
-				setArticulo(p);
-				setUnidad(p.getCostoPublico());
-				productoSelect = p;
+				setCodigoInterno(p.getProductoId().getProductoId().toString());
+				setArticulo(p.getProductoId());
+				setUnidad(p.getProductoId().getCostoPublico());
+				productoSelect = p.getProductoId();
 				RequestContext.getCurrentInstance().update(CAMPO_ARTICULO);
 				RequestContext.getCurrentInstance().update("art_11_input");
 				RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
@@ -378,20 +383,21 @@ public class PuntoVentaDia implements Serializable {
 				RequestContext.getCurrentInstance().execute(
 						"document.getElementById('cantidad_in1').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';");
 			}
-
 		}
-
 	}
 
 	public List<Producto> completeText(String query) {
 		List<Producto> nombProductos = new ArrayList<>();
-		for (Producto p : getProductosAll()) {
-			if (p.getNombre() != null) {
-				String articul = p.getNombre().toUpperCase().trim();
+		for (ProductoEmpresa p : getProductosAll()) {
+			if (p.getProductoId().getNombre() != null) {
+				String articul = p.getProductoId().getNombre().toUpperCase().trim();
 				// si en algun momento se necesita
-				// if(articul.indexOf(query.toUpperCase()) != -1) {
-				if (articul.startsWith(query.toUpperCase().trim())) {
-					nombProductos.add(p);
+				 if(articul.indexOf(query.toUpperCase()) != -1) {
+				//if (articul.startsWith(query.toUpperCase().trim())) {
+					 Producto producto = p.getProductoId();
+					 producto.setCantidad(p.getCantidad());
+					 producto.setCostoPublico(p.getPrecio());
+					nombProductos.add(producto);
 				}
 			}
 		}
@@ -611,15 +617,15 @@ public class PuntoVentaDia implements Serializable {
 			// si stock esta activo se valida que la cantidad en existencia es
 			// menor que en existencia
 			// se envida una alerta
-			if (stock != null) {
-				if (productoSelect.getCantidad() < productoSelect.getStockMin()) {
+			ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), productoSelect.getProductoId());
+			if (stock != null && productoEmpresa.getCantidad() < productoEmpresa.getProductoId().getStockMin()) {
 					FacesContext.getCurrentInstance().addMessage(null,
 							new FacesMessage("Tiene poca cantidad en inventario de " + productoSelect.getNombre()));
-				}
+				
 			}
-			if (productoSelect.getCantidad() < 0) {
+			if (productoEmpresa.getCantidad() < 0) {
 				FacesContext.getCurrentInstance().addMessage(null,
-						new FacesMessage(productoSelect.getNombre() + " se ha agotado "));
+						new FacesMessage(productoEmpresa.getProductoId().getNombre() + " se ha agotado "));
 			}
 			RequestContext.getCurrentInstance().update("growl1");
 			Long server = configuracion.getServer();
@@ -697,7 +703,7 @@ public class PuntoVentaDia implements Serializable {
 					newCantidad2 = productoSelect2.getCantidad() == null ? 0.0 : productoSelect2.getCantidad();
 				}
 
-				Double newCantidad = productoSelect.getCantidad();
+				Double newCantidad = productoEmpresa.getCantidad();
 				if (server == 2) {
 					if (newCantidad2 > 0) {
 						if (newCantidad2 > getCantidad()) {
@@ -731,12 +737,12 @@ public class PuntoVentaDia implements Serializable {
 					docDetalleVo.setCantidad1(getCantidad());
 					docDetalleVo.setCantidad2(0.0);
 				}
-				Producto proCantidad = productoSelect;
+				ProductoEmpresa proCantidad = productoEmpresa;
 				Producto proCantidad2 = productoSelect2;
 				proCantidad.setCantidad(newCantidad - docDetalle.getCantidad1());
 				restarCantidadesSubProducto(docDetalle, server);
 				documentoDetalleService.save(docDetalle, server);
-				productoService.update(proCantidad, 1l);
+				productoEmpresaService.update(proCantidad);
 				if (server == 2l && proCantidad2 != null) {
 					proCantidad2.setCantidad(newCantidad2 - docDetalle.getCantidad2());
 					productoService.update(proCantidad2, 2l);
@@ -1000,7 +1006,7 @@ public class PuntoVentaDia implements Serializable {
 					break;
 				case "BIG_PDF":
 					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
-							impresora);
+							impresora,e);
 					break;
 				case "SMALL_PDF":
 					Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,e);
@@ -1604,7 +1610,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public String getCodNom(String nombreP) {
 		String cod = "";
-		for (Producto p : getProductosAll()) {
+		for (Producto p : getProductosAll2()) {
 			if (p.getNombre() != null) {
 				if (nombreP.equals(p.getNombre().toUpperCase())) {
 					cod = p.getProductoId().toString();
@@ -1618,7 +1624,7 @@ public class PuntoVentaDia implements Serializable {
 	public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
 		if (value != null && value.trim().length() > 0) {
 			List<Producto> newP = new ArrayList<>();
-			newP = getProductosAll();
+			newP = getProductosAll2();
 			return newP.get(Integer.parseInt(value));
 		} else {
 			return null;
@@ -2121,18 +2127,19 @@ public class PuntoVentaDia implements Serializable {
 			setTotal(getDocumento().getTotal());
 			setPesoTotal(getDocumento().getPesoTotal());
 			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
-			Producto productoEdit = d.getProductoId();
-			Double cantidad = productoEdit.getCantidad() + d.getCantidad1();
-			productoEdit.setCantidad(cantidad);
-			productoService.update(productoEdit, 1l);
+			ProductoEmpresa productoEmpresa= productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), d.getProductoId().getProductoId());		
+			Double cantidad1 = productoEmpresa.getCantidad() + d.getCantidad();
+			productoEmpresa.setCantidad(cantidad1);
+			productoEmpresaService.update(productoEmpresa);
+			
 			if (server == 2l) {
-				productoEdit = productoService.getById(d.getProductoId().getProductoId());
-				cantidad = productoEdit.getCantidad() + d.getCantidad2();
-				productoEdit.setCantidad(cantidad);
-				productoService.update(productoEdit, server);
+				productoEmpresa = productoEmpresaService.getById(d.getProductoId().getProductoId());
+				cantidad = productoEmpresa.getCantidad() + d.getCantidad2();
+				productoEmpresa.setCantidad(cantidad);
+				productoEmpresaService.update(productoEmpresa);
 			}
 		} catch (Exception e) {
-			System.out.print("!!error borrando el producto:" + d.getProductoId().getProductoId());
+			log.info("!!error borrando el producto:" + d.getProductoId().getProductoId());
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error borrando Productos"));
 		}
 		RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
@@ -2652,15 +2659,26 @@ public class PuntoVentaDia implements Serializable {
 		this.productosAllCodigo = productosAllCodigo;
 	}
 
-	public List<Producto> getProductosAll() {
+	public List<ProductoEmpresa> getProductosAll() {
 		if (productosAll == null || productosAll.isEmpty()) {
-			productosAll = productoService.getByAll();
+			productosAll = productoService.getProductoByEmpresa(getEmpresa().getEmpresaId());
 		}
 		return productosAll;
 	}
 
-	public void setProductosAll(List<Producto> productosAll) {
+	public void setProductosAll(List<ProductoEmpresa> productosAll) {
 		this.productosAll = productosAll;
+	}
+	
+	public List<Producto> getProductosAll2() {
+		if (productosAll2 == null || productosAll2.isEmpty()) {
+			productosAll2 = productoService.getAllByCompany((getEmpresa()));
+		}
+		return productosAll2;
+	}
+
+	public void setProductosAll2(List<Producto> productosAll2) {
+		this.productosAll2 = productosAll2;
 	}
 
 	public Double getPx01() {

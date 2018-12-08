@@ -30,7 +30,7 @@
 				<td><p:selectOneMenu value="#{sucursales.productoNew}">
 						<f:selectItem itemLabel="Seccionar Producto" itemValue="" />
 						<f:selectItems value="#{puntoVentaDia.productosAll}" var="sucu"
-							itemLabel="#{sucu.nombre}" itemValue="#{sucu.productoId}" />
+							itemLabel="#{sucu.productoId.nombre}" itemValue="#{sucu.productoId.productoId}" />
 					</p:selectOneMenu></td>
 				<td><p:outputLabel value="cantidad: " /></td>
 				<td><p:inputNumber value="#{sucursales.cantidad}" size="10"></p:inputNumber> </td>

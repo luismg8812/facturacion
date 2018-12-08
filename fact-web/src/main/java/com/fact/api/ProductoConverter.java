@@ -3,14 +3,17 @@ package com.fact.api;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
+import com.fact.model.Empresa;
 import com.fact.model.Grupo;
 import com.fact.model.Marca;
 import com.fact.model.Producto;
@@ -24,6 +27,14 @@ public class ProductoConverter  implements Converter{
 	
 	@EJB
 	private ProductoService productoService;
+	
+	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+	Map<String, Object> sessionMap = externalContext.getSessionMap();
+	
+	private Empresa getEmpresa() {
+		return (Empresa) sessionMap.get("empresa");
+	}
+	
 	
 	List<Producto> productosAll;
 	 public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
@@ -115,7 +126,7 @@ public class ProductoConverter  implements Converter{
 	 
 	 public  List<Producto> getProductosAll() {
 			if (productosAll == null || productosAll.isEmpty()) {
-				productosAll = productoService.getByAll();
+				productosAll = productoService.getAllByCompany(getEmpresa());
 			}
 			return productosAll;
 		}

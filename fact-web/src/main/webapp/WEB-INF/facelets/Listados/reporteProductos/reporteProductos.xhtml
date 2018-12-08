@@ -21,21 +21,21 @@
 					  paginator="true" rowsPerPageTemplate="10,20,30">
 			
 			<p:column headerText="Nombre" width="40%">
-				<h:outputText value="#{pro.nombre}" />
+				<h:outputText value="#{pro.productoId.nombre}" />
 			</p:column>
 			<p:column headerText="costo Publico">
-				<h:outputText value="#{pro.costoPublico}" />
+				<h:outputText value="#{pro.productoId.costoPublico}" />
 			</p:column>
 
 			<p:column headerText="Costo Compra">
-				<h:outputText value="#{pro.costo}" />
+				<h:outputText value="#{pro.productoId.costo}" />
 			</p:column>
 
 			<p:column headerText="Cantidad">
 				<h:outputText value="#{pro.cantidad}" />
 			</p:column>
 			<p:column headerText="Iva">
-				<h:outputText value="#{pro.iva}" />
+				<h:outputText value="#{pro.productoId.iva}" />
 			</p:column>
 		</p:dataTable>
 	</h:form>

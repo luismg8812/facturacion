@@ -78,7 +78,7 @@ public class Impresion {
 	 * @throws PrintException
 	 */
 	public static String imprimirBig(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config, OpcionUsuario descuentoEnFactura, String impresora)
+			Configuracion config, OpcionUsuario descuentoEnFactura, String impresora, Empresa e)
 			throws DocumentException, IOException, PrinterException, PrintException {
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
 		float fntSize, lineSpacing;
@@ -88,7 +88,6 @@ public class Impresion {
 		String fhoyIni = df.format(documentoImp.getFechaRegistro());
 		String[] fechaHora = fhoyIni.split(" ");
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
-		Empresa e = Login.getEmpresaLogin();
 		Double tope = 15.0;// esta variable controla el nuero de productos por
 							// pagina en la factura
 		Double numPaginas = (double) productos.size();
@@ -102,7 +101,7 @@ public class Impresion {
 		PdfReader pdfReader = new PdfReader("C://facturacion/factura_big.pdf");
 		PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileOutputStream(pdf));
 		PdfContentByte canvas = pdfStamper.getOverContent(1);
-		System.out.println("productos: " + fin);
+		log.info("productos: " + fin);
 		String fuente = "arial";
 		float resta = 0;// se utiliza esta variable si si se necesita bajar o
 						// subir todo el texto
@@ -176,7 +175,8 @@ public class Impresion {
 					new Phrase(lineSpacing, "" + documentoImp.getDocumentoId(), FontFactory.getFont(fuente, fntSize)),
 					50f, 334 - resta, 0);// guia
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,
-					documentoImp.getClienteId().getNombre()+" "+documentoImp.getClienteId().getDireccion(), FontFactory.getFont(fuente, fntSize)), 160f, 334 - resta,
+				    documentoImp.getUsuarioId().getUsuarioId() + " " + documentoImp.getUsuarioId().getNombre()
+					+ " " + documentoImp.getUsuarioId().getApellido(), FontFactory.getFont(fuente, fntSize)), 190f, 334 - resta,
 					0);// cliente
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, "" + fechaHora[0], FontFactory.getFont(fuente, fntSize)), 385f, 334 - resta,
@@ -185,9 +185,8 @@ public class Impresion {
 					new Phrase(lineSpacing, "" + fechaHora[1], FontFactory.getFont(fuente, fntSize)), 500f, 330 - resta,
 					0);// hora
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,
-					"" + documentoImp.getUsuarioId().getUsuarioId() + " " + documentoImp.getUsuarioId().getNombre()
-							+ " " + documentoImp.getUsuarioId().getApellido(),
-					FontFactory.getFont(fuente, fntSize)), 60f, 317 - resta, 0);// cajero
+					"" +documentoImp.getClienteId().getNombre()+" "+documentoImp.getClienteId().getDireccion(),
+					FontFactory.getFont(fuente, fntSize)), 60f, 318 - resta, 0);// cajero
 			String telCliente = "" + documentoImp.getClienteId().getCelular();
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, telCliente, FontFactory.getFont(fuente, fntSize)), 259f, 315 - resta, 0);
@@ -959,14 +958,14 @@ public class Impresion {
 	public static void printer(String impresora, String rutaArchivo, Configuracion configuracion) {
 		PrinterJob job = PrinterJob.getPrinterJob();
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured1: " + printServices.length);
+		log.info("Number of printers configured1: " + printServices.length);
 		for (PrintService printer : printServices) {
-			System.out.println("Printer: " + printer.getName());
-			System.out.println("comparacion:"+impresora+":"+printer.getName());
-			if (printer.getName().toString().equals(impresora)) {
+			log.info("Printer: " + printer.getName());
+			log.info("comparacion:"+impresora+":"+printer.getName());
+			if (printer.getName().equals(impresora)) {
 				try {
 					job.setPrintService(printer);
-					System.out.println( impresora+" : " + printer.getName());
+					log.info("coincide:"+ impresora+" : " + printer.getName());
 					break;
 				} catch (PrinterException ex) {
 					ex.printStackTrace();
@@ -989,9 +988,9 @@ public class Impresion {
 		if (configuracion.getGuardarFacturas() == 0l) {
 			File borrar = new File(rutaArchivo);
 			if (!borrar.delete()) {
-				System.out.println("Error borrando facturas");
+				log.error("Error borrando facturas");
 			} else {
-				System.out.println("Documento borrado");
+				log.info("Documento borrado");
 			}
 		}
 

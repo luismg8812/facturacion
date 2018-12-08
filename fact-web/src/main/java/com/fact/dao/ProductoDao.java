@@ -7,7 +7,9 @@ import java.util.List;
 import javax.ejb.Local;
 
 import com.fact.api.FactException;
+import com.fact.model.Empresa;
 import com.fact.model.Producto;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.SubProducto;
 
 @Local
@@ -27,4 +29,6 @@ public interface ProductoDao {
 	void delete(SubProducto s) throws FactException;
 	Producto getByCodigoBarras(Long codigoBarrasNew) throws FactException;
 	List<Producto> getByGrupo(Long grupoId)throws FactException;
+	List<Producto> getAllByCompany(Empresa empresa)throws FactException;
+	List<ProductoEmpresa> getProductoByEmpresa(Long empresaId);
 }
