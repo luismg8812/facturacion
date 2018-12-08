@@ -103,7 +103,7 @@ public class Impresion {
 		PdfContentByte canvas = pdfStamper.getOverContent(1);
 		log.info("productos: " + fin);
 		String fuente = "arial";
-		float resta = -13;// se utiliza esta variable si si se necesita bajar o
+		float resta = 0;// se utiliza esta variable si si se necesita bajar o
 						// subir todo el texto
 		// si hay mas de dos paginas se crean las paginas faltantes
 		if (numPaginas >= 2) {
@@ -163,23 +163,23 @@ public class Impresion {
 			// encabezado factura principal
 			canvas = pdfStamper.getOverContent(i);
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
-					new Phrase(lineSpacing, TituloFactura, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)), 510f, 370, 0);// tituo
+					new Phrase(lineSpacing, TituloFactura, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)), 430f, 360, 0);// tituo
 																												// factura
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
-					new Phrase(lineSpacing, TituloFactura1, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)), 510f, 360, 0);// tituo
+					new Phrase(lineSpacing, TituloFactura1, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)), 430f, 350, 0);// tituo
 																												// factura1
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,e.getLetraConsecutivo()+
 					documentoImp.getConsecutivoDian(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize + 2)),
-					420f, 365, 0);// # DOCUMENTO
+					500f, 355, 0);// # DOCUMENTO
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, "" + documentoImp.getDocumentoId(), FontFactory.getFont(fuente, fntSize)),
-					45f, 334 - resta, 0);// guia
+					50f, 334 - resta, 0);// guia
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,
 				    documentoImp.getUsuarioId().getUsuarioId() + " " + documentoImp.getUsuarioId().getNombre()
 					+ " " + documentoImp.getUsuarioId().getApellido(), FontFactory.getFont(fuente, fntSize)), 190f, 334 - resta,
 					0);// cliente
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
-					new Phrase(lineSpacing, "" + fechaHora[0], FontFactory.getFont(fuente, fntSize)), 370f, 334 - resta,
+					new Phrase(lineSpacing, "" + fechaHora[0], FontFactory.getFont(fuente, fntSize)), 385f, 334 - resta,
 					0);// fecha
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, "" + fechaHora[1], FontFactory.getFont(fuente, fntSize)), 500f, 330 - resta,
@@ -189,12 +189,12 @@ public class Impresion {
 					FontFactory.getFont(fuente, fntSize)), 60f, 318 - resta, 0);// cajero
 			String telCliente = "" + documentoImp.getClienteId().getCelular();
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
-					new Phrase(lineSpacing, telCliente, FontFactory.getFont(fuente, fntSize)), 259f, 317 - resta, 0);
+					new Phrase(lineSpacing, telCliente, FontFactory.getFont(fuente, fntSize)), 259f, 315 - resta, 0);
 			ColumnText
 					.showTextAligned(
 							canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing,
 									documentoImp.getClienteId().getDocumento(), FontFactory.getFont(fuente, fntSize)),
-							40f, 303 - resta, 0);// nit
+							45f, 303 - resta, 0);// nit
 			// fin encabezado factura principal
 
 			// pie de pagina factura principal
@@ -208,7 +208,7 @@ public class Impresion {
 					new Phrase(lineSpacing, peso, FontFactory.getFont(fuente, fntSize)), 410f, 76, 0);// peso
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, total, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize + 2)), 463f,
-					78, 0);// total
+					58, 0);// total
 			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
 					new Phrase(lineSpacing, resolucion, FontFactory.getFont(fuente, fntSize - 1)), 55f, 41, 0);// resolucion
 																												// dian
