@@ -1006,6 +1006,9 @@ public class PuntoVentaDia implements Serializable {
 				case "PDF":
 					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
 					break;
+				case "PDF_PAGE":
+					Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
+					break;	
 				case "BIG_PDF":
 					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
 							impresora,e);
