@@ -373,6 +373,7 @@ public class PuntoVentaDia implements Serializable {
 				determinarBalanza();
 				setParciaPopup("S");
 			} else {
+				setUnidad(productoSelect.getCostoPublico());
 				Configuracion configuracion = configuracion();
 				Long server = configuracion.getServer();
 				if (server == 2l) {
@@ -788,6 +789,7 @@ public class PuntoVentaDia implements Serializable {
 			setPesoTotal(getDocumento().getPesoTotal());
 			setArticulo(null);
 			setCantidad(0.0);
+			setUnidad(null);
 			setCodigoInterno(null);
 			setCodigoBarras(null);
 			setParciaPopup(null);
@@ -1584,6 +1586,7 @@ public class PuntoVentaDia implements Serializable {
 		setTipoDocumentoFacturaNombre("");
 		setNombreCliente2("");
 		setCliente(null);
+		setUnidad(null);
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");

@@ -759,7 +759,7 @@ panel1 {
 						<p:ajax event="itemSelect"
 							listener="#{puntoVentaDia.buscarProducto}" process="@this,art_11"
 							immediate="true"
-							update="cantidad_in1,growl1,facturar,focoFact,valorParcial,nombrePro,cantidadPar"
+							update="unidad_1,cantidad_in1,growl1,facturar,focoFact,valorParcial,nombrePro,cantidadPar"
 							onstart="focoCantidad1()" />
 						<p:column>
 							<p:outputLabel value="#{name.nombre}." />
@@ -782,7 +782,7 @@ panel1 {
 						onkeyup="enterCantidad1(event)">
 						<p:ajax event="blur" partialSubmit="true"
 							listener="#{puntoVentaDia.cantidadEnter}"
-							update="art_11,cod_1,dataList1,excento,gravado,iva,total,pesoTotal,codig1" />
+							update="art_11,cod_1,dataList1,excento,gravado,iva,total,pesoTotal,codig1,unidad_1" />
 					</p:inputText></td>
 				<td width="12%"><p:inputText value="#{puntoVentaDia.unidad}"
 						style="width:90%; text-align: center" id="unidad_1"
