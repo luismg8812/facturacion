@@ -65,7 +65,7 @@ public class Login implements Serializable {
 		  	try {
 				graphicImage=new DefaultStreamedContent(new FileInputStream(path), "image/png");
 			} catch (FileNotFoundException e) {
-				System.out.println("Error cargando imagen principal");
+				log.info("Error cargando imagen principal");
 			}
 	        return graphicImage;
 	    }
@@ -107,8 +107,8 @@ public class Login implements Serializable {
     		context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, Existe un problema con su versión del software",""));
             valido = false;
     	}else{
-    		if(!configuracion.getDemo().toUpperCase().equals("FULL")){
-    			final long MILLSECS_PER_DAY = 24 * 60 * 60 * 1000; //Milisegundos al día 
+    		if(!configuracion.getDemo().equalsIgnoreCase("FULL")){
+    			final long MILLSECS_PER_DAY = 8640000; //Milisegundos al día 
     			Date hoy = new Date();
     			   			   		   			
         		if(hoy.compareTo(configuracion.getFechaIngreso())>0){
@@ -169,10 +169,9 @@ public class Login implements Serializable {
 				setDeveloperLogin(Boolean.FALSE);
 				
 			}
-			System.out.println("usuarioLogin: " + getUsuarioLogin().getLogin());
+			log.info("usuarioLogin: " + getUsuarioLogin().getLogin());
 			//setImpresora(getUsuarioLogin().getImpresora() == null ? "" : getUsuarioLogin().getImpresora());
 			sessionMap.put("impresora",leerArchivoImpresora());
-			//System.out.println("impresora:" +(String) sessionMap.get("impresora"));
 			sessionMap.put("empresa",usuarioService.getByEmpresa(getUsuarioLogin().getUsuarioId()));
 			//setEmpresaLogin(); // consulta la // empresa
 			String contex=FacesContext.getCurrentInstance().getExternalContext().getContextName();
@@ -192,7 +191,7 @@ public class Login implements Serializable {
 	      try {
 	       
 	    	  HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-	  		//request.getRemoteAddr();	  		
+	   		
 	         archivo = new File ("\\\\"+request.getRemoteAddr()+"\\facturacion\\impresora.txt");
 	         fr = new FileReader (archivo);
 	         br = new BufferedReader(fr);

@@ -1,6 +1,6 @@
 package com.fact.dao.impl;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -260,7 +260,6 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			if (detalle != null && !detalle.isEmpty()) {
 				sql += " and (d.detalleEntrada =:detalle )";
 			}
-			System.out.println(sql);
 			Query query = session.createQuery(sql);
 			query.setParameter("factura", factura);
 			if (proveedorId != null && proveedorId != 0l) {
@@ -352,7 +351,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 				sql += " and (d.fechaRegistro <= :fechafin) ";
 			}
 
-			System.out.println(sql);
+			
 			Query query = session.createQuery(sql);
 			query.setParameterList("factura", documentoId);
 			query.setParameterList("tipoPagoId", tipoPagoId);
@@ -402,7 +401,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 				sql += " and (d.consecutivoDian =:conDian )";
 			}
 			sql += " order by consecutivoDian desc ";
-			System.out.println(sql);
+			
 			Query query = session.createQuery(sql);
 			query.setParameter("factura", factura);
 			if (usuarioSelect != null && usuarioSelect != 0l) {
@@ -437,11 +436,11 @@ public class DocumentoDaoImpl implements DocumentoDao {
 	@Override
 	public String getByUltimoId() {
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		BigDecimal id;
+		BigInteger id;
 		try {
-			String sql = "SELECT S_CONSECUTIVO_DIAN.nextval FROM DUAL";
+			String sql = "SELECT nextval('S_CONSECUTIVO_DIAN')";
 			Query query = session.createSQLQuery(sql);
-			id = (BigDecimal) query.uniqueResult();
+			id = (BigInteger) query.uniqueResult();
 			session.close();
 		} catch (FactException e) {
 			throw e;

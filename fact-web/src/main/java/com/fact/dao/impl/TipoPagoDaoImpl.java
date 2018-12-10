@@ -8,6 +8,7 @@ import javax.ejb.Stateless;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+
 import com.fact.api.FactException;
 import com.fact.dao.TipoPagoDao;
 import com.fact.model.TipoPago;

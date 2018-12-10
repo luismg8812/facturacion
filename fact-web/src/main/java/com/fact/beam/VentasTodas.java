@@ -1,16 +1,13 @@
 package com.fact.beam;
 
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+
 import com.fact.model.Documento;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;

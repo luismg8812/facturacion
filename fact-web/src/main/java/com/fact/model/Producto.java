@@ -66,7 +66,7 @@ public class Producto {
 	private Long stockMax;
 	
 	@Column(name="CODIGO_BARRAS")
-	private Long codigoBarras;
+	private String codigoBarras;
 	
 	@Column(name="PESO")
 	private Double peso;
@@ -101,8 +101,7 @@ public class Producto {
 	@Column(name="VARIOS")
 	private Long varios;
 	
-	@Column(name="ACTIVO")
-	private Long activo;
+	
 	
 	@Column(name="UTILIDAD_SUGERIDA")
 	private Double utilidadSugerida;
@@ -212,11 +211,11 @@ public class Producto {
 		this.marcaId = marcaId;
 	}
 
-	public Long getCodigoBarras() {
+	public String getCodigoBarras() {
 		return codigoBarras;
 	}
 
-	public void setCodigoBarras(Long codigoBarras) {
+	public void setCodigoBarras(String codigoBarras) {
 		this.codigoBarras = codigoBarras;
 	}
 
@@ -322,14 +321,6 @@ public class Producto {
 
 	public void setVarios(Long varios) {
 		this.varios = varios;
-	}
-
-	public Long getActivo() {
-		return activo;
-	}
-
-	public void setActivo(Long activo) {
-		this.activo = activo;
 	}
 
 	public Double getUtilidadSugerida() {

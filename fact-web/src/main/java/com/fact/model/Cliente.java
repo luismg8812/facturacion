@@ -29,9 +29,6 @@ public class Cliente {
 	@Column(name="NOMBRE")
 	private String nombre;
 	
-	@Column(name="CODIGO")
-	private Long codigo;
-	
 	@Column(name="DOCUMENTO")
 	private String documento;
 	
@@ -83,14 +80,6 @@ public class Cliente {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
-	}
-
-	public Long getCodigo() {
-		return codigo;
-	}
-
-	public void setCodigo(Long codigo) {
-		this.codigo = codigo;
 	}
 
 	public String getDocumento() {

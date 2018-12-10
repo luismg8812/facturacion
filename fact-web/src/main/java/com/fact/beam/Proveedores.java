@@ -12,8 +12,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+
 import com.fact.model.Ciudad;
-import com.fact.model.Cliente;
 import com.fact.model.Departamento;
 import com.fact.model.Documento;
 import com.fact.model.Proveedor;
@@ -21,7 +21,6 @@ import com.fact.service.CiudadService;
 import com.fact.service.DepartamentoService;
 import com.fact.service.DocumentoService;
 import com.fact.service.ProveedorService;
-import com.fact.vo.ClienteVo;
 import com.fact.vo.ProveedorVo;
 
 @ManagedBean

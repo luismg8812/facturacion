@@ -13,6 +13,8 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
+import org.jboss.logging.Logger;
+
 import com.fact.api.Calculos;
 import com.fact.model.Ciudad;
 import com.fact.model.Cliente;
@@ -28,10 +30,11 @@ import com.fact.vo.ClienteVo;
 @SessionScoped
 public class Clientes implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
+	
+	private static final long serialVersionUID = -5189988812307879612L;
+
+	private static Logger log = Logger.getLogger(Clientes.class);
 
 	@EJB
 	private DepartamentoService departamentoService;
@@ -147,7 +150,7 @@ public class Clientes implements Serializable {
 	}
 
 	public String llenarCampos() {
-		System.out.println(getClienteId());
+		log.info(getClienteId());
 		Cliente p = new Cliente();
 		for (Cliente pSelect : getClientes()) {
 			if (pSelect.getClienteId().toString().equals(getClienteId().toString())) {
@@ -184,7 +187,7 @@ public class Clientes implements Serializable {
 	}
 
 	public String editarCliente() {
-		System.out.println("entra a guardar");
+		log.info("entra a guardar");
 		if (validarEdicion()) {
 			Cliente cliente = new Cliente();
 			cliente.setBarrio(getBarrio());

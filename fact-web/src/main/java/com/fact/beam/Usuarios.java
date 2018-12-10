@@ -156,7 +156,7 @@ public class Usuarios implements Serializable {
 	}
 	
 	public String llenarCampos(){
-		System.out.println(getUsuarioSelect());
+		log.info(getUsuarioSelect());
 		Usuario u =new Usuario();
 		for(Usuario uSelect:getUsuarios()){
 			if(uSelect.getUsuarioId().toString().equals(getUsuarioSelect())){
@@ -210,7 +210,7 @@ public class Usuarios implements Serializable {
 	}
 	
 	public void guardarOpciones(){
-		System.out.println("entra a guardar opciones");
+		log.info("entra a guardar opciones");
 		List<OpcionUsuario> op = new ArrayList<>();
 		List<OpcionUsuario> opSource = new ArrayList<>();
 		op=opcionUsuarioService.getByUsuario(getUsuarioOpcion());

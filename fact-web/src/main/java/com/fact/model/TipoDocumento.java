@@ -25,12 +25,6 @@ public class TipoDocumento {
 	@Column(name="NOMBRE")
 	private String nombre;
 	
-	@Column(name="CODIGO")
-	private Long codigo;
-	
-	@Column(name="NOMBRE_CORTO")
-	private String nombreCorto;
-
 	public Long getTipoDocumentoId() {
 		return tipoDocumentoId;
 	}
@@ -47,21 +41,5 @@ public class TipoDocumento {
 		this.nombre = nombre;
 	}
 
-	public Long getCodigo() {
-		return codigo;
-	}
-
-	public void setCodigo(Long codigo) {
-		this.codigo = codigo;
-	}
-
-	public String getNombreCorto() {
-		return nombreCorto;
-	}
-
-	public void setNombreCorto(String nombreCorto) {
-		this.nombreCorto = nombreCorto;
-	}
-	
 	
 }

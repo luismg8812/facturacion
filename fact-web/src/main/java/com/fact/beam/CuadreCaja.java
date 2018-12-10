@@ -35,6 +35,7 @@ import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 
 import com.fact.api.Calculos;
@@ -76,6 +77,7 @@ public class CuadreCaja implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static Logger log = Logger.getLogger(CuadreCaja.class);
 
 	@EJB
 	private DocumentoService documentoService;
@@ -268,7 +270,7 @@ public void limpiar(){
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"Warning! Hay " + noImpresas + " Facturas no impresas", ""));
 		} else {	
-			System.out.println("imprimir cuadre pdf");
+			log.info("imprimir cuadre pdf");
 			Usuario usuario = (Usuario) sessionMap.get("userLogin");
 			String pdf = "C:\\facturas\\cuadre_" + usuario.getNombre()+"_"+ Calendar.HOUR_OF_DAY+Calendar.MINUTE+Calendar.SECOND + ".pdf";
 			FileOutputStream archivo = new FileOutputStream(pdf);
@@ -376,7 +378,7 @@ public void limpiar(){
 					Date hoyfin = Calculos.fechaFinal(new Date());
 					List<DocumentoDetalle> propinasEmpleado = documentoDetalleService.getbyEmpleado(em.getEmpleadoId(), hoy,  hoyfin);
 					Double totalPropina=0.0;
-					System.out.println("imprimir cuadre pdf");
+					log.info("imprimir cuadre pdf");
 					for(DocumentoDetalle dd: propinasEmpleado){
 						totalPropina+=dd.getParcial();
 					}
@@ -387,7 +389,7 @@ public void limpiar(){
 			}
 			documento.close();
 			
-			String impresara =  usuario.getImpresora();
+			String impresara =  "";
 			Impresion.printer(impresara, pdf,configuracion());		
 		}
 		return "";
@@ -432,7 +434,7 @@ public void limpiar(){
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"Warning! Hay " + noImpresas + " Facturas no impresas", ""));
 		} else {	
-			System.out.println("imprimir cuadre pdf");
+			log.info("imprimir cuadre pdf");
 			Usuario usuario = (Usuario) sessionMap.get("userLogin");
 			String pdf = "C:\\facturas\\cuadre_" + usuario.getNombre()+"_"+ Calendar.HOUR_OF_DAY+Calendar.MINUTE+Calendar.SECOND + ".pdf";
 			FileOutputStream archivo = new FileOutputStream(pdf);
@@ -522,7 +524,7 @@ public void limpiar(){
 				documento.add(new Paragraph(new Phrase(lineSpacing, (getDiferencias()<0.0?"SOBRANTE":"FALTANTE")+".:$ "+formatea.format(getDiferencias()), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 				documento.add(new Paragraph(new Phrase(lineSpacing, "------------------------", FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 				documento.close();
-			String impresara =  usuario.getImpresora();
+			String impresara =  "";
 			Impresion.printer(impresara, pdf,configuracion());		
 		}
 		return "";
@@ -533,7 +535,7 @@ public void limpiar(){
 	private String imprimirCuadreTxt() throws IOException, ParseException {
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		int maxTamaño=14;
-		System.out.println("entro a imprimir cuadre");
+		log.info("entro a imprimir cuadre");
 		Long noImpresas = getTotalFaturasNoImp();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		Calendar calendar = Calendar.getInstance();
@@ -602,7 +604,7 @@ public void limpiar(){
 		    FileInputStream inputStream = null;
 	          try {
 	              inputStream = new FileInputStream("C:\\facturacion\\"+pdf);
-	              System.out.println(pdf);
+	              log.info(pdf);
 	          } catch (FileNotFoundException ex) {
 	              ex.printStackTrace();
 	          }
@@ -622,7 +624,7 @@ public void limpiar(){
 	                  ex.printStackTrace();
 	              }
 	          } else {
-	              System.err.println("No existen impresoras instaladas");
+	        	  log.info("No existen impresoras instaladas");
 	          }
 		}
 		return "";
@@ -1014,8 +1016,7 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 	
 	Date hoy = Calculos.fechaInicial(redu==null?new Date():redu.getFecha());
 	documentosEntradas=documentoService.getByFacturaByDia(2l, hoy, hoyfin ,conCierre);
-	documentosSalidas=documentoService.getByFacturaByDia(10l, hoy, hoyfin,conCierre);
-	//System.out.println("documentos:"+documentos.size());		
+	documentosSalidas=documentoService.getByFacturaByDia(10l, hoy, hoyfin,conCierre);		
 	if(!documentosEntradas.isEmpty()){
 		docuDetalleEntrada=documentoDetalleService.getByDocumento(documentosEntradas);
 	}
@@ -1075,7 +1076,8 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
 	}
 	FileOutputStream archivo = new FileOutputStream(carpeta+pdf);
 	Document documento = new Document();
-	float fntSize, lineSpacing;
+	float fntSize; 
+	float lineSpacing;
 	fntSize = 9f;
 	lineSpacing = 10f;
 	PdfWriter.getInstance(documento, archivo);
@@ -1204,12 +1206,6 @@ public void acumuladoventas(ReduccionVo redu) throws DocumentException, IOExcept
     documento.close();
 	
 	String impresara =""; 
-	if(redu!=null){
-		impresara=redu.getUsuarioId().getImpresora();
-	}else{
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		impresara=usuario.getImpresora();
-	}
 	Impresion.printer(impresara, carpeta+pdf,configuracion());   
 }
 
@@ -1233,7 +1229,7 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 	calendar.set(Calendar.SECOND, 59);
 	Date hoyfin= calendar.getTime();
 	
-	System.out.println(calendar.get(Calendar.DAY_OF_MONTH)-1);       
+	log.info(calendar.get(Calendar.DAY_OF_MONTH)-1);       
 	calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH)-1);
 	calendar.set(Calendar.HOUR_OF_DAY, 18);
 	calendar.set(Calendar.MINUTE, 0);
@@ -1279,7 +1275,7 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 				}
 			}
 	}
-	System.out.println("documentos:"+documentos.size());			
+	log.info("documentos:"+documentos.size());			
    
 	Empresa e = empresa();
 	SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
@@ -1337,14 +1333,11 @@ public void ventasIndividualesXcajero(ReduccionVo redu) throws DocumentException
 		}
 		documento.add(new Paragraph(new Phrase(lineSpacing, "" + nombre + "..: " +  vo.getCantidad(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
-		//System.out.println("\nproducto:"+vo.getProducto().getNombre());
-		//System.out.println("cantidad:"+vo.getCantidad());
 	}
 	documento.close();
 	
-	String impresara = redu.getUsuarioId().getImpresora();
+	String impresara = "";
 	Impresion.printer(impresara, carpeta+pdf,configuracion());
-	//return pdf;
 }
 
 public List<Producto> getProductosAll() {
@@ -1359,8 +1352,7 @@ public String guardarLiberacion(){
 		
 		OpcionUsuario cuadre = v.getOpcionCuadre();
 		if(v.getLiberarCuadre()!=null){
-			System.out.println("liberar: "+v.getLiberarCuadre());
-			//cuadre.setEstado(v.getLiberarCuadre()==Boolean.TRUE?1l:0l);
+			log.info("liberar: "+v.getLiberarCuadre());
 			cuadre.setLiberarCuadre(v.getLiberarCuadre()==Boolean.TRUE?1l:0l);
 		}else{
 			cuadre.setEstado(0l);
@@ -1406,7 +1398,6 @@ public List<BodegueroVo> getCajerosList() {
 		
 		usuario.setOpcionCuadre(cuadre);
 		cajerosList.add(usuario);
-		//System.out.println("cuadre activo:"+(cuadre==null?Boolean.FALSE:Boolean.TRUE));
 	}
 	return cajerosList;
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import javax.ejb.Stateless;
 
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
@@ -15,8 +14,6 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fact.api.FactException;
 import com.fact.dao.TransferenciaEmpresaDao;
-import com.fact.model.Documento;
-import com.fact.model.TipoPago;
 import com.fact.model.TransferenciaEmpresa;
 import com.fact.utils.HibernateUtil;
 

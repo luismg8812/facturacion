@@ -16,7 +16,6 @@ import com.fact.model.Menu;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Usuario;
 import com.fact.service.MenuService;
-
 import com.fact.service.OpcionUsuarioService;
 import com.fact.service.UsuarioService;
 

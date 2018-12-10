@@ -3,8 +3,6 @@ package com.fact.beam;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,14 +34,9 @@ import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.sound.sampled.Port.Info;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
@@ -51,7 +44,6 @@ import org.primefaces.model.StreamedContent;
 
 import com.fact.api.Calculos;
 import com.fact.api.FactException;
-import com.fact.api.Impresion;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
@@ -256,15 +248,16 @@ public class Reduccion implements Serializable {
 		tipoDocumentoId.add(10l);// tipo documento factura de salida
 		Date hoy = Calculos.fechaInicial(id.getFechaInforme());
 		Date hoyfin = Calculos.fechaFinal(id.getFechaInforme());
-		Double totalVenasTemp = 0.0, totalFacturasTemp = 0.0, totalVentasTemp = 0.0, totalRemisionesTemp = 0.0,
+		Double totalVenasTemp = 0.0; 
+		Double totalFacturasTemp = 0.0; 
+		Double totalVentasTemp = 0.0; 
+		Double totalRemisionesTemp = 0.0,
 				totalFajosTemp = 0.0, totalEfectivoTemp = 0.0, totalVentasDia = 0.0, totalRemisionesDia = 0.0;
 
 		documento.setMargins(10, 10, 20, 20);
 		documento.open();
 		documento.add(new Paragraph(new Phrase(lineSpacing, "RESUMEN N°: " + numeroImforme + "     FECHA: " + fhoyIni,
-				FontFactory.getFont(FontFactory.COURIER, 20f)))); // numero de
-																	// informe y
-																	// fecha
+				FontFactory.getFont(FontFactory.COURIER, 20f)))); // numero de informe y fecha
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				"______________________________________________________________________________",
 				FontFactory.getFont(FontFactory.COURIER, fntSize)))); // espacio
@@ -632,11 +625,10 @@ public class Reduccion implements Serializable {
 			e1.printStackTrace();
 		}
 
-		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(carpeta + pdf);
-			System.out.println(carpeta + pdf);
+			log.info(carpeta + pdf);
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -647,14 +639,14 @@ public class Reduccion implements Serializable {
 		Doc document = new SimpleDoc(inputStream, docFormat, null);
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-		System.out.println("nombre impresora predeterminada: " + defaultPrintService.getName());
-		String impresara = usuario.getImpresora();
+		log.info("nombre impresora predeterminada: " + defaultPrintService.getName());
+		String impresara = impresora();
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured: " + printServices.length);
+		log.info("Number of printers configured: " + printServices.length);
 		for (PrintService printer : printServices) {
-			System.out.println("Printer:" + printer.getName());
+			log.info("Printer:" + printer.getName());
 			if (printer.getName().equals(impresara)) {
-				System.out.println("Comparacion:" + printer.getName() + ":" + impresara);
+				log.info("Comparacion:" + printer.getName() + ":" + impresara);
 				defaultPrintService = printer;
 			}
 		}
@@ -981,7 +973,7 @@ public class Reduccion implements Serializable {
 		documento.close();
 		if("false".equals(exportar)) {
 			Usuario usuario = (Usuario) sessionMap.get("userLogin");
-			String impresara = usuario.getImpresora();
+			String impresara = impresora();
 			PrinterJob job = PrinterJob.getPrinterJob();
 			PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 			log.info("Number of printers configured: " + printServices.length);
@@ -1004,7 +996,7 @@ public class Reduccion implements Serializable {
 	}
 
 	public void guardar() {
-		System.out.println("guardar informes diarios");
+		log.info("guardar informes diarios");
 		for (InfoDiario i : getReduccionList()) {
 			if (i.getInfoDiarioId() == null) {
 				documentoService.save(i);
