@@ -62,7 +62,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 @ManagedBean
 @SessionScoped
-public class borrarFacturas implements Serializable {
+public class BorrarFacturas implements Serializable {
 
 	/**
 	 * 
