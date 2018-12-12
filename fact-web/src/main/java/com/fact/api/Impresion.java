@@ -62,6 +62,7 @@ public class Impresion {
 	
 	private static Logger log = Logger.getLogger(MovimientoMes.class);
 	private final static String  LINEA = "-------------------------------------------------";
+	private final static String  LINEA_GRANDE = "-------------------------------------------------------------------------------------------------------------------------------";
 
 	/**
 	 * Metodo que imprime la factura en formato a5 o media carta
@@ -1227,33 +1228,27 @@ public class Impresion {
 			TituloFactura = "GUÍA DE REMISIÓN";
 			break;
 		case "4":
-			TituloFactura = "COTIZACIÓN";
-		
+			TituloFactura = "COTIZACIÓN";	
 			break;
 		default:
 			break;
 		}
 		documento.open();
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		
 		if(imagen!=null){
 			documento.add(imagen); // LEGAL
 		}
-		documento.add(new Paragraph(
-				new Phrase(lineSpacing, "" + e.getNombre(), FontFactory.getFont(FontFactory.COURIER_BOLD, 13f)))); // NOMBRE
-																													// EMPRESA
-		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getRepresentante(),
-				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
-																			// LEGAL
+		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getNombre(), FontFactory.getFont(FontFactory.COURIER_BOLD, 13f)))); // NOMBRE EMPRESA																	// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing, "NIT. " + e.getNit() + " " + e.getRegimen(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // NIT
-		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getDireccion() + " - " + e.getBarrio(),
-				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
-																			// Y
-																			// BARRIO
+		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getDireccion() + " - " + e.getBarrio(),FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION  Y BARRIO
 		documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getCiudad() + "- " + e.getDepartamento(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // ciudad
 		documento.add(new Paragraph(new Phrase(lineSpacing, "TEL: " + e.getTelefonoFijo() + " - " + e.getCel(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // tel
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Resolución. " + e.getResolucionDian() + " Fecha: " + e.getFechaResolucion()+ " Rango autorizado desde: " + e.getAutorizacionDesde() + " a " + e.getAutorizacionHasta() ,
+						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE LEGAL	
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		documento.add(new Paragraph(new Phrase(lineSpacing, TituloFactura+": " + documentoImp.getConsecutivoDian(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, 11f)))); // numer
 																		// de
@@ -1282,23 +1277,23 @@ public class Impresion {
 					new Phrase(lineSpacing, "MESERO: " + documentoImp.getEmpleadoId().getNombre(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // fecha
 		}
 		// LEGAL
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// lineSpacing, "Descripción CANT UNIDAD TOTAL" LEGAL
 		String impuesto = e.getImpuesto().equals("IVA") ? "IVA" : "IPO";
-		documento.add(new Paragraph(new Phrase(lineSpacing, "CANT Descripción      UNI  TOTAL  " + impuesto,
+		documento.add(new Paragraph(new Phrase(lineSpacing, "CANTIDAD     DESCRIPCION                 UNIDAD       TOTAL     " + impuesto,
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
 		for (DocumentoDetalleVo ddV : productos) {
 			// descripcion
 			String nombre = "";
-			int maxTamañoNombre = configuracion.getNombreProductoLargo() == 1l ? 24 : 17;
+			int maxTamañoNombre = configuracion.getNombreProductoLargo() == 1l ? 24 : 25;
 			nombre = Calculos.cortarDescripcion(ddV.getProductoId().getNombre(), maxTamañoNombre);
 
 			// Cantidad
 			String cant = "";
-			int maxTamañoCant = 3;
+			int maxTamañoCant = 8;
 			cant = Calculos.cortarCantidades(ddV.getCantidad(), maxTamañoCant);
 
 			// Unitario
@@ -1321,7 +1316,7 @@ public class Impresion {
 			String iva = "";
 			iva = Calculos.cortarCantidades(ddV.getProductoId().getIva(), 2);
 			if (configuracion.getNombreProductoLargo() == 1l) {
-				documento.add(new Paragraph(new Phrase(lineSpacing, cant + " " + nombre,
+				documento.add(new Paragraph(new Phrase(lineSpacing, cant + "     " + nombre,
 						FontFactory.getFont(FontFactory.COURIER_BOLD, 12f)))); // CANTIDAD
 																				// NOMBRE
 				documento.add(
@@ -1329,14 +1324,14 @@ public class Impresion {
 								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 			} else {
 				documento.add(new Paragraph(
-						new Phrase(lineSpacing, cant + " " + nombre + " " + unit + " " + total + " " + iva,
+						new Phrase(lineSpacing, cant + "     " + nombre + "   " + unit + "        " + total + "    " + iva,
 								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // CANTIDAD
 																							// NOMBRE
 			}
 
 			// LEGAL
 		}
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
 		documento
 				.add(new Paragraph(new Phrase(lineSpacing,
@@ -1355,24 +1350,24 @@ public class Impresion {
 						+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
 		documento
 				.add(new Paragraph(new Phrase(lineSpacing, "TOTAL A PAGAR: " + formatea.format(documentoImp.getTotal()),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, 14f)))); // REPRESENTANTE
 																				// LEGAL
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing, "         **** FORMA DE PAGO****        ",
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
 		Double pago = documentoImp.getValorTarjeta() == null ? 0l : documentoImp.getValorTarjeta();
 		documento.add(
-				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con Tarjeta:  " + Calculos.cortarCantidades(pago, 13),
+				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con Tarjeta:   " + Calculos.cortarCantidades(pago, 13),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
 		documento.add(
-				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con cheque:   " + Calculos.cortarCantidades(0.0, 13),
+				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con cheque:    " + Calculos.cortarCantidades(0.0, 13),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing,
@@ -1385,16 +1380,9 @@ public class Impresion {
 						.cortarCantidades((documentoImp.getCambio() == null ? "0" : "" + documentoImp.getCambio()), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
-		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
-		documento.add(new Paragraph(
-				new Phrase(lineSpacing, "Res. " + e.getResolucionDian() + " Fecha: " + e.getFechaResolucion(),
-						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
-																					// LEGAL
-		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"Rango autorizado desde: " + e.getAutorizacionDesde() + " a " + e.getAutorizacionHasta(),
-				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
-																			// LEGAL
+		
 		documento.add(new Paragraph(new Phrase(lineSpacing, "Factura: " + e.gettFactura(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
