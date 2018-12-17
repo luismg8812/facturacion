@@ -281,6 +281,7 @@ public class InventarioFisico implements Serializable {
 			Impresion.imprimirInventarioPDF(lista, usuario(), configuracion,impresora);
 			break;
 		default:
+			Impresion.imprimirInventarioPDF(lista, usuario(), configuracion,impresora);
 			break;
 		}
 

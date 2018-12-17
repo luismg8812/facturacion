@@ -1017,6 +1017,7 @@ public class PuntoVentaDia implements Serializable {
 					Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,e);
 					break;
 				default:
+					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
 					break;
 
 				}

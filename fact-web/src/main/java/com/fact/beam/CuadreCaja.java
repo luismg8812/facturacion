@@ -251,6 +251,11 @@ public void limpiar(){
 			pdf = imprimirCuadrePDFSmall();
 			break;
 		default:
+			pdf = imprimirCuadrePDF();
+			if(con.getImpresionContinua()==1l){
+				acumuladoventas(null);
+				ventasIndividualesXcajero(null);
+			}
 			break;
 		}
 		return pdf;

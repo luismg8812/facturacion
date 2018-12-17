@@ -231,6 +231,7 @@ public class Reduccion implements Serializable {
 				break;
 
 			default:
+				imprimirInfoPDF(id,"false");
 				break;
 			}
 		}
