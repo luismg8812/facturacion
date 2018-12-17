@@ -146,9 +146,7 @@ public class InventarioFisico implements Serializable {
 			
 			Producto p = pVo.getProducto();
 			ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),p.getProductoId());
-			if (pVo.getBorrar().equalsIgnoreCase("B")) {
-				p.setEstado(0l);
-			}
+			
 			p.setCosto(pVo.getCosto() == null ? 0.0 : pVo.getCosto());
 			productoEmpresa.setPrecio(pVo.getPublico() == null ? 0.0 : pVo.getPublico());
 			productoEmpresa.setCantidad(pVo.getCantidad() == null ? 0.0 : pVo.getCantidad());
@@ -175,7 +173,11 @@ public class InventarioFisico implements Serializable {
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage("La cantidad max sugerida para " + p.getNombre() + " es " + p.getStockMax()));
 			}
-			productoEmpresaService.update(productoEmpresa);
+			if (pVo.getBorrar().equalsIgnoreCase("B")) {
+				productoEmpresaService.delete(productoEmpresa);
+			}else {
+				productoEmpresaService.update(productoEmpresa);
+			}
 			productoService.update(p,1l);
 			Configuracion configuracion = configuracion();
 			Long server = configuracion.getServer();
@@ -185,7 +187,6 @@ public class InventarioFisico implements Serializable {
 		}
 		setProductosAll(null);
 		RequestContext.getCurrentInstance().update("inventarioFisicoForm");
-
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(edits.size() + " Productos editados exitosamente"));
 		log.info("tamaño edit:" + edits.size());
