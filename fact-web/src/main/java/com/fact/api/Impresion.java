@@ -763,7 +763,7 @@ public class Impresion {
 	 */
 	public static String imprimirPDFSmall(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
 			Configuracion config, String impresora,Empresa empresa) throws DocumentException, IOException, PrinterException, PrintException {
-		System.out.println("todo el codigo de imprimir");
+		log.info("todo el codigo de imprimir");
 		Empresa e = empresa;
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
@@ -777,7 +777,7 @@ public class Impresion {
 		fntSize = 6f;
 		lineSpacing = 10f;
 		PdfWriter.getInstance(documento, archivo);
-		documento.setMargins(1, 1, 1, 1);
+		documento.setMargins(9, 1, 1, 1);
 		documento.open();
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
 		documento.add(imagen); // LEGAL

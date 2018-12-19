@@ -206,7 +206,7 @@ public class InventarioFisico implements Serializable {
 				ProductoVo pVo = new ProductoVo();
 				pVo.setBorrar("");
 				pVo.setNombre(p.getProductoId().getNombre() == null ? "" : p.getProductoId().getNombre().toUpperCase().trim());
-				pVo.setPublico(p.getProductoId().getCostoPublico() == null ? 0.0 : p.getProductoId().getCostoPublico());
+				pVo.setPublico(p.getPrecio() == null ? 0.0 : p.getPrecio());
 				pVo.setCosto(p.getProductoId().getCosto() == null ? 0.0 : p.getProductoId().getCosto());
 				pVo.setCantidad(p.getCantidad() == null ? 0.0 : p.getCantidad());
 				pVo.setIva(p.getProductoId().getIva() == null ? 0.0 : p.getProductoId().getIva());
