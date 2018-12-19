@@ -339,7 +339,7 @@ public class PuntoVentaDia implements Serializable {
 	public void buscarProductoCodigo(SelectEvent event) {
 		String completo = event.getObject().toString();
 		for (ProductoEmpresa p : getProductosAll()) {
-			if (p.getProductoId().toString().contains(completo)) {
+			if (p.getProductoId().getProductoId().toString().contains(completo)) {
 				setCodigoInterno(p.getProductoId().getProductoId().toString());
 				setArticulo(p.getProductoId());
 				setUnidad(p.getProductoId().getCostoPublico());

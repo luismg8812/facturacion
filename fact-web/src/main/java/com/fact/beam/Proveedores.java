@@ -80,7 +80,7 @@ public class Proveedores implements Serializable {
 		setCelular(p.getCelular());
 		setCiudad(p.getCiudadId()!=null?p.getCiudadId().getCiudadId():0l);
 		setCreditoActivo(p.getCreditoActivo()==0?Boolean.FALSE:Boolean.TRUE);
-		setCumpleanos(p.getCumpleaños());
+		setCumpleanos(p.getCumpleanos());
 		setCupoCredito(p.getCupoCredito());
 		setDireccion(p.getDireccion());
 		setDocumento(p.getDocumento());
@@ -110,7 +110,7 @@ public class Proveedores implements Serializable {
 			ciu.setCiudadId(getCiudad());
 			proveedor.setCiudadId(ciu);
 			proveedor.setCreditoActivo(getCreditoActivo()==Boolean.TRUE?1l:0l);
-			proveedor.setCumpleaños(getCumpleanos());
+			proveedor.setCumpleanos(getCumpleanos());
 			proveedor.setCupoCredito(getCupoCredito());
 			proveedor.setDocumento(getDocumento());
 			proveedor.setFechaRegistro(new Date());
@@ -152,7 +152,7 @@ public class Proveedores implements Serializable {
 				proveedor.setCiudadId(ciu);
 			}
 			proveedor.setCreditoActivo(getCreditoActivo()==Boolean.TRUE?1l:0l);
-			proveedor.setCumpleaños(getCumpleanos());
+			proveedor.setCumpleanos(getCumpleanos());
 			proveedor.setCupoCredito(getCupoCredito());
 			proveedor.setDocumento(getDocumento());
 			proveedor.setDireccion(getDireccion());

@@ -60,7 +60,7 @@ public class ProveedorConverter  implements Converter{
 	        	pNew.add(p.getCiudadId()==null?"":p.getCiudadId().getCiudadId().toString());
 	        	pNew.add("");
 	        	pNew.add(p.getCreditoActivo()==null?"":p.getCreditoActivo().toString());
-	        	pNew.add(p.getCumpleaños()==null?"":p.getCumpleaños().toString());
+	        	pNew.add(p.getCumpleanos()==null?"":p.getCumpleanos().toString());
 	        	pNew.add(p.getFechaRegistro()==null?"":p.getFechaRegistro().toString());
 	        	pNew.add(p.getCupoCredito()==null?"":p.getCupoCredito().toString());
 	        	pNew.add(p.getFijo()==null?"":p.getFijo().toString());

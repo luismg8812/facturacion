@@ -163,7 +163,7 @@ public class Clientes implements Serializable {
 		setCiudad(p.getCiudadId() != null ? p.getCiudadId().getCiudadId() : 0l);
 		setCreditoActivo(p.getCreditoActivo() == 0 ? Boolean.FALSE : Boolean.TRUE);
 		setGuiaTrasnsporte(p.getGuiaTransporte() == 0 ? Boolean.FALSE : Boolean.TRUE);
-		setCumpleaños(p.getCumpleaños());
+		setCumpleaños(p.getCumpleanos());
 		setCupoCredito(p.getCupoCredito());
 		setDireccion(p.getDireccion());
 		setDocumento(p.getDocumento());
@@ -197,7 +197,7 @@ public class Clientes implements Serializable {
 			cliente.setCiudadId(ciu);
 			cliente.setCreditoActivo(getCreditoActivo() == Boolean.TRUE ? 1l : 0l);
 			cliente.setGuiaTransporte(getGuiaTrasnsporte() == Boolean.TRUE ? 1l : 0l);
-			cliente.setCumpleaños(getCumpleaños());
+			cliente.setCumpleanos(getCumpleaños());
 			cliente.setCupoCredito(getCupoCredito());
 			cliente.setDocumento(getDocumento() == null ? "" : getDocumento());
 			cliente.setFechaRegistro(new Date());
@@ -243,7 +243,7 @@ public class Clientes implements Serializable {
 			}
 			cliente.setCreditoActivo(getCreditoActivo() == Boolean.TRUE ? 1l : 0l);
 			cliente.setGuiaTransporte(getGuiaTrasnsporte() == Boolean.TRUE ? 1l : 0l);
-			cliente.setCumpleaños(getCumpleaños());
+			cliente.setCumpleanos(getCumpleaños());
 			cliente.setCupoCredito(getCupoCredito());
 			cliente.setDocumento(getDocumento() == null ? "" : getDocumento());
 			cliente.setDireccion(getDireccion());
