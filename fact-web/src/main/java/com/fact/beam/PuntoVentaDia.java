@@ -856,7 +856,7 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
-	public String imprimirFactura(String enPantalla) throws IOException, DocumentException, PrinterException, PrintException {
+	public String imprimirFactura(String enPantalla	) throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null) {
 			return "";
 		}
@@ -994,7 +994,7 @@ public class PuntoVentaDia implements Serializable {
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla);
 					break;
 				case "BIG":
 					// quitar la dependencia del ireport

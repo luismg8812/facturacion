@@ -1057,7 +1057,7 @@ public class MovimientoMes implements Serializable {
 			setProductos(Calculos.ordenar(getProductos()));
 			switch (imp) {
 			case "TXT":
-				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,"true");
 				break;
 			case "BIG":
 				// quitar la dependencia del ireport

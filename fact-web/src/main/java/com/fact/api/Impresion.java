@@ -1079,7 +1079,7 @@ public class Impresion {
 	}
 	
 	public static String imprimirTxt(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config,String impresora) throws IOException {
+			Configuracion config,String impresora,String enPantalla) throws IOException {
 		log.info("entra a imprimir");
 		Empresa e = Login.getEmpresaLogin();
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".txt";
@@ -1128,8 +1128,8 @@ public class Impresion {
 		bw.write("\nVr. Pago con Tarjeta:        " + Calculos.cortarCantidades(formatea.format(pago), 11));
 		bw.write("\nVr. Comisión Tarjeta:        " + Calculos.cortarCantidades(formatea.format(0l), 11));
 		bw.write("\nVr. Total Factura:           " + Calculos.cortarCantidades(formatea.format(documentoImp.getTotal()), 11));
-		bw.write("\nEfectivo:		 	  " + Calculos.cortarCantidades(formatea.format(documentoImp.getEfectivo()), 11));
-		bw.write("\nCambio:			      " + Calculos.cortarCantidades(formatea.format(documentoImp.getCambio()), 11));
+		bw.write("\nEfectivo:		 	  " + Calculos.cortarCantidades(formatea.format(documentoImp.getEfectivo()==null?0.0:documentoImp.getEfectivo()), 11));
+		bw.write("\nCambio:			      " + Calculos.cortarCantidades(formatea.format(documentoImp.getCambio()==null?0.0:documentoImp.getCambio()), 11));
 		bw.write("\n");
 		bw.write("\nEl servicio voluntario no es obligatorio");
 		bw.write("\ny puede ser modificado por el cliente.");
@@ -1147,7 +1147,7 @@ public class Impresion {
 		bw.write(" \n");
 		bw.write(" \n");
 		bw.close();
-
+		if(enPantalla.equals("false")){
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(pdf);
@@ -1190,6 +1190,7 @@ public class Impresion {
 			}
 		} else {
 			log.info("No existen impresoras instaladas");
+		}
 		}
 		return pdf;
 	}
