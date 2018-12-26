@@ -1603,6 +1603,7 @@ public class PuntoVentaDia implements Serializable {
 		setNombreCliente2("");
 		setCliente(null);
 		setUnidad(null);
+		setProductosAllCodigo(null);
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
