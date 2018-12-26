@@ -35,7 +35,7 @@ public class ProveedorConverter  implements Converter{
 	        	Ciudad ciudad= new Ciudad();
 	        	ciudad.setCiudadId(Long.valueOf(parts1[5].trim().equals("")?"0":parts1[5].trim()));
 	        	p.setCiudadId(ciudad);
-	        	p.setCodigo(Long.valueOf(parts1[6].trim().equals("")?"0":parts1[6].trim()));
+	        	//p.setCodigo(Long.valueOf(parts1[6].trim().equals("")?"0":parts1[6].trim()));
 	        	p.setCreditoActivo(Long.valueOf(parts1[7].trim().equals("")?"0":parts1[7].trim()));
 	        	//p.setCumpleaños((Date)(parts1[8].trim().equals("")?new Date():parts1[8].trim()));
 	        	//p.setFechaActualiza(new Date());
@@ -58,9 +58,9 @@ public class ProveedorConverter  implements Converter{
 	        	pNew.add(p.getDocumento()==null?"":p.getDocumento());
 	        	pNew.add(p.getCelular()==null?"":p.getCelular().toString());
 	        	pNew.add(p.getCiudadId()==null?"":p.getCiudadId().getCiudadId().toString());
-	        	pNew.add(p.getCodigo()==null?"":p.getCodigo().toString());
+	        	pNew.add("");
 	        	pNew.add(p.getCreditoActivo()==null?"":p.getCreditoActivo().toString());
-	        	pNew.add(p.getCumpleaños()==null?"":p.getCumpleaños().toString());
+	        	pNew.add(p.getCumpleanos()==null?"":p.getCumpleanos().toString());
 	        	pNew.add(p.getFechaRegistro()==null?"":p.getFechaRegistro().toString());
 	        	pNew.add(p.getCupoCredito()==null?"":p.getCupoCredito().toString());
 	        	pNew.add(p.getFijo()==null?"":p.getFijo().toString());

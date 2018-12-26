@@ -12,7 +12,6 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 
 import com.fact.api.FactException;
-
 import com.fact.dao.DocumentoDetalleDao;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;

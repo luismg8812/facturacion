@@ -30,7 +30,6 @@ import org.apache.pdfbox.printing.PDFPageable;
 import org.jboss.logging.Logger;
 
 import com.fact.beam.Login;
-import com.fact.beam.MovimientoMes;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.Empresa;
@@ -38,7 +37,6 @@ import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.Usuario;
 import com.fact.vo.DocumentoDetalleVo;
-import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -60,7 +58,7 @@ import com.itextpdf.text.pdf.PdfWriter;
  */
 public class Impresion {
 	
-	private static Logger log = Logger.getLogger(MovimientoMes.class);
+	private static Logger log = Logger.getLogger(Impresion.class);
 	private final static String  LINEA = "-------------------------------------------------";
 	private final static String  LINEA_GRANDE = "-------------------------------------------------------------------------------------------------------------------------------";
 
@@ -111,10 +109,10 @@ public class Impresion {
 			int pagina = 3;
 			for (int i = 1; i < numPaginas; i++) {
 				pdfStamper.insertPage(pagina, pdfReader.getPageSize(1));
-				System.out.println("se crea la pagina.:" + pagina);
+				log.info("se crea la pagina.:" + pagina);
 				pdfStamper.replacePage(pdfReader, 1, pagina);
 				pdfStamper.insertPage(pagina + 1, pdfReader.getPageSize(1));
-				System.out.println("se crea la pagina:" + (pagina + 1));
+				log.info("se crea la pagina:" + (pagina + 1));
 				pdfStamper.replacePage(pdfReader, 2, pagina + 1);
 				pagina++;
 			}
@@ -520,7 +518,7 @@ public class Impresion {
 	 */
 	public static String imprimirPDF(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
 			Configuracion config,String impresora, String enPantalla ,Empresa empresa) throws DocumentException, IOException, PrinterException, PrintException {
-		System.out.println("todo el codigo de imprimir");
+		log.info("todo el codigo de imprimir");
 		Empresa e = empresa;
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
@@ -741,7 +739,7 @@ public class Impresion {
 																			// LEGAL
 		documento.close();
 		if(enPantalla.equals("false")){
-			System.out.println("imprime en papel");
+			log.info("imprime en papel");
 			printer(impresora, pdf, config);
 		}
 		
@@ -978,6 +976,7 @@ public class Impresion {
 			document = PDDocument.load(new File(rutaArchivo));
 			job.setPageable(new PDFPageable(document));
 			try {
+				log.info("imprime doc..." );
 				job.print();
 			} catch (PrinterException e) {
 				e.printStackTrace();
@@ -1005,7 +1004,7 @@ public class Impresion {
 	 * @return
 	 */
 	public static String imprimirInventarioPDF(List<Producto> productos, Usuario usuario, Configuracion con, String  impresora) {
-		System.out.println("todo el codigo de imprimir");
+		log.info("todo el codigo de imprimir");
 		Empresa e = Login.getEmpresaLogin();
 		String carpeta = "C:\\facturacion\\inventarios";
 		SimpleDateFormat df2 = new SimpleDateFormat("yyyyMMdd");
@@ -1017,7 +1016,7 @@ public class Impresion {
 		try {
 			archivo = new FileOutputStream(carpeta + pdf);
 		} catch (FileNotFoundException e1) {
-			System.out.print("Error creando archivo de inventario pdf");
+			log.error("Error creando archivo de inventario pdf");
 			e1.printStackTrace();
 		}
 		Document documento = new Document();
@@ -1036,7 +1035,7 @@ public class Impresion {
 			documento.add(new Paragraph(new Phrase(lineSpacing, ">>" + e.getNombre() + "<<",
 					FontFactory.getFont(FontFactory.COURIER_BOLD, 13f)))); // NOMBRE
 																			// EMPRESA
-			documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getSlogan() == null ? "" : e.getSlogan(),
+			documento.add(new Paragraph(new Phrase(lineSpacing,  e.getSlogan() == null ? "" : e.getSlogan(),
 					FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // slogan
 			documento.add(new Paragraph(new Phrase(lineSpacing, "" + e.getRepresentante(),
 					FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
@@ -1081,8 +1080,8 @@ public class Impresion {
 	}
 	
 	public static String imprimirTxt(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config,String impresora) throws IOException {
-		System.out.println("entra a imprimir");
+			Configuracion config,String impresora,String enPantalla) throws IOException {
+		log.info("entra a imprimir");
 		Empresa e = Login.getEmpresaLogin();
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".txt";
 		File archivo = new File(pdf);
@@ -1103,8 +1102,7 @@ public class Impresion {
 		bw.write("\nCAJERO: " + documentoImp.getUsuarioId().getUsuarioId() + " "
 				+ documentoImp.getUsuarioId().getNombre() + " " + documentoImp.getUsuarioId().getApellido()
 				+ "\nCLIENTE: ");
-		bw.write("\nCLIENTE: " + documentoImp.getClienteId() == null ? "VARIOS"
-				: documentoImp.getClienteId().getNombre());
+		bw.write("\nCLIENTE: " + (documentoImp.getClienteId() == null ? "VARIOS": documentoImp.getClienteId().getNombre()));
 		bw.write("\nNIT/CC:" + documentoImp.getClienteId().getDocumento());
 		if(documentoImp.getEmpleadoId()!=null){
 			bw.write("\nMESERO: " + documentoImp.getEmpleadoId().getNombre());
@@ -1131,8 +1129,8 @@ public class Impresion {
 		bw.write("\nVr. Pago con Tarjeta:        " + Calculos.cortarCantidades(formatea.format(pago), 11));
 		bw.write("\nVr. Comisión Tarjeta:        " + Calculos.cortarCantidades(formatea.format(0l), 11));
 		bw.write("\nVr. Total Factura:           " + Calculos.cortarCantidades(formatea.format(documentoImp.getTotal()), 11));
-		bw.write("\nEfectivo:		 	  " + Calculos.cortarCantidades(formatea.format(documentoImp.getEfectivo()), 11));
-		bw.write("\nCambio:			      " + Calculos.cortarCantidades(formatea.format(documentoImp.getCambio()), 11));
+		bw.write("\nEfectivo:		 	  " + Calculos.cortarCantidades(formatea.format(documentoImp.getEfectivo()==null?0.0:documentoImp.getEfectivo()), 11));
+		bw.write("\nCambio:			      " + Calculos.cortarCantidades(formatea.format(documentoImp.getCambio()==null?0.0:documentoImp.getCambio()), 11));
 		bw.write("\n");
 		bw.write("\nEl servicio voluntario no es obligatorio");
 		bw.write("\ny puede ser modificado por el cliente.");
@@ -1150,11 +1148,11 @@ public class Impresion {
 		bw.write(" \n");
 		bw.write(" \n");
 		bw.close();
-
+		if(enPantalla.equals("false")){
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(pdf);
-			System.out.println(pdf);
+			log.info(pdf);
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -1167,13 +1165,13 @@ public class Impresion {
 		
 		PrintService defaultPrintService=PrintServiceLookup.lookupDefaultPrintService();
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured1: " + printServices.length);
+		log.info("Number of printers configured1: " + printServices.length);
 		for (PrintService printer : printServices) {
-			System.out.println("Printer: " + printer.getName());
-			System.out.println("comparacion:"+impresora+":"+printer.getName());
-			if (printer.getName().toString().equals(impresora)) {
+			log.info("Printer: " + printer.getName());
+			log.info("comparacion:"+impresora+":"+printer.getName());
+			if (printer.getName().equals(impresora)) {
 				defaultPrintService=printer;
-				System.out.println( impresora+" : " + printer.getName());
+				log.info( impresora+" : " + printer.getName());
 				break;
 			}
 		}
@@ -1192,7 +1190,8 @@ public class Impresion {
 				ex.printStackTrace();
 			}
 		} else {
-			System.err.println("No existen impresoras instaladas");
+			log.info("No existen impresoras instaladas");
+		}
 		}
 		return pdf;
 	}

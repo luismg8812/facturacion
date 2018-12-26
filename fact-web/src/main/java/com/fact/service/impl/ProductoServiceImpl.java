@@ -2,7 +2,7 @@ package com.fact.service.impl;
 
 
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -58,7 +58,7 @@ public class ProductoServiceImpl implements ProductoService{
 	}
 	
 	@Override
-	public BigDecimal getByUltimoId()throws FactException{
+	public BigInteger getByUltimoId()throws FactException{
 		return productoDao.getByUltimoId();
 	}
 
@@ -96,7 +96,7 @@ public class ProductoServiceImpl implements ProductoService{
 	}
 
 	@Override
-	public Producto getByCodigoBarras(Long codigoBarrasNew) throws FactException {
+	public Producto getByCodigoBarras(String codigoBarrasNew) throws FactException {
 		return productoDao.getByCodigoBarras(codigoBarrasNew);
 	}
 

@@ -54,9 +54,10 @@ public class Usuario {
 	@Column(name="LOGIN")
 	private String login;
 	
-	@Column(name="IMPRESORA")
-	private String impresora;
 	
+	/**
+	 * construcctor
+	 */
 	public Usuario()
 	{
 	}
@@ -141,12 +142,6 @@ public class Usuario {
 		this.login = login;
 	}
 
-	public String getImpresora() {
-		return impresora;
-	}
-
-	public void setImpresora(String impresora) {
-		this.impresora = impresora;
-	}
+	
 	
 }

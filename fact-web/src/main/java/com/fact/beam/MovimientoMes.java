@@ -4,6 +4,7 @@ import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,9 +19,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.print.PrintException;
-import javax.servlet.http.HttpServletRequest;
 
-import org.apache.poi.hssf.record.chart.SeriesToChartGroupRecord;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -28,7 +27,6 @@ import org.primefaces.event.SelectEvent;
 import com.fact.api.Calculos;
 import com.fact.api.FactException;
 import com.fact.api.Impresion;
-import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
@@ -42,7 +40,6 @@ import com.fact.model.ProductoEmpresa;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
-import com.fact.model.TipoPago;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
@@ -142,7 +139,7 @@ public class MovimientoMes implements Serializable {
 	private String impresion;
 
 	// variables nuevo producto
-	BigDecimal codigoNew;
+	BigInteger codigoNew;
 	String articuloNew = "";
 	Double costoNew;
 	Double publicoNew;
@@ -155,7 +152,7 @@ public class MovimientoMes implements Serializable {
 
 	Marca marcaNew;
 	Proveedor proveedorNew;
-	Long codigoBarrasNew;
+	String codigoBarrasNew;
 	Double pesoKgNew;
 	Double pesoEmpaqueKgNew;
 	String unidadNew;
@@ -339,7 +336,7 @@ public class MovimientoMes implements Serializable {
 	public String buscarProductoCodBarras(AjaxBehaviorEvent event) {
 		String completo = getCodigoBarras();
 		for (ProductoEmpresa p : getProductosAll()) {
-			if (p.getProductoId().getCodigoBarras() != null && completo.equals(p.getProductoId().getCodigoBarras().toString())) {
+			if (p.getProductoId().getCodigoBarras() != null && completo.equals(p.getProductoId().getCodigoBarras())) {
 				setCodigoInterno(p.getProductoId().toString());
 				setArticulo(p.getProductoId());
 				setUnidad(p.getProductoId().getCosto());
@@ -407,7 +404,7 @@ public class MovimientoMes implements Serializable {
 		long server = 1;
 		log.info("proveedor select:" + proveedorSelect.getNombre());
 		setCodigoProveedor(proveedorSelect.getProveedorId());
-		setTipoDocumentoEntrada(getDocumento().getTipoDocumentoId().getNombreCorto());
+		setTipoDocumentoEntrada(getDocumento().getTipoDocumentoId().getNombre());
 		setIdentificacionProveedor(proveedorSelect.getDocumento());
 		setFechaCreacion(new Date());
 		getDocumento().setProveedorId(proveedorSelect);
@@ -514,7 +511,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public String cantidadEnter(AjaxBehaviorEvent event) {
-		System.out.println("entra a cantidad enter");
+		log.info("entra a cantidad enter");
 		if (getCantidad() == null) {
 			RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
 			RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
@@ -560,9 +557,9 @@ public class MovimientoMes implements Serializable {
 		OpcionUsuario stock;
 		switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
 		case "6": // tipo documento igual a salida de almacen
-			System.out.println("salida de almacen");
+			log.info("salida de almacen");
 			cantidadTemp = cantidadTemp - getCantidad();
-			System.out.println("cantidad actualizada:" + cantidadTemp);
+			log.info("cantidad actualizada:" + cantidadTemp);
 			break;
 		case "2":// tipo documento igual a entrada de almacen
 			cantidadTemp = cantidadTemp + getCantidad();
@@ -672,11 +669,11 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("pagina='crearProducto';");
 			// faltan los valores por defecto del formulario de guardar
 			setCrearNew("N");
-			System.out.println("presiono s entra popup creacion crear");
+			log.info("presiono s entra popup creacion crear");
 		} else {
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
-			System.out.println("presiono ota cosa no entra al formulario de crear");
+			log.info("presiono ota cosa no entra al formulario de crear");
 		}
 		setCrear("N");
 	}
@@ -801,12 +798,12 @@ public class MovimientoMes implements Serializable {
 	}
 	
 	public void recalcularPrecio(DocumentoDetalleVo d) {
-		System.out.println("aqui va");
+		log.info("aqui va");
 		dCambio = d;
 	}
 	
 	public String recalcularPrecio(AjaxBehaviorEvent event) {
-		System.out.println("cambio de precio MM:" + getCambioTemp());
+		log.info("cambio de precio MM:" + getCambioTemp());
 		if(getCambioTemp()==null || (getCambioTemp().indexOf(' ') == -1) ){
 			return "";
 		}
@@ -817,7 +814,7 @@ public class MovimientoMes implements Serializable {
 		} catch (Exception e) {
 			return "";
 		}
-		System.out.println("paso:" + getCambioTemp());
+		log.info("paso:" + getCambioTemp());
 		//se comenta el pedaso de codigo que hace que se pueda bajar el precio		
 		int pos = getProductos().indexOf(dCambio);
 		Double descuentoTemp = getDocumento().getDescuento() == null ? 0.0 : getDocumento().getDescuento();
@@ -969,7 +966,7 @@ public class MovimientoMes implements Serializable {
 	public void asignarGrupo(SelectEvent event) {
 		Grupo pr = (Grupo) event.getObject();
 		setGrupoNew(pr);
-		System.out.println("grupo asignado:" + pr.getNombre());
+		log.info("grupo asignado:" + pr.getNombre());
 	}
 
 	public void editarProducto(SelectEvent event) {
@@ -1008,7 +1005,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void limpiarEditar() {
-		System.out.println("entra a limpiar editar: ");
+		log.info("entra a limpiar editar: ");
 		setProductoEdict(null);
 		setCodigoEdit(null);
 		setFechaEdit(null);
@@ -1060,7 +1057,7 @@ public class MovimientoMes implements Serializable {
 			setProductos(Calculos.ordenar(getProductos()));
 			switch (imp) {
 			case "TXT":
-				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,"true");
 				break;
 			case "BIG":
 				// quitar la dependencia del ireport
@@ -1091,7 +1088,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void buscarUltimaFactura() {
-		System.out.println("buscar ultima factura");
+		log.info("buscar ultima factura");
 		Documento ultimoFactura;
 		Usuario usuario = usuario();
 		Long idFactura = 2l; // id de tipo documento entrada de almacen
@@ -1141,7 +1138,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void modificarUltimaFactura() {
-		System.out.println("buscar ultima factura MM");
+		log.info("buscar ultima factura MM");
 		if (getDocumento() != null && getDocumento().getTipoDocumentoId() != null) {
 			RequestContext.getCurrentInstance().execute("document.getElementById('confir_mm').style.display='inline';");
 			actModFactura = Boolean.TRUE;
@@ -1161,7 +1158,7 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void activarBorrado() {
-		System.out.println("presiona b para borrar factura MM");
+		log.info("presiona b para borrar factura MM");
 		setProductosBorrar(Boolean.TRUE);
 		setProductosBorrarList(getProductos());
 		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
@@ -1230,12 +1227,12 @@ public class MovimientoMes implements Serializable {
 					.execute("document.getElementById('borrarTablaMM:checkboxDT:0:rowDelete_').focus();");
 		}
 		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
-		System.out.println("documentoDetalle borrado:" + d.getDocumentoDetalleId());
+		log.info("documentoDetalle borrado:" + d.getDocumentoDetalleId());
 	}
 
 	public void popupImprimir() {
 		if (actModFactura) {
-			System.out.println("i en modificar factura");
+			log.info("i en modificar factura");
 			// todo lo de modificar, activar cosas y asi....
 
 			RequestContext.getCurrentInstance().execute(ACTIVAR_CAMPO_COD_BARRAS);
@@ -1294,13 +1291,13 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void siguienteFactura() throws ParseException {
-		System.out.println("siguiente_factura_MM");
+		log.info("siguiente_factura_MM");
 		List<DocumentoDetalle> dd = new ArrayList<>();
 		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
 		if (getDocumentoActual() == null) {
 			if (!getListaDocumento().isEmpty()) {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
-				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
@@ -1342,7 +1339,7 @@ public class MovimientoMes implements Serializable {
 			Integer pos = getListaDocumento().indexOf(getDocumentoActual());
 			if (pos > 0) {
 				setDocumentoActual(getListaDocumento().get(pos - 1));
-				System.out.println("documento actual: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
@@ -1385,13 +1382,13 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void anteriorFactura() throws ParseException {
-		System.out.println("siguiente_factura_MM");
+		log.info("siguiente_factura_MM");
 		List<DocumentoDetalle> dd = new ArrayList<>();
 		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
 		if (getDocumentoActual() == null) {
 			if (!getListaDocumento().isEmpty()) {
 				setDocumentoActual(getListaDocumento().get(getListaDocumento().size() - 1));
-				System.out.println("documento actual MM: " + getDocumentoActual().getDocumentoId());
+				log.info("documento actual MM: " + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
@@ -1433,7 +1430,7 @@ public class MovimientoMes implements Serializable {
 			Integer pos = getListaDocumento().indexOf(getDocumentoActual());
 			if (pos < getListaDocumento().size() - 1) {
 				setDocumentoActual(getListaDocumento().get(pos + 1));
-				System.out.println("documento actual: MM" + getDocumentoActual().getDocumentoId());
+				log.info("documento actual: MM" + getDocumentoActual().getDocumentoId());
 				setDocumento(getDocumentoActual());
 				dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 				for (DocumentoDetalle d1 : dd) {
@@ -1477,10 +1474,10 @@ public class MovimientoMes implements Serializable {
 
 	public String cantidadBalanza(AjaxBehaviorEvent event) {
 		if (getParciaPopup().equalsIgnoreCase("S")) {
-			System.out.println("entra");
+			log.info("entra");
 			cantidadEnter(null);
 		} else {
-			System.out.println("else");
+			log.info("else");
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in').value='';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
@@ -1653,14 +1650,14 @@ public class MovimientoMes implements Serializable {
 		this.crearNew = crearNew;
 	}
 
-	public BigDecimal getCodigoNew() {
+	public BigInteger getCodigoNew() {
 		if (codigoNew == null) {
 			codigoNew = productoService.getByUltimoId();
 		}
 		return codigoNew;
 	}
 
-	public void setCodigoNew(BigDecimal codigoNew) {
+	public void setCodigoNew(BigInteger codigoNew) {
 		this.codigoNew = codigoNew;
 	}
 
@@ -1750,11 +1747,11 @@ public class MovimientoMes implements Serializable {
 		this.proveedorNew = proveedorNew;
 	}
 
-	public Long getCodigoBarrasNew() {
+	public String getCodigoBarrasNew() {
 		return codigoBarrasNew;
 	}
 
-	public void setCodigoBarrasNew(Long codigoBarrasNew) {
+	public void setCodigoBarrasNew(String codigoBarrasNew) {
 		this.codigoBarrasNew = codigoBarrasNew;
 	}
 

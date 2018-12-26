@@ -16,6 +16,9 @@
 						<f:selectItem itemLabel="Seccionar Sucursal" itemValue="" />
 						<f:selectItems value="#{sucursales.sucursalesList}" var="sucu"
 							itemLabel="#{sucu.nombre}" itemValue="#{sucu.empresaId}" />
+							<p:ajax event="itemSelect"
+							listener="#{sucursales.productosSucursal}"
+							update="empresaHasta" />
 					</p:selectOneMenu></td>
 
 				<td><p:outputLabel value="Hasta:" /></td>
@@ -27,10 +30,11 @@
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Producto: " /></td>
-				<td><p:selectOneMenu value="#{sucursales.productoNew}">
+				<td><p:selectOneMenu value="#{sucursales.productoNew}" id="empresaHasta">
 						<f:selectItem itemLabel="Seccionar Producto" itemValue="" />
-						<f:selectItems value="#{puntoVentaDia.productosAll}" var="sucu"
+						<f:selectItems value="#{sucursales.productoList}" var="sucu"
 							itemLabel="#{sucu.productoId.nombre}" itemValue="#{sucu.productoId.productoId}" />
+							
 					</p:selectOneMenu></td>
 				<td><p:outputLabel value="cantidad: " /></td>
 				<td><p:inputNumber value="#{sucursales.cantidad}" size="10"></p:inputNumber> </td>

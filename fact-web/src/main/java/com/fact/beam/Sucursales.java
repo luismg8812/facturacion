@@ -13,6 +13,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 
@@ -38,6 +39,7 @@ public class Sucursales implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8482659843887410377L;
+	private static Logger log = Logger.getLogger(Sucursales.class);
 
 	@EJB
 	private ProductoEmpresaService productoEmpresaService;
@@ -65,6 +67,7 @@ public class Sucursales implements Serializable {
 	private Long ProductoNew;
 	private Double cantidad;
 	private List<TransferenciaEmpresaDetalle>productosList= new ArrayList<>();
+	private List<ProductoEmpresa> productoList;
 	
 	//reporte
 	private Date fechaIni;
@@ -80,6 +83,11 @@ public class Sucursales implements Serializable {
 	private Usuario usuario() {
 		Usuario yourVariable = (Usuario) sessionMap.get("userLogin");
 		return yourVariable;
+	}
+	
+	public void productosSucursal() {
+		setProductoList(productoEmpresaService.getByEmpresa(getDesde()));
+		log.info(""+getDesde());
 	}
 
 	public void confirmar(){
@@ -100,11 +108,19 @@ public class Sucursales implements Serializable {
 		for(TransferenciaEmpresaDetalle td: getProductosList()){
 			ProductoEmpresa productoEmpDesde = productoEmpresaService.getByProductoAndEmpresa(ed,td.getProductoId().getProductoId());
 			ProductoEmpresa productoEmpHasta = productoEmpresaService.getByProductoAndEmpresa(eh,td.getProductoId().getProductoId());
-			if(productoEmpDesde==null ||productoEmpHasta==null){
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Una de las sucursales no tiene productos configurados"));
+			if(productoEmpDesde==null ){
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La sucursale de donde se va a transferir el producto no tiene "+td.getProductoId().getNombre()+" creado"));
 				return;
 			}
-			
+			if(productoEmpHasta==null) {
+				productoEmpHasta = new ProductoEmpresa();
+				productoEmpHasta.setProductoId(td.getProductoId());
+				productoEmpHasta.setEmpresaId(eh);
+				productoEmpHasta.setFechaRegistro(new Date());
+				productoEmpHasta.setCantidad(0.0);
+				productoEmpHasta.setPrecio(td.getProductoId().getCostoPublico());
+				productoEmpresaService.save(productoEmpHasta);
+			}
 			Double cantidadActual =productoEmpDesde.getCantidad();
 			productoEmpDesde.setCantidad(cantidadActual-getCantidad());
 			cantidadActual =productoEmpHasta.getCantidad();
@@ -160,13 +176,11 @@ public class Sucursales implements Serializable {
 	
 	public void onRowEdit(RowEditEvent event) {
 		ProductoEmpresa pe=(ProductoEmpresa) event.getObject();
-		System.out.println("cantidad:"+pe.getCantidad());
-		System.out.println("cantidad:"+pe.getPrecio());
-		productoEmpresaService.save(pe);
+		productoEmpresaService.update(pe);
     }
 	
 	public void onRowCancel(RowEditEvent event) {
-      
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Conceló la transacción"));
     }
 	
 	public void buscarReporte(){
@@ -191,7 +205,6 @@ public class Sucursales implements Serializable {
 	 * si se confirma la busqueda se crean los registros de Productos por empresa
 	 */
 	public void confirmarBusqueda(){
-		System.out.println("entra a crear productos empresa");
 		List<Producto> productos=productoService.getByAll();
 		for(Producto p: productos){
 			ProductoEmpresa proEmpr = new ProductoEmpresa();
@@ -209,6 +222,8 @@ public class Sucursales implements Serializable {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Productos creados Exitosamente para la sucursal seleccionada"));
 		setProductoEmpresaList(productoEmpresaService.getByEmpresa(getEmpresaId()));
 	}
+	
+	
 
 	public List<ProductoEmpresa> getProductoEmpresaList() {
 		return productoEmpresaList;
@@ -322,5 +337,15 @@ public class Sucursales implements Serializable {
 	public void setDetalleReporteList(List<TransferenciaEmpresaDetalle> detalleReporteList) {
 		DetalleReporteList = detalleReporteList;
 	}
+
+	public List<ProductoEmpresa> getProductoList() {
+		return productoList;
+	}
+
+	public void setProductoList(List<ProductoEmpresa> productoList) {
+		this.productoList = productoList;
+	}
+	
+	
 	
 }

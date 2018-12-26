@@ -1,5 +1,6 @@
 package com.fact.api;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -17,6 +18,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 
 import com.fact.model.Configuracion;
@@ -34,6 +36,9 @@ import com.fact.vo.DocumentoDetalleVo;
  *
  */
 public class Calculos {
+	
+	private static Logger log = Logger.getLogger(Calculos.class);
+	
 	private static Configuracion configuracion() {
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -68,7 +73,7 @@ public class Calculos {
 			try {
 				hoy = df.parse(fhoyIni);
 			} catch (ParseException e) {
-				System.out.println("Error en fecha inicial");
+				log.error("Error en fecha inicial");
 				e.printStackTrace();
 			}
 			calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -94,7 +99,7 @@ public class Calculos {
 			try {
 				fin = df.parse(fhoyFin);
 			} catch (ParseException e) {
-				System.out.println("Error en fecha Final");
+				log.error("Error en fecha Final");
 				e.printStackTrace();
 			}
 			calendar.set(Calendar.HOUR_OF_DAY, 23);
@@ -280,7 +285,7 @@ public class Calculos {
 					sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
 				}
 			} else {
-				System.out.println("Address doesn't exist or is not " + "accessible.");
+				log.info("Address doesn't exist or is not " + "accessible.");
 			}
 		} else {
 			return request.getRemoteAddr();
@@ -438,9 +443,9 @@ public class Calculos {
 			cant = respuesta;
 			cant = cant.replace("=", "");
 			cant = cant.replace(" ", "");
-			System.out.println("cant:" + cant);
+			log.info("cant:" + cant);
 			canti = Double.parseDouble(cant);
-			System.out.println("canti:" + canti);
+			log.info("canti:" + canti);
 			break;
 		default:
 			break;

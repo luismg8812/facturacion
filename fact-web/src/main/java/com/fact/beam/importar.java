@@ -96,7 +96,7 @@ public class importar  implements Serializable{
 //						marcaService.save(mar);
 //						p.setMarcaId(mar);
 					}					
-					p.setCodigoBarras(Long.valueOf(codB));
+					p.setCodigoBarras(codB);
 					p.setCantidad(Double.valueOf(CANTID));
 					p.setBalanza(BALANZA.toUpperCase().equals("S")?1l:0l);
 					p.setPromo(PROMO.toUpperCase().equals("S")?1l:0l);

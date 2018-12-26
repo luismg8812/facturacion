@@ -39,10 +39,7 @@
 			if(e.keyCode==78){
 				document.getElementById('opciones:New_movi_mes1').click();	
 				}
-			
 
-			
-			
 			if(e.keyCode==73){
 				document.getElementById('opciones:Imp_movi_mes1').click();
 				//alert("tecla i")	punto venta dia
@@ -390,6 +387,7 @@
         	document.getElementById('codBarras_input1').value=='';
         	document.getElementById('codBarras_input1').focus();
         	document.getElementById('codBarras_input1').select();
+        	document.getElementById('codBarras_input1').value=='';
 			}else{
 				document.getElementById('art_11_input').value='';
 			    document.getElementById('art_11_input').focus();
@@ -399,6 +397,7 @@
 	 
 	 function limpiarCod(){
 		 document.getElementById('codBarras_input1').value='';
+		 document.getElementById('codBarras_input1').select();
 		 }
 	 function opcion(e){	//selecciona la ruta de la opcion del opciones 
 			var elec =e.getAttribute('id'); // 

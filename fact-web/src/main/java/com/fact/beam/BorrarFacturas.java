@@ -33,6 +33,7 @@ import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 
+import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 
 import com.fact.api.Calculos;
@@ -51,7 +52,6 @@ import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
 import com.fact.service.UsuarioService;
-import com.fact.vo.DocumentoDetalleVo;
 import com.fact.vo.DocumentoVo;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -67,7 +67,8 @@ public class BorrarFacturas implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2141454443696640336L;
+	private static Logger log = Logger.getLogger(BorrarFacturas.class);
 
 	@EJB
 	private DocumentoService documentoService;
@@ -116,7 +117,7 @@ public class BorrarFacturas implements Serializable {
 	}
 
 	public String imprimirFactura() throws DocumentException, IOException, PrinterException {
-		System.out.println("entra a imprimir");
+		log.info("entra a imprimir");
 		documentoSelect.getDocumentoId().setImpreso(1l);
 		documentoService.update(documentoSelect.getDocumentoId(), 1l);
 		Empresa e =getEmpresa();
@@ -244,7 +245,7 @@ public class BorrarFacturas implements Serializable {
 	}
 
 	public String imprimirTxt() throws IOException {
-		System.out.println("entra a imprimir");
+		log.info("entra a imprimir");
 		Empresa e = getEmpresa();
 		String pdf = "factura_" + documentoSelect.getDocumentoId() + ".txt";
 		File archivo = new File("C:\\facturacion\\" + pdf);
@@ -314,7 +315,7 @@ public class BorrarFacturas implements Serializable {
 	}
 
 	public void barrarTodas() {
-		System.out.println("borrar_todas");
+		log.info("borrar_todas");
 		long server = 1;
 		for (DocumentoVo dvoss : getDocumentosVoSelect()) {
 			List<DocumentoDetalle> dd = documentoDetalleService.getByDocumento(dvoss.getDocumentoId().getDocumentoId(),
@@ -356,7 +357,8 @@ public class BorrarFacturas implements Serializable {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String fhoyIni = getFechaIni() == null ? "" : df.format(getFechaIni());
 		String fhoyFin = getFechaFin() == null ? "" : df.format(getFechaFin());
-		Date hoy, hoyfin;
+		Date hoy; 
+		Date hoyfin;
 		try {
 			hoy = df.parse(fhoyIni);
 			hoyfin = df.parse(fhoyFin);
@@ -380,8 +382,8 @@ public class BorrarFacturas implements Serializable {
 			throws DocumentException, IOException, PrinterException, PrintException {
 		// colocar la ruta de la imagen principal de la empresa
 		// 77 acabar de cambiar los campos en la empresion de recibos txt y pdf
-		System.out.println("entra a imprimir");
-		System.out.println("Documento:" + docu.getDocumentoId());
+		log.info("entra a imprimir");
+		log.info("Documento:" + docu.getDocumentoId());
 		Configuracion configuracion = configuracion();
 		String impresora = impresora();
 		String enPantalla = "false"; 
@@ -400,7 +402,7 @@ public class BorrarFacturas implements Serializable {
 		eventoService.save(evento);
 		switch (docu.getTipoDocumentoId().getTipoDocumentoId().toString()) {
 		case "9":
-			System.out.println("consecutivo documentoId: " + docu.getDocumentoId());
+			log.info("consecutivo documentoId: " + docu.getDocumentoId());
 			tituloFactura = "No. DE GUIA";
 			break;
 		case "10":			
@@ -419,7 +421,7 @@ public class BorrarFacturas implements Serializable {
 		switch (imp) {
 		case "TXT":
 			pdf = Impresion.imprimirTxt(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora);
+					configuracion, impresora,"true");
 			break;
 		case "BIG":
 			pdf = imprimirTemporal(tituloFactura, docu);
@@ -445,13 +447,12 @@ public class BorrarFacturas implements Serializable {
 			break;
 		}
 
-		System.out.println("todo el codigo de imprimir");
-		// falta auto incrementable dian
+		log.info("todo el codigo de imprimir");
 		return pdf;
 	}
 
 	private String imprimirTemporal(String tituloFactura, Documento docu) throws IOException {
-		System.out.println("entra a imprimir");
+		log.info("entra a imprimir");
 		Empresa e = getEmpresa();
 		String pdf = "C:\\facturas\\factura_" + docu.getDocumentoId() + "Copia.txt";
 		File archivo = new File(pdf);
@@ -586,7 +587,7 @@ public class BorrarFacturas implements Serializable {
 		FileInputStream inputStream = null;
 		try {
 			inputStream = new FileInputStream(pdf);
-			System.out.println(pdf);
+			log.info(pdf);
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -598,13 +599,13 @@ public class BorrarFacturas implements Serializable {
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
-		String impresara = docu.getUsuarioId().getImpresora();
+		String impresara = impresora();
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		System.out.println("Number of printers configured: " + printServices.length);
+		log.info("Number of printers configured: " + printServices.length);
 		for (PrintService printer : printServices) {
-			System.out.println("Printer:" + printer.getName());
+			log.info("Printer:" + printer.getName());
 			if (printer.getName().equals(impresara)) {
-				System.out.println("Comparacion:" + printer.getName() + ":" + impresara);
+				log.info("Comparacion:" + printer.getName() + ":" + impresara);
 				defaultPrintService = printer;
 			}
 		}
@@ -617,7 +618,7 @@ public class BorrarFacturas implements Serializable {
 				ex.printStackTrace();
 			}
 		} else {
-			System.err.println("No existen impresoras instaladas");
+			log.error("No existen impresoras instaladas");
 		}
 		return pdf;
 	}

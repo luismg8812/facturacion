@@ -36,7 +36,6 @@ import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.printing.PDFPageable;
@@ -47,7 +46,6 @@ import org.primefaces.event.SelectEvent;
 import com.fact.api.Calculos;
 import com.fact.api.FactException;
 import com.fact.api.Impresion;
-import com.fact.dao.InformeDiarioDao;
 import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
@@ -134,7 +132,7 @@ public class PuntoVentaDia implements Serializable {
 	private GrupoService grupoService;
 
 	String codigoBarras;
-	Map<Long, Producto> productosAllCodigo;
+	Map<String, Producto> productosAllCodigo;
 	List<ProductoEmpresa> productosAll;
 	List<Producto> productosAll2;
 	List<Cliente> clientesAll;
@@ -274,7 +272,7 @@ public class PuntoVentaDia implements Serializable {
 
 	private void productoFind(String completo) {
 		Producto p = null;
-		p = getProductosAllCodigo().get(Long.valueOf(completo));
+		p = getProductosAllCodigo().get(completo);
 		if (p != null) {
 			log.info("entra al else");
 			RequestContext.getCurrentInstance().execute("document.getElementById('cantidad_in1').focus();");
@@ -304,13 +302,14 @@ public class PuntoVentaDia implements Serializable {
 			codigoProducoUnidad = completo.substring(0, 6);
 			boolean codigo2=false;
 			log.info("codigoP:" + codigoProducoString);
-			log.info("codigoP:" + codigoProducoUnidad);
-			p = getProductosAllCodigo().get(Long.valueOf(codigoProducoString));
+			log.info("codigoPunidad:" + codigoProducoUnidad);
+			p = getProductosAllCodigo().get(codigoProducoString);
 			if (p == null) {
-				p = getProductosAllCodigo().get(Long.valueOf("2"+codigoProducoUnidad));
+				p = getProductosAllCodigo().get("2"+codigoProducoUnidad);
 				completo="2"+completo;
 				codigo2=true;
 			}
+
 			if (p != null) {
 				log.info("producto carnes: " + p.getNombre());
 				String pesoProducoString = completo.substring(7, 12);
@@ -353,7 +352,7 @@ public class PuntoVentaDia implements Serializable {
 	public void buscarProductoCodigo(SelectEvent event) {
 		String completo = event.getObject().toString();
 		for (ProductoEmpresa p : getProductosAll()) {
-			if (p.getProductoId().toString().contains(completo)) {
+			if (p.getProductoId().getProductoId().toString().contains(completo)) {
 				setCodigoInterno(p.getProductoId().getProductoId().toString());
 				setArticulo(p.getProductoId());
 				setUnidad(p.getProductoId().getCostoPublico());
@@ -385,7 +384,7 @@ public class PuntoVentaDia implements Serializable {
 				determinarBalanza();
 				setParciaPopup("S");
 			} else {
-				setUnidad(productoSelect.getCostoPublico());
+				setUnidad(productoSelect.getCostoPublico()==null?0.0:productoSelect.getCostoPublico());
 				Configuracion configuracion = configuracion();
 				Long server = configuracion.getServer();
 				if (server == 2l) {
@@ -870,7 +869,7 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
-	public String imprimirFactura(String enPantalla) throws IOException, DocumentException, PrinterException, PrintException {
+	public String imprimirFactura(String enPantalla	) throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null) {
 			return "";
 		}
@@ -891,7 +890,7 @@ public class PuntoVentaDia implements Serializable {
 																							// el
 																							// consecutivo
 																							// dian
-					System.out.println("consecutivo documentoId: " + getDocumento().getDocumentoId());
+					log.info("consecutivo documentoId: " + getDocumento().getDocumentoId());
 					tituloFactura = "No. DE GUIA";
 					getDocumento().setReduccion(1l);
 					// server=2l; //facturacion en el server 2
@@ -972,11 +971,11 @@ public class PuntoVentaDia implements Serializable {
 				if (getDescuento() < -100.0 || getDescuento() > 100.0) {
 					getDocumento().setDescuento(getDescuento());
 					desTemp = (getDescuento() * 100) / getDocumento().getTotal();
-					System.out.println("% descuento:" + desTemp);
+					log.info("% descuento:" + desTemp);
 				} else {
 					getDocumento().setDescuento((getDocumento().getTotal() * getDescuento()) / 100);
 					desTemp = getDescuento();
-					System.out.println("% descuento:" + desTemp);
+					log.info("% descuento:" + desTemp);
 				}
 				if (desTemp < -15 || desTemp > 15) {
 					FacesContext.getCurrentInstance().addMessage(null,
@@ -995,20 +994,20 @@ public class PuntoVentaDia implements Serializable {
 			}
 			// se busca la mac del equipo y se le asigna a la factura
 			getDocumento().setMac(Calculos.conseguirMAC2());
-			System.out.println("mac:" + getDocumento().getMac());
+			log.info("mac:" + getDocumento().getMac());
 			documentoService.update(getDocumento(), server);
 			// se manda a que se agregue el documento a la suma del informe
 			// diario parcial
 			calcularInfoDiario(e);
 			String imp = e.getImpresion().toUpperCase();
-			// System.out.println("numero de impresiones: "+numeroImpresiones);
+			log.info("numero de impresiones: "+numeroImpresiones);
 			for (int i = 0; i < numeroImpresiones; i++) { // si la factura fue
 															// a// credito se//
 															// imprime dos veces
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora);
+					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla);
 					break;
 				case "BIG":
 					// quitar la dependencia del ireport
@@ -1017,6 +1016,7 @@ public class PuntoVentaDia implements Serializable {
 					break;
 				case "PDF":
 					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
+					log.info("sale de impresion pdf");
 					break;
 				case "PDF_PAGE":
 					Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
@@ -1035,7 +1035,7 @@ public class PuntoVentaDia implements Serializable {
 				}
 
 			}
-
+			
 			limpiar();
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
@@ -1162,7 +1162,7 @@ public class PuntoVentaDia implements Serializable {
 		try {
 			dirCliente = getDocumento().getClienteId().getDireccion();
 		} catch (Exception e2) {
-			System.out.println("cliente sin direccion");
+			log.info("cliente sin direccion");
 			dirCliente = "";
 		}
 
@@ -1214,7 +1214,7 @@ public class PuntoVentaDia implements Serializable {
 			try {
 				totalTep = formatea.format(total);
 			} catch (Exception e2) {
-				System.out.println("error tratando de dar formato a valor parcial");
+				log.info("error tratando de dar formato a valor parcial");
 			}
 			totalProducto = Calculos.cortarCantidades(totalTep, 12);
 			iva = Calculos.cortarCantidades(ivaTem, 2);
@@ -1296,7 +1296,7 @@ public class PuntoVentaDia implements Serializable {
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
-		String impresara = usuario().getImpresora();
+		String impresara = impresora();
 		log.info("impresoraUsuario: " + impresara);
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 		log.info("Number of printers configured: " + printServices.length);
@@ -1316,7 +1316,7 @@ public class PuntoVentaDia implements Serializable {
 				ex.printStackTrace();
 			}
 		} else {
-			System.err.println("No existen impresoras instaladas");
+			log.error("No existen impresoras instaladas");
 		}
 		return pdf;
 	}
@@ -1770,7 +1770,7 @@ public class PuntoVentaDia implements Serializable {
 				for (PrintService printer : printServices) {
 					log.info("Printer: " + printer.getName());
 					log.info("comparacion:" + impresora + ":" + printer.getName());
-					if (printer.getName().toString().equals(impresora)) {
+					if (printer.getName().equals(impresora)) {
 						try {
 							job.setPrintService(printer);
 							log.info(impresora + " : " + printer.getName());
@@ -1796,7 +1796,7 @@ public class PuntoVentaDia implements Serializable {
 				if (configuracion.getGuardarFacturas() == 0l) {
 					File borrar = new File(pdf);
 					if (!borrar.delete()) {
-						System.out.println("Error borrando facturas");
+						log.error("Error borrando facturas");
 					} else {
 						log.info("Documento borrado");
 					}
@@ -1829,7 +1829,7 @@ public class PuntoVentaDia implements Serializable {
 			imprimirFactura("true");
 			RequestContext.getCurrentInstance().execute("PF('dialogComanda').hide();");
 		} catch (IOException | DocumentException | PrinterException | PrintException e) {
-			System.err.println("Error en imprimir factura: " + e.getMessage());
+			log.error("Error en imprimir factura: " + e.getMessage());
 		}
 	}
 
@@ -2661,20 +2661,21 @@ public class PuntoVentaDia implements Serializable {
 		this.valorTargeta = valorTargeta;
 	}
 
-	public Map<Long, Producto> getProductosAllCodigo() {
+	public Map<String, Producto> getProductosAllCodigo() {
 		if (productosAllCodigo == null || productosAllCodigo.isEmpty()) {
-			List<Producto> l = productoService.getByAll();
+			List<ProductoEmpresa> l = productoService.getProductoByEmpresa(getEmpresa().getEmpresaId());
+			log.info(l.size());
 			productosAllCodigo = new HashMap<>();
-			for (Producto p : l) {
-				if (p.getCodigoBarras() != null) {
-					productosAllCodigo.put(p.getCodigoBarras(), p);
+			for (ProductoEmpresa p : l) {
+				if (p.getProductoId().getCodigoBarras() != null) {
+					productosAllCodigo.put(p.getProductoId().getCodigoBarras(), p.getProductoId());
 				}
 			}
 		}
 		return productosAllCodigo;
 	}
 
-	public void setProductosAllCodigo(Map<Long, Producto> productosAllCodigo) {
+	public void setProductosAllCodigo(Map<String, Producto> productosAllCodigo) {
 		this.productosAllCodigo = productosAllCodigo;
 	}
 

@@ -13,7 +13,6 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fact.api.FactException;
 import com.fact.dao.TransferenciaEmpresaDetalleDao;
-import com.fact.model.Documento;
 import com.fact.model.TransferenciaEmpresaDetalle;
 import com.fact.utils.HibernateUtil;
 

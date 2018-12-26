@@ -1,7 +1,7 @@
 package com.fact.dao.impl;
 
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,13 +124,13 @@ public class ProductoDaoImpl implements ProductoDao{
 	
 	//SELECT BLOG_ITEM_SEQ.nextval FROM DUAL
 	@Override
-	public BigDecimal getByUltimoId() throws FactException{
+	public BigInteger getByUltimoId() throws FactException{
 		Session session = HibernateUtil.getSessionFactory().openSession();
-		BigDecimal id ; 
+		BigInteger id ; 
 		try {
-			String sql = "SELECT S_PRODUCTO.nextval FROM DUAL";
+			String sql = "SELECT nextval('S_PRODUCTO')";
 			Query query = session.createSQLQuery(sql);		
-			id=  (BigDecimal) query.uniqueResult(); 
+			id=  (BigInteger) query.uniqueResult(); 
 			session.close();
 		} catch (FactException e) {
 			throw e;
@@ -276,7 +276,7 @@ public class ProductoDaoImpl implements ProductoDao{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Producto getByCodigoBarras(Long codigoBarrasNew) throws FactException {
+	public Producto getByCodigoBarras(String codigoBarrasNew) throws FactException {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Producto> menuList = new ArrayList<>(); 
 		try {

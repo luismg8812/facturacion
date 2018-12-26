@@ -50,7 +50,7 @@ public class ProductoConverter  implements Converter{
 	        	p.setUnidad(parts1[3].trim());
 	        	p.setBalanza(Long.valueOf(parts1[4].trim().equals("")?"0":parts1[4].trim()));
 	        	p.setCantidad(Double.valueOf(parts1[5].trim().equals("")?"0.0":parts1[5].trim()));
-	        	p.setCodigoBarras(Long.valueOf(parts1[6].trim().equals("")?"0":parts1[6].trim()));
+	        	p.setCodigoBarras(parts1[6].trim());
 	        	p.setCosto(Double.valueOf(parts1[7].trim().equals("")?"0.0":parts1[7].trim()));
 	        	p.setCostoPublico(Double.valueOf(parts1[8].trim().equals("")?"0.0":parts1[8].trim()));
 	        	p.setFechaActualiza(new Date());
@@ -94,7 +94,7 @@ public class ProductoConverter  implements Converter{
 	        	pNew.add(p.getUnidad()==null?"":p.getUnidad());
 	        	pNew.add(p.getBalanza()==null?"":p.getBalanza().toString());
 	        	pNew.add(p.getCantidad()==null?"":p.getCantidad().toString());
-	        	pNew.add(p.getCodigoBarras()==null?"":p.getCodigoBarras().toString());
+	        	pNew.add(p.getCodigoBarras()==null?"":p.getCodigoBarras());
 	        	pNew.add(p.getCosto()==null?"":p.getCosto().toString());
 	        	pNew.add(p.getCostoPublico()==null?"":p.getCostoPublico().toString());
 	        	pNew.add(p.getFechaActualiza()==null?"":p.getFechaActualiza().toString());

@@ -29,9 +29,6 @@ public class Cliente {
 	@Column(name="NOMBRE")
 	private String nombre;
 	
-	@Column(name="CODIGO")
-	private Long codigo;
-	
 	@Column(name="DOCUMENTO")
 	private String documento;
 	
@@ -54,8 +51,8 @@ public class Cliente {
 	@Column(name="FECHA_REGISTRO")
 	private Date fechaRegistro;
 	
-	@Column(name="CUMPLEAÑOS")
-	private Date cumpleaños;
+	@Column(name="CUMPLEANOS")
+	private Date cumpleanos;
 	
 	@Column(name="CREDITO_ACTIVO")
 	private Long creditoActivo;
@@ -83,14 +80,6 @@ public class Cliente {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
-	}
-
-	public Long getCodigo() {
-		return codigo;
-	}
-
-	public void setCodigo(Long codigo) {
-		this.codigo = codigo;
 	}
 
 	public String getDocumento() {
@@ -149,12 +138,12 @@ public class Cliente {
 		this.fechaRegistro = fechaRegistro;
 	}
 
-	public Date getCumpleaños() {
-		return cumpleaños;
+	public Date getCumpleanos() {
+		return cumpleanos;
 	}
 
-	public void setCumpleaños(Date cumpleaños) {
-		this.cumpleaños = cumpleaños;
+	public void setCumpleanos(Date cumpleanos) {
+		this.cumpleanos = cumpleanos;
 	}
 
 	public Long getCreditoActivo() {

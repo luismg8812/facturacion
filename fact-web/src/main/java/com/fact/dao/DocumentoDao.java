@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.ejb.Local;
 
-import com.fact.api.FactException;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
