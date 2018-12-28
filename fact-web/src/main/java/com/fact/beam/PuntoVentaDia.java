@@ -172,19 +172,20 @@ public class PuntoVentaDia implements Serializable {
 	Empleado empleado;
 
 	// creacion de cliente
-	Date fechaIngresoClienteNew;
-	String nombreClienteNew;
-	String documentoClienteNew;
-	String barrioClienteNew;
-	String direcionClienteNew;
-	Long celularClienteNew;
-	Long fijoClienteNew;
-	Date cumpleanosClienteNew;
-	String creditoActivoClienteNew;
-	Long cupoCreditoClienteNew;
-	String retencionClienteNew;
-	String guiaTransporteClienteNew;
-	String crearNew;
+	private Date fechaIngresoClienteNew;
+	private String nombreClienteNew;
+	private String documentoClienteNew;
+	private String barrioClienteNew;
+	private String direcionClienteNew;
+	private String mail;
+	private Long celularClienteNew;
+	private Long fijoClienteNew;
+	private Date cumpleanosClienteNew;
+	private String creditoActivoClienteNew;
+	private Long cupoCreditoClienteNew;
+	private String retencionClienteNew;
+	private String guiaTransporteClienteNew;
+	private String crearNew;
 	//
 
 	Double excento;
@@ -1603,6 +1604,7 @@ public class PuntoVentaDia implements Serializable {
 		setNombreCliente2("");
 		setCliente(null);
 		setUnidad(null);
+		setClientesAll(null);
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
@@ -2210,7 +2212,7 @@ public class PuntoVentaDia implements Serializable {
 		return clientesAll;
 	}
 
-	public void setClientestosAll(List<Cliente> clientesAll) {
+	public void setClientesAll(List<Cliente> clientesAll) {
 		this.clientesAll = clientesAll;
 	}
 
@@ -2421,6 +2423,7 @@ public class PuntoVentaDia implements Serializable {
 			Long server = 1l;
 			Cliente cNew = new Cliente();
 			cNew.setBarrio(getBarrioClienteNew() == null ? "" : getBarrioClienteNew());
+			cNew.setMail(getMail()==null?"":getMail());
 			cNew.setCelular(getCelularClienteNew() == null ? 0l : getCelularClienteNew());
 			if (getCreditoActivoClienteNew() != null) {
 				cNew.setCreditoActivo(getCreditoActivoClienteNew().equalsIgnoreCase("S") ? 1l : 0l);
@@ -3029,4 +3032,12 @@ public class PuntoVentaDia implements Serializable {
 		this.productoSelect = productoSelect;
 	}
 
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
+	
 }

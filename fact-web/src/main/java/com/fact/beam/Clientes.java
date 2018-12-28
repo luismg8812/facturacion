@@ -54,6 +54,7 @@ public class Clientes implements Serializable {
 	private Long celular;
 	private Long fijo;
 	private Date Cumpleaños;
+	private String mail;
 	private Boolean creditoActivo = Boolean.FALSE;
 	private Long cupoCredito;
 	private double retencion;
@@ -167,6 +168,7 @@ public class Clientes implements Serializable {
 		setFijo(p.getFijo());
 		setNombre(p.getNombre());
 		setRetencion(p.getRetencion());
+		setMail(p.getMail());
 		// setDepartamento(p.getCiudadId()!=null?p.getCiudadId().getDepartamentoId().getDepartamentoId():0l);
 		return "";
 	}
@@ -203,6 +205,7 @@ public class Clientes implements Serializable {
 			cliente.setRetencion(getRetencion());
 			cliente.setDireccion(getDireccion());
 			cliente.setClienteId(getClienteId());
+			cliente.setMail(getMail());
 			clienteService.update(cliente);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Proveedor Editado exitosamente"));
 		}
@@ -214,14 +217,13 @@ public class Clientes implements Serializable {
 		boolean valido = true;
 		if (getNombre() == null || getNombre().equals("")) {
 			context.addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!,El Nombre es obligatorio", ""));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, El Nombre es obligatorio", ""));
 			valido = false;
 		} else {
-			Cliente cli = new Cliente();
-			cli = clienteService.getByName(getNombre().toUpperCase());
+			Cliente cli = clienteService.getByName(getNombre().toUpperCase());
 			if (cli != null) {
 				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, El Proveedor ya existe", ""));
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, El Cliente ya existe", ""));
 				valido = false;
 			}
 		}
@@ -246,6 +248,7 @@ public class Clientes implements Serializable {
 			cliente.setDireccion(getDireccion());
 			cliente.setFechaRegistro(new Date());
 			cliente.setFijo(getFijo());
+			cliente.setMail(getMail());
 			cliente.setNombre(getNombre().toUpperCase());
 			cliente.setRetencion(getRetencion());
 			clienteService.save(cliente);
@@ -333,6 +336,15 @@ public class Clientes implements Serializable {
 
 	public Boolean getCreditoActivo() {
 		return creditoActivo;
+	}
+	
+
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
 	}
 
 	public void setCreditoActivo(Boolean creditoActivo) {
