@@ -27,6 +27,11 @@
 				return "";			
 			}
 			if(elec=='nuevoClienteForm:direccionNew'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:mailNew').focus();
+				document.getElementById('nuevoClienteForm:mailNew').select();
+				return "";			
+			}
+			if(elec=='nuevoClienteForm:mailNew'){//cuendo esta seleccionando el tipo documento
 				document.getElementById('nuevoClienteForm:celularNew_input').focus();
 				document.getElementById('nuevoClienteForm:celularNew_input').select();
 				return "";			
@@ -75,9 +80,14 @@
 				document.getElementById('nuevoClienteForm:barrioNew').select();
 				return "";			
 			}
-			if(elec=='nuevoClienteForm:celularNew_input'){//cuendo esta seleccionando el tipo documento
+			if(elec=='nuevoClienteForm:mailNew'){//cuendo esta seleccionando el tipo documento
 				document.getElementById('nuevoClienteForm:direccionNew').focus();
 				document.getElementById('nuevoClienteForm:direccionNew').select();
+				return "";			
+			}	
+			if(elec=='nuevoClienteForm:celularNew_input'){//cuendo esta seleccionando el tipo documento
+				document.getElementById('nuevoClienteForm:mailNew').focus();
+				document.getElementById('nuevoClienteForm:mailNew').select();
 				return "";			
 			}
 			if(elec=='nuevoClienteForm:fijoNew_input'){//cuendo esta seleccionando el tipo documento
@@ -148,6 +158,12 @@
 			<td><p:outputLabel value="Dirección:" /></td>
 			<td><p:inputText value="#{puntoVentaDia.direcionClienteNew}" size="15" maxlength="40"
 					onkeyup="teclasNewCliente(event,this)" id="direccionNew" >
+				</p:inputText>	</td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Mail:" /></td>
+			<td><p:inputText value="#{puntoVentaDia.mail}" size="15" maxlength="60"
+					onkeyup="teclasNewCliente(event,this)" id="mailNew" >
 				</p:inputText>	</td>
 		</tr>
 		<tr>

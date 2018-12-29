@@ -66,6 +66,19 @@ public class Cliente {
 	@Column(name="GUIA_TRANSPORTE")
 	private Long guiaTransporte;
 	
+	@Column(name="MAIL")
+	private String mail;
+	
+	
+	
+	public String getMail() {
+		return mail;
+	}
+
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
+
 	public Long getClienteId() {
 		return clienteId;
 	}

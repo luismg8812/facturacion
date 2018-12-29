@@ -71,8 +71,8 @@
 						<td><p:selectBooleanButton id="guiaNew" value="#{clientes.guiaTrasnsporte}"
 						 onLabel="Si" offLabel="No"  />
  						</td>
-						<td></td>
-						<td></td>
+						<td><p:outputLabel value="Mail: " /></td>
+						<td><p:inputText value="#{clientes.mail}"></p:inputText></td>
 						<td></td>
 						<td><p:commandButton value="Guardar" id="guardarBotton"  process="@form" 
 						update="@form,growl1,clientesForm:acord:guardarForm:clienteEdictSelect" 
@@ -156,10 +156,9 @@
 					<tr>
 					<td><p:outputLabel value="Guia Trans.: " /></td>
 						<td><p:selectBooleanButton id="guiaEdit" value="#{clientes.guiaTrasnsporte}"
-						 onLabel="Si" offLabel="No"  />
- 						</td>
-						<td></td>
-						<td></td>
+						 onLabel="Si" offLabel="No"  /></td>
+						<td><p:outputLabel value="Mail: " /></td>
+						<td><p:inputText value="#{clientes.mail}"></p:inputText></td>
 						<td></td>
 						<td><p:commandButton value="Guardar" id="editarUsuaririoButon"  process="@form" 
 						update="@form,growl1" 
