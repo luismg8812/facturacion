@@ -99,6 +99,7 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 		try {
 			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
 			detached.add(Restrictions.eq("empresaId.empresaId", empresaId));
+			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.nombre"));
 			Criteria criteria =  detached.getExecutableCriteria(session);
 			documentoList =criteria.list(); 
 		} catch (FactException e) {
@@ -120,6 +121,7 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
 			detached.add(Restrictions.eq("empresaId.empresaId", empresaId.getEmpresaId()));
 			detached.add(Restrictions.eq("productoId.productoId", productoId));
+			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.nombre"));
 			Criteria criteria =  detached.getExecutableCriteria(session);
 			documentoList =criteria.list(); 
 		} catch (FactException e) {

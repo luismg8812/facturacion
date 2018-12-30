@@ -325,11 +325,11 @@ public class PuntoVentaDia implements Serializable {
 				productoSelect = p;
 				cantidadEnter(null);
 			} else {
-				productoFind(completo);
+				productoFind(getCodigoBarras());
 			}
 		} catch (Exception e) {
 			try {
-				productoFind(completo);
+				productoFind(getCodigoBarras());
 			} catch (Exception e2) {
 
 			}
@@ -1594,6 +1594,7 @@ public class PuntoVentaDia implements Serializable {
 		setEfectivo(null);
 		setImpresion(null);
 		setProductosAll(null);
+		setProductosAll2(null);
 		setProductosBorrar(Boolean.FALSE);
 		setDocumentoActual(null);
 		setListaDocumento(null);
