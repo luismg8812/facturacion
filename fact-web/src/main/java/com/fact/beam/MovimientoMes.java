@@ -874,6 +874,7 @@ public class MovimientoMes implements Serializable {
 		String nombre = getProductoEdict().getNombre().trim();
 		getProductoEdict().setNombre(nombre);
 		Producto prodNew = getProductoEdict();
+		ProductoEmpresa empresaEdit= productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), getProductoEdict().getProductoId());
 		if (getProductoEdict().getProductoId() == 1l) {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage("No es posible editar el producto ¡Varios!"));
@@ -927,6 +928,7 @@ public class MovimientoMes implements Serializable {
 		}
 		if (getPublicoNew() != null) {
 			prodNew.setCostoPublico(getPublicoNew());
+			empresaEdit.setPrecio(getPublicoNew());
 		} else {
 			prodNew.setCostoPublico(0.0);
 		}
@@ -952,6 +954,7 @@ public class MovimientoMes implements Serializable {
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
 		productoService.update(prodNew, 1l);
+		productoEmpresaService.update(empresaEdit);
 		if (server == 2l) {
 			productoService.update(prodNew, 2l);
 		}
