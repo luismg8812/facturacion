@@ -49,7 +49,5 @@ public interface DocumentoService {
 	List<Documento> getByCliente(Long clienteId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
 	List<Documento> getByClienteAndProveedorAndTipo(Long clienteId, Long proveedorId,List<Long> tipoId);
 	List<Documento> getByProveedor(Long proveedorId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
-	
-	
-	
+	List<Documento> buscarPorInvoice(long invoice);
 }

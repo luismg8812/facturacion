@@ -50,6 +50,10 @@ public class Documento {
 	@JoinColumn(name="TIPO_PAGO_ID")
 	private TipoPago tipoPagoId;
 	
+	@ManyToOne
+	@JoinColumn(name="INVOICE")
+	private Invoice invoiceId;
+	
 	@Column(name="FECHA_REGISTRO")
 	private Date fechaRegistro;
 	
@@ -130,7 +134,8 @@ public class Documento {
 	
 	@Column(name="TOTAL_COSTO")
 	private Double totalCosto;
-		
+	
+	
 
 	public Long getDocumentoId() {
 		return documentoId;
@@ -405,4 +410,13 @@ public class Documento {
 	public void setTotalCosto(Double totalCosto) {
 		this.totalCosto = totalCosto;
 	}
+
+	public Invoice getInvoiceId() {
+		return invoiceId;
+	}
+
+	public void setInvoiceId(Invoice invoiceId) {
+		this.invoiceId = invoiceId;
+	}
+	
 }

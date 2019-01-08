@@ -3,7 +3,7 @@
 		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
 		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
-    <session-factory name="oracle">
+    <session-factory name="postgres">
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.password">nuevof</property>
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/facturacion_1</property>
@@ -41,5 +41,6 @@
     	<mapping class="com.fact.model.TransferenciaEmpresaDetalle" />
     	<mapping class="com.fact.model.TipoEmpresa" />
     	<mapping class="com.fact.model.UsuarioEmpresa" />
+    	<mapping class="com.fact.model.Invoice" />
     </session-factory>
 </hibernate-configuration>

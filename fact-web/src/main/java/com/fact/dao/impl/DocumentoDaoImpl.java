@@ -20,6 +20,7 @@ import com.fact.dao.DocumentoDao;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
+import com.fact.model.Invoice;
 import com.fact.utils.HibernateUtil;
 
 @Stateless()
@@ -837,6 +838,29 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			detached.add(Restrictions.eq("proveedorId.proveedorId", proveedorId));
 			detached.add(Restrictions.in("tipoDocumentoId.tipoDocumentoId", tipoDocumentoId));
 			detached.add(Restrictions.between("fechaRegistro", fechaInicio, fechafin));
+			detached.addOrder(org.hibernate.criterion.Order.desc("documentoId"));
+			Criteria criteria = detached.getExecutableCriteria(session);
+			documentoList = criteria.list();
+		} catch (FactException e) {
+			throw e;
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return documentoList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Documento> buscarPorInvoice(long invoice) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Documento> documentoList = new ArrayList<>();
+		try {
+			Invoice objInvoice = new Invoice();
+			objInvoice.setInvoiceId(invoice);
+			DetachedCriteria detached = DetachedCriteria.forClass(Documento.class);
+			detached.add(Restrictions.eq("invoiceId", objInvoice));
 			detached.addOrder(org.hibernate.criterion.Order.desc("documentoId"));
 			Criteria criteria = detached.getExecutableCriteria(session);
 			documentoList = criteria.list();

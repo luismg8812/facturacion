@@ -29,17 +29,17 @@ public class HibernateUtil {
 			throw new ExceptionInInitializerError(he);
 		}
 	}
-	static {
-		try {
-			Configuration configuration2 = new Configuration().configure("/META-INF/hibernate/hibernate2.cfg.xml");
-			serviceRegistry2 = new ServiceRegistryBuilder().applySettings(configuration2.getProperties())
-					.buildServiceRegistry();
-			sessionFactory2 = configuration2.buildSessionFactory(serviceRegistry2);
-		} catch (HibernateException e) {
-			System.out.println("Error server 2");
-			throw new ExceptionInInitializerError(e);
-		}
-	}
+//	static {
+//		try {
+//			Configuration configuration2 = new Configuration().configure("/META-INF/hibernate/hibernate2.cfg.xml");
+//			serviceRegistry2 = new ServiceRegistryBuilder().applySettings(configuration2.getProperties())
+//					.buildServiceRegistry();
+//			sessionFactory2 = configuration2.buildSessionFactory(serviceRegistry2);
+//		} catch (HibernateException e) {
+//			System.out.println("Error server 2");
+//			throw new ExceptionInInitializerError(e);
+//		}
+//	}
 
 	public static SessionFactory getSessionFactory() {
 		return sessionFactory;

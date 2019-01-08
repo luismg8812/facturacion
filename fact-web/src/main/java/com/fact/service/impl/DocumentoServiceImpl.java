@@ -207,4 +207,9 @@ public class DocumentoServiceImpl implements DocumentoService{
 		return documentoDao.getByfacturasRealesConFecha(tipoDocumentoId,hoy,hoyfin,usuarioId,conCierre,server);
 	}
 
+	@Override
+	public List<Documento> buscarPorInvoice(long invoice) {
+		return documentoDao.buscarPorInvoice(invoice) ;
+	}
+
 }

@@ -55,6 +55,7 @@ import com.fact.model.Empresa;
 import com.fact.model.Evento;
 import com.fact.model.Grupo;
 import com.fact.model.InfoDiario;
+import com.fact.model.Invoice;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.ProductoEmpresa;
@@ -486,11 +487,15 @@ public class PuntoVentaDia implements Serializable {
 			if (getDocumento().getDocumentoId() == null) {
 				Documento docOjb = new Documento();
 				TipoDocumento td = new TipoDocumento();
-				td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que
-											// es igual a factura
+				td.setTipoDocumentoId(10l); 
+				// se le envia tipo documento 10 que es igual a factura
 				docOjb.setTipoDocumentoId(td);
 				docOjb.setFechaRegistro(new Date());
 				docOjb.setUsuarioId(usuario());
+				//se deja factura sin enviar por defecto para facturacion electronica
+				Invoice invoice = new Invoice();
+				invoice.setInvoiceId(1l);
+				docOjb.setInvoiceId(invoice);
 				if (clienteSelect == null) {
 					clienteSelect = new Cliente();
 					clienteSelect.setClienteId(1l); // se le envia cliente
@@ -499,6 +504,9 @@ public class PuntoVentaDia implements Serializable {
 					clienteSelect.setNombre("Varios");
 					docOjb.setClienteId(clienteSelect);
 				}
+				//se deja factura sin enviar por defecto para facturacion electronica
+				invoice.setInvoiceId(1l);
+				docOjb.setInvoiceId(invoice);
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
 				log.info("Documento: " + getDocumento().getDocumentoId());
@@ -669,7 +677,10 @@ public class PuntoVentaDia implements Serializable {
 					clienteSelect.setNombre("Varios");
 					docOjb.setClienteId(clienteSelect);
 				}
-
+				//se deja factura sin enviar por defecto para facturacion electronica
+				Invoice invoice = new Invoice();
+				invoice.setInvoiceId(1l);
+				docOjb.setInvoiceId(invoice);
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
 				log.info("Documento:" + getDocumento().getDocumentoId());
@@ -2231,6 +2242,7 @@ public class PuntoVentaDia implements Serializable {
 
 	public void tipoFacturaSelect() {
 		TipoDocumento td = new TipoDocumento();
+		Invoice invoice = new Invoice();
 		Long server = 1l;
 		if (getTipoDocumentoFactura() != null && !getTipoDocumentoFactura().equals("")) {
 			switch (getTipoDocumentoFactura().toUpperCase()) {
@@ -2240,6 +2252,8 @@ public class PuntoVentaDia implements Serializable {
 											// venta
 				setTipoDocumentoFacturaNombre("Factura de venta");
 				server = 1l;
+				//se deja factura sin enviar por defecto para facturacion electronica	
+				invoice.setInvoiceId(1l);
 				break;
 			case "R":
 				log.info("tipo documento igual a factura de venta con remision");
@@ -2265,6 +2279,7 @@ public class PuntoVentaDia implements Serializable {
 				docOjb.setTipoDocumentoId(td);
 				docOjb.setFechaRegistro(new Date());
 				docOjb.setUsuarioId(usuario());
+				docOjb.setInvoiceId(invoice);
 				if (clienteSelect == null) {
 					clienteSelect = new Cliente();
 					clienteSelect.setClienteId(1l); // se le envia cliente
@@ -2311,20 +2326,24 @@ public class PuntoVentaDia implements Serializable {
 			setNombreCliente2("Factura de venta");
 			Documento docOjb = new Documento();
 			if (getDocumento().getDocumentoId() == null) {
-				td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que
-											// es igual a factura
+				td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que es igual a factura
+				//se deja factura sin enviar por defecto para facturacion electronica
+				invoice.setInvoiceId(1l);
+				docOjb.setInvoiceId(invoice);
 				docOjb.setTipoDocumentoId(td);
 				docOjb.setFechaRegistro(new Date());
 				docOjb.setUsuarioId(usuario());
-				// docOjb.setClienteId(clienteSelect);
 				documentoService.save(docOjb, server);
 				setDocumento(docOjb);
 				log.info("Documento:" + getDocumento().getDocumentoId());
 				log.info("Usuario:" + usuario().getLogin());
 			} else {
-				td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que
-											// es igual a factura
+				td.setTipoDocumentoId(10l); 
+				// se le envia tipo documento 10 que es igual a factura
 				getDocumento().setTipoDocumentoId(td);
+				//se deja factura sin enviar por defecto para facturacion electronica
+				invoice.setInvoiceId(1l);
+				docOjb.setInvoiceId(invoice);
 				documentoService.update(getDocumento(), server);
 				log.info("Documento:" + getDocumento().getDocumentoId());
 				log.info("Usuario:" + usuario().getLogin());
@@ -2356,6 +2375,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void buscarCliente(SelectEvent event)  {
+		Invoice invoice = new Invoice();
 		Long server = 1l;
 		clienteSelect = (Cliente) event.getObject();
 		setDisplayTipoDocumento("inline");
@@ -2367,12 +2387,14 @@ public class PuntoVentaDia implements Serializable {
 		if (getDocumento().getDocumentoId() == null) {
 			Documento docOjb = new Documento();
 			TipoDocumento td = new TipoDocumento();
-			td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que es
-										// igual a factura
+			td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que es igual a factura
 			docOjb.setTipoDocumentoId(td);
 			docOjb.setFechaRegistro(new Date());
 			docOjb.setUsuarioId(usuario());
 			docOjb.setClienteId(clienteSelect);
+			//se deja factura sin enviar por defecto para facturacion electronica
+			invoice.setInvoiceId(1l);
+			docOjb.setInvoiceId(invoice);
 			documentoService.save(docOjb, server);
 			setDocumento(docOjb);
 		} else {
@@ -2389,12 +2411,15 @@ public class PuntoVentaDia implements Serializable {
 		if (getDocumento().getDocumentoId() == null) {
 			Documento docOjb = new Documento();
 			TipoDocumento td = new TipoDocumento();
-			td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que es
-										// igual a factura
+			td.setTipoDocumentoId(10l); // se le envia tipo documento 10 que es igual a factura
 			docOjb.setTipoDocumentoId(td);
 			docOjb.setFechaRegistro(new Date());
 			docOjb.setUsuarioId(usuario());
 			docOjb.setEmpleadoId(empleadoSelect);
+			//se deja factura sin enviar por defecto para facturacion electronica
+			Invoice invoice = new Invoice();
+			invoice.setInvoiceId(1l);
+			docOjb.setInvoiceId(invoice);
 			documentoService.save(docOjb, server);
 			setDocumento(docOjb);
 			log.info("Documento:" + getDocumento().getDocumentoId());
@@ -2464,6 +2489,10 @@ public class PuntoVentaDia implements Serializable {
 				docOjb.setFechaRegistro(new Date());
 				docOjb.setUsuarioId(usuario());
 				docOjb.setClienteId(clienteSelect);
+				//se deja factura sin enviar por defecto para facturacion electronica
+				Invoice invoice = new Invoice();
+				invoice.setInvoiceId(1l);
+				docOjb.setInvoiceId(invoice);
 				documentoService.save(docOjb, server);
 
 				setDocumento(docOjb);

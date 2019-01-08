@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="envioDocumentosForm">
+	<p:growl id="growl" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:commandButton value="Buscar" process="@form"
+						update="checkboxDT" id="buscar" actionListener="#{invoice.buscarSinEnviar()}" /> 
+					<p:commandButton value="Enviar" type="button" onclick="PF('dlg2').show();" /></td>
+				<td> <p:commandButton value="Descartar" type="button" onclick="PF('dlg1').show();" /></td>
+			</tr>
+		</table>
+		 <p:dataTable id="checkboxDT" var="car" value="#{invoice.documentos}" selection="#{invoice.documentosSelect}" rowKey="#{car.documentoId}" style="margin-bottom:0"
+		 			   emptyMessage="No hay registros pendientes pare gestión de facturación electrónica">
+        <f:facet name="header">
+            Documentos
+        </f:facet>
+        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+        <p:column headerText="Detalle">
+            <p:commandButton icon="ui-icon-search" title="Detalle" />
+        </p:column>
+        <p:column headerText="Numero de documento">
+            <h:outputText value="#{car.consecutivoDian}" />
+        </p:column>
+        <p:column headerText="Total">
+            <h:outputText value="#{car.total}" >
+            	<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+            </h:outputText>
+        </p:column>
+        <p:column headerText="Fecha">
+            <h:outputText value="#{car.fechaRegistro}" />
+        </p:column>
+    </p:dataTable>
+    
+    <p:dialog header="Confirmar envio" widgetVar="dlg2"  height="100">
+   	 	<h:outputText value="Los documentos seleccionados se enviarán electrónicamente a la DiAN, esta seguro de enviarlos?" />
+   	 	<table width="100%" align="center">
+			<tr>
+				<td><p:commandButton value="Confirmar" action="#{invoice.enviarDocumentosDIAN()}" process="@form" update="checkboxDT,growl" id="confirmar"  /> 
+					<p:commandButton value="Cancelar"  onclick="PF('dlg2').hide();"  /></td>
+				<td> </td>
+			</tr>
+		</table>
+	</p:dialog>  
+	 <p:dialog header="Descartar envio" widgetVar="dlg1"  height="100">
+   	 	<h:outputText value="Los documentos seleccionados 'NO' se enviarán electrónicamente a la DiAN, esta seguro de Descartarlos?" />
+   	 	<table width="100%" align="center">
+			<tr>
+				<td><p:commandButton value="Descartar"  action="#{invoice.descartar()}" process="@form" update="checkboxDT,growl" id="descartar"  /> 
+					<p:commandButton value="Cancelar"  onclick="PF('dlg1').hide();" /></td>
+				<td> </td>
+			</tr>
+		</table>
+	</p:dialog>  
+	</h:form>
+</ui:composition>
