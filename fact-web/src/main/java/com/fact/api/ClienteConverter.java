@@ -31,7 +31,7 @@ public class ClienteConverter  implements Converter{
 	        	p.setDireccion(parts1[1]);
 	        	p.setNombre(parts1[2]);
 	        	p.setDocumento(parts1[3]);
-	        	p.setCelular(Long.valueOf(parts1[4].trim()));
+	        	p.setCelular(parts1[4].trim());
 	        	Ciudad ciudad= new Ciudad();
 	        	ciudad.setCiudadId(Long.valueOf(parts1[5].trim().equals("")?"0":parts1[5].trim()));
 	        	p.setCiudadId(ciudad);
@@ -40,7 +40,7 @@ public class ClienteConverter  implements Converter{
 	        	//p.setCumpleaños((Date)(parts1[8].trim().equals("")?new Date():parts1[8].trim()));
 	        	//p.setFechaActualiza(new Date());
 	        	p.setCupoCredito((Long.valueOf(parts1[10].trim().equals("")?"0":parts1[10].trim())));
-	        	p.setFijo(Long.valueOf(parts1[11].trim().equals("")?"0":parts1[11].trim()));
+	        	p.setFijo(parts1[11].trim().equals("")?"0":parts1[11].trim());
 	        	p.setClienteId(Long.valueOf(parts1[12].trim()));
 	        	p.setGuiaTransporte(Long.valueOf(parts1[13].trim().equals("")?"0":parts1[13].trim()));
 	        	p.setRetencion(Double.valueOf(parts1[14].replace("]", "").trim().equals("")?"0":parts1[14].replace("]", "").trim()));

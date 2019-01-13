@@ -14,45 +14,35 @@
 		<p:growl id="growl1" life="7000" />
 		<table width="30%" align="left">
 			<tr>
-				<td><p:outputLabel value="Documento:" /></td>
-				<td><p:outputLabel
-						value="#{abonos.abonoNew.documentoId.documentoId}" /></td>
-			</tr>
-			<tr>
-				<td><p:outputLabel value="Fecha: " /></td>
-				<td><p:outputLabel value="#{abonos.abonoNew.fechaRegistro}">
+				<td><p:outputLabel value="Documento:" /> 
+					<p:outputLabel value="#{abonos.abonoNew.documentoId.detalleEntrada}" id="documentoId"/>
+				</td>
+				<td><p:outputLabel value="Fecha: " /> 
+				  	<p:outputLabel value="#{abonos.abonoNew.fechaRegistro}">
 						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
-					</p:outputLabel></td>
-			</tr>
-			<tr>
-				<td><p:outputLabel value="Total Factura: " /></td>
-				<td>
-				<p:inputNumber value="#{abonos.abonoNew.documentoId.total}" readonly="true"/>
+					</p:outputLabel>
 				</td>
-			</tr>
+			</tr>		
 			<tr>
-				<td><p:outputLabel value="Saldo: " /></td>
-				<td> <p:inputNumber value="#{abonos.abonoNew.documentoId.saldo}" readonly="true"/>
-				</td>
-			</tr>
-			<tr>
-				<td><p:outputLabel value="Tipo de pago: " /></td>
-				<td><p:selectOneMenu value="#{abonos.tipoPago}" id="tipoPago">
-						<f:selectItem itemLabel="Seccionar Tipo de Pago" itemValue="0" />
+				<td><p:outputLabel value="Tipo de pago: " />
+					<p:selectOneMenu value="#{abonos.tipoPago}" id="tipoPago">
+						<f:selectItem itemLabel="Seccionar Tipo de Pago" itemValue="" />
 						<f:selectItems value="#{abonos.tipoPagos}" var="tipa"
 							itemLabel="#{tipa.nombre}" itemValue="#{tipa.tipoPagoId}" />
-					</p:selectOneMenu></td>
-			</tr>
-			<tr>
-				<td><p:outputLabel value="Cantidad Abono: " /></td>
-				<td><p:inputNumber value="#{abonos.cantidadNew}" /></td>
+					</p:selectOneMenu>
+				</td>
+			
+				<td><p:outputLabel value="Cantidad Abono: " />
+					<p:inputNumber value="#{abonos.cantidadNew}" /></td>
 			</tr>
 			<tr>
 				<td><p:commandButton value="Guardar" id="guardar"
-						process="@form" update="growl1,abonos123" onclick="ocultarDialocrearAbonoCliente()"
-						actionListener="#{abonos.crearAbono()}" /></td>
-				<td><p:commandButton value="Salir" onclick="ocultarDialocrearAbonoCliente()"/></td>
-				<p:commandButton value="Actualizar" update="@form" />
+						process="@form" update="growl1,abonos123"
+						onclick="ocultarDialocrearAbonoCliente()"
+						actionListener="#{abonos.crearAbono()}" />
+				<p:commandButton value="Salir"
+						onclick="ocultarDialocrearAbonoCliente()" /></td>
+				
 			</tr>
 		</table>
 	</h:form>

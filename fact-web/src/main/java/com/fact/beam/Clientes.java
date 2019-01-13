@@ -54,8 +54,8 @@ public class Clientes implements Serializable {
 	private String documento;
 	private String Barrio;
 	private String direccion;
-	private Long celular;
-	private Long fijo;
+	private String celular;
+	private String fijo;
 	private Date Cumpleaños;
 	private String mail;
 	private Boolean creditoActivo = Boolean.FALSE;
@@ -313,19 +313,19 @@ public class Clientes implements Serializable {
 		this.direccion = direccion;
 	}
 
-	public Long getCelular() {
+	public String getCelular() {
 		return celular;
 	}
 
-	public void setCelular(Long celular) {
+	public void setCelular(String celular) {
 		this.celular = celular;
 	}
 
-	public Long getFijo() {
+	public String getFijo() {
 		return fijo;
 	}
 
-	public void setFijo(Long fijo) {
+	public void setFijo(String fijo) {
 		this.fijo = fijo;
 	}
 

@@ -9,25 +9,46 @@
 	
 	</script>
 	<h:form id="ventasTodasForm">
-	 <p:growl id="growl1" life="7000" />
-		
-		  <p:dataTable id="eventsDT" var="ventas" value="#{ventasTodas.cuadrePorCajeroVos}" selectionMode="single"
-		    rowKey="#{ventas.usuarioId2}"  emptyMessage="No hay Cajeros disponibles" style="width:100%">
-        <f:facet name="header">
+		<p:growl id="growl1" life="7000" />
+		<p:commandButton update="@form" value="Actualizar"></p:commandButton>
+		<p:dataTable id="eventsDT" var="ventas"
+			value="#{ventasTodas.cuadrePorCajeroVos}" selectionMode="single"
+			rowKey="#{ventas.usuarioId2}"
+			emptyMessage="No hay Cajeros disponibles" style="width:100%">
+			<f:facet name="header">
            Ventas Por Usuario
         </f:facet>
-        <p:ajax event="rowSelect"   />
-        <p:ajax event="rowUnselect"  />
-        <p:column headerText="Cajero">
-            <h:outputText value="#{ventas.usuarioId.nombre} #{ventas.usuarioId.apellido} (#{ventas.usuarioId.login})" />
-        </p:column>
-         <p:column headerText="Total  Facturas">
-            <h:outputText value="#{ventas.totalFacturas}" />
-        </p:column>
-        <p:column headerText="Cod. Cajero">
-            <h:outputText value="#{ventas.usuarioId2}" />
-        </p:column>
-    </p:dataTable>
-		
+			<p:ajax event="rowSelect" />
+			<p:ajax event="rowUnselect" />
+			<p:column headerText="Cajero">
+				<h:outputText
+					value="#{ventas.usuarioId.nombre} #{ventas.usuarioId.apellido} (#{ventas.usuarioId.login})" />
+			</p:column>
+			<p:column headerText="Total  Facturas">
+				<h:outputText value="#{ventas.totalFacturas}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="R. realizadas">
+				<h:outputText value="#{ventas.totalRemisiones}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Cod. Cajero">
+				<h:outputText value="#{ventas.usuarioId2}" />
+			</p:column>
+		</p:dataTable>
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="R: " /></td>
+				<td><p:outputLabel value="#{ventasTodas.remisiones}">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="F: " /></td>
+				<td><p:outputLabel value="#{ventasTodas.facturas}">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+			</tr>
+		</table>
 	</h:form>
 </ui:composition>

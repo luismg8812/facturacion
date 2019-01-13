@@ -338,7 +338,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 		tipoPagoId.add(2l);
 		tipoPagoId.add(6l);
 		documentoId.add(8l);
-		documentoId.add(10l);
+		//documentoId.add(10l);
 		try {
 			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId  in :factura "
 					+ " and d.tipoPagoId.tipoPagoId in :tipoPagoId";

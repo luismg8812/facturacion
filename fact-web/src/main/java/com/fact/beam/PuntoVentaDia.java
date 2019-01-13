@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ import com.fact.model.Invoice;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.ProductoEmpresa;
+import com.fact.model.Proporcion;
 import com.fact.model.SubProducto;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
@@ -177,8 +179,8 @@ public class PuntoVentaDia implements Serializable {
 	private String barrioClienteNew;
 	private String direcionClienteNew;
 	private String mail;
-	private Long celularClienteNew;
-	private Long fijoClienteNew;
+	private String celularClienteNew;
+	private String fijoClienteNew;
 	private Date cumpleanosClienteNew;
 	private String creditoActivoClienteNew;
 	private Long cupoCreditoClienteNew;
@@ -243,6 +245,9 @@ public class PuntoVentaDia implements Serializable {
 
 	// se activa las impresion en pantalla para qeu no gaste papel
 	OpcionUsuario activarImpresionPantalla;
+
+	// se activa las proporciones entre remisiones y facturas
+	OpcionUsuario activarProporcion;
 
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
@@ -886,95 +891,21 @@ public class PuntoVentaDia implements Serializable {
 			return "";
 		}
 		Configuracion configuracion = configuracion();
-		Long numeroImpresiones = configuracion.getNumImpresion()==null?1l:configuracion.getNumImpresion();		
+		int numeroImpresiones = configuracion.getNumImpresion()==null?1:configuracion.getNumImpresion();		
 		Long server = configuracion.getServer();
 		String impresora = impresora();
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = getEmpresa();
 			String tituloFactura = "";
+			
+			//calcular tipo de documento	
+			calcularTipoDocumento(e,server);
+		
 			getDocumento().setImpreso(1l);
 			getDocumento().setEntregado(0l);
-			if (getDocumento().getTipoDocumentoId() == null) {
-				if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
-					getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());// es
-																							// necesario
-																							// asignar
-																							// el
-																							// consecutivo
-																							// dian
-					log.info("consecutivo documentoId: " + getDocumento().getDocumentoId());
-					tituloFactura = "No. DE GUIA";
-					getDocumento().setReduccion(1l);
-					// server=2l; //facturacion en el server 2
-				} else {
-					String con = documentoService.getByUltimoId();
-					String consecutivoDian = e.getLetraConsecutivo()+con ;
-					
-					log.info("consecutivo Dian: " + consecutivoDian);
-					getDocumento().setConsecutivoDian(consecutivoDian);
-					tituloFactura = "FACTURA DE VENTA";
-					getDocumento().setReduccion(0l);
-				}
-			} else {
-				switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
-				case "9":
-					getDocumento().setConsecutivoDian( ""+getDocumento().getDocumentoId());
-					log.info("consecutivo documentoId: " + getDocumento().getDocumentoId());
-					tituloFactura = "No. DE GUIA";
-					getDocumento().setReduccion(1l);					
-					break;
-				case "10":
-					String con = documentoService.getByUltimoId();
-					// dentro de try se valida si faltan 500 facturas para
-					// llegar hasta el tope
-					try {
-						Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
-						Long consegutivo = Long.valueOf(con);
-						if (consegutivo + 500 > topeConsecutivo) {
-							FacesContext.getCurrentInstance().addMessage(null,
-									new FacesMessage(" se esta agotando el consegutivo DIAN "));
-						}
 
-					} catch (Exception e2) {
-						e2.printStackTrace();
-					}					
-					String consecutivoDian=e.getLetraConsecutivo()+con;
-					log.info("consecutivo Dian: " + consecutivoDian);
-					getDocumento().setConsecutivoDian(consecutivoDian);
-					tituloFactura = "FACTURA DE VENTA";
-					getDocumento().setReduccion(0l);
-					server = 1l;
-					break;
-				case "4":
-					getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());// es
-																							// necesario
-																							// asignar
-																							// el
-																							// consecutivo
-																							// dian
-					log.info("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
-					tituloFactura = "No. DE COTIZACIÓN";
-					server = 1l;
-					break;
-				default:
-					break;
-				}
-			}
-			// se asigna un tipo de pago
-			TipoPago tipa = new TipoPago();
-			if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
-				tipa.setTipoPagoId(2l);// pago a credito
-				getDocumento().setTipoPagoId(tipa);
-				numeroImpresiones = 2l;
-			} else {
-				if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
-					tipa.setTipoPagoId(5l);// pago con targeta
-					getDocumento().setTipoPagoId(tipa);
-				} else {
-					tipa.setTipoPagoId(1l);// pago en efectivo
-					getDocumento().setTipoPagoId(tipa);
-				}
-			}
+			
+			
 			// se verifica si hay descuento para aplicar
 			Double des1 = getDescuento() == null ? 0.0 : getDescuento();
 			if (des1 != 0.0) {
@@ -996,14 +927,19 @@ public class PuntoVentaDia implements Serializable {
 				}
 			}
 
+			// se le envia cliente varios por defecto
 			if (getDocumento().getClienteId() == null) {
 				Cliente c = new Cliente();
-				c.setClienteId(1l); // se le envia cliente varios por defecto
+				c.setClienteId(1l); 
 				c.setGuiaTransporte(0l);
 				c.setNombre("Varios");
 				c.setDireccion("");
 				getDocumento().setClienteId(c);
 			}
+			
+			// se asigna un tipo de pago
+			numeroImpresiones=asignartipoPago( numeroImpresiones);
+			
 			// se busca la mac del equipo y se le asigna a la factura
 			getDocumento().setMac(Calculos.conseguirMAC2());
 			log.info("mac:" + getDocumento().getMac());
@@ -1086,6 +1022,163 @@ public class PuntoVentaDia implements Serializable {
 		}
 		// falta auto incrementable dian
 		return "";
+	}
+
+	private int asignartipoPago(int numeroImpresiones) {
+		TipoPago tipa = new TipoPago();
+		if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
+			tipa.setTipoPagoId(2l);// pago a credito
+			getDocumento().setTipoPagoId(tipa);
+			numeroImpresiones = 2;
+			//si la factura es acredito se hace un vale
+			crearVale();
+		} else {
+			if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
+				tipa.setTipoPagoId(5l);// pago con targeta
+				getDocumento().setTipoPagoId(tipa);
+			} else {
+				tipa.setTipoPagoId(1l);// pago en efectivo
+				getDocumento().setTipoPagoId(tipa);
+			}
+		}
+		return numeroImpresiones;
+	}
+	
+	private void crearVale() {
+		Documento docu = new Documento();
+		TipoDocumento tido = new TipoDocumento();
+		TipoPago pago = new TipoPago();
+		Usuario usuario = usuario();
+		long server = 1;
+		docu.setFechaRegistro(new Date());
+		
+		docu.setClienteId(getDocumento().getClienteId());
+		docu.setSaldo(getDocumento().getTotal());
+		// se le envia tipo documento vale (Vale) por que zohan dijo
+		tido.setTipoDocumentoId(8l); 
+		docu.setTipoDocumentoId(tido);
+		// se envia tipo pago con vale, debido a que el vale es un documento a credito
+		pago.setTipoPagoId(6l); 
+		docu.setTipoPagoId(pago);
+		docu.setTotal(getDocumento().getTotal());
+		docu.setUsuarioId(usuario);
+		docu.setDetalleEntrada(getDocumento().getConsecutivoDian());
+		documentoService.save(docu, server);
+		log.info("se crea el vale por factura venta a cretido:" + docu.getDocumentoId());
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
+	}
+
+	private void calcularTipoDocumento(Empresa e, Long server) {
+		TipoDocumento tipo = new TipoDocumento();
+		if(activarProporcion != null ) {
+			try {
+				Proporcion proporcion=usuarioService.getProporcion();
+				double numero= proporcion.getVariable().doubleValue()/proporcion.getBase().doubleValue();
+				log.info("numero : "+numero);
+				Long contaRemision= proporcion.getContadorRemision();
+				Long contaFactura= proporcion.getContadorFactura();
+				double numeroProporcion= contaRemision.doubleValue()/contaFactura.doubleValue();
+				log.info("numero proporcion: "+numeroProporcion);
+				Calendar fecha = Calendar.getInstance();
+			    int dia = fecha.get(Calendar.DAY_OF_MONTH);
+			    double rangoA;
+			    double rangoB;
+			    if(dia%2==0) {
+			    	rangoA = proporcion.getRangoParA();
+			    	rangoB = proporcion.getRangoParB();
+			    }else {
+			    	rangoA = proporcion.getRangoImparA();
+			    	rangoB = proporcion.getRangoImparB();
+			    }
+			    
+			    if((getDocumento().getTotal()>=rangoA && getDocumento().getTotal()<=rangoB )) {
+			    	tipo.setTipoDocumentoId(9l);//se asigna factura
+			    }else {
+			    	if(numero<numeroProporcion || getDocumento().getClienteId().getClienteId()!=1 ) {
+						tipo.setTipoDocumentoId(10l);//se asigna factura
+						proporcion.setContadorFactura(contaFactura+1);
+					}else {
+						proporcion.setContadorRemision(contaRemision+1);
+						tipo.setTipoDocumentoId(9l);//se asigna remision	
+					}
+			    }
+				
+				usuarioService.update(proporcion);
+			} catch (Exception e2) {
+				e2.printStackTrace();
+				log.error("Error en la proporción");
+			}	
+		}
+		
+		getDocumento().setTipoDocumentoId(tipo);
+		String tituloFactura = "";
+		if (getDocumento().getTipoDocumentoId() == null) {
+			if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
+				// es necesario asignar el consecutivo dian
+				getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());
+				log.info("consecutivo documentoId: " + getDocumento().getDocumentoId());
+				tituloFactura = "No. DE GUIA";
+				getDocumento().setReduccion(1l);
+				// server=2l; //facturacion en el server 2
+			} else {
+				String con = documentoService.getByUltimoId();
+				String consecutivoDian = e.getLetraConsecutivo()+con ;	
+				log.info("consecutivo Dian: " + consecutivoDian);
+				getDocumento().setConsecutivoDian(consecutivoDian);
+				tituloFactura = "FACTURA DE VENTA";
+				getDocumento().setReduccion(0l);
+			}
+		} else {
+			if(getDocumento().getTipoDocumentoId().getTipoDocumentoId()==null) {
+				TipoDocumento ti = new TipoDocumento();
+				ti.setTipoDocumentoId(10l);
+				getDocumento().setTipoDocumentoId(ti);
+			}
+			switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId()==null?"10":getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
+			case "9":
+				getDocumento().setConsecutivoDian( ""+getDocumento().getDocumentoId());
+				log.info("consecutivo documentoId: " + getDocumento().getDocumentoId());
+				tituloFactura = "No. DE GUIA";
+				getDocumento().setReduccion(1l);					
+				break;
+			case "10":
+				String con = documentoService.getByUltimoId();
+				// dentro de try se valida si faltan 500 facturas para
+				// llegar hasta el tope
+				try {
+					Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
+					Long consegutivo = Long.valueOf(con);
+					if (consegutivo + 500 > topeConsecutivo) {
+						FacesContext.getCurrentInstance().addMessage(null,
+								new FacesMessage(" se esta agotando el consegutivo DIAN "));
+					}
+
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}					
+				String consecutivoDian=e.getLetraConsecutivo()+con;
+				log.info("consecutivo Dian: " + consecutivoDian);
+				getDocumento().setConsecutivoDian(consecutivoDian);
+				tituloFactura = "FACTURA DE VENTA";
+				getDocumento().setReduccion(0l);
+				server = 1l;
+				break;
+			case "4":
+				getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());// es
+																						// necesario
+																						// asignar
+																						// el
+																						// consecutivo
+																						// dian
+				log.info("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
+				tituloFactura = "No. DE COTIZACIÓN";
+				server = 1l;
+				break;
+			default:
+				break;
+			}
+		}
+		
 	}
 
 	private void calcularInfoDiario(Empresa e) {
@@ -1377,6 +1470,7 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("BLOQUEO_CUADRE_CAJA");
 			rutas.add("ASIGNAR_EMPLEADO_FACTURA");
 			rutas.add("ACTIVAR_COMANDAS");
+			rutas.add("ACTIVAR_PROPORCION");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarCodigoBarras(usuario, opcionesActivas);
@@ -1393,6 +1487,7 @@ public class PuntoVentaDia implements Serializable {
 			activarAsignacionEmpleadoFactura(usuario, opcionesActivas);
 			activarComandas(usuario, opcionesActivas);
 			activarImpresionPantalla(usuario, opcionesActivas);
+			activarProporcion(opcionesActivas);
 		}
 		if (op.equals("movimiento_mes")) {
 			rutas.add("CLAVE_BORRADO");
@@ -1580,6 +1675,16 @@ public class PuntoVentaDia implements Serializable {
 		} else {
 			activarImpresionPantalla = null;
 			RequestContext.getCurrentInstance().execute("activarImpresionPantalla=0;");
+		}
+	}
+	
+	public void activarProporcion( Map<String, OpcionUsuario> opcionesActivas) {
+		String ruta = "ACTIVAR_PROPORCION";
+		if (opcionesActivas.containsKey(ruta)) {
+			log.info("proporcion activo");
+			activarProporcion = opcionesActivas.get(ruta);
+		} else {
+			activarProporcion = null;
 		}
 	}
 
@@ -2248,8 +2353,8 @@ public class PuntoVentaDia implements Serializable {
 			switch (getTipoDocumentoFactura().toUpperCase()) {
 			case "F":
 				log.info("tipo documento igual a factura de venta");
-				td.setTipoDocumentoId(10l); // tipo documento igual a factura de
-											// venta
+				// tipo documento igual a factura de venta
+				td.setTipoDocumentoId(10l); 
 				setTipoDocumentoFacturaNombre("Factura de venta");
 				server = 1l;
 				//se deja factura sin enviar por defecto para facturacion electronica	
@@ -2451,7 +2556,7 @@ public class PuntoVentaDia implements Serializable {
 			Cliente cNew = new Cliente();
 			cNew.setBarrio(getBarrioClienteNew() == null ? "" : getBarrioClienteNew());
 			cNew.setMail(getMail()==null?"":getMail());
-			cNew.setCelular(getCelularClienteNew() == null ? 0l : getCelularClienteNew());
+			cNew.setCelular(getCelularClienteNew() == null ? "0" : getCelularClienteNew());
 			if (getCreditoActivoClienteNew() != null) {
 				cNew.setCreditoActivo(getCreditoActivoClienteNew().equalsIgnoreCase("S") ? 1l : 0l);
 			} else {
@@ -2462,7 +2567,7 @@ public class PuntoVentaDia implements Serializable {
 			cNew.setDireccion(getDirecionClienteNew() == null ? "" : getDirecionClienteNew());
 			cNew.setDocumento(getDocumentoClienteNew() == null ? "" : getDocumentoClienteNew());
 			cNew.setFechaRegistro(new Date());
-			cNew.setFijo(getFijoClienteNew() == null ? 0l : getFijoClienteNew());
+			cNew.setFijo(getFijoClienteNew() == null ? "0" : getFijoClienteNew());
 			if (getGuiaTransporteClienteNew() != null) {
 				cNew.setGuiaTransporte(getGuiaTransporteClienteNew().equalsIgnoreCase("S") ? 1l : 0l);
 			} else {
@@ -2920,19 +3025,19 @@ public class PuntoVentaDia implements Serializable {
 		this.direcionClienteNew = direcionClienteNew;
 	}
 
-	public Long getCelularClienteNew() {
+	public String getCelularClienteNew() {
 		return celularClienteNew;
 	}
 
-	public void setCelularClienteNew(Long celularClienteNew) {
+	public void setCelularClienteNew(String celularClienteNew) {
 		this.celularClienteNew = celularClienteNew;
 	}
 
-	public Long getFijoClienteNew() {
+	public String getFijoClienteNew() {
 		return fijoClienteNew;
 	}
 
-	public void setFijoClienteNew(Long fijoClienteNew) {
+	public void setFijoClienteNew(String fijoClienteNew) {
 		this.fijoClienteNew = fijoClienteNew;
 	}
 

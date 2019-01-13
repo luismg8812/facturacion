@@ -43,10 +43,10 @@ public class Cliente {
 	private String direccion;
 	
 	@Column(name="CELULAR")
-	private Long celular;
+	private String celular;
 
 	@Column(name="FIJO")
-	private Long fijo;
+	private String fijo;
 	
 	@Column(name="FECHA_REGISTRO")
 	private Date fechaRegistro;
@@ -127,19 +127,19 @@ public class Cliente {
 		this.direccion = direccion;
 	}
 
-	public Long getCelular() {
+	public String getCelular() {
 		return celular;
 	}
 
-	public void setCelular(Long celular) {
+	public void setCelular(String celular) {
 		this.celular = celular;
 	}
 
-	public Long getFijo() {
+	public String getFijo() {
 		return fijo;
 	}
 
-	public void setFijo(Long fijo) {
+	public void setFijo(String fijo) {
 		this.fijo = fijo;
 	}
 

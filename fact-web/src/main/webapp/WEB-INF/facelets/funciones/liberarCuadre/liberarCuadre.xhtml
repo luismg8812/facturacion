@@ -11,7 +11,10 @@
 		<p:commandButton value="Guardar" action="#{cuadreCaja.guardarLiberacion()}" process="@form" ></p:commandButton>
 		<p:dataTable var="usu" value="#{cuadreCaja.cajerosList}" id="cuadres">
 			<p:column headerText="Liberar cuadre">
-				<p:selectBooleanButton id="value2" value="#{usu.liberarCuadre}"  onLabel="Si" offLabel="No" style="width:60px" />
+				<p:selectBooleanButton id="value2" value="#{usu.liberarCuadre}"  onLabel="Si" offLabel="No" style="width:40px" />
+			</p:column>
+			<p:column headerText="Ver R.">
+				<p:selectBooleanButton id="value3" value="#{usu.verRemisiones}"  onLabel="Si" offLabel="No" style="width:40px" />
 			</p:column>
 			<p:column headerText="Cajero">
 				<h:outputText value="#{usu.nombreBodeguero} " />

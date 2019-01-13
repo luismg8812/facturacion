@@ -12,6 +12,7 @@ import com.fact.dao.UsuarioDao;
 import com.fact.model.Configuracion;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
+import com.fact.model.Proporcion;
 import com.fact.model.Usuario;
 import com.fact.model.UsuarioEmpresa;
 import com.fact.service.UsuarioService;
@@ -108,6 +109,17 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Override
 	public void save(UsuarioEmpresa usuarioEmpresa) {
 		usuarioDao.save(usuarioEmpresa);
+		
+	}
+
+	@Override
+	public Proporcion getProporcion() {
+		return usuarioDao.getProporcion();
+	}
+
+	@Override
+	public void update(Proporcion proporcion) {
+		usuarioDao.update(proporcion);
 		
 	}
 

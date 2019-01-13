@@ -16,7 +16,9 @@ public class BodegueroVo {
 	private Long  cantidadFacturas;
 	private EntregaMercancia entregaMercancia;
 	private Boolean liberarCuadre; // campo utilizado para activar la liberacion de cuadre
+	private Boolean verRemisiones; // campo utilizado para activar la vista de remisiones en el cuadre
 	private OpcionUsuario opcionCuadre;//variable utilizada para almacenar la opcion de cuadre de caja (id=15)
+	private OpcionUsuario opcionVerRemisiones;//variable utilizada para almacenar la opcion ver remision (id=22)
 	public String getNombreBodeguero() {
 		return nombreBodeguero;
 	}
@@ -70,6 +72,18 @@ public class BodegueroVo {
 	}
 	public void setOpcionCuadre(OpcionUsuario opcionCuadre) {
 		this.opcionCuadre = opcionCuadre;
+	}
+	public Boolean getVerRemisiones() {
+		return verRemisiones;
+	}
+	public void setVerRemisiones(Boolean verRemisiones) {
+		this.verRemisiones = verRemisiones;
+	}
+	public OpcionUsuario getOpcionVerRemisiones() {
+		return opcionVerRemisiones;
+	}
+	public void setOpcionVerRemisiones(OpcionUsuario opcionVerRemisiones) {
+		this.opcionVerRemisiones = opcionVerRemisiones;
 	}
 	
 }

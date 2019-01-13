@@ -47,13 +47,13 @@ public class Configuracion {
 	private Long gramera;
 	
 	@Column(name="NUM_IMPRESION")
-	private Long numImpresion;
+	private Integer numImpresion;
 	
-	public Long getNumImpresion() {
+	public Integer getNumImpresion() {
 		return numImpresion;
 	}
 
-	public void setNumImpresion(Long numImpresion) {
+	public void setNumImpresion(Integer numImpresion) {
 		this.numImpresion = numImpresion;
 	}
 

@@ -17,7 +17,7 @@
 		document.getElementById('abonos123:crearVale1').style.display = 'none';
 	}
 	</script>
-	<h:form  id="abonos123" >
+	<h:form id="abonos123">
 		<p:growl id="growl1" life="7000" />
 		<table width="100%" align="center">
 			<tr>
@@ -43,39 +43,39 @@
 		<table width="100%" align="center">
 			<tr>
 				<td><p:commandButton value="Buscar" process="@form"
-						update="documentosCliente" id="buscar"
+						update="@form" id="buscar"
 						actionListener="#{abonos.buscarAbonosCliente}" /> <p:commandButton
-						value="Salir" onclick="PF('bonos').hide();" /> <p:commandButton
-						value="Crear Vale" onclick="showDialogoVale()" /></td>
+						value="Salir" onclick="PF('bonos').hide();" /> </td>
 			</tr>
 		</table>
 		<p:dataTable id="documentosCliente" var="docu"
+			 selectionMode="single"  rowKey="#{docu.documentoId}"
 			value="#{abonos.documentosCliente}" style="font-size: 9px"
-			scrollable="true" scrollHeight="150"
-			emptyMessage="No hay facturas disponibles para El proveedor seleccionado">
+			scrollable="true" scrollHeight="220"
+			emptyMessage="No hay facturas disponibles para El Cliente seleccionado">
 			<f:facet name="header">
             Facturas
         </f:facet>
+        <p:ajax event="rowSelect" listener="#{abonos.abrirPopupAbonoCliente}" update="@form" />
 			<p:column headerText="Opción">
-				<p:commandLink value="Detalle"
-					action="#{abonos.consultarAbonosCliente(docu)}" />
+				<p:commandButton value="Detalle"
+					action="#{abonos.consultarAbonosCliente(docu)}" />			
 				<br />
-				<p:commandButton value="Crear"
-					action="#{abonos.abrirPopupAbonoCliente(docu)}"
-					onclick="showDialocrearAbonoCliente()" />
-				<br />
-				<p:commandLink value="Eliminar" action="#{abonos.borrarVale(docu)}"
-					update="documentosCliente,growl1,@form" />
+				
 
 			</p:column>
 			<p:column headerText="No. Documento">
-				<h:outputText value="#{docu.consecutivoDian}" />
+				<h:outputText value="#{docu.detalleEntrada}" />
 			</p:column>
 			<p:column headerText="Valor">
-				<h:outputText value="#{docu.total}" />
+				<h:outputText value="#{docu.total}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
 			</p:column>
 			<p:column headerText="Saldo">
-				<h:outputText value="#{docu.saldo}" />
+				<h:outputText value="#{docu.saldo}" > 
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
 			</p:column>
 			<p:column headerText="No. Abonos">
 				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
@@ -88,30 +88,21 @@
 			<p:graphicImage url="/images/bloqBar.gif" />
 		</p:blockUI>
 
-		<p:panelGrid columns="1" layout="grid" style="display:none"
-			id="crearAbonoCliente">
-			<div>
+		<p:panelGrid columns="1" layout="grid" id="crearAbonoCliente">
+			
 				<ui:include
 					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
-			</div>
+			
 		</p:panelGrid>
-		<p:panelGrid columns="1" layout="grid" style="display:none"
-			id="crearVale1">
-			<div>
-				<ui:include
-					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearVale.xhtml" />
-			</div>
-		</p:panelGrid>
-
-		<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos"
+		
+	</h:form>
+	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos" width="400px"
 			closeOnEscape="true" showEffect="fade" resizable="false">
 			<div>
 				<ui:include
 					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
 			</div>
 		</p:dialog>
-	</h:form>
-
 
 
 </ui:composition>

@@ -25,6 +25,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 
 import com.fact.model.Documento;
 import com.fact.model.Empresa;
@@ -61,6 +62,7 @@ public class Invoice implements Serializable {
 	// busqueda
 	private List<Documento> documentos;
 	private List<Documento> documentosSelect;
+	private Double totalFacturas;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -98,6 +100,19 @@ public class Invoice implements Serializable {
 				"Se descartaron exitosamente los documentos para facturación electronica", ""));
 		setDocumentosSelect(null);
 		RequestContext.getCurrentInstance().execute("PF('dlg1').hide();");
+	}
+	
+	public void sumarFacturas(SelectEvent event) {
+		log.info("metodo de sumar facturas");
+		double sumar=0.0;
+		for(Documento d: getDocumentosSelect()) {
+		sumar+=	d.getTotal();
+		}
+		setTotalFacturas(sumar);
+	}
+
+	public void rumarFacturas(SelectEvent event) {
+		log.info("metodo de restar facturas");
 	}
 
 	public void enviarDocumentosDIAN() {
@@ -229,5 +244,15 @@ public class Invoice implements Serializable {
 	public void setDocumentosSelect(List<Documento> documentosSelect) {
 		this.documentosSelect = documentosSelect;
 	}
+
+	public Double getTotalFacturas() {
+		return totalFacturas;
+	}
+
+	public void setTotalFacturas(Double totalFacturas) {
+		this.totalFacturas = totalFacturas;
+	}
+	
+	
 
 }

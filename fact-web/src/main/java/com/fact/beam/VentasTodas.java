@@ -35,7 +35,8 @@ public class VentasTodas implements Serializable {
 	
 	
 	private List<CuadrePorCajeroVo> cuadrePorCajeroVos= new ArrayList<>();
-
+	private Double remisiones;
+	private Double facturas;
 
 	public List<CuadrePorCajeroVo> getCuadrePorCajeroVos()  {
 	    List<Usuario> usuarios = usuarioService.getByAll();
@@ -45,6 +46,7 @@ public class VentasTodas implements Serializable {
 	    	cpc.setUsuarioId(u);
 	    	cpc.setUsuarioId2(u.getUsuarioId());
 	    	cpc.setTotalFacturas(getTotalFaturasToDay(u));
+	    	cpc.setTotalRemisiones(getTotalRemisionesToDay(u));
 	    	cuadretemp.add(cpc);
 	    }
 	    cuadrePorCajeroVos=cuadretemp;
@@ -64,10 +66,56 @@ public class VentasTodas implements Serializable {
 		Double total = 0.0;
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {
-				total = total + d.getTotal().doubleValue();
+				total = total + d.getTotal();
 			}
 		}
 		return total;
 	}
+	
+	public Double getTotalRemisionesToDay(Usuario usuario)  {
+		List<Long>tipoDocumentoId = new ArrayList<>();
+		tipoDocumentoId.add(9l); // tipo documento factura de salida
+		Boolean conCierre=true;		
+		List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, usuario.getUsuarioId(), conCierre, 1l);
+		Double total = 0.0;
+		for (Documento d : factDia) {
+			if (d.getTotal() != null) {
+				total = total + d.getTotal();
+			}
+		}
+		return total;
+	}
+
+
+	public Double getRemisiones() {
+		remisiones=0.0;
+		List<Usuario> usuarios = usuarioService.getByAll();
+	    for(Usuario u: usuarios){
+	    	remisiones+=getTotalRemisionesToDay(u);
+	    }
+		return remisiones;
+	}
+
+
+	public void setRemisiones(Double remisiones) {
+		this.remisiones = remisiones;
+	}
+
+
+	public Double getFacturas() {
+		facturas=0.0;
+		List<Usuario> usuarios = usuarioService.getByAll();
+	    for(Usuario u: usuarios){
+	    	facturas+=getTotalFaturasToDay(u);
+	    }
+		return facturas;
+	}
+
+
+	public void setFacturas(Double facturas) {
+		this.facturas = facturas;
+	}
+	
+	
 
 }

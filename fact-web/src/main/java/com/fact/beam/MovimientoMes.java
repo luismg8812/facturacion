@@ -1034,7 +1034,7 @@ public class MovimientoMes implements Serializable {
 		}
 		log.info("entra a imprimir entrada almacen");
 		Configuracion configuracion = configuracion();
-		Long numeroImpresiones = configuracion.getNumImpresion();
+		int numeroImpresiones = configuracion.getNumImpresion();
 		Long server = configuracion.getServer();
 		String impresora = impresora();
 		Empresa e = getEmpresa();

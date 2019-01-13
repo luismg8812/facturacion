@@ -19,6 +19,7 @@ import com.fact.dao.UsuarioDao;
 import com.fact.model.Configuracion;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
+import com.fact.model.Proporcion;
 import com.fact.model.Usuario;
 import com.fact.model.UsuarioEmpresa;
 import com.fact.utils.HibernateUtil;
@@ -234,6 +235,22 @@ public class UsuarioDaoImpl implements UsuarioDao{
 		}
 		return configuracion;
 	}
+	
+	@Override
+	public Proporcion getProporcion() throws FactException {
+		Session session = HibernateUtil.getSessionFactory().openSession();;
+		session.beginTransaction();
+		Proporcion proporcion=null;
+		try {
+			String sql = "select c from Proporcion c where c.proporcionId = 1";
+			Query query = session.createQuery(sql);
+			proporcion = (Proporcion) query.uniqueResult(); 
+			session.close();
+		} catch (Exception e) {
+			throw e;
+		}
+		return proporcion;
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -291,6 +308,26 @@ public class UsuarioDaoImpl implements UsuarioDao{
 				session.close();
 			}
 		}
+	}
+
+	@Override
+	public void update(Proporcion proporcion) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction transaction= session.beginTransaction();
+		try {
+			session.update(proporcion);
+			transaction.commit();
+		} catch (Exception e) {
+			if (transaction!=null) {
+				transaction.rollback();
+			}
+			throw e;
+		}finally{
+			if (session!=null) {
+				session.close();
+			}
+		}
+		
 	}
 	
 	

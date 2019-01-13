@@ -1348,6 +1348,15 @@ public class Impresion {
 				(e.getImpuesto().equals("IVA") ? "IVA" : "IPO") + ":                   "
 						+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
+		double porcRetencion = documentoImp.getClienteId().getRetencion()==null?0.0:documentoImp.getClienteId().getRetencion();
+		porcRetencion=porcRetencion/100;
+		Double rete =  ((documentoImp.getTotal() / (1 +porcRetencion )) * porcRetencion);
+		documento
+		.add(new Paragraph(new Phrase(lineSpacing,
+				"Retención:             "
+						+ Calculos.cortarCantidades(formatea.format(rete), 13),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
+																			// LEGAL
 																			// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL

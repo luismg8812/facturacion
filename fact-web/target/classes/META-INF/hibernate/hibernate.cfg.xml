@@ -42,5 +42,6 @@
     	<mapping class="com.fact.model.TipoEmpresa" />
     	<mapping class="com.fact.model.UsuarioEmpresa" />
     	<mapping class="com.fact.model.Invoice" />
+    	<mapping class="com.fact.model.Proporcion" />
     </session-factory>
 </hibernate-configuration>

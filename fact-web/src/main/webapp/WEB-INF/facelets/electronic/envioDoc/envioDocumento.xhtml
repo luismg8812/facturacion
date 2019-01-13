@@ -14,8 +14,12 @@
 			<tr>
 				<td><p:commandButton value="Buscar" process="@form"
 						update="checkboxDT" id="buscar" actionListener="#{invoice.buscarSinEnviar()}" /> 
-					<p:commandButton value="Enviar" type="button" onclick="PF('dlg2').show();" /></td>
-				<td> <p:commandButton value="Descartar" type="button" onclick="PF('dlg1').show();" /></td>
+					<p:commandButton value="Enviar" type="button" onclick="PF('dlg2').show();" />
+					<p:commandButton value="Descartar" type="button" onclick="PF('dlg1').show();" /></td>
+				<td> <p:outputLabel value="Facturas: "></p:outputLabel> 
+				<h:outputText value="#{invoice.totalFacturas}" id="totalFacturas" >
+            	<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+            </h:outputText></td>
 			</tr>
 		</table>
 		 <p:dataTable id="checkboxDT" var="car" value="#{invoice.documentos}" selection="#{invoice.documentosSelect}" rowKey="#{car.documentoId}" style="margin-bottom:0"
@@ -23,6 +27,8 @@
         <f:facet name="header">
             Documentos
         </f:facet>
+        <p:ajax event="rowSelect" listener="#{invoice.sumarFacturas}" update=":envioDocumentosForm:totalFacturas" />
+        <p:ajax event="rowUnselect" listener="#{invoice.rumarFacturas}" update=":envioDocumentosForm:totalFacturas" />
         <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
         <p:column headerText="Detalle">
             <p:commandButton icon="ui-icon-search" title="Detalle" />
@@ -34,6 +40,12 @@
             <h:outputText value="#{car.total}" >
             	<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
             </h:outputText>
+        </p:column>
+        <p:column headerText="Cliente">
+            <h:outputText value="#{car.clienteId.nombre} - #{car.clienteId.documento}" />
+        </p:column>
+        <p:column headerText="Tipo documento">
+            <h:outputText value="#{car.tipoDocumentoId.nombre}" />
         </p:column>
         <p:column headerText="Fecha">
             <h:outputText value="#{car.fechaRegistro}" />

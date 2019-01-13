@@ -10,6 +10,7 @@ import com.fact.api.FactException;
 import com.fact.model.Configuracion;
 import com.fact.model.Empleado;
 import com.fact.model.Empresa;
+import com.fact.model.Proporcion;
 import com.fact.model.Usuario;
 import com.fact.model.UsuarioEmpresa;
 
@@ -32,6 +33,8 @@ public interface UsuarioService {
 			String identificacionEmpleado)throws FactException;
 	
 	List<Empleado> getByEmpleadosAll()throws FactException;
+	Proporcion getProporcion();
+	void update(Proporcion proporcion);
 	
 	
 	

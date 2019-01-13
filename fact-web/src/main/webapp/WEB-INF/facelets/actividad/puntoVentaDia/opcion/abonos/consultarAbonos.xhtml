@@ -14,10 +14,14 @@
 		<p:outputLabel value="#{abonos.documentoSelect.documentoId}" />
 		
 		<p:outputLabel value="Total Factura: " />
-		<p:inputNumber value="#{abonos.documentoSelect.total}" readonly="true"/>
-		
+			<h:outputText value="#{abonos.documentoSelect.total}">
+				<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+			</h:outputText>
+
 			<p:outputLabel value="Saldo: " />
-				<p:inputNumber value="#{abonos.documentoSelect.saldo}" readonly="true"/>
+			<h:outputText value="#{abonos.documentoSelect.saldo}">
+				<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+			</h:outputText>
 				<p:commandButton value="Salir" onclick="PF('consultarAbono').hide();"/>
 				<p:commandButton value="Actualizar" update="@form" />
 		</p:panelGrid>
@@ -30,7 +34,9 @@
             Abonos
         </f:facet>
 			<p:column headerText="Cantidad Abono">
-				<p:inputNumber value="#{docu.cantidadAbono}" readonly="true"/>
+			<h:outputText value="#{docu.cantidadAbono}" > 
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
 			</p:column>
 			<p:column headerText="Fecha">
 				<h:outputText value="#{docu.fechaRegistro}">
@@ -41,7 +47,7 @@
 				<h:outputText value="#{docu.tipoPagoId.nombre}" />
 			</p:column>
 			<p:column headerText="No. Documento">
-				<h:outputText value="#{docu.documentoId.documentoId}" />
+				<h:outputText value="#{docu.documentoId.detalleEntrada}" />
 			</p:column>
 		</p:dataTable>
 	</h:form>

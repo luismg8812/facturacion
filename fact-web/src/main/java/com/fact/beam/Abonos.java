@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.SelectEvent;
 
 import com.fact.model.Abono;
 import com.fact.model.Cliente;
@@ -138,13 +139,10 @@ public class Abonos implements Serializable {
 					FacesContext.getCurrentInstance().addMessage(null,
 							new FacesMessage("El proveedor solo tiene un cupo maximo de " + pro.getCupoCredito()));
 					return;
-				}
-				
+				}				
 			}
 			docu.setProveedorId(pro);
-			
 		}
-		
 		if(getClienteId()!=null){
 			cli = clienteService.getById(getClienteId());
 			if (getClienteId() == null || cli.getCreditoActivo() == null || cli.getCreditoActivo() != 1l) {
@@ -264,6 +262,26 @@ public class Abonos implements Serializable {
 	}
 
 	public void crearAbono() {
+		
+		if(getAbonoNew().getDocumentoId()==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Debe seleccionar un documento"));
+			return;
+		}
+		if(getTipoPago()==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El tipo de pago es obligatorio"));
+			return;
+		}
+		if(getCantidadNew()==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La cantidad es obligatoria"));
+			return;
+		}
+		Documento docu = getAbonoNew().getDocumentoId();
+		Double saldoNew = docu.getSaldo() == null ? 0.0 : docu.getSaldo();
+		double saldoTemp = saldoNew - getCantidadNew();
+		if(saldoTemp<0) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El valor pagado excede el saldo"));
+			return;
+		}
 		getAbonoNew().setCantidadAbono(getCantidadNew());
 		TipoPago tipa = new TipoPago();
 		tipa.setTipoPagoId(getTipoPago());
@@ -272,15 +290,15 @@ public class Abonos implements Serializable {
 		getAbonoNew().setUsuarioId(usuario);
 		getAbonoNew().setTipoPagoId(tipa);
 		abonoService.save(getAbonoNew());
-		Documento docu = getAbonoNew().getDocumentoId();
-		Double saldoNew = docu.getSaldo() == null ? 0.0 : docu.getSaldo();
-		docu.setSaldo(saldoNew - getCantidadNew());
+		
+		docu.setSaldo(saldoTemp);
 		documentoService.update(docu, server);
 		log.info("se crea el abono:" + getAbonoNew().getAbonoId());
 		RequestContext.getCurrentInstance().execute("PF('crearAbono').hide();");
 		//RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').hide();");
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Abono Creado exitosamente"));
 		setAbonoNew(null);
+		RequestContext.getCurrentInstance().update("@form");
 	}
 
 	public void consultarAbonos(Documento docu) {
@@ -306,13 +324,13 @@ public class Abonos implements Serializable {
 		RequestContext.getCurrentInstance().update("@form");
 	}
 
-	public void abrirPopupAbonoCliente(Documento docu) {
+	public void abrirPopupAbonoCliente(SelectEvent event) {
+		Documento docu= (Documento) event.getObject();
 		log.info("entra a popup crear abono:" + docu.getDocumentoId());
 		getAbonoNew().setDocumentoId(docu);
 		getAbonoNew().setFechaRegistro(new Date());
 		setCantidadNew(null);
-		//RequestContext.getCurrentInstance().execute("PF('crearAbonoCliente').show();");
-		RequestContext.getCurrentInstance().update("@form");
+		//RequestContext.getCurrentInstance().update("@form");
 	}
 
 	public void borrarVale(Documento docu) {

@@ -14,6 +14,7 @@ public class CuadrePorCajeroVo {
 	private Double base;
 	private Double recargas;
 	private Double totalIngresos;
+	private Double totalRemisiones;
 	private Long usuarioId2;
 	
 	public Double getTotalFacturas() {
@@ -64,6 +65,13 @@ public class CuadrePorCajeroVo {
 	public void setUsuarioId2(Long usuarioId2) {
 		this.usuarioId2 = usuarioId2;
 	}
+	public Double getTotalRemisiones() {
+		return totalRemisiones;
+	}
+	public void setTotalRemisiones(Double totalRemisiones) {
+		this.totalRemisiones = totalRemisiones;
+	}
+	
 	
 	
 }
