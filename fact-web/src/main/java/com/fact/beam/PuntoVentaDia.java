@@ -142,7 +142,7 @@ public class PuntoVentaDia implements Serializable {
 	List<Empleado> empleadosAll;
 	String codigoInterno;
 	Producto articulo;
-	Double Unidad;
+	Double unidad;
 	Double cantidad;
 	Double parcial;
 	Documento documento;
@@ -348,7 +348,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public List<String> completeCodigo(String query) {
-		List<String> codProductos = new ArrayList<String>();
+		List<String> codProductos = new ArrayList<>();
 		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId() != null) {
 				String articul = p.getProductoId().getProductoId().toString();
@@ -416,8 +416,8 @@ public class PuntoVentaDia implements Serializable {
 			if (p.getProductoId().getNombre() != null) {
 				String articul = p.getProductoId().getNombre().toUpperCase().trim();
 				// si en algun momento se necesita
-				 if(articul.indexOf(query.toUpperCase()) != -1) {
-				//if (articul.startsWith(query.toUpperCase().trim())) {
+				 //if(articul.indexOf(query.toUpperCase()) != -1) {
+				if (articul.startsWith(query.toUpperCase().trim())) {
 					 Producto producto = p.getProductoId();
 					 producto.setCantidad(p.getCantidad());
 					 producto.setCostoPublico(p.getPrecio());
@@ -905,32 +905,13 @@ public class PuntoVentaDia implements Serializable {
 			
 			//calcular tipo de documento	
 			calcularTipoDocumento(e,server);
-		
+
 			getDocumento().setImpreso(1l);
 			getDocumento().setEntregado(0l);
 
-			
-			
 			// se verifica si hay descuento para aplicar
-			Double des1 = getDescuento() == null ? 0.0 : getDescuento();
-			if (des1 != 0.0) {
-				Double desTemp = 0.0;
-				getAplicarDescuento();
-				if (getDescuento() < -100.0 || getDescuento() > 100.0) {
-					getDocumento().setDescuento(getDescuento());
-					desTemp = (getDescuento() * 100) / getDocumento().getTotal();
-					log.info("% descuento:" + desTemp);
-				} else {
-					getDocumento().setDescuento((getDocumento().getTotal() * getDescuento()) / 100);
-					desTemp = getDescuento();
-					log.info("% descuento:" + desTemp);
-				}
-				if (desTemp < -15 || desTemp > 15) {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage("El descuento no puede ser mayor o menor al 15%"));
-					return "";
-				}
-			}
+			verificarDescuento();
+			
 
 			// se le envia cliente varios por defecto
 			if (getDocumento().getClienteId() == null) {
@@ -954,9 +935,8 @@ public class PuntoVentaDia implements Serializable {
 			calcularInfoDiario(e);
 			String imp = e.getImpresion().toUpperCase();
 			log.info("numero de impresiones: "+numeroImpresiones);
-			for (int i = 0; i < numeroImpresiones; i++) { // si la factura fue
-															// a// credito se//
-															// imprime dos veces
+			// si la factura fue a credito se imprime dos veces
+			for (int i = 0; i < numeroImpresiones; i++) { 
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
@@ -965,7 +945,6 @@ public class PuntoVentaDia implements Serializable {
 				case "BIG":
 					// quitar la dependencia del ireport
 					imprimirTemporal(tituloFactura);
-					// pdf = imprimirBig(tituloFactura);
 					break;
 				case "PDF":
 					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
@@ -996,7 +975,6 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute("pagina='submenu';");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('opciones:op_mov_mes1_content').style.display='inline';");
-			// RequestContext.getCurrentInstance().execute("opciones:Imp_movi_mes1");
 			RequestContext.getCurrentInstance().execute("document.getElementById('excento_input').value='';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('gravado_input').value='';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('iva_input').value='';");
@@ -1027,6 +1005,29 @@ public class PuntoVentaDia implements Serializable {
 		}
 		// falta auto incrementable dian
 		return "";
+	}
+
+	private void verificarDescuento() {
+		Double des1 = getDescuento() == null ? 0.0 : getDescuento();
+		if (des1 != 0.0) {
+			Double desTemp = 0.0;
+			getAplicarDescuento();
+			if (getDescuento() < -100.0 || getDescuento() > 100.0) {
+				getDocumento().setDescuento(getDescuento());
+				desTemp = (getDescuento() * 100) / getDocumento().getTotal();
+				log.info("% descuento:" + desTemp);
+			} else {
+				getDocumento().setDescuento((getDocumento().getTotal() * getDescuento()) / 100);
+				desTemp = getDescuento();
+				log.info("% descuento:" + desTemp);
+			}
+			if (desTemp < -15 || desTemp > 15) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage("El descuento no puede ser mayor o menor al 15%"));
+				return ;
+			}
+		}
+		
 	}
 
 	private int asignartipoPago(int numeroImpresiones) {
@@ -2306,7 +2307,7 @@ public class PuntoVentaDia implements Serializable {
 				productoEmpresaService.update(productoEmpresa);
 			}
 		} catch (Exception e) {
-			log.info("!!error borrando el producto:" + d.getProductoId().getProductoId());
+			log.error("!!error borrando el producto:" + d.getProductoId().getProductoId());
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error borrando Productos"));
 		}
 		RequestContext.getCurrentInstance().update("borrarTabla:checkboxDT");
@@ -2679,11 +2680,11 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public Double getUnidad() {
-		return Unidad;
+		return unidad;
 	}
 
 	public void setUnidad(Double unidad) {
-		Unidad = unidad;
+		this.unidad = unidad;
 	}
 
 	public List<DocumentoDetalleVo> getProductos() {
