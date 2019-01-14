@@ -352,15 +352,12 @@ public class BorrarFacturas implements Serializable {
 		return documentosVo;
 	}
 
-	public void buscarFacturas() {
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fhoyIni = getFechaIni() == null ? "" : df.format(getFechaIni());
-		String fhoyFin = getFechaFin() == null ? "" : df.format(getFechaFin());
+	public void buscarFacturas() {		
 		Date hoy; 
 		Date hoyfin;
 		try {
-			hoy = df.parse(fhoyIni);
-			hoyfin = df.parse(fhoyFin);
+			hoy = Calculos.fechaInicial(getFechaIni());
+			hoyfin = Calculos.fechaFinal(getFechaFin());
 		} catch (Exception e) {
 			hoy = null;
 			hoyfin = null;

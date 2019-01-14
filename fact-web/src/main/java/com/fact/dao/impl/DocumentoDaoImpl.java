@@ -390,10 +390,10 @@ public class DocumentoDaoImpl implements DocumentoDao {
 				sql += " and d.clienteId.clienteId = :clienteId ";
 			}
 			if (fechaIni != null) {
-				sql += " and to_number(to_char(d.fechaRegistro,'yyyyMMdd'))  >= to_number(to_char(:fechaInicio,'yyyyMMdd')) ";
+				sql += " and d.fechaRegistro  >=:fechaInicio ";
 			}
 			if (fechaFin != null) {
-				sql += " and to_number(to_char(d.fechaRegistro,'yyyyMMdd')) <= to_number(to_char(:fechafin,'yyyyMMdd'))  ";
+				sql += " and d.fechaRegistro  <=:fechafin  ";
 			}
 			if (documentoId != null && !documentoId.isEmpty()) {
 				sql += " and (d.documentoId =:documentoId )";

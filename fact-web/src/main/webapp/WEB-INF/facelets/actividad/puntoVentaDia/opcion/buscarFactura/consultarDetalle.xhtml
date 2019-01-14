@@ -14,7 +14,9 @@
 		<p:outputLabel value="#{borrarFacturas.docuConsulta.consecutivoDian}" />
 		
 		<p:outputLabel value="Total iva: " />
-		<p:inputNumber value="#{borrarFacturas.docuConsulta.iva}" readonly="true"/>
+		<p:outputLabel value="#{borrarFacturas.docuConsulta.iva}" >
+			<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+		</p:outputLabel>
 		
 			<p:outputLabel value="Fecha registro: " />
 				<h:outputText  value="#{borrarFacturas.docuConsulta.fechaRegistro}" >
@@ -36,7 +38,9 @@
 				<h:outputText value="#{docu.cantidad}"/>
 			</p:column>
 			<p:column headerText="Parcial">
-				<h:outputText value="#{docu.parcial}" />
+				<h:outputText value="#{docu.parcial}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
 			</p:column>
 		</p:dataTable>
 	</h:form>
