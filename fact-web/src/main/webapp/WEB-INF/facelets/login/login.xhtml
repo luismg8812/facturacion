@@ -5,7 +5,7 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:p="http://primefaces.org/ui">
-	
+
 	<script type="text/javascript">
 	function cambioAbajo(e){
 		
@@ -24,46 +24,38 @@
 	}
 	
 </script>
-<h:form id="login">
- <p:growl id="growl" life="7000" />  
-<p:hotkey bind="enter" actionListener="#{login.logueo()}"  update="@all" process="@this"></p:hotkey>
-	<table width="35%" align="center"> 
-		<tr>
-			<td>
-			<p:focus for="loginForm:login:usuario"/>
-				<p:outputLabel value="Usuario"/>	
-			</td>
-			<td>
-				<p:inputText id="usuario" required="true" style="width:50%" 
-				requiredMessage="El usuario es requerido" 
-				value="#{login.usuario}" onkeydown="cambioAbajo(event)"/>
-			
-			</td>
-		</tr>
-		<tr>
-			<td >
-				<p:outputLabel value="Password" />
-			</td>
-			<td>
-			
-				<p:password id="pass" onkeydown="cambioAbajo(event)"  style="width:50%"
-				required="true" requiredMessage="El password es requerido"
-				value="#{login.password}"/>
-				<p:spacer width="1%"/>
-				 <p:commandButton value="Entrar" id="entrar"  
-				 update="growl,usuario,pass" onkeydown="cambioAbajo(event)" 
-				 action="#{login.logueo()}"></p:commandButton>
-			</td>
-			<td align="left" width="10%">
-			
-			</td>
-		</tr>
-		<tr>
-			<td>
-			
-			</td>
-		</tr>
-	</table>
+	<h:form id="login">
+		<p:growl id="growl" life="7000" />
+		<p:hotkey bind="enter" actionListener="#{login.logueo()}"
+			update="@all" process="@this"></p:hotkey>
+		<table width="35%" align="center">
+			<tr>
+				<td><p:focus for="loginForm:login:usuario" /> <p:outputLabel
+						value="Usuario" /></td>
+				<td><p:inputText id="usuario" required="true" style="width:50%"
+						requiredMessage="El usuario es requerido" value="#{login.usuario}"
+						onkeydown="cambioAbajo(event)" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Password" /></td>
+				<td><p:password id="pass" onkeydown="cambioAbajo(event)"
+						style="width:50%" required="true"
+						requiredMessage="El password es requerido"
+						value="#{login.password}" /> <p:spacer width="1%" /> <p:commandButton
+						value="Entrar" id="entrar" update="growl,usuario,pass"
+						onkeydown="cambioAbajo(event)" action="#{login.logueo()}"></p:commandButton>
+				</td>
+				<td align="left" width="10%"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><p:commandLink id="ajax"
+						actionListener="#{login.tutoriales}" style="margin-right:20px;">
+						<h:outputText value=" Tutoriales" />
+						<p:ajax event="click" listener="#{login.tutoriales}"></p:ajax>
+					</p:commandLink></td>
+			</tr>
+		</table>
 	</h:form>
 
 </ui:composition>

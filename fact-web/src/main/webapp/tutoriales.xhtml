@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>NICESOFT</title>
+</h:head>
+<body>
+	<h:form id="tutoriales" enctype="multipart/form-data">
+		<div id="header">
+			<h2 style="margin-top: 5">Tutoriales</h2>
+			<p:separator />
+			<br />
+			<p:commandLink  process="@this" value="INGRESO - INICIO DE SESIÓN MODULO DE FACTURACIÓN" actionListener="#{login.tutorialesRuta('1')}" style="margin-right:12px;"/>
+			<br />
+			<p:commandLink  process="@this" value="CREACIÓN USUARIOS DEL SISTEMA MODULO FACTURACIÓN" actionListener="#{login.tutorialesRuta('2')}" style="margin-right:12px;"/>
+			<br />
+			<p:commandLink  process="@this" value="CREACIÓN - MODIFICACIÓN DE CLIENTES MODULO DE FACTURACIÓN" actionListener="#{login.tutorialesRuta('3')}" style="margin-right:12px;"/>
+			<br />
+			<p:commandLink  process="@this" value="CREACIÓN - MODIFICACIÓN DE PRODUCTO MODULO DE FACTURACIÓN" actionListener="#{login.tutorialesRuta('4')}" style="margin-right:12px;"/>
+			<br />
+			<p:commandLink  process="@this" value="INVENTARIO FÍSICO MODULO FACTURACIÓN" actionListener="#{login.tutorialesRuta('5')}" style="margin-right:12px;"/>
+			
+						
+						
+				
+			
+   
+
+		</div>
+	</h:form>
+</body>
+</html>

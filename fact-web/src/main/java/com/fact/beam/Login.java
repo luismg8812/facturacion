@@ -192,6 +192,41 @@ public class Login implements Serializable {
 		}
 	}
 	
+	public void tutoriales() throws IOException {
+		String contex=FacesContext.getCurrentInstance().getExternalContext().getContextName();
+		String url = "/"+contex+"/tutoriales.jsf"; //url donde se redirige la pantalla
+		log.info(url);
+		FacesContext fc = FacesContext.getCurrentInstance();	
+		fc.getExternalContext().redirect(url);// redirecciona la página
+	}
+	
+	public void tutorialesRuta(String url) throws IOException {
+		String ruta = "";
+		switch (url) {
+		case "1":
+			ruta = "https://www.youtube.com/watch?v=4yTj-AaJ1fU&feature=youtu.be";
+			break;
+		case "2":
+			ruta = "https://www.youtube.com/watch?v=KQVq6mKb52M&feature=youtu.be";
+			break;
+		case "3":
+			ruta = "https://www.youtube.com/watch?v=Qeg4t1m39b8&feature=youtu.be";
+			break;
+		case "4":
+			ruta = "https://www.youtube.com/watch?v=9oRN0SLMvg8&feature=youtu.be";
+			break;	
+		case "5":
+			ruta = "https://www.youtube.com/watch?v=7nJsMsUYhXA&feature=youtu.be";
+			break;	
+			
+		default:
+			break;
+		}
+		log.info(url);
+		FacesContext fc = FacesContext.getCurrentInstance();	
+		fc.getExternalContext().redirect(ruta);// redirecciona la página
+	}
+	
 	 private List<String> leerArchivoImpresora() {
 	      File archivo = null;
 	      FileReader fr = null;
