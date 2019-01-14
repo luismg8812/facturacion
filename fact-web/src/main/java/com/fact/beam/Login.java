@@ -7,9 +7,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
@@ -24,10 +27,13 @@ import org.jboss.logging.Logger;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
+import com.fact.api.ImpresorasInstaladas;
 import com.fact.model.Configuracion;
 import com.fact.model.Empresa;
 import com.fact.model.Usuario;
 import com.fact.service.UsuarioService;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 @ManagedBean
 @SessionScoped
@@ -171,7 +177,10 @@ public class Login implements Serializable {
 			}
 			log.info("usuarioLogin: " + getUsuarioLogin().getLogin());
 			//setImpresora(getUsuarioLogin().getImpresora() == null ? "" : getUsuarioLogin().getImpresora());
-			sessionMap.put("impresora",leerArchivoImpresora());
+			List<String> impresoras = leerArchivoImpresora();
+			for(int i=1; i<=impresoras.size();i++) {
+				sessionMap.put("impresora"+i, impresoras.get(i-1) );
+			}		
 			sessionMap.put("empresa",usuarioService.getByEmpresa(getUsuarioLogin().getUsuarioId()));
 			//setEmpresaLogin(); // consulta la // empresa
 			String contex=FacesContext.getCurrentInstance().getExternalContext().getContextName();
@@ -183,41 +192,41 @@ public class Login implements Serializable {
 		}
 	}
 	
-	 private String leerArchivoImpresora() {
+	 private List<String> leerArchivoImpresora() {
 	      File archivo = null;
 	      FileReader fr = null;
 	      BufferedReader br = null;
 	      String linea="";
+	      ImpresorasInstaladas fromJson;
 	      try {
-	       
 	    	  HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-	   		
 	         archivo = new File ("\\\\"+request.getRemoteAddr()+"\\facturacion\\impresora.txt");
 	         fr = new FileReader (archivo);
 	         br = new BufferedReader(fr);
-
-	         // Lectura del fichero
-	         
-	         while((linea=br.readLine())!=null)
-	           return linea;
-	      }
-	      catch(Exception e){
+	         String json = "";
+	         // Lectura del fichero         
+	         while((linea=br.readLine())!=null) {
+	        	 json += br.readLine(); 
+	         }
+	         Gson gson = new Gson();
+	          fromJson = gson.fromJson(json, ImpresorasInstaladas.class);
+	         log.info("archivo de impresion configurado en el equipo: "+fromJson.getImpresoras().toString());				
+	      }catch(Exception e){
 	         e.printStackTrace();
-	         return linea;
+	         log.error("error con el archivo de impresoras");
+	         return new ArrayList<>();
 	      }finally{
-	         // En el finally cerramos el fichero, para asegurarnos
-	         // que se cierra tanto si todo va bien como si salta 
+	         // En el finally cerramos el fichero, para asegurarnos que se cierra tanto si todo va bien como si salta 
 	         // una excepcion.
 	         try{                    
 	            if( null != fr ){   
 	               fr.close();     
 	            }                  
 	         }catch (Exception e2){ 
-	            e2.printStackTrace();
-	            return linea;
+	            e2.printStackTrace();         
 	         }
 	      }
-	      return linea;
+	      return fromJson.getImpresoras();
 	   }
 
 	public String getUsuario() {

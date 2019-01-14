@@ -1080,28 +1080,45 @@ public class Impresion {
 	}
 	
 	public static String imprimirTxt(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config,String impresora,String enPantalla) throws IOException {
+			Configuracion config,String impresora,String enPantalla,Empresa e) throws IOException {
 		log.info("entra a imprimir");
-		Empresa e = Login.getEmpresaLogin();
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".txt";
 		File archivo = new File(pdf);
 		BufferedWriter bw;
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
+		String TituloFactura = "";
+		int tamanoTxt=40;
+		switch ("" + documentoImp.getTipoDocumentoId().getTipoDocumentoId()) {
+		case "10":
+			TituloFactura = "FACTURA DE VENTA";
+			break;
+		case "9":
+			TituloFactura = "GUÍA DE REMISIÓN";
+			break;
+		case "4":
+			TituloFactura = "COTIZACIÓN";	
+			break;
+		case "8":
+			TituloFactura = "VALE";	
+			break;
+		default:
+			break;
+		}
 		bw = new BufferedWriter(new FileWriter(archivo));
 		bw.write("----------------------------------------\n");
-		bw.write(">>" + e.getNombre() + "<<\n");
-		bw.write("" + e.getRepresentante() + "\n");
-		bw.write("NIT. " + e.getNit() + "   " + e.getRegimen() + "\n");
-		bw.write("" + e.getDireccion() + "\n");
-		bw.write("" + e.getBarrio() + "            \n");
-		bw.write("" + e.getCiudad() + "-" + e.getDepartamento() + "\n");
-		bw.write("TEL: " + e.getTelefonoFijo() + "\n");
-		bw.write("FACTURA DE VENTA: " + documentoImp.getConsecutivoDian());
+		bw.write(Calculos.centrarDescripcion(e.getNombre(), tamanoTxt)  + "\n");
+		bw.write(Calculos.centrarDescripcion( e.getRepresentante(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("NIT. " + e.getNit() + " " + e.getRegimen(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion(e.getDireccion(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion(e.getBarrio(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion(e.getCiudad() + "-" + e.getDepartamento(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("TEL: " + e.getTelefonoFijo(), tamanoTxt) + "\n");
+		bw.write("\n");
+		bw.write(TituloFactura+": " + documentoImp.getConsecutivoDian());
 		bw.write("\n" +df.format(documentoImp.getFechaRegistro())) ;
 		bw.write("\nCAJERO: " + documentoImp.getUsuarioId().getUsuarioId() + " "
-				+ documentoImp.getUsuarioId().getNombre() + " " + documentoImp.getUsuarioId().getApellido()
-				+ "\nCLIENTE: ");
+				+ documentoImp.getUsuarioId().getNombre() + " " + documentoImp.getUsuarioId().getApellido());
 		bw.write("\nCLIENTE: " + (documentoImp.getClienteId() == null ? "VARIOS": documentoImp.getClienteId().getNombre()));
 		bw.write("\nNIT/CC:" + documentoImp.getClienteId().getDocumento());
 		if(documentoImp.getEmpleadoId()!=null){
@@ -1129,8 +1146,8 @@ public class Impresion {
 		bw.write("\nVr. Pago con Tarjeta:        " + Calculos.cortarCantidades(formatea.format(pago), 11));
 		bw.write("\nVr. Comisión Tarjeta:        " + Calculos.cortarCantidades(formatea.format(0l), 11));
 		bw.write("\nVr. Total Factura:           " + Calculos.cortarCantidades(formatea.format(documentoImp.getTotal()), 11));
-		bw.write("\nEfectivo:		 	  " + Calculos.cortarCantidades(formatea.format(documentoImp.getEfectivo()==null?0.0:documentoImp.getEfectivo()), 11));
-		bw.write("\nCambio:			      " + Calculos.cortarCantidades(formatea.format(documentoImp.getCambio()==null?0.0:documentoImp.getCambio()), 11));
+		bw.write("\nEfectivo:		 	         " + Calculos.cortarCantidades(formatea.format(documentoImp.getEfectivo()==null?0.0:documentoImp.getEfectivo()), 11));
+		bw.write("\nCambio:			             " + Calculos.cortarCantidades(formatea.format(documentoImp.getCambio()==null?0.0:documentoImp.getCambio()), 11));
 		bw.write("\n");
 		bw.write("\nEl servicio voluntario no es obligatorio");
 		bw.write("\ny puede ser modificado por el cliente.");
@@ -1175,10 +1192,7 @@ public class Impresion {
 				break;
 			}
 		}
-		
-		
-		
-		
+	
 		//defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 		if (defaultPrintService != null) {
 			DocPrintJob printJob = defaultPrintService.createPrintJob();
@@ -1228,6 +1242,9 @@ public class Impresion {
 			break;
 		case "4":
 			TituloFactura = "COTIZACIÓN";	
+			break;
+		case "8":
+			TituloFactura = "VALE";	
 			break;
 		default:
 			break;

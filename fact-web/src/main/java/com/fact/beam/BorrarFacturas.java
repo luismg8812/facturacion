@@ -309,9 +309,8 @@ public class BorrarFacturas implements Serializable {
 		return yourVariable;
 	}
 
-	private String impresora() {
-		String yourVariable = (String) sessionMap.get("impresora");
-		return yourVariable;
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 
 	public void barrarTodas() {
@@ -385,7 +384,7 @@ public class BorrarFacturas implements Serializable {
 		log.info("entra a imprimir");
 		log.info("Documento:" + docu.getDocumentoId());
 		Configuracion configuracion = configuracion();
-		String impresora = impresora();
+		String impresora = impresora("1");
 		String enPantalla = "false"; 
 		Empresa e = getEmpresa();
 		String tituloFactura = "";
@@ -421,7 +420,7 @@ public class BorrarFacturas implements Serializable {
 		switch (imp) {
 		case "TXT":
 			pdf = Impresion.imprimirTxt(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora,"true");
+					configuracion, impresora,"true",e);
 			break;
 		case "BIG":
 			pdf = imprimirTemporal(tituloFactura, docu);
@@ -599,7 +598,7 @@ public class BorrarFacturas implements Serializable {
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
-		String impresara = impresora();
+		String impresara = impresora("1");
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 		log.info("Number of printers configured: " + printServices.length);
 		for (PrintService printer : printServices) {

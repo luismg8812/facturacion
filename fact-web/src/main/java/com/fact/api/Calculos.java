@@ -156,6 +156,30 @@ public class Calculos {
 		}
 		return nombre;
 	}
+	
+	/**
+	 * metodo encargado de centrar la descripcion para las facturas e informes
+	 * 
+	 * @param nombre
+	 * @param maxTamañoNombre
+	 * @return
+	 */
+	public static String centrarDescripcion(String nombre, int maxTamanoNombre) {
+		nombre = nombre == null ? " " : nombre;
+		int tamanoNombre = nombre.length();
+		String espacio="";
+		if(maxTamanoNombre<tamanoNombre) {
+			return nombre;
+		}
+		int tamanoEspacio = (maxTamanoNombre-tamanoNombre)/2;
+		if (tamanoNombre != 0) {
+			for (int j = 0; j < tamanoEspacio; j++) {
+				espacio += " ";
+			}
+		}				
+		nombre=espacio+nombre;
+		return nombre;
+	}
 
 	public static String cortarCantidades(Double cantidad, int maxTamañoUnit) {
 		String unit = "";

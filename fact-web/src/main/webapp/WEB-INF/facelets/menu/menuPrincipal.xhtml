@@ -28,6 +28,7 @@
 	var asignarEmpleadoFactura=0; //variable que controla la asignacion de los empleados a la factura
 	var activarComandas=0; //variable que controla la activacion de las comandas para los restaurantes
 	var activarImpresionPantalla=0;//variables que controla si se imprimen facturas en pantalla 
+	var activarMultiplesImpresoras=0;//variable que controla si activa o no la casilla de multiples impresoras
 	function info(elEvento) {
 		var texto = document.getElementById('menuPrincipal') //acceso al sitio de escritura
         var evento = elEvento || window.event // definir objeto event
@@ -438,7 +439,7 @@
 	</p:dialog>
 	<p:dialog widgetVar="imprimir" id="imprimir"  onShow="document.getElementById('pogoTargeta').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';"
 		style="font-size: 16px" header="Valor a cacelar">
-		<div style="width: 250px; height: 340px">
+		<div style="width: 350px; height: 400px">
 			<ui:include
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/imprimir.xhtml" />
 		</div>

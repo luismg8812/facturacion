@@ -28,36 +28,35 @@
 					 document.getElementById('campoImp').style.display='inline';
 			    	 document.getElementById('impresion_inp').focus();
 			    	 document.getElementById('impresion_inp').value='S';
-				     document.getElementById('impresion_inp').select();	
-				    // var vefectivo= parseFloat( document.getElementById('efectivo_input').value.replace(",","") );				     
-				    // var vtotal = parseFloat(document.getElementById('total1_input').value.replace(",","") );
-				    // var vvalortarget = parseFloat(document.getElementById('valorTargeta_input').value.replace(",","") );			     
-				    // var vcambio=parseFloat( vefectivo+vvalortarget - vtotal);
-				    // document.getElementById('cambio_input').value=  vcambio;
-				     
-				 }
-			     
+				     document.getElementById('impresion_inp').select();				     
+				 }		     
 			     if(elec=='valorTargeta_input'){
 			    	 document.getElementById('efectivo_input').focus();
 					 document.getElementById('efectivo_input').select();
 				 }
-
 			     if(elec=='cartera'){
 			    	 document.getElementById('pogoTargeta').focus();
 					 document.getElementById('pogoTargeta').value='N';
 					 document.getElementById('pogoTargeta').select();
 				 }
-
 			     if(elec=='descuento'){
-			    	 document.getElementById('cartera').focus();
-					 document.getElementById('cartera').value='N';
-					 document.getElementById('cartera').select();
-				 }
-			     
+				     if(activarMultiplesImpresoras==1){
+				    	 document.getElementById('impresoras').focus();
+						 document.getElementById('impresoras').value='1';
+						 document.getElementById('impresoras').select();
+					 }else{
+						 document.getElementById('cartera').focus();
+						 document.getElementById('cartera').value='N';
+						 document.getElementById('cartera').select();
+					 }
+			    	
+				 }	     
+		     }	 
+			 if(elec=='impresoras'){
+		    	 document.getElementById('cartera').focus();
+				 document.getElementById('cartera').value='N';
+				 document.getElementById('cartera').select();
 		     }
-
-			
-			 
 		     if(e.keyCode==83  ){
 			     if(elec =='pogoTargeta'){
 			    	// document.getElementById('valorTargeta_input').setAttribute('aria-disabled', false);
@@ -78,8 +77,7 @@
 		     if(e.keyCode==78){
 			     if(elec =='pogoTargeta'){
 			    	// document.getElementById('valorTargeta_input').setAttribute('aria-disabled', true) ;
-				    document.getElementById('efectivo_input').focus();
-				    
+				    document.getElementById('efectivo_input').focus();				    
 					document.getElementById('efectivo_input').select();
 				    document.getElementById('pogoTargeta').value='N';
 					return "";	
@@ -137,6 +135,13 @@
 			<td><p:inputText value="#{puntoVentaDia.descuento}" id="descuento" size="10" onkeyup="controlTeclasImp(event,this)" 
 							 style="display:#{puntoVentaDia.descuentosActivo}">
 				 <p:focus for="descuento" />
+				 <p:ajax  event="keyup" partialSubmit="true" />
+			</p:inputText> </td>
+		</tr>
+		<tr>
+			<td><p:outputLabel value="Impresora:" style="display:#{puntoVentaDia.activarMultiplesImpresoras}" id="impresorasLabel" /></td>
+			<td><p:inputText value="#{puntoVentaDia.impresoras}" id="impresoras" size="2" onkeyup="controlTeclasImp(event,this)" 
+							 style="display:#{puntoVentaDia.activarMultiplesImpresoras}">		 
 				 <p:ajax  event="keyup" partialSubmit="true" />
 			</p:inputText> </td>
 		</tr>

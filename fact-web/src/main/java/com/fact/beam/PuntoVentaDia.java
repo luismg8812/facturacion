@@ -202,6 +202,7 @@ public class PuntoVentaDia implements Serializable {
 	Double px01;
 	String parciaPopup;
 	Double descuento;
+	String impresoras;
 
 	// modificar factura
 	String modFactura;
@@ -248,6 +249,10 @@ public class PuntoVentaDia implements Serializable {
 
 	// se activa las proporciones entre remisiones y facturas
 	OpcionUsuario activarProporcion;
+	
+	// se activa impresion por varias impresoras en el sistem
+	OpcionUsuario activarMultiplesImpresoras;
+
 
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
@@ -273,8 +278,8 @@ public class PuntoVentaDia implements Serializable {
 		return (Empresa) sessionMap.get("empresa");
 	}
 
-	private String impresora() {
-		return (String) sessionMap.get("impresora");
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 
 	private void productoFind(String completo) {
@@ -488,7 +493,7 @@ public class PuntoVentaDia implements Serializable {
 	public String precioX01() {
 		if (getPx01() != null) {
 			Long server = 1l;
-			log.info("dio enter en presio x01");
+			log.info("dio enter en precio x01");
 			if (getDocumento().getDocumentoId() == null) {
 				Documento docOjb = new Documento();
 				TipoDocumento td = new TipoDocumento();
@@ -893,7 +898,7 @@ public class PuntoVentaDia implements Serializable {
 		Configuracion configuracion = configuracion();
 		int numeroImpresiones = configuracion.getNumImpresion()==null?1:configuracion.getNumImpresion();		
 		Long server = configuracion.getServer();
-		String impresora = impresora();
+		String impresora = impresora(getImpresoras());
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = getEmpresa();
 			String tituloFactura = "";
@@ -955,7 +960,7 @@ public class PuntoVentaDia implements Serializable {
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla);
+					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla,e);
 					break;
 				case "BIG":
 					// quitar la dependencia del ireport
@@ -1026,21 +1031,29 @@ public class PuntoVentaDia implements Serializable {
 
 	private int asignartipoPago(int numeroImpresiones) {
 		TipoPago tipa = new TipoPago();
-		if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
-			tipa.setTipoPagoId(2l);// pago a credito
+		//si el documento es un vale se agrega sus tipos de pago
+		if(getDocumento().getTipoDocumentoId().getTipoDocumentoId()==8l) {
+			log.info("se asigna tipo de pago al vale");
+			tipa.setTipoPagoId(6l); 
 			getDocumento().setTipoPagoId(tipa);
-			numeroImpresiones = 2;
-			//si la factura es acredito se hace un vale
-			crearVale();
-		} else {
-			if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
-				tipa.setTipoPagoId(5l);// pago con targeta
+		}else {
+			if (getCartera()!=null && getCartera().equalsIgnoreCase("S")) {
+				tipa.setTipoPagoId(2l);// pago a credito
 				getDocumento().setTipoPagoId(tipa);
+				numeroImpresiones = 2;
+				//si la factura es acredito se hace un vale
+				crearVale();
 			} else {
-				tipa.setTipoPagoId(1l);// pago en efectivo
-				getDocumento().setTipoPagoId(tipa);
+				if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
+					tipa.setTipoPagoId(5l);// pago con targeta
+					getDocumento().setTipoPagoId(tipa);
+				} else {
+					tipa.setTipoPagoId(1l);// pago en efectivo
+					getDocumento().setTipoPagoId(tipa);
+				}
 			}
 		}
+		
 		return numeroImpresiones;
 	}
 	
@@ -1070,7 +1083,7 @@ public class PuntoVentaDia implements Serializable {
 
 	private void calcularTipoDocumento(Empresa e, Long server) {
 		TipoDocumento tipo = new TipoDocumento();
-		if(activarProporcion != null ) {
+		if(activarProporcion != null && (getDocumento().getTipoDocumentoId().getTipoDocumentoId()==10l && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==9l) ) {
 			try {
 				Proporcion proporcion=usuarioService.getProporcion();
 				double numero= proporcion.getVariable().doubleValue()/proporcion.getBase().doubleValue();
@@ -1109,8 +1122,9 @@ public class PuntoVentaDia implements Serializable {
 				log.error("Error en la proporción");
 			}	
 		}
-		
-		getDocumento().setTipoDocumentoId(tipo);
+		if(getDocumento().getTipoDocumentoId().getTipoDocumentoId()==9l && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==10l) {
+			getDocumento().setTipoDocumentoId(tipo);
+		}
 		String tituloFactura = "";
 		if (getDocumento().getTipoDocumentoId() == null) {
 			if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
@@ -1401,7 +1415,7 @@ public class PuntoVentaDia implements Serializable {
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 
-		String impresara = impresora();
+		String impresara = impresora(getImpresoras());
 		log.info("impresoraUsuario: " + impresara);
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 		log.info("Number of printers configured: " + printServices.length);
@@ -1471,6 +1485,7 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("ASIGNAR_EMPLEADO_FACTURA");
 			rutas.add("ACTIVAR_COMANDAS");
 			rutas.add("ACTIVAR_PROPORCION");
+			rutas.add("ACTIVAR_MULTIPLE_IMPRESORA");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarCodigoBarras(usuario, opcionesActivas);
@@ -1488,6 +1503,7 @@ public class PuntoVentaDia implements Serializable {
 			activarComandas(usuario, opcionesActivas);
 			activarImpresionPantalla(usuario, opcionesActivas);
 			activarProporcion(opcionesActivas);
+			activarMultipesImpresoras( opcionesActivas);
 		}
 		if (op.equals("movimiento_mes")) {
 			rutas.add("CLAVE_BORRADO");
@@ -1687,6 +1703,18 @@ public class PuntoVentaDia implements Serializable {
 			activarProporcion = null;
 		}
 	}
+	
+	public void activarMultipesImpresoras( Map<String, OpcionUsuario> opcionesActivas) {
+		String ruta = "ACTIVAR_MULTIPLE_IMPRESORA";
+		if (opcionesActivas.containsKey(ruta)) {
+			log.info("tiene multiple impresora activo");
+			RequestContext.getCurrentInstance().execute("activarMultiplesImpresoras=1;");
+			activarMultiplesImpresoras = opcionesActivas.get(ruta);
+		} else {
+			activarMultiplesImpresoras = null;
+			RequestContext.getCurrentInstance().execute("activarMultiplesImpresoras=0;");
+		}
+	}
 
 	public void limpiar() {
 		log.info("limpiar");
@@ -1819,7 +1847,7 @@ public class PuntoVentaDia implements Serializable {
 			return;
 		}
 		Configuracion configuracion = configuracion();
-		String impresora = impresora();
+		String impresora = impresora(getImpresoras());
 		Empresa e = Login.getEmpresaLogin();
 		String imp = e.getImpresion().toUpperCase();
 		List<Long> gruposId = new ArrayList<>();
@@ -2373,6 +2401,12 @@ public class PuntoVentaDia implements Serializable {
 				td.setTipoDocumentoId(4l); // tipo documento igual a cotizacion
 				server = 1l;
 				break;
+			case "V":
+				log.info("tipo documento igual a vale");
+				setTipoDocumentoFacturaNombre("Vale");
+				td.setTipoDocumentoId(8l); // tipo documento igual a vale
+				server = 1l;
+				break;	
 			case "":
 			default:
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Tipo documento no valido"));
@@ -2399,7 +2433,6 @@ public class PuntoVentaDia implements Serializable {
 				log.info("Documento:" + getDocumento().getDocumentoId());
 				log.info("Usuario:" + usuario().getLogin());
 			} else {
-
 				Documento docOjb = getDocumento();
 				docOjb.setTipoDocumentoId(td);
 				if (clienteSelect == null) {
@@ -2457,7 +2490,6 @@ public class PuntoVentaDia implements Serializable {
 		
 		// // campos
 		if (asignarEmpleadoFactura != null) {
-			log.info("po aqui pasa");
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('nombreEmpleado').style.display='inline';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('nombreEmpleado_input').focus();");
@@ -3120,6 +3152,14 @@ public class PuntoVentaDia implements Serializable {
 	public void setDescuentosActivo(OpcionUsuario descuentosActivo) {
 		this.descuentosActivo = descuentosActivo;
 	}
+	
+	public String getActivarMultiplesImpresoras() {
+		return activarMultiplesImpresoras == null ? "none" : "inline";
+	}
+
+	public void setActivarMultiplesImpresoras(OpcionUsuario activarMultiplesImpresoras) {
+		this.activarMultiplesImpresoras = activarMultiplesImpresoras;
+	}
 
 	public String getCopiaFacuta() {
 		return copiaFacuta == null ? "none" : "inline";
@@ -3175,6 +3215,14 @@ public class PuntoVentaDia implements Serializable {
 
 	public void setMail(String mail) {
 		this.mail = mail;
+	}
+	
+	public String getImpresoras() {
+		return impresoras;
+	}
+
+	public void setImpresoras(String impresoras) {
+		this.impresoras = impresoras;
 	}
 	
 }

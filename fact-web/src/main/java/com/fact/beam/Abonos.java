@@ -213,32 +213,7 @@ public class Abonos implements Serializable {
 		setAvances(documentoService.getByClienteAndProveedorAndTipo(getClienteId(), getProveedorId(), tipoId));
 	}
 
-	public void crearVale() {
-		Documento docu = new Documento();
-		Cliente cli = new Cliente();
-		TipoDocumento tido = new TipoDocumento();
-		TipoPago pago = new TipoPago();
-		Usuario usuario = usuario();
-		long server = 1;
-		docu.setFechaRegistro(new Date());
-		cli.setClienteId(getClienteId());
-		docu.setClienteId(cli);
-		docu.setSaldo(getCantidadTotal());
-		tido.setTipoDocumentoId(8l); // se le envia tipo documento vale (Vale)
-										// // por que zohan dijo
-		docu.setTipoDocumentoId(tido);
-		pago.setTipoPagoId(6l); // se envia tipo pago con vale, debido a que el
-								// vale es un documento a credito
-		docu.setTipoPagoId(pago);
-		docu.setTotal(getCantidadTotal());
-		docu.setUsuarioId(usuario);
-		docu.setDetalleEntrada(getDetalleNew());
-		documentoService.save(docu, server);
-		log.info("se crea el vale por abonos Cliente:" + docu.getDocumentoId());
-		//RequestContext.getCurrentInstance().execute("PF('crearVale').hide();");
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
-	}
-
+	
 	public void crearDocumento() {
 		Documento docu = new Documento();
 		Proveedor pro = new Proveedor();

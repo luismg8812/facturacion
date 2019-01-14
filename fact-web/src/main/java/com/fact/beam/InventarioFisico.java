@@ -91,8 +91,8 @@ public class InventarioFisico implements Serializable {
 		return  (Configuracion) sessionMap.get("configuracion");
 	}
 	
-	private String impresora() {		
-		return (String) sessionMap.get("impresora");
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 	
 	private Empresa getEmpresa() {
@@ -268,7 +268,7 @@ public class InventarioFisico implements Serializable {
 		Empresa e = Login.getEmpresaLogin();
 		Configuracion configuracion = configuracion();
 		String imp = e.getImpresion().toUpperCase();
-		String impresora=impresora();
+		String impresora=impresora("1");
 		switch (imp) {
 		case "TXT":
 			// pdf = imprimirTxt();

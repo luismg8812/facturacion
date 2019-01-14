@@ -157,8 +157,8 @@ public class Reduccion implements Serializable {
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 	
-	private String impresora() {
-		return (String) sessionMap.get("impresora");
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 	
 	private Configuracion configuracion() {
@@ -641,7 +641,7 @@ public class Reduccion implements Serializable {
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
 		log.info("nombre impresora predeterminada: " + defaultPrintService.getName());
-		String impresara = impresora();
+		String impresara = impresora("1");
 		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 		log.info("Number of printers configured: " + printServices.length);
 		for (PrintService printer : printServices) {
@@ -667,7 +667,7 @@ public class Reduccion implements Serializable {
 			throws DocumentException, ParseException, IOException, PrinterException {		
 		String userPropietario = (String) sessionMap.get("userPropietario");
 		Empresa e = getEmpresa();
-		String impresora = impresora();
+		String impresora = impresora("1");
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 		String fhoyIni = df.format(id.getFechaInforme());
@@ -974,7 +974,7 @@ public class Reduccion implements Serializable {
 		documento.close();
 		if("false".equals(exportar)) {
 			Usuario usuario = (Usuario) sessionMap.get("userLogin");
-			String impresara = impresora();
+			String impresara = impresora("1");
 			PrinterJob job = PrinterJob.getPrinterJob();
 			PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
 			log.info("Number of printers configured: " + printServices.length);

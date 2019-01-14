@@ -78,9 +78,8 @@ public class Devoluciones  implements Serializable{
 		return yourVariable;
 	}
 	
-	private String impresora() {
-		String yourVariable = (String) sessionMap.get("impresora");
-		return yourVariable;
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 	
 	public String  buscar(){
@@ -157,7 +156,7 @@ public class Devoluciones  implements Serializable{
 	public String imprimirFactura() throws DocumentException, IOException, PrinterException {
 		System.out.println("entra a imprimir");
 		Configuracion configuracion = configuracion();
-		String impresora=impresora();
+		String impresora=impresora("1");
 		String enPantalla = "false"; 
 		long server =1;
 			documentoSelect.setImpreso(1l);

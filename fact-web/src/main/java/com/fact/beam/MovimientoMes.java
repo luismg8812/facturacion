@@ -221,8 +221,8 @@ public class MovimientoMes implements Serializable {
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 
-	private String impresora() {
-		return (String) sessionMap.get("impresora");
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 	
 	private Empresa getEmpresa() {
@@ -1036,7 +1036,7 @@ public class MovimientoMes implements Serializable {
 		Configuracion configuracion = configuracion();
 		int numeroImpresiones = configuracion.getNumImpresion();
 		Long server = configuracion.getServer();
-		String impresora = impresora();
+		String impresora = impresora("1");
 		Empresa e = getEmpresa();
 		getDocumento().setImpreso(1l);
 		getDocumento().setEntregado(0l);
@@ -1060,7 +1060,7 @@ public class MovimientoMes implements Serializable {
 			setProductos(Calculos.ordenar(getProductos()));
 			switch (imp) {
 			case "TXT":
-				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,"true");
+				Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,"true",e);
 				break;
 			case "BIG":
 				// quitar la dependencia del ireport
