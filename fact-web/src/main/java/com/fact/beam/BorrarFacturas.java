@@ -417,7 +417,7 @@ public class BorrarFacturas implements Serializable {
 		switch (imp) {
 		case "TXT":
 			pdf = Impresion.imprimirTxt(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora,"true",e);
+					configuracion, impresora,enPantalla,e);
 			break;
 		case "BIG":
 			pdf = imprimirTemporal(tituloFactura, docu);
@@ -438,6 +438,7 @@ public class BorrarFacturas implements Serializable {
 					configuracion, descuentoEnFactura, impresora,e);
 			break;
 		default:
+			log.info("imprime por defecto en pdf");
 			pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
 					configuracion, impresora,enPantalla,e);
 			break;

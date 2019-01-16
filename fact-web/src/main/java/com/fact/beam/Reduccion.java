@@ -166,23 +166,24 @@ public class Reduccion implements Serializable {
 	}
 
 
-	public void imprimirinforme(InfoDiario id,String exportar) throws DocumentException, IOException, PrinterException, ParseException {
+	public String imprimirinforme(InfoDiario id,String exportar) throws DocumentException, IOException, PrinterException, ParseException {
 		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		int numeroImpresiones = 1;
+		String ruta = "";
 		for (int i = 0; i < numeroImpresiones; i++) {
 			switch (imp) {
 			case "TXT":
-				imprimirBig(id);
+				ruta=imprimirBig(id,exportar);
 				break;
 			case "BIG":
-				imprimirBig(id);
+				ruta=imprimirBig(id,exportar);
 				break;
 			case "PDF":
-				imprimirInfoPDF(id,exportar);
+				ruta=imprimirInfoPDF(id,exportar);
 				break;
 			case "BIG_PDF":
-				imprimirInfoPDF(id,exportar);
+				ruta=imprimirInfoPDF(id,exportar);
 				break;
 
 			default:
@@ -191,11 +192,11 @@ public class Reduccion implements Serializable {
 			}
 		}
 
-		// imprimirTXT(id);
+		return ruta;
 
 	}
 
-	public void imprimirinformePropietario(InfoDiario id)
+	public String imprimirinformePropietario(InfoDiario id)
 			throws DocumentException, IOException, PrinterException, ParseException {
 		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
@@ -206,6 +207,7 @@ public class Reduccion implements Serializable {
 		// los
 		// cajeros
 		int numeroImpresiones = 1;
+		String ruta="";
 		for (int i = 0; i < numeroImpresiones; i++) {
 			switch (imp) {
 			case "TXT":
@@ -215,11 +217,11 @@ public class Reduccion implements Serializable {
 				// imprimirBig(id);
 				break;
 			case "PDF":
-				imprimirInfoPDF(id,"false");
+				ruta=imprimirInfoPDF(id,"false");
 
 				break;
 			case "BIG_PDF":
-				imprimirInformePropietarioPDF(id, numeroInforme, usuario, configuracion, uList);
+				ruta=imprimirInformePropietarioPDF(id, numeroInforme, usuario, configuracion, uList);
 				break;
 
 			default:
@@ -227,7 +229,7 @@ public class Reduccion implements Serializable {
 				break;
 			}
 		}
-
+		return ruta;
 	}
 
 	public String imprimirInformePropietarioPDF(InfoDiario id, String numeroImforme, Usuario usuario,
@@ -438,7 +440,7 @@ public class Reduccion implements Serializable {
 		return "";
 	}
 
-	private void imprimirBig(InfoDiario id) throws ParseException {
+	private String imprimirBig(InfoDiario id, String exportar) throws ParseException {
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, Object> sessionMap = externalContext.getSessionMap();
 		String userPropietario = (String) sessionMap.get("userPropietario");
@@ -448,8 +450,8 @@ public class Reduccion implements Serializable {
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
 		String fhoyIni = df.format(id.getFechaInforme());
-		String carpeta = "C:\\facturas\\infoDiario";
-		String pdf = "\\informeDiario_" + fhoyIni + ".txt";
+		String carpeta = "C:\\facturas\\infoDiario\\";
+		String pdf = "informeDiario_" + fhoyIni + ".txt";
 		File folder = new File(carpeta);
 		folder.mkdirs();
 		folder = new File(carpeta + pdf);
@@ -461,23 +463,25 @@ public class Reduccion implements Serializable {
 			bw.write(e.getNombre().toUpperCase() + "\n");
 			bw.write("NIT. " + e.getNit() + "\n");
 			bw.write("Comprobante de Informe Diario\n");
-			bw.write("Fecha: " + df2.format(id.getFechaInforme()) + "\n");
-			bw.write("                                        \n");
+			bw.write("FECHA INFORME: " + df2.format(id.getFechaInforme()) + "\n");
+			bw.write("\n");
 			bw.write("Identificador del servidor: " + Calculos.conseguirMAC() + "\n");
 			bw.write("______________________________________________________________________________\n");
 			bw.write("N° Factura Inicial  N° de Factura Final  Cantidad Fac.  Valor Total Facturado\n");
 			bw.write("______________________________________________________________________________\n");
 			bw.write("" + Calculos.cortarDescripcion(id.getDocumentoInicio(), 18) + "  "
-					+ Calculos.cortarDescripcion(e.getLetraConsecutivo()+id.getDocumentoFin(), 19) + "  "
+					+ Calculos.cortarDescripcion(id.getDocumentoFin(), 19) + "  "
 					+ Calculos.cortarCantidades(id.getCantidadDocumentos(), 13) + "  "
 					+ Calculos.cortarCantidades(formatea.format(id.getTotalReducido()), 21) + "\n");
-			bw.write("                                        \n");
+			bw.write("\n");
 			bw.write("Descriminación de ventas atendidas por Computador.\n");
 			bw.write("______________________________________________________\n");
 			bw.write("Computador            Cant. Fac.  Vr. Total Facturado\n");
 			bw.write("______________________________________________________\n");
 			// se trae la lista de las mac que facturaron
 			List<String> macs = documentoService.getMagList();
+			Long porcenReduccion = id.getPorcReduccion()==null?getReduccion() :id.getPorcReduccion();
+			Double redu = (porcenReduccion==null?0.0:porcenReduccion / 100.0);
 			for (String m : macs) {
 				numeroDocumentosMac = 0.0;
 
@@ -535,7 +539,7 @@ public class Reduccion implements Serializable {
 				bw.write("TOTAL REMISIONES:...........: "
 						+ Calculos.cortarCantidades(formatea.format(id.getTotalRemisiones()), maxTamaño) + "\n");
 			}
-			Double redu = (id.getPorcReduccion() == 0 ? 0.0 : id.getPorcReduccion()) / 100;
+			
 			Configuracion configuracion = configuracion();
 			Long server = configuracion.getServer();
 			List<Usuario> uList = usuarioService.getByRol(2l); // se traen solo
@@ -636,6 +640,7 @@ public class Reduccion implements Serializable {
 		if (inputStream == null) {
 			// return;
 		}
+		if("false".equals(exportar)) {
 		DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
 		Doc document = new SimpleDoc(inputStream, docFormat, null);
 		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
@@ -660,10 +665,11 @@ public class Reduccion implements Serializable {
 				ex.printStackTrace();
 			}
 		}
-
+		}
+		return  carpeta + pdf+";txt";
 	}
 
-	private void imprimirInfoPDF(InfoDiario id,String exportar)
+	private String imprimirInfoPDF(InfoDiario id,String exportar)
 			throws DocumentException, ParseException, IOException, PrinterException {		
 		String userPropietario = (String) sessionMap.get("userPropietario");
 		Empresa e = getEmpresa();
@@ -993,7 +999,7 @@ public class Reduccion implements Serializable {
 			document.close();
 		}
 		
-
+		return  carpeta + pdf+";pdf";
 	}
 
 	public void guardar() {
@@ -1414,15 +1420,14 @@ public class Reduccion implements Serializable {
 	public StreamedContent getFileXls(InfoDiario info)
 			throws DocumentException, IOException, PrinterException, ParseException {
 		StreamedContent file = null;
-		imprimirinforme(info,"true");
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fhoyIni = df.format(info.getFechaInforme());
-		String carpeta = "C:\\facturas\\infoDiario";
-		String pdf = "\\informeDiario_" + fhoyIni + ".pdf";
-		File f = new File(carpeta + pdf);
+		String ruta= imprimirinforme(info,"true");		
+		String[] parts = ruta.split(";");
+		ruta = parts[0];
+		String estencion = parts[1]; 
+		File f = new File(ruta);
 		InputStream stream = new FileInputStream(f);
 		if (stream != null) {
-			file = new DefaultStreamedContent(stream, "application/pdf", pdf);
+			file = new DefaultStreamedContent(stream, "application/pdf", ruta);
 		}
 		return file;
 	}

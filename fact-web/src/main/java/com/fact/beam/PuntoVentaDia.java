@@ -390,13 +390,13 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('px01_input_input').select();");
 			RequestContext.getCurrentInstance().update("px01_input");
 		} else {
-
+			ProductoEmpresa productoEmpresaSelect = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), productoSelect.getProductoId());
 			if (productoSelect != null && productoSelect.getBalanza() == 1l) {
 				RequestContext.getCurrentInstance().execute("pupupCantidad();");
 				determinarBalanza();
 				setParciaPopup("S");
 			} else {
-				setUnidad(productoSelect.getCostoPublico()==null?0.0:productoSelect.getCostoPublico());
+				setUnidad(productoEmpresaSelect.getPrecio()==null?0.0:productoEmpresaSelect.getPrecio());
 				Configuracion configuracion = configuracion();
 				Long server = configuracion.getServer();
 				if (server == 2l) {
@@ -719,14 +719,15 @@ public class PuntoVentaDia implements Serializable {
 				Date fecha = new Date();
 				docDetalle.setFechaRegistro(fecha);
 				docDetalle.setEstado(1l);
+				//TODO validar las promociones para sucursales, hay que agregarle el campo de precio promocion
 				if (promo) {
 					Double precioPromo = productoSelect.getPubPromo();
 					Double cantidadPromo = productoSelect.getkGPromo();
 					Double unitarioPromo = precioPromo / cantidadPromo;
 					docDetalle.setParcial(getCantidad() * unitarioPromo);
 				} else {
-					if (getCantidad() != null && productoSelect.getCostoPublico() != null) {
-						docDetalle.setParcial(getCantidad() * productoSelect.getCostoPublico());
+					if (getCantidad() != null && productoEmpresa.getPrecio() != null) {
+						docDetalle.setParcial(getCantidad() * productoEmpresa.getPrecio());
 					} else {
 						docDetalle.setParcial(0.0);
 					}
@@ -793,9 +794,9 @@ public class PuntoVentaDia implements Serializable {
 					docDetalleVo.setUnitario(unitarioPromo);
 					docDetalleVo.setParcial(getCantidad() * unitarioPromo);
 				} else {
-					if (getCantidad() != null && productoSelect.getCostoPublico() != null) {
-						docDetalleVo.setParcial(getCantidad() * productoSelect.getCostoPublico());
-						docDetalleVo.setUnitario(productoSelect.getCostoPublico());
+					if (getCantidad() != null && productoEmpresa.getPrecio() != null) {
+						docDetalleVo.setParcial(getCantidad() * productoEmpresa.getPrecio());
+						docDetalleVo.setUnitario(productoEmpresa.getPrecio());
 					} else {
 						docDetalleVo.setParcial(0.0);
 					}
@@ -1489,6 +1490,7 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("ACTIVAR_MULTIPLE_IMPRESORA");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
+			activarMultipesImpresoras( opcionesActivas);
 			activarCodigoBarras(usuario, opcionesActivas);
 			activarCarteraCliente(usuario, opcionesActivas);
 			activarGuiFacturacion(usuario, opcionesActivas);
@@ -1503,8 +1505,7 @@ public class PuntoVentaDia implements Serializable {
 			activarAsignacionEmpleadoFactura(usuario, opcionesActivas);
 			activarComandas(usuario, opcionesActivas);
 			activarImpresionPantalla(usuario, opcionesActivas);
-			activarProporcion(opcionesActivas);
-			activarMultipesImpresoras( opcionesActivas);
+			activarProporcion(opcionesActivas);	
 		}
 		if (op.equals("movimiento_mes")) {
 			rutas.add("CLAVE_BORRADO");
@@ -1708,6 +1709,7 @@ public class PuntoVentaDia implements Serializable {
 	public void activarMultipesImpresoras( Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "ACTIVAR_MULTIPLE_IMPRESORA";
 		if (opcionesActivas.containsKey(ruta)) {
+			getActivarMultiplesImpresoras();
 			log.info("tiene multiple impresora activo");
 			RequestContext.getCurrentInstance().execute("activarMultiplesImpresoras=1;");
 			activarMultiplesImpresoras = opcionesActivas.get(ruta);
@@ -3155,7 +3157,7 @@ public class PuntoVentaDia implements Serializable {
 	}
 	
 	public String getActivarMultiplesImpresoras() {
-		return activarMultiplesImpresoras == null ? "none" : "inline";
+		return activarMultiplesImpresoras == null ? "none" : "block";
 	}
 
 	public void setActivarMultiplesImpresoras(OpcionUsuario activarMultiplesImpresoras) {

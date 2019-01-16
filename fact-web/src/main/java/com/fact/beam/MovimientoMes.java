@@ -522,19 +522,8 @@ public class MovimientoMes implements Serializable {
 		Double cantidadTemp;
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
-		if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == 1l && server == 2l) { // si
-																								// es
-																								// una
-																								// entrada
-																								// de
-																								// almacen
-																								// se
-																								// guarda
-																								// el
-																								// en
-																								// el
-																								// server
-																								// 2
+		// si es una entrada de almacen se guarda el en el server 2
+		if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == 1l && server == 2l) { 
 			server = 2l;
 		} else {
 			server = 1l;
@@ -798,20 +787,22 @@ public class MovimientoMes implements Serializable {
 	}
 	
 	public void recalcularPrecio(DocumentoDetalleVo d) {
-		log.info("aqui va");
+		log.info("producto para cambio de precio: "+d.getUnitario());
 		dCambio = d;
 	}
 	
 	public String recalcularPrecio(AjaxBehaviorEvent event) {
 		log.info("cambio de precio MM:" + getCambioTemp());
-		if(getCambioTemp()==null || (getCambioTemp().indexOf(' ') == -1) ){
+		if(getCambioTemp()==null  ){
 			return "";
 		}
 		
 		Double cambioTemp1;
 		try {
-		   cambioTemp1 = Double.valueOf(getCambioTemp());
+		   cambioTemp1 = Double.valueOf(getCambioTemp().trim());
 		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("error cambiando el precio");
 			return "";
 		}
 		log.info("paso:" + getCambioTemp());
@@ -848,7 +839,7 @@ public class MovimientoMes implements Serializable {
 		setRetefuente(getDocumento().getRetefuente());
 		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
 		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
-		RequestContext.getCurrentInstance().execute("document.getElementById('art_11_input').value='';");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
 		RequestContext.getCurrentInstance().execute("PF('cambioPrecioMM').hide();");
 		RequestContext.getCurrentInstance().update("dataList");
 		RequestContext.getCurrentInstance().update("execentoFact");
@@ -910,13 +901,13 @@ public class MovimientoMes implements Serializable {
 		}
 
 		if (getVariosNew() != null) {
-			prodNew.setVarios((getVariosNew().toUpperCase().equals("N") ? 0l : 1l));
+			prodNew.setVarios((getVariosNew().equalsIgnoreCase("N") ? 0l : 1l));
 		} else {
 			prodNew.setVarios(0l);
 		}
 
 		if (getUnidadNew() != null) {
-			prodNew.setUnidad(getUnidadNew().toUpperCase().equals("N") ? "N" : "S");
+			prodNew.setUnidad(getUnidadNew().equalsIgnoreCase("N") ? "N" : "S");
 		} else {
 			prodNew.setUnidad("N");
 		}

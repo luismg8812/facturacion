@@ -6,14 +6,25 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
+	function cambioPrecio1MM(e){
+		//var  valor = document.getElementById('px01_input_input').value.toString() ;
+		if(e.keyCode==13){
+			//alert("Cerrar popup");
+			//PF('cambioPrecioMM').hide();
+			document.getElementById('art_1_input').focus();
+         	document.getElementById('art_1_input').select();
+         	document.getElementById('art_1_input').value='';
+				
+		}
+	}
 	</script>
 	<h:form id="cambioPrecioFormMM">
 	<table width="100%" align="center">
 		<tr>
 			<td><p:outputLabel value="Precio:" /></td>
-			<td><p:inputText value="#{movimientoMes.cambioTemp}" id="cambioPrecioIn" size="10"  >
-				<p:ajax event="keyup"  partialSubmit="true"  
-					        listener="#{movimientoMes.recalcularPrecio}" /> 
+			<td><p:inputText value="#{movimientoMes.cambioTemp}" id="cambioPrecioIn" size="10" onkeydown="cambioPrecio1MM(event)" onblur="PF('cambioPrecioMM').hide();" >
+				<p:ajax event="blur"  partialSubmit="true"  
+					        listener="#{movimientoMes.recalcularPrecio}" update="dataList,execentoFact,gravadoFact,ivaFact,totalFact"/> 
 			</p:inputText> </td>
 		</tr>		
 	</table>

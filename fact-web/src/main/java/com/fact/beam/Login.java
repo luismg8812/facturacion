@@ -179,7 +179,8 @@ public class Login implements Serializable {
 			//setImpresora(getUsuarioLogin().getImpresora() == null ? "" : getUsuarioLogin().getImpresora());
 			List<String> impresoras = leerArchivoImpresora();
 			for(int i=1; i<=impresoras.size();i++) {
-				sessionMap.put("impresora"+i, impresoras.get(i-1) );
+				String impresora =impresoras.get(i-1).replace(";", "\\");
+				sessionMap.put("impresora"+i, impresora);
 			}		
 			sessionMap.put("empresa",usuarioService.getByEmpresa(getUsuarioLogin().getUsuarioId()));
 			//setEmpresaLogin(); // consulta la // empresa
@@ -217,7 +218,14 @@ public class Login implements Serializable {
 			break;	
 		case "5":
 			ruta = "https://www.youtube.com/watch?v=7nJsMsUYhXA&feature=youtu.be";
+			break;
+		case "6":
+			ruta = "https://youtu.be/zGL1aC3Kn9o";
+			break;
+		case "7":
+			ruta = "https://www.youtube.com/watch?v=kYxHPQc9nC4&feature=youtu.be";
 			break;	
+			
 			
 		default:
 			break;
@@ -243,9 +251,10 @@ public class Login implements Serializable {
 	         while((linea=br.readLine())!=null) {
 	        	 json += br.readLine(); 
 	         }
+	         log.info("archivo de impresion configurado en el equipo: "+json);
 	         Gson gson = new Gson();
 	          fromJson = gson.fromJson(json, ImpresorasInstaladas.class);
-	         log.info("archivo de impresion configurado en el equipo: "+fromJson.getImpresoras().toString());				
+	         				
 	      }catch(Exception e){
 	         e.printStackTrace();
 	         log.error("error con el archivo de impresoras");

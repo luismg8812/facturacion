@@ -139,11 +139,14 @@ public class CuadreCaja implements Serializable {
 	private Empresa empresa() {
 		return (Empresa) sessionMap.get("empresa");
 	}
+	
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
+	}
 
 	public Double getTotalFaturasToDay() throws ParseException {
 		List<Long> tipoDocumentoId = new ArrayList<>();
-		
-		
+
 		tipoDocumentoId.add(-1l);// tipo documento remision
 		Long server = 1l;
 		Boolean conCierre = Boolean.TRUE;
@@ -153,8 +156,8 @@ public class CuadreCaja implements Serializable {
 		OpcionUsuario liberarCuadre = opcionUsuarioService.getbySubMenuAndUsuario(usuario, 15l);
 		totalFacturasToDay = 0.0;
 		OpcionUsuario verRemision = opcionUsuarioService.getbySubMenuAndUsuario(usuario, 21l);
-		if (verRemision!=null && verRemision.getLiberarCuadre() != null && verRemision.getLiberarCuadre() == 1l) {
-			tipoDocumentoId.add(9l);// tipo documento remision	
+		if (verRemision != null && verRemision.getLiberarCuadre() != null && verRemision.getLiberarCuadre() == 1l) {
+			tipoDocumentoId.add(9l);// tipo documento remision
 		}
 		List<Documento> factDia = new ArrayList<>();
 		if (liberarCuadre.getLiberarCuadre() != null && liberarCuadre.getLiberarCuadre() == 1l) {
@@ -646,6 +649,7 @@ public class CuadreCaja implements Serializable {
 	private String imprimirCuadreTxt() throws IOException, ParseException {
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		int maxTamaño = 14;
+		String impresora = impresora("1");
 		log.info("entro a imprimir cuadre");
 		Long noImpresas = getTotalFaturasNoImp();
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
@@ -656,124 +660,152 @@ public class CuadreCaja implements Serializable {
 		if (noImpresas > 0l) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 					"Warning! Hay " + noImpresas + " Facturas no impresas", ""));
-		} else {
-			// todo lo de imprimir cuadre
-			// Date f= new Date();
-			String pdf = Calendar.HOUR_OF_DAY + Calendar.MINUTE + Calendar.SECOND + ".txt";
-			pdf = pdf.replace(" ", "_");
-			File archivo = new File("C:\\facturacion\\" + pdf);
-			BufferedWriter bw;
-			bw = new BufferedWriter(new FileWriter(archivo));
-			bw.write("---------------------------------------\n");
-			bw.write("         >>" + getEmpresa().getNombre() + "<<\n");
-			bw.write("           " + getEmpresa().getRepresentante() + "         \n");
-			bw.write("      NIT. " + getEmpresa().getNit() + "   " + getEmpresa().getRegimen() + "   \n");
-			bw.write("          " + getEmpresa().getDireccion() + "           \n");
-			bw.write("           " + getEmpresa().getBarrio() + "            \n");
-			bw.write(
-					"  	 	   " + getEmpresa().getCiudad() + "-" + getEmpresa().getDepartamento() + "	        \n");
-			bw.write("             TEL: " + getEmpresa().getCel() + "             \n");
-			bw.write(usuario.getNombre() + " " + usuario.getApellido() + "\n");
-			bw.write(getFechaHoy() + "\n");
-			bw.write("ENTREGO:______________________________\n");
-			bw.write("Factura inicial:....: " + getPrimeraFact() + "\n");
-			bw.write("Factura final:......: " + getUltimaFact() + "\n");
-			bw.write("---------------------------------------\n");
-			bw.write("Cantidad.......Descripción........Valor\n");
-			bw.write("---------------------------------------\n");
-			bw.write("Total Facturas:.....: "
-					+ Calculos.cortarCantidades(formatea.format(getTotalFaturasToDay()), maxTamaño) + "\n");
-			bw.write("Abonos:.............: " + Calculos.cortarCantidades(formatea.format(getAbonosDia()), maxTamaño)
-					+ "\n");
-			bw.write(
-					"Base:...............: " + Calculos.cortarCantidades(formatea.format(getBase()), maxTamaño) + "\n");
-			bw.write("Abance Efectivo:....: "
-					+ Calculos.cortarCantidades(formatea.format(getAvanceEfectivo()), maxTamaño) + "\n");
-			bw.write("Cheques Recogidos:..: "
-					+ Calculos.cortarCantidades(formatea.format(getChequesRecogidos()), maxTamaño) + "\n");
-			bw.write("Otros :.............: " + Calculos.cortarCantidades(formatea.format(getOtros()), maxTamaño)
-					+ "\n");
-			bw.write("Recargas:...........: " + Calculos.cortarCantidades(formatea.format(getRecargas()), maxTamaño)
-					+ "\n");
-			bw.write("TOTAL MOV. DEL DIA:.: "
-					+ Calculos.cortarCantidades(formatea.format(getTotalIngresos()), maxTamaño) + "\n");
-			bw.write("---------------------------------------\n");
-			bw.write(
-					"VR. EN FAJOS:.......: "
-							+ Calculos.cortarCantidades(
-									formatea.format(getValorFajos() == null ? 0.0 : getValorFajos()), maxTamaño)
-							+ "\n");
-			bw.write("MONEDA: ............: "
-					+ Calculos.cortarCantidades(formatea.format(getMonedas() == null ? 0.0 : getMonedas()), maxTamaño)
-					+ "\n");
-			bw.write("EFECTIVO:...........: "
-					+ Calculos.cortarCantidades(formatea.format(getEfectivo() == null ? 0.0 : getEfectivo()), maxTamaño)
-					+ "\n");
-			bw.write("CHEQUES:............: "
-					+ Calculos.cortarCantidades(formatea.format(getCheques() == null ? 0.0 : getCheques()), maxTamaño)
-					+ "\n");
-			bw.write("DOC. ESPECIALES:....: " + Calculos.cortarCantidades(
-					formatea.format(getDocumentosEspeciales() == null ? 0.0 : getDocumentosEspeciales()), maxTamaño)
-					+ "\n");
-			bw.write(
-					"TARJETA:............: "
-							+ Calculos.cortarCantidades(
-									formatea.format(getTotalTargetas() == null ? 0.0 : getTotalTargetas()), maxTamaño)
-							+ "\n");
-			bw.write("VARIOS:.............: "
-					+ Calculos.cortarCantidades(formatea.format(getVarios() == null ? 0.0 : getVarios()), maxTamaño)
-					+ "\n");
-			bw.write("VALES:..............: " + Calculos.cortarCantidades(formatea.format(getVales()), maxTamaño)
-					+ "\n");
-			if (getNomina() != null) {
-				bw.write("NOMINA:.........: "
-						+ Calculos.cortarCantidades(formatea.format(getNomina() == null ? 0.0 : getNomina()), maxTamaño)
+			return "";
+		}
+		// todo lo de imprimir cuadre
+		String pdf = "cuadre_" + usuario.getNombre() + "_" + Calendar.HOUR_OF_DAY + Calendar.MINUTE
+				+ Calendar.SECOND + ".txt";
+		String carpeta = "C:\\facturas\\";
+		pdf = pdf.replace(" ", "_");
+		File archivo = new File( carpeta+ pdf);
+		int tamanoTxt = 40;
+		BufferedWriter bw;
+		bw = new BufferedWriter(new FileWriter(archivo));
+		bw.write("---------------------------------------\n");
+		bw.write( Calculos.centrarDescripcion(getEmpresa().getNombre(), tamanoTxt)  + "\n");
+		bw.write(Calculos.centrarDescripcion(getEmpresa().getRepresentante(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("NIT. " + getEmpresa().getNit() + "   " + getEmpresa().getRegimen(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion( getEmpresa().getDireccion(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion( getEmpresa().getBarrio(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion( getEmpresa().getCiudad() + "-" + getEmpresa().getDepartamento(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("TEL: " + getEmpresa().getCel(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("CAJERO: "+usuario.getNombre() + " " + usuario.getApellido(), tamanoTxt) + "\n");
+		bw.write(getFechaHoy() + "\n");
+		bw.write("ENTREGO:______________________________\n");
+		bw.write("Factura inicial:....: " + getEmpresa().getLetraConsecutivo() + getPrimeraFact() + "\n");
+		bw.write("Factura final:......: " + getEmpresa().getLetraConsecutivo() + getUltimaFact() + "\n");
+		bw.write("---------------------------------------\n");
+		bw.write("Cantidad.......Descripción........Valor\n");
+		bw.write("---------------------------------------\n");
+		bw.write("Total Facturas:.....: "
+				+ Calculos.cortarCantidades(formatea.format(getTotalFaturasToDay()), maxTamaño) + "\n");
+		bw.write("Abonos:.............: " + Calculos.cortarCantidades(formatea.format(getAbonosDia()), maxTamaño)
+				+ "\n");
+		bw.write("Base:...............: " + Calculos.cortarCantidades(formatea.format(getBase()), maxTamaño) + "\n");
+		bw.write("Abance Efectivo:....: " + Calculos.cortarCantidades(formatea.format(getAvanceEfectivo()), maxTamaño)
+				+ "\n");
+		bw.write("Cheques Recogidos:..: " + Calculos.cortarCantidades(formatea.format(getChequesRecogidos()), maxTamaño)
+				+ "\n");
+		bw.write("Otros :.............: " + Calculos.cortarCantidades(formatea.format(getOtros()), maxTamaño) + "\n");
+		bw.write(
+				"Recargas:...........: " + Calculos.cortarCantidades(formatea.format(getRecargas()), maxTamaño) + "\n");
+		bw.write("TOTAL MOV. DEL DIA:.: " + Calculos.cortarCantidades(formatea.format(getTotalIngresos()), maxTamaño)
+				+ "\n");
+		bw.write("---------------------------------------\n");
+		bw.write("VR. EN FAJOS:.......: "
+				+ Calculos.cortarCantidades(formatea.format(getValorFajos() == null ? 0.0 : getValorFajos()), maxTamaño)
+				+ "\n");
+		bw.write("MONEDA: ............: "
+				+ Calculos.cortarCantidades(formatea.format(getMonedas() == null ? 0.0 : getMonedas()), maxTamaño)
+				+ "\n");
+		bw.write("EFECTIVO:...........: "
+				+ Calculos.cortarCantidades(formatea.format(getEfectivo() == null ? 0.0 : getEfectivo()), maxTamaño)
+				+ "\n");
+		bw.write("CHEQUES:............: "
+				+ Calculos.cortarCantidades(formatea.format(getCheques() == null ? 0.0 : getCheques()), maxTamaño)
+				+ "\n");
+		if (getDocumentosEspeciales() != null) {
+		bw.write("DOC. ESPECIALES:....: "
+				+ Calculos.cortarCantidades(
+						formatea.format(getDocumentosEspeciales() == null ? 0.0 : getDocumentosEspeciales()), maxTamaño)
+				+ "\n");
+		}
+		if (getTotalTargetas() != null) {
+		bw.write(
+				"TARJET DÉBIT Y CRÉDIT: "
+						+ Calculos.cortarCantidades(
+								formatea.format(getTotalTargetas() == null ? 0.0 : getTotalTargetas()), maxTamaño)
 						+ "\n");
-			}
-			if (getGastado() != null) {
-				bw.write("GASTOS:.........: " + Calculos.cortarCantidades(
-						formatea.format(getGastado() == null ? 0.0 : getGastado()), maxTamaño) + "\n");
-			}
-			if (getDescuentos() != null) {
-				bw.write(
-						"DESCUENTOS:.....: "
-								+ Calculos.cortarCantidades(
-										formatea.format(getDescuentos() == null ? 0.0 : getDescuentos()), maxTamaño)
-								+ "\n");
-			}
+		}
+		if (getVarios() != null) {
+		bw.write("VARIOS:.............: "
+				+ Calculos.cortarCantidades(formatea.format(getVarios() == null ? 0.0 : getVarios()), maxTamaño)
+				+ "\n");
+		}
+		bw.write("VALES:..............: " + Calculos.cortarCantidades(formatea.format(getVales()), maxTamaño) + "\n");
+		if (getNomina() != null) {
+			bw.write("NOMINA:.........: "
+					+ Calculos.cortarCantidades(formatea.format(getNomina() == null ? 0.0 : getNomina()), maxTamaño)
+					+ "\n");
+		}
+		if (getGastado() != null) {
+			bw.write("GASTOS:.........: "
+					+ Calculos.cortarCantidades(formatea.format(getGastado() == null ? 0.0 : getGastado()), maxTamaño)
+					+ "\n");
+		}
+		if (getDescuentos() != null) {
+			bw.write("DESCUENTOS:.........: "
+							+ Calculos.cortarCantidades(
+									formatea.format(getDescuentos() == null ? 0.0 : getDescuentos()), maxTamaño)
+							+ "\n");
+		}
+		if (getPropinas() != null) {
+			bw.write("PROPIAS:............: "
+							+ Calculos.cortarCantidades(
+									formatea.format(getPropinas() == null ? 0.0 : getPropinas()), maxTamaño)
+							+ "\n");
+		}
+		bw.write(
+				"VENTAS A CRÉDITO:...: "
+						+ Calculos.cortarCantidades(
+								formatea.format(getCartera() == null ? 0.0 : getCartera()), maxTamaño)
+						+ "\n");
+		bw.write("TOTAL INGRESOS:.....: " + Calculos.cortarCantidades(formatea.format(getTotalEnCaja()), maxTamaño)
+				+ "\n");
+		bw.write("---------------------------------------\n");
+		bw.write((getDiferencias() < 0.0 ? "SOBRANTE" : "FALTANTE")+"$...........: " + Calculos.cortarCantidades(formatea.format(getDiferencias()), maxTamaño)
+				+ "\n");
+		bw.write("---------------------------------------\n");
+		bw.close();
+		FileInputStream inputStream = null;
+		try {
+			inputStream = new FileInputStream(carpeta+ pdf);
+			log.info(carpeta+ pdf);
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		}
+		if (inputStream == null) {
+			// return;
+		}
+		DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+		Doc document = new SimpleDoc(inputStream, docFormat, null);
+		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
 
-			bw.write("TOTAL INGRESOS:.....: " + Calculos.cortarCantidades(formatea.format(getTotalEnCaja()), maxTamaño)
-					+ "\n");
-			bw.write("---------------------------------------\n");
-			bw.write("FALTANTE..$.........: " + Calculos.cortarCantidades(formatea.format(getDiferencias()), maxTamaño)
-					+ "\n");
-			bw.write("---------------------------------------\n");
-			bw.close();
-			FileInputStream inputStream = null;
+		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+		log.info("Number of printers configured1: " + printServices.length);
+		for (PrintService printer : printServices) {
+			log.info("Printer: " + printer.getName());
+			log.info("comparacion:" + impresora + ":" + printer.getName());
+			if (printer.getName().equals(impresora)) {
+				defaultPrintService = printer;
+				log.info(impresora + " : " + printer.getName());
+				break;
+			}
+		}
+
+		// defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+		if (defaultPrintService != null) {
+			DocPrintJob printJob = defaultPrintService.createPrintJob();
+
 			try {
-				inputStream = new FileInputStream("C:\\facturacion\\" + pdf);
-				log.info(pdf);
-			} catch (FileNotFoundException ex) {
+				printJob.print(document, attributeSet);
+
+			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-			if (inputStream == null) {
-				// return;
-			}
-			DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-			Doc document = new SimpleDoc(inputStream, docFormat, null);
-			PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
-			PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-			if (defaultPrintService != null) {
-				DocPrintJob printJob = defaultPrintService.createPrintJob();
-				try {
-					printJob.print(document, attributeSet);
-
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			} else {
-				log.info("No existen impresoras instaladas");
-			}
+		} else {
+			log.info("No existen impresoras instaladas");
 		}
 		return "";
 	}
@@ -1513,8 +1545,6 @@ public class CuadreCaja implements Serializable {
 			} else {
 				opcionUsuarioService.update(cuadre);
 			}
-			
-
 
 			if (v.getVerRemisiones() != null) {
 				log.info("Ver remision: " + v.getVerRemisiones());

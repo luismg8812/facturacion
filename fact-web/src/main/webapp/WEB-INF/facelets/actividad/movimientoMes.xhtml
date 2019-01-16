@@ -4,9 +4,53 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:c="http://java.sun.com/jstl/core">
+	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">
+	/**
+	 * 
+	 */
+	function pupupCantidadMM() {
+		//alert("ejecuta");
+		PF('cantidadPopupMM').show();
+		document.getElementById('cantidadMM:facturar').focus();
+		document.getElementById('cantidadMM:facturar').select();
+		document.getElementById('cantidadMM:facturar').className = ' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus ui-state-focus';
 		
+	}
+
+	function controlTeclasMM(e,element){
+		if(e.keyCode==79){
+			document.getElementById('movMesForm:Opc_movi_mes_menuButton').click();
+			//alert("tecla o")		movimiento mes		
+		}
+		if(e.keyCode==85){
+			document.getElementById('movMesForm:Ult_movi_mes').click();
+			//alert("tecla u")		movimiento mes		
+		}
+		if(e.keyCode==77){
+			document.getElementById('movMesForm:Mod_movi_mes').click();
+			//alert("tecla m")		movimiento mes		
+		}
+		if(e.keyCode==73){
+			document.getElementById('movMesForm:Imp_movi_mes').click();
+			//alert("tecla i")		movimiento mes		
+		}
+		
+		if(e.keyCode==66){
+			document.getElementById('movimiento_mes_bor').click();
+			//alert("tecla b")		movimiento mes		
+		}
+
+		if(e.keyCode==65){
+			document.getElementById('movMesForm:Ant_movi_mes').click();
+			//alert("tecla a")		movimiento mes		
+		}
+
+		if(e.keyCode==83){
+			document.getElementById('movMesForm:Sig_movi_mes').click();
+			//alert("tecla s")		movimiento mes		
+		}
+	}	
 	
 	   function selectTipoDoc(e){
 			if(e.keyCode==13){
@@ -177,6 +221,7 @@
 items {
 	font-size: 11px;
 }
+
 #art_1_panel {
 	font-size: 11px;
 	width: 75%;
@@ -188,158 +233,173 @@ items {
 		<table width="80%" id="dat">
 			<tr>
 				<td><p:outputLabel value="Documento: " /></td>
-				<td><p:outputLabel value="#{movimientoMes.documento.documentoId}" id="codig"/></td>
+				<td><p:outputLabel
+						value="#{movimientoMes.documento.documentoId}" id="codig" /></td>
 
 				<td><p:outputLabel value="Fecha: " /></td>
-				<td><p:outputLabel value=" #{movimientoMes.fechaCreacion}" id="fechaDoc">
-					 <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
-				</p:outputLabel> </td>
+				<td><p:outputLabel value=" #{movimientoMes.fechaCreacion}"
+						id="fechaDoc">
+						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+					</p:outputLabel></td>
 
 				<td><p:outputLabel value="Codigo: " /></td>
-				<td><p:outputLabel value="#{movimientoMes.codigoProveedor}" id="codProveedor" /></td>
+				<td><p:outputLabel value="#{movimientoMes.codigoProveedor}"
+						id="codProveedor" /></td>
 
 				<td><p:outputLabel value=" tipo Documento: " /></td>
-				<td><p:outputLabel value=" #{movimientoMes.tipoDocumentoEntrada}" 
-								   id="nombc" /></td>
+				<td><p:outputLabel
+						value=" #{movimientoMes.tipoDocumentoEntrada}" id="nombc" /></td>
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Detalle: " /></td>
-				<td><p:inputText value="#{movimientoMes.detalle}" id="detalleEntrada"  style="display: none"
-								 onkeydown="ciclo(event,this)">
-								 <p:ajax event="keydown" partialSubmit="true" listener="#{movimientoMes.detalleEnDocumento}"/>
-								 </p:inputText> </td>
+				<td><p:inputText value="#{movimientoMes.detalle}"
+						id="detalleEntrada" style="display: none"
+						onkeydown="ciclo(event,this)">
+						<p:ajax event="keydown" partialSubmit="true"
+							listener="#{movimientoMes.detalleEnDocumento}" />
+					</p:inputText></td>
 
 				<td><p:outputLabel value="Cargo: " /></td>
 				<td><p:outputLabel value=" " /></td>
 			</tr>
 			<tr>
-				<td>
-					<p:outputLabel value="Nombre: " />
-				</td>
-				<td>
-					<p:autoComplete id="nombreProveedor" value="#{movimientoMes.proveedor}" style="display:none" size="20" onkeydown="ciclo(event,this)" 
-									completeMethod="#{movimientoMes.completeTextProveedor}" maxResults="10"  forceSelection="true" minQueryLength="2" onclick="entrarFactura"
-									 var="name" itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{proveedorConverter}">
-									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProveedor}" process="detalleEntrada,@this" 
-									 update="fechaDoc,codProveedor,nombc,identProveedor,art_1,codBarras_input" onsuccess="entrarFactura"
-									  />
-					</p:autoComplete>
-				</td>
+				<td><p:outputLabel value="Nombre: " /></td>
+				<td><p:autoComplete id="nombreProveedor"
+						value="#{movimientoMes.proveedor}" style="display:none" size="20"
+						onkeydown="ciclo(event,this)"
+						completeMethod="#{movimientoMes.completeTextProveedor}"
+						maxResults="10" forceSelection="true" minQueryLength="2"
+						onclick="entrarFactura" var="name" itemValue="#{name}"
+						itemLabel="#{name.nombre}" converter="#{proveedorConverter}">
+						<p:ajax event="itemSelect"
+							listener="#{movimientoMes.buscarProveedor}"
+							process="detalleEntrada,@this"
+							update="fechaDoc,codProveedor,nombc,identProveedor,art_1,codBarras_input"
+							onsuccess="entrarFactura" />
+					</p:autoComplete></td>
 				<td><p:outputLabel value="CC: " /></td>
-				<td><p:outputLabel value="#{movimientoMes.identificacionProveedor}" id="identProveedor" /></td>
+				<td><p:outputLabel
+						value="#{movimientoMes.identificacionProveedor}"
+						id="identProveedor" /></td>
 				<td><p:outputLabel value="Ven: " /></td>
 				<td><p:outputLabel value=" " /></td>
 			</tr>
 		</table>
 	</p:panel>
-	
+
 	<p:panel style="font-size: 16px;width:100% " id="op_mov_mes">
-	<h:form id="movMesForm">
-		<table width="100%">
-			<tr>
-				<td><p:commandButton value="Sig" id="Sig_movi_mes" onkeydown="poput(event,this),controlTeclasMM(event,this)" actionListener="#{movimientoMes.siguienteFactura()}" 
-									 update="growl, dataList,codig" >					
-				   		  <p:hotkey bind="f" partialSubmit="true" onstart="PF('movimiento_mes').hide();limpiarRuta;" />
-				    </p:commandButton> 
-					<p:commandButton value="Ant" id="Ant_movi_mes" update="growl, dataList,codig,retefuentelFact,totalFact" actionListener="#{movimientoMes.anteriorFactura()}"/> 
-					<p:commandButton value="Pri" id="Pri_movi_mes" />
-					<p:commandButton value="Ult" id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
-									 actionListener="#{movimientoMes.buscarUltimaFactura()}" update="growl"/> 
-					<p:commandButton value="Bus"
-						id="Bus_movi_mes" /> <p:commandButton value="..."
-						id="P1_movi_mes" /> 
-					<p:commandButton value="Mod" id="Mod_movi_mes" onkeydown="controlTeclasMM(event,this)" actionListener="#{movimientoMes.modificarUltimaFactura()}" /> 
-					<p:commandButton value="Gat"
-						id="Gat_movi_mes" /> <p:commandButton value="..."
-						id="P2_movi_mes" /> <p:commandButton value="New"
-						id="New_movi_mes" onkeyup="selectTipoDoc(event)"
-						onclick="newDocumentoMM()" /> <p:commandButton
-						value="..." id="P3_movi_mes" /> 
-					<p:commandButton value="Imp" id="Imp_movi_mes" actionListener="#{movimientoMes.popupImprimir()}" update="growl"/> 
-					<p:commandButton value="..."
-						id="P4_movi_mes" /> 
-							
-						<p:splitButton value="Opc" id="Opc_movi_mes" disabled="false" icon="ui-icon-document" >
-								<c:forEach items="#{menuPrincipal.getOpcionUsuariosByRuta('opcion')}" var="ou">
-									<p:menuitem value="#{ou.subMenuId.nombre}" id="#{ou.subMenuId.bar}"
-									 onclick="opcion(this),limpiarEditar(this),#{ou.subMenuId.url}"  
-									 update="cuadreDiario:docNoImpresos,cuadreDiario:totalfact,cuadreDiario:totalIngresos,cuadreDiario:abonoDia,
-										    cuadreDiario:vales1,cuadreDiario:avance"/>
-							    </c:forEach>							  
-						</p:splitButton>
-						 
-						<p:commandButton value="Fin"
-						id="Fin_movi_mes" /></td>
-			</tr>
-		</table>
+		<h:form id="movMesForm">
+			<table width="100%">
+				<tr>
+					<td><p:commandButton value="Sig" id="Sig_movi_mes"
+							onkeydown="poput(event,this),controlTeclasMM(event,this)"
+							actionListener="#{movimientoMes.siguienteFactura()}"
+							update="growl, dataList,codig">
+							<p:hotkey bind="f" partialSubmit="true"
+								onstart="PF('movimiento_mes').hide();limpiarRuta;" />
+						</p:commandButton> <p:commandButton value="Ant" id="Ant_movi_mes"
+							update="growl, dataList,codig,retefuentelFact,totalFact"
+							actionListener="#{movimientoMes.anteriorFactura()}" /> <p:commandButton
+							value="Pri" id="Pri_movi_mes" /> <p:commandButton value="Ult"
+							id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
+							actionListener="#{movimientoMes.buscarUltimaFactura()}"
+							update="growl" /> <p:commandButton value="Bus" id="Bus_movi_mes" />
+						<p:commandButton value="..." id="P1_movi_mes" /> <p:commandButton
+							value="Mod" id="Mod_movi_mes"
+							onkeydown="controlTeclasMM(event,this)"
+							actionListener="#{movimientoMes.modificarUltimaFactura()}" /> <p:commandButton
+							value="Gat" id="Gat_movi_mes" /> <p:commandButton value="..."
+							id="P2_movi_mes" /> <p:commandButton value="New"
+							id="New_movi_mes" onkeyup="selectTipoDoc(event)"
+							onclick="newDocumentoMM()" /> <p:commandButton value="..."
+							id="P3_movi_mes" /> <p:commandButton value="Imp"
+							id="Imp_movi_mes"
+							actionListener="#{movimientoMes.popupImprimir()}" update="growl" />
+						<p:commandButton value="..." id="P4_movi_mes" /> <p:splitButton
+							value="Opc" id="Opc_movi_mes" disabled="false"
+							icon="ui-icon-document">
+							<c:forEach
+								items="#{menuPrincipal.getOpcionUsuariosByRuta('opcion')}"
+								var="ou">
+								<p:menuitem value="#{ou.subMenuId.nombre}"
+									id="#{ou.subMenuId.bar}"
+									onclick="opcion(this),limpiarEditar(this),#{ou.subMenuId.url}"
+									update="cuadreDiario:docNoImpresos,cuadreDiario:totalfact,cuadreDiario:totalIngresos,cuadreDiario:abonoDia,
+										    cuadreDiario:vales1,cuadreDiario:avance" />
+							</c:forEach>
+						</p:splitButton> <p:commandButton value="Fin" id="Fin_movi_mes" /></td>
+				</tr>
+			</table>
 		</h:form>
 	</p:panel>
-	
-	<p:panel style="font-size: 16px;width:100% "  id="productos">
-		<table width="50%" style="display: none" id="busquedaCodBarras" >
+
+	<p:panel style="font-size: 16px;width:100% " id="productos">
+		<table width="50%" style="display: none" id="busquedaCodBarras">
 			<tr>
 				<td><p:outputLabel value="Codigo Barras" /></td>
-				<td><p:inputText value="#{movimientoMes.codigoBarras}" id="codBarras_input" onblur="ocultarCodBarras()" onkeyup="ciclo(event,this)" >
-				 <p:ajax event="keyup" partialSubmit="true" listener="#{movimientoMes.buscarProductoCodBarras}"/>
-				</p:inputText> </td>
+				<td><p:inputText value="#{movimientoMes.codigoBarras}"
+						id="codBarras_input" onblur="ocultarCodBarras()"
+						onkeyup="ciclo(event,this)">
+						<p:ajax event="keyup" partialSubmit="true"
+							listener="#{movimientoMes.buscarProductoCodBarras}" />
+					</p:inputText></td>
 			</tr>
 		</table>
-		<table width="50%" style="display: none" id="table_crearProd" >
+		<table width="50%" style="display: none" id="table_crearProd">
 			<tr>
 				<td><p:outputLabel value="El lote no existe, Desea crearlo?: " /></td>
-				<td>
-					<p:inputText value="#{movimientoMes.crear}" id="crar_input" size="3" onblur="ocultarCrear()"  >
-					  <p:ajax event="keydown" partialSubmit="true"  listener="#{movimientoMes.crearProducto}" delay="30" process="@this"/>
-					</p:inputText>
-				</td>
+				<td><p:inputText value="#{movimientoMes.crear}" id="crar_input"
+						size="3" onblur="ocultarCrear()">
+						<p:ajax event="keydown" partialSubmit="true"
+							listener="#{movimientoMes.crearProducto}" delay="30"
+							process="@this" />
+					</p:inputText></td>
 			</tr>
 		</table>
 		<table width="100%">
 			<tr>
-				<td width="15%">
-					<p:outputLabel value= "Codigo" style="font-size: 16px;font-weight:bold"/>
-				</td>
-				<td width="44%">
-					<p:outputLabel value= "Artículo" style="font-size: 16px;font-weight:bold"/>
-				</td>
-				<td width="10%">
-					<p:outputLabel value= "Cant" style="font-size: 16px;font-weight:bold"/>
-				</td>
-				<td width="15%">
-					<p:outputLabel value= "Unitario" style="font-size: 16px;font-weight:bold"/>
-				</td>
-				<td width="15%">
-					<p:outputLabel value= "Parcial" style="font-size: 16px;font-weight:bold"/>
-				</td>
+				<td width="15%"><p:outputLabel value="Codigo"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="44%"><p:outputLabel value="Artículo"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="10%"><p:outputLabel value="Cant"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="15%"><p:outputLabel value="Unitario"
+						style="font-size: 16px;font-weight:bold" /></td>
+				<td width="15%"><p:outputLabel value="Parcial"
+						style="font-size: 16px;font-weight:bold" /></td>
 			</tr>
 		</table>
-		
+
 		<div id="prodList" style="display: none;">
-		<p:scrollPanel mode="native" style="height:150px">
-			 <p:dataList value="#{movimientoMes.productos}" style="font-size: 9px" id="dataList" var="prod1" type="definition">
-				 <table width="100%" >
-		 			<tr>
-						<td width="10%"><p:outputLabel value="#{prod1.productoId.productoId}" size="10" /></td>
-						<td width="40%"><p:outputLabel value="#{prod1.productoId.nombre}" size="38"/></td>
-						<td width="15%"><p:outputLabel value="#{prod1.cantidad}" size="10" /></td>
-						<td width="10%"><p:outputLabel value="#{prod1.productoId.costo}" size="10"  rendered="!#{movimientoMes.cambioPrecio}"/>
-						
-						<p:inputNumber value="#{prod1.costoUnitario}"
+			<p:scrollPanel mode="native" style="height:150px">
+				<p:dataList value="#{movimientoMes.productos}"
+					style="font-size: 9px" id="dataList" var="prod1" type="definition">
+					<table width="100%">
+						<tr>
+							<td width="10%"><p:outputLabel
+									value="#{prod1.productoId.productoId}" size="10" /></td>
+							<td width="40%"><p:outputLabel
+									value="#{prod1.productoId.nombre}" size="38" /></td>
+							<td width="15%"><p:outputLabel value="#{prod1.cantidad}"
+									size="10" /></td>
+							<td width="10%"><p:outputLabel
+									value="#{prod1.productoId.costo}" size="10"
+									rendered="!#{movimientoMes.cambioPrecio}" /> <p:inputNumber
+									value="#{prod1.unitario}"
 									rendered="#{movimientoMes.cambioPrecio}" symbol="$"
 									decimalPlaces="0" id="precioVariable1" minValue="0"
 									onfocus="PF('cambioPrecioMM').show();">
 									<p:ajax event="focus"
 										listener="#{movimientoMes.recalcularPrecio(prod1)}"></p:ajax>
-								</p:inputNumber>
-						
-						</td>
-						<td width="15%"><p:outputLabel value="#{prod1.parcial}" size="10" /></td>
-					</tr>
-				</table>
-			 </p:dataList>	
-			 <h:form id="borrarTablaMM">
-					<p:dataTable id="checkboxDT" var="prod11"
-						emptyMessage=" "
+								</p:inputNumber></td>
+							<td width="15%"><p:outputLabel value="#{prod1.parcial}"
+									size="10" /></td>
+						</tr>
+					</table>
+				</p:dataList>
+				<h:form id="borrarTablaMM">
+					<p:dataTable id="checkboxDT" var="prod11" emptyMessage=" "
 						value="#{movimientoMes.productosBorrarList}">
 						<p:column width="10%">
 							<p:commandButton id="rowDelete_#{rowIndex}" value="Borrar"
@@ -361,28 +421,29 @@ items {
 						</p:column>
 
 					</p:dataTable>
-				</h:form>	
-		 </p:scrollPanel> 
+				</h:form>
+			</p:scrollPanel>
 		</div>
-		<table width="100%" style="display: none;" id="prod" >		
+		<table width="100%" style="display: none;" id="prod">
 			<tr>
-				<td width="14%">
-					<p:autoComplete value= "#{movimientoMes.codigoInterno}"  id="cod_" size="12" onkeyup="ciclo(event,this),crearProd(event)" 
-					completeMethod="#{movimientoMes.completeCodigo}" >
-							<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProductoCodigo}"  oncomplete="focoCantidad()" />
-									
-					</p:autoComplete>
-				</td>
-				<td width="50%">
-					
-				
-					<p:autoComplete id="art_1" value="#{movimientoMes.articulo}"  onkeyup="ciclo(event,this)"  minQueryLength="2"
-									completeMethod="#{movimientoMes.completeText}" maxResults="11"  var="name" size="38"
-									itemValue="#{name}" itemLabel="#{name.nombre}" converter="#{productoConverter}">
-									<p:ajax event="itemSelect" listener="#{movimientoMes.buscarProducto}" process="@this,art_1" immediate="true" update="cantidadMM:facturar"
-									 
-									  />
-						<p:column >
+				<td width="14%"><p:autoComplete
+						value="#{movimientoMes.codigoInterno}" id="cod_" size="12"
+						onkeyup="ciclo(event,this),crearProd(event)"
+						completeMethod="#{movimientoMes.completeCodigo}">
+						<p:ajax event="itemSelect"
+							listener="#{movimientoMes.buscarProductoCodigo}"
+							oncomplete="focoCantidad()" />
+
+					</p:autoComplete></td>
+				<td width="50%"><p:autoComplete id="art_1"
+						value="#{movimientoMes.articulo}" onkeyup="ciclo(event,this)"
+						minQueryLength="2" completeMethod="#{movimientoMes.completeText}"
+						maxResults="11" var="name" size="38" itemValue="#{name}"
+						itemLabel="#{name.nombre}" converter="#{productoConverter}">
+						<p:ajax event="itemSelect"
+							listener="#{movimientoMes.buscarProducto}" process="@this,art_1"
+							immediate="true" update="cantidadMM:facturar" />
+						<p:column>
 							<p:outputLabel value="#{name.nombre}" />
 						</p:column>
 						<p:column>
@@ -392,27 +453,24 @@ items {
 							<p:outputLabel value="Existencia: #{name.cantidad}" />
 						</p:column>
 						<p:column>
-							<p:outputLabel value="Costo: #{name.costo}" >
+							<p:outputLabel value="Costo: #{name.costo}">
 								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 							</p:outputLabel>
 						</p:column>
-					</p:autoComplete>
-				
-					
-				</td>
-				<td width="15%">
-					<p:inputText value= "#{movimientoMes.cantidad}" onselect="focoCantidad" onfocus="focoCantidad"  size="10" onblur="listaProductos()"   id="cantidad_in" onkeyup="enterCantidad(event)">
-						<p:ajax event="blur"  partialSubmit="true"
-					        listener="#{movimientoMes.cantidadEnter}" update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact"/> 
-					        
-					</p:inputText>
-				</td>
-				<td width="15%">
-					<p:inputText value= "#{movimientoMes.unidad}" size="12" id="unidad_" disabled="true"/>
-				</td>
-				<td width="15%">
-					<p:inputText value= "#{movimientoMes.parcial}" size="12" disabled="true"/>
-				</td>
+					</p:autoComplete></td>
+				<td width="15%"><p:inputText value="#{movimientoMes.cantidad}"
+						onselect="focoCantidad" onfocus="focoCantidad" size="10"
+						onblur="listaProductos()" id="cantidad_in"
+						onkeyup="enterCantidad(event)">
+						<p:ajax event="blur" partialSubmit="true"
+							listener="#{movimientoMes.cantidadEnter}"
+							update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact" />
+
+					</p:inputText></td>
+				<td width="15%"><p:inputText value="#{movimientoMes.unidad}"
+						size="12" id="unidad_" disabled="true" /></td>
+				<td width="15%"><p:inputText value="#{movimientoMes.parcial}"
+						size="12" disabled="true" /></td>
 			</tr>
 		</table>
 	</p:panel>
@@ -430,16 +488,19 @@ items {
 					</td>
 				</tr>
 				<tr>
-					<td>
-					</td>
+					<td></td>
 				</tr>
 			</table>
-			<table width="100%" align="center" id="confir_mm" style="display: none">
+			<table width="100%" align="center" id="confir_mm"
+				style="display: none">
 				<tr>
 					<td><p:outputLabel value="[C] Cambia" /><br /></td>
-					<td><p:commandButton value="[B] Borra"  actionListener="#{movimientoMes.borrarFactura()}" id="movimiento_mes_bor" 
-					         onstart="verificarBorrado()" update="borrarTablaMM:checkboxDT"/><br /></td>
-					<td><p:commandButton value="[I] Inserta" actionListener="#{movimientoMes.popupImprimir()}"/><br /></td>
+					<td><p:commandButton value="[B] Borra"
+							actionListener="#{movimientoMes.borrarFactura()}"
+							id="movimiento_mes_bor" onstart="verificarBorrado()"
+							update="borrarTablaMM:checkboxDT" /><br /></td>
+					<td><p:commandButton value="[I] Inserta"
+							actionListener="#{movimientoMes.popupImprimir()}" /><br /></td>
 				</tr>
 			</table>
 		</p:layoutUnit>
@@ -447,34 +508,38 @@ items {
 			<table width="100%">
 				<tr>
 					<td><p:outputLabel value="Vr. Excento: " /></td>
-					<td><p:inputNumber value="#{movimientoMes.execento}" id="execentoFact" disabled="true"/></td>
+					<td><p:inputNumber value="#{movimientoMes.execento}"
+							id="execentoFact" disabled="true" /></td>
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Vr. Gravado" /></td>
-					<td><p:inputNumber value="#{movimientoMes.gravado}" id="gravadoFact" disabled="true"/></td>
+					<td><p:inputNumber value="#{movimientoMes.gravado}"
+							id="gravadoFact" disabled="true" /></td>
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Vr. Iva" /></td>
-					<td><p:inputNumber value="#{movimientoMes.iva}" disabled="true" id="ivaFact" /></td>
+					<td><p:inputNumber value="#{movimientoMes.iva}"
+							disabled="true" id="ivaFact" /></td>
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Retefuente" /></td>
-					<td><p:inputNumber value="#{movimientoMes.retefuente}" id="retefuentelFact" disabled="true"/></td>
+					<td><p:inputNumber value="#{movimientoMes.retefuente}"
+							id="retefuentelFact" disabled="true" /></td>
 				</tr>
 				<tr>
 					<td><p:outputLabel value="Total" /></td>
-					<td><p:inputNumber value="#{movimientoMes.total}" id="totalFact" disabled="true"/></td>
+					<td><p:inputNumber value="#{movimientoMes.total}"
+							id="totalFact" disabled="true" /></td>
 				</tr>
-				
+
 			</table>
 		</p:layoutUnit>
 	</p:layout>
-	<p:dialog widgetVar="cambioPrecioMM" id="cambiopreMM"  
+	<p:dialog widgetVar="cambioPrecioMM" id="cambiopreMM"
 		style="font-size: 16px" header="Cambio de precio">
-		<div style="width: 300px; ">
+		<div style="width: 300px;">
 			<ui:include
 				src="/WEB-INF/facelets/actividad/movimientoMes/cambioPrecio.xhtml" />
 		</div>
 	</p:dialog>
-	<h:outputScript library="js/movimientoMes" name="movimientoMes.js" />
 </ui:composition>
