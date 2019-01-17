@@ -9,16 +9,82 @@
 	
 	</script>
 	<h:form id="consultaDocumentosForm">
-	<p:growl id="growl1" life="7000" />
-	<table width="100%" align="center">
-		<tr>
-				<td><p:outputLabel value="Desde: " /></td>
-				<td><p:calendar id="fechaInicial"
-						value="#{reduccion.fechaInicio}" pattern="dd-MM-yyyy" mask="true" /></td>
-				<td><p:outputLabel value="Hasta: " /></td>
-				<td><p:calendar id="fechaFzinal" value="#{reduccion.fechafin}"
-						pattern="dd-MM-yyyy" mask="true" /></td>
-			</tr>
-	</table>
+		<p:growl id="growl1" life="7000" />
+		<p:fieldset legend="1. Exportación de terceros Para DELTA"
+			style="margin-bottom:20px">
+			<table width="70%" align="center">
+				<tr>
+					<td><p:selectManyCheckbox id="basic" 
+							value="#{exportarDelta.selectedTerceros}">
+							<f:selectItem itemLabel="Clientes" itemValue="clientes" />
+							<f:selectItem itemLabel="Proveedores" itemValue="proveedores" />
+							<f:selectItem itemLabel="Empleados" itemValue="empleados" />
+						</p:selectManyCheckbox></td>
+					<td><p:commandButton value="Exportar" title="Exportar"
+							ajax="false">
+							<p:fileDownload value="#{exportarDelta.file}" />
+						</p:commandButton></td>
+					<td><p:commandLink value="Video Tutorial"></p:commandLink> </td>	
+				</tr>
+			</table>
+		</p:fieldset>
+		<p:fieldset legend="2. Exportar Documentos Contabilidad DELTA"
+			style="margin-bottom:20px">
+			<table width="100%" align="center">
+				<tr>
+					<td><p:outputLabel value="Desde: " /></td>
+					<td><p:calendar id="fechaInicial"
+							value="#{exportarDelta.fechaInicio}" pattern="dd-MM-yyyy" mask="true" /></td>
+					<td><p:outputLabel value="Hasta: " /></td>
+					<td><p:calendar id="fechaFzinal" value="#{exportarDelta.fechafin}"
+							pattern="dd-MM-yyyy" mask="true" /></td>
+					<td><p:commandButton value="Exportar" title="Exportar"
+							ajax="false">
+							<p:fileDownload value="#{exportarDelta.fileDocument}" />
+						</p:commandButton></td>
+					<td></td>
+					<td></td>
+				</tr>
+
+			</table>
+			<table width="100%" align="center">
+				<tr>
+
+					<td><p:outputLabel value="Tipo documento: " /></td>
+					<td><p:selectOneMenu value="#{exportarDelta.tipoDocumento}">
+							<f:selectItem itemLabel="Seccionar Tipo Documento" itemValue="0" />
+							<f:selectItems value="#{exportarDelta.tipoDocumentos}"
+								noSelectionValue="Seleccione tipoDocumento" var="tipo"
+								itemLabel="#{tipo.nombre}" itemValue="#{tipo.tipoDocumentoId}" />
+						</p:selectOneMenu></td>
+					<td><p:outputLabel value="Tipo de pago: " /></td>
+					<td><p:selectOneMenu value="#{exportarDelta.tipoPago}">
+							<f:selectItem itemLabel="Seccionar tipo de pago" itemValue="0" />
+							<f:selectItems value="#{exportarDelta.tipoPagos}"
+								noSelectionValue="Seleccione SUcuersal" var="sucursal"
+								itemLabel="#{sucursal.nombre}" itemValue="#{sucursal.tipoPagoId}" />
+						</p:selectOneMenu></td>
+					<td><p:outputLabel value="Cuenta: " /></td>
+					<td><p:inputText size="5" value="#{exportarDelta.cuenta}"></p:inputText></td>
+					<td><p:commandButton value="Agregar" action="#{exportarDelta.agregar}" update="dataList"></p:commandButton></td>
+				</tr>
+			</table>
+			<table width="100%" align="center">
+				<tr>
+					<td><p:dataList value="#{exportarDelta.convinacionDeltas}" var="car" id="dataList"
+							type="ordered" emptyMessage="No hay convinacines agregadas" >
+							<f:facet name="header">
+            				Documentos
+        					</f:facet>
+        					<table width="100%" align="center">
+        					<tr>
+					<td> <p:commandButton value="Borrar" update="dataList" action="#{exportarDelta.borrar(car)}" />
+					 	 #{car.tipoDocumentoNombre}, #{car.tipoPagoNombre}, #{car.cuenta}
+					 </td></tr></table>
+    					</p:dataList></td>
+				</tr>
+			</table>
+		</p:fieldset>
+
 	</h:form>
 </ui:composition>

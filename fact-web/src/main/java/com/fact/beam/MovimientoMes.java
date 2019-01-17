@@ -1173,7 +1173,7 @@ public class MovimientoMes implements Serializable {
 	public void borrarFacturaSelect(DocumentoDetalleVo d) {
 		DocumentoDetalle dd = new DocumentoDetalle();
 		ProductoEmpresa productoEmpresa= productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),d.getProductoId().getProductoId());
-		Documento docu = new Documento();
+		Documento docu;
 		long server = 1;
 		dd.setDocumentoDetalleId(d.getDocumentoDetalleId().getDocumentoDetalleId());
 		dd.setCantidad(d.getCantidad());
@@ -1198,15 +1198,14 @@ public class MovimientoMes implements Serializable {
 		setTotal(canti);
 		setExecento(excentoB);
 		setIva(ivaDocu);
-		Producto productoEdit = d.getProductoId();
-		
-		Double cantidad = productoEmpresa.getCantidad() - d.getCantidad();
-		productoEmpresa.setCantidad(cantidad);
+		Producto productoEdit;	
+		Double cantidadactu = productoEmpresa.getCantidad() - d.getCantidad();
+		productoEmpresa.setCantidad(cantidadactu);
 		productoEmpresaService.update(productoEmpresa);
 		if (server == 2l) {
 			productoEdit = productoService.getById(d.getProductoId().getProductoId());
 			cantidad = productoEdit.getCantidad() + d.getCantidad2();
-			productoEdit.setCantidad(cantidad);
+			productoEdit.setCantidad(cantidadactu);
 			productoService.update(productoEdit, server);
 		}
 		documentoDetalleService.update(dd, server);

@@ -899,7 +899,7 @@ public class PuntoVentaDia implements Serializable {
 		Configuracion configuracion = configuracion();
 		int numeroImpresiones = configuracion.getNumImpresion()==null?1:configuracion.getNumImpresion();		
 		Long server = configuracion.getServer();
-		String impresora = impresora(getImpresoras());
+		String impresora = impresora(getImpresoras()==null?"1":getImpresoras());
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = getEmpresa();
 			String tituloFactura = "";
