@@ -212,4 +212,10 @@ public class DocumentoServiceImpl implements DocumentoService{
 		return documentoDao.buscarPorInvoice(invoice) ;
 	}
 
+	@Override
+	public void getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

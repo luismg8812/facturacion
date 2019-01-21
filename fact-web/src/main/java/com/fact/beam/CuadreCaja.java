@@ -831,7 +831,7 @@ public class CuadreCaja implements Serializable {
 		tipoDocumentoId.add(5l); // tipo documento cotizacion
 		tipoDocumentoId.add(4l); // tipo documento remision
 		tipoDocumentoId.add(8l); // tipo vale
-		tipoDocumentoId.add(2l); // tipo documento remision
+		//tipoDocumentoId.add(2l); // tipo documento remision
 		Date hoy = Calculos.fechaInicial(new Date());
 		Date hoyfin = Calculos.fechaFinal(new Date());
 		List<Documento> factDia = documentoService.getByFacturaSinCierre(tipoDocumentoId, hoy, hoyfin);

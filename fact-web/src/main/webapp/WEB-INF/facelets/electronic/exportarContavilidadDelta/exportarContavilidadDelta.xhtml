@@ -49,7 +49,6 @@
 			</table>
 			<table width="100%" align="center">
 				<tr>
-
 					<td><p:outputLabel value="Tipo documento: " /></td>
 					<td><p:selectOneMenu value="#{exportarDelta.tipoDocumento}">
 							<f:selectItem itemLabel="Seccionar Tipo Documento" itemValue="0" />
@@ -61,7 +60,7 @@
 					<td><p:selectOneMenu value="#{exportarDelta.tipoPago}">
 							<f:selectItem itemLabel="Seccionar tipo de pago" itemValue="0" />
 							<f:selectItems value="#{exportarDelta.tipoPagos}"
-								noSelectionValue="Seleccione SUcuersal" var="sucursal"
+								noSelectionValue="Seleccione Sucuersal" var="sucursal"
 								itemLabel="#{sucursal.nombre}" itemValue="#{sucursal.tipoPagoId}" />
 						</p:selectOneMenu></td>
 					<td><p:outputLabel value="Cuenta: " /></td>

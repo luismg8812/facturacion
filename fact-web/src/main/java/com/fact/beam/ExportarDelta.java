@@ -26,6 +26,7 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import com.fact.model.Cliente;
+import com.fact.model.Documento;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoPago;
@@ -134,7 +135,16 @@ public class ExportarDelta implements Serializable {
 		File folder = new File(carpeta);
 		folder.mkdirs();
 		folder = new File(carpeta + pdf);
+		String tab = "	";
+		BufferedWriter bw;
+		List<Documento> documentos= new  ArrayList<>();
+		for(ConvinacionDelta c: getConvinacionDeltas()) {
+			//documentoService.getconvinacion(c.getTipodocumentoId(),getTipoPago(),getFechaInicio(),getFechafin());
+		}
+		
 		return carpeta + pdf;
+		
+		
 	}
 
 	private String documentoTerceros() {

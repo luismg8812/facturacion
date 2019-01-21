@@ -416,8 +416,8 @@ public class PuntoVentaDia implements Serializable {
 			if (p.getProductoId().getNombre() != null) {
 				String articul = p.getProductoId().getNombre().toUpperCase().trim();
 				// si en algun momento se necesita
-				 //if(articul.indexOf(query.toUpperCase()) != -1) {
-				if (articul.startsWith(query.toUpperCase().trim())) {
+				 if(articul.indexOf(query.toUpperCase()) != -1) {
+				//if (articul.startsWith(query.toUpperCase().trim())) {
 					 Producto producto = p.getProductoId();
 					 producto.setCantidad(p.getCantidad());
 					 producto.setCostoPublico(p.getPrecio());
@@ -1085,7 +1085,10 @@ public class PuntoVentaDia implements Serializable {
 
 	private void calcularTipoDocumento(Empresa e, Long server) {
 		TipoDocumento tipo = new TipoDocumento();
-		if(activarProporcion != null && (getDocumento().getTipoDocumentoId().getTipoDocumentoId()==10l && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==9l) ) {
+		if(activarProporcion != null && (getDocumento().getTipoDocumentoId()==null||
+				getDocumento().getTipoDocumentoId().getTipoDocumentoId()==null||
+				getDocumento().getTipoDocumentoId().getTipoDocumentoId()==10l ||
+				getDocumento().getTipoDocumentoId().getTipoDocumentoId()==9l) ) {
 			try {
 				Proporcion proporcion=usuarioService.getProporcion();
 				double numero= proporcion.getVariable().doubleValue()/proporcion.getBase().doubleValue();
@@ -1108,26 +1111,26 @@ public class PuntoVentaDia implements Serializable {
 			    
 			    if((getDocumento().getTotal()>=rangoA && getDocumento().getTotal()<=rangoB )) {
 			    	tipo.setTipoDocumentoId(9l);//se asigna factura
+			    	getDocumento().setTipoDocumentoId(tipo);
 			    }else {
 			    	if(numero<numeroProporcion || getDocumento().getClienteId().getClienteId()!=1 ) {
 						tipo.setTipoDocumentoId(10l);//se asigna factura
 						proporcion.setContadorFactura(contaFactura+1);
+						getDocumento().setTipoDocumentoId(tipo);
 					}else {
 						proporcion.setContadorRemision(contaRemision+1);
 						tipo.setTipoDocumentoId(9l);//se asigna remision	
+						getDocumento().setTipoDocumentoId(tipo);
 					}
 			    }
-				
 				usuarioService.update(proporcion);
 			} catch (Exception e2) {
 				e2.printStackTrace();
 				log.error("Error en la proporción");
 			}	
 		}
-		if(getDocumento().getTipoDocumentoId().getTipoDocumentoId()==9l && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==10l) {
-			getDocumento().setTipoDocumentoId(tipo);
-		}
 		String tituloFactura = "";
+		//este if controla el titulo de la factura para quia de remi si no tiene activado proporcion
 		if (getDocumento().getTipoDocumentoId() == null) {
 			if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
 				// es necesario asignar el consecutivo dian

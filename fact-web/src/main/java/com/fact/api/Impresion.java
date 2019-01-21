@@ -1116,7 +1116,7 @@ public class Impresion {
 		bw.write("\nCAJA: " + Calculos.conseguirMAC());
 		bw.write("\nCLIENTE: "
 				+ (documentoImp.getClienteId() == null ? "VARIOS" : documentoImp.getClienteId().getNombre()));
-		bw.write("\nNIT/CC:" + documentoImp.getClienteId().getDocumento());
+		bw.write("\nNIT/CC:" + documentoImp.getClienteId().getDocumento()==null?"":documentoImp.getClienteId().getDocumento());
 		if (documentoImp.getEmpleadoId() != null) {
 			bw.write("\nMESERO: " + documentoImp.getEmpleadoId().getNombre());
 		}

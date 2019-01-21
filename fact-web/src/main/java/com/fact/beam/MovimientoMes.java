@@ -1495,6 +1495,7 @@ public class MovimientoMes implements Serializable {
 		if (listaDocumento == null) {
 			List<Long> tipoDocumentoId = new ArrayList<>();
 			tipoDocumentoId.add(2l); // tipo documento factura de salida
+			tipoDocumentoId.add(6l); // tipo documento factura de salida
 			Usuario usuario = usuario();
 			listaDocumento = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, 1l);
 		}
