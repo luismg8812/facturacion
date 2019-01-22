@@ -1445,4 +1445,132 @@ public class Impresion {
 
 	}
 
+	public static void imprimirEntadaAlmacenTXT(Documento documentoImp, List<DocumentoDetalleVo> productos,
+			Usuario usuario, Configuracion config, String impresora, Empresa e) throws IOException {
+		log.info("imprimir entrada almacen txt");
+		String carpeta = "C:\\facturas\\entradas";
+		String pdf = "\\entrada_" + documentoImp.getDocumentoId() + ".txt";
+		File folder = new File(carpeta);
+		folder.mkdirs();
+		File archivo = new File(carpeta+pdf);
+		BufferedWriter bw;
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DecimalFormat formatea = new DecimalFormat("###,###.##");
+		String TituloFactura = "";
+		int tamanoTxt = 40;
+		String fhoyIni = df.format(documentoImp.getFechaRegistro());
+		bw = new BufferedWriter(new FileWriter(archivo));
+		bw.write("----------------------------------------\n");
+		bw.write(Calculos.centrarDescripcion(e.getNombre(), tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion(e.getSlogan(), tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion(e.getRepresentante(), tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion("NIT. " + e.getNit() + " " + e.getRegimen(), tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion(e.getDireccion() + " - " + e.getBarrio(), tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion(e.getCiudad() + "- " + e.getDepartamento(), tamanoTxt)+"\n");												
+		bw.write(Calculos.centrarDescripcion("TEL: " + e.getTelefonoFijo() + " - " + e.getCel()+"\n", tamanoTxt));
+		bw.write("Entrada de almacen: " + documentoImp.getDocumentoId()+"\n");
+		bw.write("FECHA: " + fhoyIni+"\n");
+		bw.write("CAJERO: " + documentoImp.getUsuarioId().getUsuarioId() + " " + documentoImp.getUsuarioId().getNombre()
+				+ " " + documentoImp.getUsuarioId().getApellido()+"\n");
+		bw.write("CAJA: " + Calculos.conseguirMAC()+"\n");
+		bw.write("PROVEEDOR: "+ (documentoImp.getProveedorId() == null ? "VARIOS" : documentoImp.getProveedorId().getNombre())+"\n");
+		bw.write("CC/NIT: " + documentoImp.getProveedorId().getDocumento() == null ? ""
+				: documentoImp.getProveedorId().getDocumento()+"\n");
+		bw.write(LINEA+"\n");			
+		String impuesto = e.getImpuesto().equals("IVA") ? "IVA" : "IPO";
+		bw.write("CANT Descripción      UNI  TOTAL  " + impuesto+"\n");
+		bw.write(LINEA+"\n");	
+																			
+		for (DocumentoDetalleVo ddV : productos) {
+			// descripcion
+			String nombre = "";
+			int maxTamañoNombre = config.getNombreProductoLargo() == 1l ? 24 : 17;
+			nombre = Calculos.cortarDescripcion(ddV.getProductoId().getNombre(), maxTamañoNombre);
+
+			// Cantidad
+			String cant = "";
+			int maxTamañoCant = 3;
+			cant = Calculos.cortarCantidades(ddV.getCantidad(), maxTamañoCant);
+
+			// Unitario
+			String unit = "";
+			int maxTamañoUnit = 5;
+			unit = Calculos.cortarCantidades(ddV.getUnitario(), maxTamañoUnit);
+
+			// total
+			Double totalDouble = 0.0;
+			String total = "";
+			int maxTamañoTotal = 6;
+			try {
+				totalDouble = ddV.getUnitario() * ddV.getCantidad();
+			} catch (Exception e2) {
+				totalDouble = 0.0;
+			}
+			total = Calculos.cortarCantidades(totalDouble, maxTamañoTotal);
+			// iva
+			String iva = "";			
+			iva = Calculos.cortarCantidades(ddV.getProductoId().getIva(), 2);			
+			bw.write(cant + " " + nombre + " " + unit + " " + total + " " + iva+"\n");				
+		}
+		bw.write(LINEA+"\n");	
+		bw.write("Valor Exento:          "+Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13)+"\n");	
+		bw.write("Valor Gravado:         "+Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 13)+"\n");	
+		bw.write("Retefuente:            "+Calculos.cortarCantidades(formatea.format(documentoImp.getRetefuente()), 13)+"\n");	
+		bw.write((e.getImpuesto().equals("IVA") ? "IVA" : "IPO") + ":                   "
+				+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13)+"\n");	
+		bw.write(LINEA+"\n");	
+		bw.write("TOTAL A PAGAR: " + formatea.format(documentoImp.getTotal())+"\n");
+		bw.write(LINEA+"\n");
+		bw.write(Calculos.centrarDescripcion("*****GRACIAS POR SU COMPRA*****", tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion("Software  NICESOTF", tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion("LUIS MIGUEL GONZALEZ  Cel 3185222474", tamanoTxt)+"\n");
+		bw.write(Calculos.centrarDescripcion("JOHAN ANDRES ORDOÑEZ  Cel 3112864974", tamanoTxt)+"\n");
+		bw.write("\n");
+		bw.write("\n");
+		bw.write("\n");
+		bw.write("\n");
+		bw.write("\n");
+		bw.close();
+		//if (enPantalla.equals("false")) {
+			FileInputStream inputStream = null;
+			try {
+				inputStream = new FileInputStream(carpeta+pdf);
+				log.info(carpeta+pdf);
+			} catch (FileNotFoundException ex) {
+				ex.printStackTrace();
+			}
+			if (inputStream == null) {
+				// return;
+			}
+			DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+			Doc document = new SimpleDoc(inputStream, docFormat, null);
+			PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
+
+			PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+			PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+			log.info("Number of printers configured1: " + printServices.length);
+			for (PrintService printer : printServices) {
+				log.info("Printer: " + printer.getName());
+				log.info("comparacion:" + impresora + ":" + printer.getName());
+				if (printer.getName().equals(impresora)) {
+					defaultPrintService = printer;
+					log.info(impresora + " : " + printer.getName());
+					break;
+				}
+			}
+			// defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+			if (defaultPrintService != null) {
+				DocPrintJob printJob = defaultPrintService.createPrintJob();
+				try {
+					printJob.print(document, attributeSet);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			} else {
+				log.info("No existen impresoras instaladas");
+			}
+		//}
+			
+	}
+
 }
