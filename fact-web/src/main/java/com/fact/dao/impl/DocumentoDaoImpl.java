@@ -17,6 +17,7 @@ import org.hibernate.criterion.Restrictions;
 
 import com.fact.api.FactException;
 import com.fact.dao.DocumentoDao;
+import com.fact.model.ConsecutivoDian;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
@@ -376,12 +377,12 @@ public class DocumentoDaoImpl implements DocumentoDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni, Date fechaFin,
-			String conDian, Long clienteId) {
+			String conDian, Long clienteId, Long tipoDocumento) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Documento> documentoList = new ArrayList<>();
-		Long factura = 10l;
+		Long factura = tipoDocumento==0?10l:tipoDocumento;
 		try {
-			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId in :factura "
+			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId = :factura "
 					+ "and d.impreso = 1 " + " and consecutivoDian is not null";
 			if (usuarioSelect != null && usuarioSelect != 0l) {
 				sql += " and d.usuarioId.usuarioId =:usuarioId ";
@@ -389,6 +390,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			if (clienteId != null && clienteId != 0l) {
 				sql += " and d.clienteId.clienteId = :clienteId ";
 			}
+		
 			if (fechaIni != null) {
 				sql += " and d.fechaRegistro  >=:fechaInicio ";
 			}
@@ -411,6 +413,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			if (clienteId != null && clienteId != 0l) {
 				query.setParameter("clienteId", clienteId);
 			}
+			
 			if (fechaIni != null) {
 				query.setParameter("fechaInicio", fechaIni);
 			}
@@ -862,6 +865,69 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			DetachedCriteria detached = DetachedCriteria.forClass(Documento.class);
 			detached.add(Restrictions.eq("invoiceId", objInvoice));
 			detached.addOrder(org.hibernate.criterion.Order.desc("documentoId"));
+			Criteria criteria = detached.getExecutableCriteria(session);
+			documentoList = criteria.list();
+		} catch (FactException e) {
+			throw e;
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return documentoList;
+	}
+
+	@Override
+	public ConsecutivoDian getConsecutivoDian() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<ConsecutivoDian> documentoList = new ArrayList<>();
+		try {			
+			DetachedCriteria detached = DetachedCriteria.forClass(ConsecutivoDian.class);
+			detached.add(Restrictions.eq("consecutivoDianId", 1l));
+			detached.addOrder(org.hibernate.criterion.Order.desc("consecutivoDianId"));
+			Criteria criteria = detached.getExecutableCriteria(session);
+			documentoList = criteria.list();
+		} catch (FactException e) {
+			throw e;
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+		return documentoList.isEmpty()?null:documentoList.get(0);
+	}
+
+	@Override
+	public void update(ConsecutivoDian consecutivoDian) {
+				StatelessSession session;			
+					session = HibernateUtil.getSessionFactory().openStatelessSession();			
+				Transaction transaction = session.beginTransaction();
+				try {
+					session.update(consecutivoDian);
+					transaction.commit();
+				} catch (Exception e) {
+					if (transaction != null) {
+						transaction.rollback();
+					}
+					throw e;
+				} finally {
+					if (session != null) {
+						session.close();
+					}
+				}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Documento> getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Documento> documentoList = new ArrayList<>();
+		try {			
+			DetachedCriteria detached = DetachedCriteria.forClass(Documento.class);
+			detached.add(Restrictions.eq("tipoDocumentoId.tipoDocumentoId", tipodocumentoId));
+			detached.add(Restrictions.eq("tipoPagoId.tipoPagoId", tipoPago));
+			detached.add(Restrictions.between("fechaRegistro", fechaInicio, fechafin));
+			detached.addOrder(org.hibernate.criterion.Order.desc("consecutivoDian"));
 			Criteria criteria = detached.getExecutableCriteria(session);
 			documentoList = criteria.list();
 		} catch (FactException e) {

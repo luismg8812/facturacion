@@ -114,10 +114,10 @@ public class ExportarDelta implements Serializable {
 	public StreamedContent getFileDocument() throws FileNotFoundException {
 		StreamedContent file = null;
 		String ruta = documento();
-		if(getConvinacionDeltas().isEmpty()) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay convinaciones agregadas"));
-			return null;
-		}
+//		if(getConvinacionDeltas().isEmpty()) {
+//			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay convinaciones agregadas"));
+//			return null;
+//		}
 		File f = new File(ruta);
 		InputStream stream = new FileInputStream(f);
 		if (stream != null) {
@@ -138,9 +138,43 @@ public class ExportarDelta implements Serializable {
 		String tab = "	";
 		BufferedWriter bw;
 		List<Documento> documentos= new  ArrayList<>();
+		List<Documento> documentosTemp;
 		for(ConvinacionDelta c: getConvinacionDeltas()) {
-			//documentoService.getconvinacion(c.getTipodocumentoId(),getTipoPago(),getFechaInicio(),getFechafin());
+			documentosTemp=documentoService.getconvinacion(c.getTipodocumentoId(),getTipoPago(),getFechaInicio(),getFechafin());
+			documentos.addAll(documentosTemp);
 		}
+		log.info("totalDocumentos:"+documentos.size());
+		try {
+			String heder = "CodTipoDoc" + tab + "NumDoc" + tab + "Fecha" + tab + "MesAdicional" + tab + "NroControlInt" + tab
+					+ "Concepto" + tab + "CodCuenta" + tab + "CodTercero" + tab + "Debito" + tab + "Credito" + tab + "ValorBase" + tab + "Cheque" + tab + "CodCentroCosto"
+					+ tab + "DetalleItem";
+			bw = new BufferedWriter(new FileWriter(folder));
+			bw.write(heder);
+			for(Documento d: documentos) {
+				String codigoTercero="C"+d.getClienteId().getClienteId();
+				String lineaDocumento =d.getTipoDocumentoId().getNombre()+tab+
+						 d.getConsecutivoDian()+
+						 " "+tab+
+						 d.getFechaRegistro()+tab+
+						 "0"+tab+
+						 ""+tab+
+						 d.getTipoDocumentoId().getNombre()+tab+
+						 getCuenta()+tab+
+						 codigoTercero+tab+
+						 "0"+tab+
+						 "0"+tab+
+						 "0"+tab+
+						 ""+tab+
+						 ""+tab+
+						 "";
+			bw.write("\n"+lineaDocumento);
+			}
+			bw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("error exportando archivo de documentos de delta");
+		}
+		
 		
 		return carpeta + pdf;
 		

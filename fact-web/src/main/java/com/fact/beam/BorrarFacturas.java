@@ -45,12 +45,14 @@ import com.fact.model.DocumentoDetalle;
 import com.fact.model.Empresa;
 import com.fact.model.Evento;
 import com.fact.model.OpcionUsuario;
+import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
 import com.fact.model.Usuario;
 import com.fact.service.ClienteService;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
+import com.fact.service.TipoDocumentoService;
 import com.fact.service.UsuarioService;
 import com.fact.vo.DocumentoVo;
 import com.itextpdf.text.Document;
@@ -84,6 +86,9 @@ public class BorrarFacturas implements Serializable {
 
 	@EJB
 	private EventoService eventoService;
+	
+	@EJB
+	private TipoDocumentoService tipoDocumentoService;
 
 	List<DocumentoVo> documentosVo = new ArrayList<>();
 	List<DocumentoVo> documentosVoSelect = new ArrayList<>();
@@ -100,6 +105,8 @@ public class BorrarFacturas implements Serializable {
 	String ConDian;
 	Documento docuConsulta;
 	Long cliente;
+	Long tipoDocumento;
+	List<TipoDocumento> tipoDocumentoList;
 
 	private DocumentoVo documentoSelect;
 
@@ -364,7 +371,7 @@ public class BorrarFacturas implements Serializable {
 		}
 		setDocumentosCliente(new ArrayList<>());
 		setDocumentosCliente(documentoService.buscarPorFechaAndCajero(getUsuarioSelect(), getDocumentoId(), hoy, hoyfin,
-				getConDian(), getCliente()));
+				getConDian(), getCliente(),getTipoDocumento()));
 	}
 
 	public void consultarDetalle(Documento docu) {
@@ -396,7 +403,8 @@ public class BorrarFacturas implements Serializable {
 		evento.setFechaRegistro(new Date());
 		evento.setCampo("" + docu.getConsecutivoDian());
 		eventoService.save(evento);
-		switch (docu.getTipoDocumentoId().getTipoDocumentoId().toString()) {
+		String tipoDocu=docu.getTipoDocumentoId().getTipoDocumentoId().toString();
+		switch (tipoDocu) {
 		case "9":
 			log.info("consecutivo documentoId: " + docu.getDocumentoId());
 			tituloFactura = "No. DE GUIA";
@@ -411,13 +419,19 @@ public class BorrarFacturas implements Serializable {
 			break;
 		}
 		List<DocumentoDetalle> detalles = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l);
-
+		
 		String pdf = "";
 		String imp = e.getImpresion().toUpperCase();
 		switch (imp) {
 		case "TXT":
-			pdf = Impresion.imprimirTxt(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora,enPantalla,e);
+			//si el tipo documento es igual a entrada o salida de almacen
+			if("1".equals(tipoDocu) ||"2".equals(tipoDocu) ||"6".equals(tipoDocu)) {
+				 Impresion.imprimirEntadaAlmacenTXT(docu, Calculos.llenarDocumentoDetalleVoList(detalles), configuracion, impresora, e);
+			}else {
+				pdf = Impresion.imprimirTxt(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
+						configuracion, impresora,enPantalla,e);
+			}
+			
 			break;
 		case "BIG":
 			pdf = imprimirTemporal(tituloFactura, docu);
@@ -749,5 +763,34 @@ public class BorrarFacturas implements Serializable {
 	public void setCliente(Long cliente) {
 		this.cliente = cliente;
 	}
+	
+	public Long getTipoDocumento() {
+		return tipoDocumento;
+	}
+
+	public void setTipoDocumento(Long tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
+	}
+
+	public List<TipoDocumento> getTipoDocumentoList() {
+		if(tipoDocumentoList==null) {
+			List<Long> tipos = new ArrayList<>();
+			tipos.add(2l);
+			tipos.add(3l);
+			tipos.add(4l);
+			tipos.add(5l);
+			tipos.add(6l);
+			tipos.add(8l);
+			tipos.add(10l);
+			tipoDocumentoList= tipoDocumentoService.getById(tipos);
+		}
+		return tipoDocumentoList;
+	}
+
+	public void setTipoDocumentoList(List<TipoDocumento> tipoDocumentoList) {
+		this.tipoDocumentoList = tipoDocumentoList;
+	}
+	
+	
 
 }

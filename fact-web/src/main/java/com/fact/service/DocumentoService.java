@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ejb.Local;
 
+import com.fact.model.ConsecutivoDian;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
@@ -28,7 +29,7 @@ public interface DocumentoService {
 	List<Documento> getByFacturaByDia(Long tipoDocumentoId, Date hoy, Date hoyfin,Boolean conCierre) ;
 	List<Documento> getByHoyNoImpresas(List<Long> tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId) ;
 	List<Documento> buscarPorAbonosByClient(Long clienteId, Date fechaInicio, Date fechafin);
-	List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni, Date fechaFin,String conDian,Long clienteId);
+	List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni, Date fechaFin,String conDian,Long clienteId, Long tipoDocumento);
 	String getByUltimoId();
 	List<Documento> getRemisionesByUsuario(Long tipoDocumentoId,Long usuarioId, Boolean conCierre,Long server) ;
 	List<Documento> getRemisionesByUsuarioConFecha(Long tipoDocumentoId, Date hoy, Date hoyfin, Long usuarioId,
@@ -50,5 +51,7 @@ public interface DocumentoService {
 	List<Documento> getByClienteAndProveedorAndTipo(Long clienteId, Long proveedorId,List<Long> tipoId);
 	List<Documento> getByProveedor(Long proveedorId, List<Long> tipoDocumentoId, Date fechaInicio, Date fechafin);
 	List<Documento> buscarPorInvoice(long invoice);
-	void getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin);
+	ConsecutivoDian getConsecutivoDian();
+	void update(ConsecutivoDian consecutivoDian);
+	List<Documento> getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin);
 }

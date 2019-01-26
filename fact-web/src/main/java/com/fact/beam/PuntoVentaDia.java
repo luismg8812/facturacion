@@ -49,6 +49,7 @@ import com.fact.api.FactException;
 import com.fact.api.Impresion;
 import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
+import com.fact.model.ConsecutivoDian;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.Empleado;
@@ -1161,12 +1162,18 @@ public class PuntoVentaDia implements Serializable {
 				getDocumento().setReduccion(1l);					
 				break;
 			case "10":
-				String con = documentoService.getByUltimoId();
+				ConsecutivoDian consecutivoDian = documentoService.getConsecutivoDian();
+				Long con;
+				if(consecutivoDian.getSecuencia()==0l) {
+					con=Long.valueOf(e.getAutorizacionDesde());
+				}else {
+					con= consecutivoDian.getSecuencia()+1;
+				}
 				// dentro de try se valida si faltan 500 facturas para
 				// llegar hasta el tope
 				try {
 					Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
-					Long consegutivo = Long.valueOf(con);
+					Long consegutivo = con;
 					if (consegutivo + 500 > topeConsecutivo) {
 						FacesContext.getCurrentInstance().addMessage(null,
 								new FacesMessage(" se esta agotando el consegutivo DIAN "));
@@ -1175,12 +1182,14 @@ public class PuntoVentaDia implements Serializable {
 				} catch (Exception e2) {
 					e2.printStackTrace();
 				}					
-				String consecutivoDian=e.getLetraConsecutivo()+con;
-				log.info("consecutivo Dian: " + consecutivoDian);
-				getDocumento().setConsecutivoDian(consecutivoDian);
+				String consecutivo=e.getLetraConsecutivo()+con;
+				log.info("consecutivo Dian: " + consecutivo);
+				getDocumento().setConsecutivoDian(consecutivo);
 				tituloFactura = "FACTURA DE VENTA";
 				getDocumento().setReduccion(0l);
 				server = 1l;
+				consecutivoDian.setSecuencia(con);
+				documentoService.update(consecutivoDian);
 				break;
 			case "4":
 				getDocumento().setConsecutivoDian(""+ getDocumento().getDocumentoId());// es

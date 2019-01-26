@@ -10,6 +10,7 @@ import javax.ejb.Stateless;
 
 import com.fact.api.FactException;
 import com.fact.dao.DocumentoDao;
+import com.fact.model.ConsecutivoDian;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
@@ -100,8 +101,8 @@ public class DocumentoServiceImpl implements DocumentoService{
 
 	@Override
 	public List<Documento> buscarPorFechaAndCajero(Long usuarioSelect, String documentoId, Date fechaIni,
-			Date fechaFin, String conDian,Long clienteId)  {
-		return documentoDao.buscarPorFechaAndCajero(usuarioSelect,documentoId,fechaIni,fechaFin,conDian,clienteId);
+			Date fechaFin, String conDian,Long clienteId,Long tipoDocumento)  {
+		return documentoDao.buscarPorFechaAndCajero(usuarioSelect,documentoId,fechaIni,fechaFin,conDian,clienteId,tipoDocumento);
 	}
 
 	@Override
@@ -212,10 +213,24 @@ public class DocumentoServiceImpl implements DocumentoService{
 		return documentoDao.buscarPorInvoice(invoice) ;
 	}
 
+
 	@Override
-	public void getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin) {
-		// TODO Auto-generated method stub
+	public ConsecutivoDian getConsecutivoDian() {
+		return documentoDao.getConsecutivoDian() ;
+	}
+
+	@Override
+	public void update(ConsecutivoDian consecutivoDian) {
+		if(consecutivoDian.getConsecutivoDianId()==null){
+			throw new FactException("El id es obligatorio");
+		}		
+		documentoDao.update(consecutivoDian);
 		
+	}
+
+	@Override
+	public List<Documento> getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin) {
+		return documentoDao.getconvinacion(tipodocumentoId,tipoPago,fechaInicio,fechafin) ;
 	}
 
 }

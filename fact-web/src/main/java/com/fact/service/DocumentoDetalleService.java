@@ -10,6 +10,7 @@ import javax.ejb.Local;
 import com.fact.api.FactException;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
+import com.fact.model.Empresa;
 
 @Local
 public interface DocumentoDetalleService {
@@ -25,4 +26,5 @@ public interface DocumentoDetalleService {
 			Boolean conCierre, Long server) throws FactException;
 	List<DocumentoDetalle> getbyEmpleado(Long empleadoId, Date hoy, Date hoyfin) throws FactException;
 	List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin) throws FactException;
+	List<DocumentoDetalle> getCardex(Empresa empresa, Long productoId, Date fechaIni, Date fechaFin);
 }

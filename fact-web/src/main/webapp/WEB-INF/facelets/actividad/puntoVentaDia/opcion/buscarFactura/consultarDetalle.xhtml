@@ -14,7 +14,10 @@
 		<p:outputLabel value="#{borrarFacturas.docuConsulta.consecutivoDian}" />
 		
 		<p:outputLabel value="Total iva: " />
-		<p:outputLabel value="#{borrarFacturas.docuConsulta.iva}" >
+		<p:outputLabel value="#{borrarFacturas.docuConsulta.iva}" />
+		
+		<p:outputLabel value="Proveedor: " />
+		<p:outputLabel value="#{borrarFacturas.docuConsulta.proveedorId.nombre}" >
 			<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 		</p:outputLabel>
 		

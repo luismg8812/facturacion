@@ -608,7 +608,7 @@ public class MovimientoMes implements Serializable {
 		// en esta funcion de calcula el excento, iva, total
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		// se agrega re
-		if (proveedorSelect != null && proveedorSelect.getRetencion() != null) {
+		if (proveedorSelect != null && proveedorSelect.getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l) {
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorSelect));
 		}else {
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
@@ -1031,7 +1031,7 @@ public class MovimientoMes implements Serializable {
 		Empresa e = getEmpresa();
 		getDocumento().setImpreso(1l);
 		getDocumento().setEntregado(0l);
-
+		getDocumento().setConsecutivoDian(""+documento.getDocumentoId());
 		if (getDocumento().getProveedorId() == null) {
 			Proveedor c = new Proveedor();
 			c.setProveedorId(1l); // se le envia proveedor varios por
@@ -1051,7 +1051,7 @@ public class MovimientoMes implements Serializable {
 			setProductos(Calculos.ordenar(getProductos()));
 			switch (imp) {
 			case "TXT":
-				Impresion.imprimirEntadaAlmacenTXT(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
+				Impresion.imprimirEntadaAlmacenTXT(getDocumento(), getProductos(), configuracion, impresora, e);
 				break;
 			case "BIG":
 				// quitar la dependencia del ireport

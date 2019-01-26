@@ -12,6 +12,7 @@ import com.fact.api.FactException;
 import com.fact.dao.DocumentoDetalleDao;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
+import com.fact.model.Empresa;
 import com.fact.service.DocumentoDetalleService;
 
 @Stateless
@@ -83,6 +84,11 @@ public class DocumentoDetalleServiceImpl implements DocumentoDetalleService{
 	@Override
 	public List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin) throws FactException {
 		return documentoDetalleDao.getByProductoId(productoId,hoy, hoyfin);
+	}
+
+	@Override
+	public List<DocumentoDetalle> getCardex(Empresa empresa, Long productoId, Date fechaIni, Date fechaFin) {
+		return documentoDetalleDao.getCardex(empresa,productoId, fechaIni,fechaFin);
 	}
 	
 }

@@ -483,8 +483,8 @@ public class Calculos {
 	}
 
 	public static Documento calcularRetefuente(Documento doc, Proveedor pro) {
-		Double retencion = pro.getRetencion() / 100;
-		Double retefuente = ((doc.getTotal() - doc.getIva()) * retencion);
+		Double retencion = (pro.getRetencion()==null?0.0:pro.getRetencion()) / 100;
+		Double retefuente = (((doc.getTotal()==null?0.0:doc.getTotal()) - (doc.getIva()==null?0.0:doc.getIva())) * retencion);
 		doc.setRetefuente(retefuente);
 		return doc;
 	}

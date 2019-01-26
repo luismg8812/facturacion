@@ -3,6 +3,7 @@ package com.fact.beam;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -177,6 +178,8 @@ public class Invoice implements Serializable {
 	}
 
 	private DocumentoDeltaVo llenarDocumento(Documento d) {
+		
+		//String fhoyIni = df.format(getDocumento().getFechaRegistro())
 		DocumentoDeltaVo invoice = new DocumentoDeltaVo();
 		com.fact.model.invoice.Documento documentoInvoice = new com.fact.model.invoice.Documento();
 		List<DocumentoDetalle> detalleInvoice = new ArrayList<>();	
@@ -185,13 +188,14 @@ public class Invoice implements Serializable {
 			Producto producto = new Producto();
 			ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(), det.getProductoId().getProductoId());
 			producto.setCosto(det.getProductoId().getCosto());
-			producto.setCostoPublico(productoEmpresa.getPrecio());
+			producto.setCodigoInterno("123");
+			producto.setCostoPublico(productoEmpresa.getPrecio()==null?0.0:productoEmpresa.getPrecio());
 			producto.setIva(det.getProductoId().getIva());
 			producto.setNombre(det.getProductoId().getNombre());
 			DocumentoDetalle detalleInvoiceTemp = new DocumentoDetalle();
 			detalleInvoiceTemp.setCantidad(det.getCantidad());
 			detalleInvoiceTemp.setCodigoImpuesto(determinarImpuesto(det));
-			detalleInvoiceTemp.setFechaRegistro(det.getFechaRegistro());
+			//detalleInvoiceTemp.setFechaRegistro(det.getFechaRegistro());
 			detalleInvoiceTemp.setParcial(det.getParcial());
 			detalleInvoiceTemp.setProductoId(producto);
 			detalleInvoice.add(detalleInvoiceTemp);
@@ -200,15 +204,16 @@ public class Invoice implements Serializable {
 		receptor.setApellidos("");
 		receptor.setNombre(d.getClienteId().getNombre());
 		receptor.setDireccion(d.getClienteId().getDireccion());
-		receptor.setEmail(d.getClienteId().getMail());
+		receptor.setEmail(d.getClienteId().getMail()==null?"notiene@hotmail.com":d.getClienteId().getMail());
 		receptor.setIdentificacion(d.getClienteId().getDocumento());
 		receptor.setRazonSocial(d.getClienteId().getNombre());
+		receptor.setTipoIdenificacionId(31l);//valor quedado
 		//TODO hay que hacer las tablas de tipo documento y regimen
-		//receptor.set
+		receptor.setRegimen(2l);//esto por ahora quemado
 		documentoInvoice.setBase19(d.getBase19());
 		documentoInvoice.setBase5(d.getBase5());
 		documentoInvoice.setExento(d.getExcento());
-		documentoInvoice.setFechaRegistro(d.getFechaRegistro());
+		//documentoInvoice.setFechaRegistro(d.getFechaRegistro());
 		documentoInvoice.setGravado(d.getGravado());
 		documentoInvoice.setIva(d.getIva());
 		documentoInvoice.setIva19(d.getIva19());

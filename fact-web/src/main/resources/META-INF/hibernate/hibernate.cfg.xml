@@ -43,5 +43,6 @@
     	<mapping class="com.fact.model.UsuarioEmpresa" />
     	<mapping class="com.fact.model.Invoice" />
     	<mapping class="com.fact.model.Proporcion" />
+    	<mapping class="com.fact.model.ConsecutivoDian" />
     </session-factory>
 </hibernate-configuration>

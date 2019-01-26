@@ -15,6 +15,7 @@ import com.fact.api.FactException;
 import com.fact.dao.DocumentoDetalleDao;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
+import com.fact.model.Empresa;
 import com.fact.utils.HibernateUtil;
 
 @Stateless()
@@ -235,6 +236,28 @@ public class DocumentoDetalleDaoImpl implements DocumentoDetalleDao {
 			Query query = session.createQuery(sql);
 			query.setParameter("hoy", hoy);
 			query.setParameter("hoyfin", hoyfin);
+			DocumentoDetalleList = query.list();
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return DocumentoDetalleList;
+	}
+
+	@Override
+	public List<DocumentoDetalle> getCardex(Empresa empresa, Long productoId, Date fechaIni, Date fechaFin) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<DocumentoDetalle> DocumentoDetalleList = new ArrayList<>();
+		try {
+			String sql = "select dd from DocumentoDetalle dd "
+					+ " where dd.productoId.productoId= :productoId "
+				    + " and (dd.documentoId.fechaRegistro >= :fechaIni) AND (dd.documentoId.fechaRegistro <= :fechaFin) "
+					//falta ver como sacamos el filtro de la empresa
+					+ "and dd.estado = 1 ";
+			Query query = session.createQuery(sql);
+			query.setParameter("fechaIni", fechaIni);
+			query.setParameter("fechaFin", fechaFin);
+			query.setParameter("productoId", productoId);
 			DocumentoDetalleList = query.list();
 			session.close();
 		} catch (FactException e) {

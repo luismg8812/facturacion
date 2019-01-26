@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form id="cardexForm">
+	<p:growl id="growl" life="7000" />
+		Para mejorar el tiempo de busqueda se recomienda ingresar un rago de fechas.
+		<table width="70%" align="center">
+		<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial"
+						value="#{infoVentas.fechaIni}" size="16" pattern="dd-MM-yyyy"
+						mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal"
+						value="#{infoVentas.fechaFin}" size="16" pattern="dd-MM-yyyy"
+						mask="true" /></td>
+			</tr>
+		<tr>
+			<td><p:outputLabel value="Producto:" /></td>
+			<td><p:selectOneMenu value="#{infoVentas.productoId}" panelStyle="font-size: 13px"
+						id="cliente">
+						<f:selectItem itemLabel="Seleccione Producto" itemValue="0" />
+						<f:selectItems value="#{infoVentas.productoList}" var="usua"
+							itemLabel="#{usua.productoId.nombre}" itemValue="#{usua.productoEmpresaId}" />
+					</p:selectOneMenu></td>
+					<td> <p:commandButton value="Buscar" update="cardexTable,actual,growl,cantidad,entradas,salidas" action="#{infoVentas.buscarCardex()}"></p:commandButton></td>
+		</tr>		
+	</table>
+	<table width="100%" align="center">
+		<tr>
+				<td><p:outputLabel id="actual" value="Existencia Actual: #{infoVentas.actual.cantidad}" ></p:outputLabel></td>
+				<td><p:outputLabel id="cantidad" value="Existencia Inicial: #{infoVentas.actual.productoId.cantidad}" ></p:outputLabel></td>
+				<td><p:outputLabel id="entradas" value="Total Entradas: #{infoVentas.totalEntradas}"  ></p:outputLabel></td>
+				<td><p:outputLabel id="salidas" value="Total Salidas: #{infoVentas.totalSalidas}" ></p:outputLabel></td>
+		</tr>
+	</table>
+	 
+	<p:dataTable var="car" value="#{infoVentas.cardexList}" id="cardexTable" emptyMessage="No existen movimientos para el producto seleccionado">
+    <p:column headerText="Producto">
+        <h:outputText value="#{car.productoId.nombre}" />
+    </p:column>
+ 
+    <p:column headerText="Documento">
+ 	
+    		<h:outputText value="#{car.documentoId.consecutivoDian}" />
+    	
+    	
+    </p:column>
+ 
+    <p:column headerText="Fecha">
+        <h:outputText value="#{car.fechaRegistro}" >
+        	<f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+        </h:outputText>
+    </p:column>
+ 
+    <p:column headerText="Tipo documento">
+    		<h:outputText value="#{car.documentoId.tipoDocumentoId.nombre}" />
+    </p:column>
+    <p:column headerText="Cantidad">
+    	<h:outputText value="#{car.cantidad}" />
+    </p:column>
+</p:dataTable>
+	</h:form>
+</ui:composition>

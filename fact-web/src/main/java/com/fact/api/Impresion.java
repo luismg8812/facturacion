@@ -1446,7 +1446,7 @@ public class Impresion {
 	}
 
 	public static void imprimirEntadaAlmacenTXT(Documento documentoImp, List<DocumentoDetalleVo> productos,
-			Usuario usuario, Configuracion config, String impresora, Empresa e) throws IOException {
+			 Configuracion config, String impresora, Empresa e) throws IOException {
 		log.info("imprimir entrada almacen txt");
 		String carpeta = "C:\\facturas\\entradas";
 		String pdf = "\\entrada_" + documentoImp.getDocumentoId() + ".txt";
@@ -1458,6 +1458,19 @@ public class Impresion {
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		String TituloFactura = "";
 		int tamanoTxt = 40;
+		switch (""+documentoImp.getTipoDocumentoId().getTipoDocumentoId()) {
+		case "6":
+			TituloFactura="SALIDA DE ALMACEN: ";
+			break;
+		case "2":
+			TituloFactura="ENTRADA DE ALMACEN: ";
+			break;
+		case "1":
+			TituloFactura="ENTRADA POR GUIA: ";
+			break;	
+		default:
+			break;
+		}
 		String fhoyIni = df.format(documentoImp.getFechaRegistro());
 		bw = new BufferedWriter(new FileWriter(archivo));
 		bw.write("----------------------------------------\n");
@@ -1468,7 +1481,7 @@ public class Impresion {
 		bw.write(Calculos.centrarDescripcion(e.getDireccion() + " - " + e.getBarrio(), tamanoTxt)+"\n");
 		bw.write(Calculos.centrarDescripcion(e.getCiudad() + "- " + e.getDepartamento(), tamanoTxt)+"\n");												
 		bw.write(Calculos.centrarDescripcion("TEL: " + e.getTelefonoFijo() + " - " + e.getCel()+"\n", tamanoTxt));
-		bw.write("Entrada de almacen: " + documentoImp.getDocumentoId()+"\n");
+		bw.write(TituloFactura + documentoImp.getDocumentoId()+"\n");
 		bw.write("FECHA: " + fhoyIni+"\n");
 		bw.write("CAJERO: " + documentoImp.getUsuarioId().getUsuarioId() + " " + documentoImp.getUsuarioId().getNombre()
 				+ " " + documentoImp.getUsuarioId().getApellido()+"\n");
@@ -1515,7 +1528,7 @@ public class Impresion {
 		bw.write(LINEA+"\n");	
 		bw.write("Valor Exento:          "+Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13)+"\n");	
 		bw.write("Valor Gravado:         "+Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 13)+"\n");	
-		bw.write("Retefuente:            "+Calculos.cortarCantidades(formatea.format(documentoImp.getRetefuente()), 13)+"\n");	
+		bw.write("Retefuente:            "+Calculos.cortarCantidades(formatea.format(documentoImp.getRetefuente()==null?0.0:documentoImp.getRetefuente()), 13)+"\n");	
 		bw.write((e.getImpuesto().equals("IVA") ? "IVA" : "IPO") + ":                   "
 				+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13)+"\n");	
 		bw.write(LINEA+"\n");	
@@ -1538,10 +1551,7 @@ public class Impresion {
 				log.info(carpeta+pdf);
 			} catch (FileNotFoundException ex) {
 				ex.printStackTrace();
-			}
-			if (inputStream == null) {
-				// return;
-			}
+			}		
 			DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
 			Doc document = new SimpleDoc(inputStream, docFormat, null);
 			PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
@@ -1557,8 +1567,7 @@ public class Impresion {
 					log.info(impresora + " : " + printer.getName());
 					break;
 				}
-			}
-			// defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
+			}		
 			if (defaultPrintService != null) {
 				DocPrintJob printJob = defaultPrintService.createPrintJob();
 				try {

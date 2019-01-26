@@ -135,8 +135,6 @@ public class Documento {
 	@Column(name="TOTAL_COSTO")
 	private Double totalCosto;
 	
-	
-
 	public Long getDocumentoId() {
 		return documentoId;
 	}
@@ -418,5 +416,5 @@ public class Documento {
 	public void setInvoiceId(Invoice invoiceId) {
 		this.invoiceId = invoiceId;
 	}
-	
+
 }
