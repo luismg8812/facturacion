@@ -40,6 +40,7 @@ import com.fact.model.ProductoEmpresa;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
+import com.fact.model.TipoPago;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
@@ -136,7 +137,7 @@ public class MovimientoMes implements Serializable {
 	String focus = "";
 	String crear;
 	String crearNew;
-	private String impresion;
+	
 
 	// variables nuevo producto
 	BigInteger codigoNew;
@@ -165,9 +166,15 @@ public class MovimientoMes implements Serializable {
 	String cambioTemp;// variable para almacednar el cambio dde precio temporal
 	DocumentoDetalleVo dCambio;// variable que contiene el detalle del producto
 								// que se le cambiara el precio
+	
+	private String buscar;
 
 	private String parciaPopup = "";
 	Conector conector = null;
+	
+	//imprimir
+	private String cartera;
+	private String impresion;
 
 	public String getSubProductoNew() {
 		return subProductoNew;
@@ -786,6 +793,55 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().execute("document.getElementById('nuevoProducto').style.display='none';");
 	}
 	
+	public void buscarByIdFactura() {
+		log.info("entra a buscar factura id: "+getBuscar());
+		List<DocumentoDetalle> dd ;
+		List<DocumentoDetalleVo> ddVo = new ArrayList<>();
+		Documento docu = documentoService.getById(Long.valueOf(getBuscar()==null?"0":getBuscar()));
+		if(docu==null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No se encontró el documento con id: "+getBuscar()));
+			return;
+		}
+//		//if(docu.getTipoDocumentoId().getTipoDocumentoId()!=2 || docu.getTipoDocumentoId().getTipoDocumentoId()!=6) {
+//			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El documento solicitado no corresponde a una entrasa o salida de almacen"));
+//			return;
+//		}
+		setDocumentoActual(docu);
+		dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
+		for (DocumentoDetalle d1 : dd) {
+			DocumentoDetalleVo vo = new DocumentoDetalleVo();
+			vo.setCantidad(d1.getCantidad());
+			vo.setDocumentoDetalleId(d1);
+			vo.setDocumentoId(d1.getDocumentoId());
+			vo.setFechaRegistro(d1.getFechaRegistro());
+			vo.setParcial(d1.getParcial());
+			d1.getProductoId().setCostoPublico(vo.getParcial() / vo.getCantidad());
+			vo.setProductoId(d1.getProductoId());
+			ddVo.add(vo);
+		}
+		setProductos(ddVo);
+		setTotal(getDocumentoActual().getTotal());
+		setExecento(getDocumentoActual().getExcento());
+		setIva(getDocumentoActual().getIva());
+		setRetefuente(getDocumentoActual().getRetefuente());
+		setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+		RequestContext.getCurrentInstance()
+				.execute("document.getElementById('dataList_content').style.display='inline';");
+		RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
+		RequestContext.getCurrentInstance().update("cod_");
+		RequestContext.getCurrentInstance().update("nombc");
+		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
+		RequestContext.getCurrentInstance().update("cantidad_in");
+		RequestContext.getCurrentInstance().update("dataList");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().update("unidad_");
+	}
+	
 	public void recalcularPrecio(DocumentoDetalleVo d) {
 		log.info("producto para cambio de precio: "+d.getUnitario());
 		dCambio = d;
@@ -1020,9 +1076,10 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
-		if (getDocumento().getDocumentoId() == null) {
+		if (getDocumento().getDocumentoId() == null || getImpresion()==null ||getImpresion().equalsIgnoreCase("n")) {
 			return "";
 		}
+		
 		log.info("entra a imprimir entrada almacen");
 		Configuracion configuracion = configuracion();
 		int numeroImpresiones = configuracion.getNumImpresion();
@@ -1034,12 +1091,16 @@ public class MovimientoMes implements Serializable {
 		getDocumento().setConsecutivoDian(""+documento.getDocumentoId());
 		if (getDocumento().getProveedorId() == null) {
 			Proveedor c = new Proveedor();
-			c.setProveedorId(1l); // se le envia proveedor varios por
-									// defecto
+			c.setProveedorId(1l); // se le envia proveedor varios por defecto
 			c.setNombre("Varios");
 			c.setDireccion("");
 			getDocumento().setProveedorId(c);
 		}
+		if(getCartera().equalsIgnoreCase("s")) {
+			log.info("documento para cartera");
+			crearVale();
+		}
+		
 		// se busca la mac del equipo y se le asigna a la factura
 		getDocumento().setMac(Calculos.conseguirMAC2());
 		documentoService.update(getDocumento(), server);
@@ -1074,7 +1135,46 @@ public class MovimientoMes implements Serializable {
 			}
 
 		}
+		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
+		setTotal(null);
+		setIva(null);
+		setRetefuente(null);
+		setGravado(null);
+		setExecento(null);
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().execute("PF('imprimirMM').hide();");
+		limpiar();
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Impresión Completa"));
 		return "";
+	}
+	
+	private void crearVale() {
+		Documento docu = new Documento();
+		TipoDocumento tido = new TipoDocumento();
+		TipoPago pago = new TipoPago();
+		Usuario usuario = usuario();
+		long server = 1;
+		docu.setFechaRegistro(new Date());
+
+		docu.setClienteId(getDocumento().getClienteId());
+		docu.setSaldo(getDocumento().getTotal());
+		// se le envia tipo documento vale (Vale) por que zohan dijo
+		tido.setTipoDocumentoId(8l);
+		docu.setTipoDocumentoId(tido);
+		// se envia tipo pago con vale, debido a que el vale es un documento a credito
+		pago.setTipoPagoId(6l);
+		docu.setTipoPagoId(pago);
+		docu.setTotal(getDocumento().getTotal());
+		docu.setUsuarioId(usuario);
+		docu.setDetalleEntrada(""+getDocumento().getDocumentoId());
+		documentoService.save(docu, server);
+		log.info("se crea el vale por factura venta a cretido:" + docu.getDocumentoId());
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
 	}
 
 	public Usuario usuario() {
@@ -1143,7 +1243,8 @@ public class MovimientoMes implements Serializable {
 	public void borrarFactura() {
 		claveBorradoActivo = (OpcionUsuario) sessionMap.get("claveBorradoActivo");
 		if (getDocumento() != null && getDocumento().getTipoDocumentoId() != null) {
-			if (claveBorradoActivo != null) {
+			//if (claveBorradoActivo != null) {
+			if(1!=1) {
 				RequestContext.getCurrentInstance().execute("PF('modificarFactura').show();");
 			} else {
 				activarBorrado();
@@ -1171,52 +1272,48 @@ public class MovimientoMes implements Serializable {
 	}
 
 	public void borrarFacturaSelect(DocumentoDetalleVo d) {
-		DocumentoDetalle dd = new DocumentoDetalle();
-		ProductoEmpresa productoEmpresa= productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),d.getProductoId().getProductoId());
-		Documento docu;
-		long server = 1;
-		dd.setDocumentoDetalleId(d.getDocumentoDetalleId().getDocumentoDetalleId());
-		dd.setCantidad(d.getCantidad());
-		dd.setDocumentoId(d.getDocumentoId());
-		dd.setFechaRegistro(d.getFechaRegistro());
-		dd.setProductoId(d.getProductoId());
-		dd.setEstado(0l);
-		dd.setParcial(d.getParcial());
-		docu = dd.getDocumentoId();
-		Double ivaDocu = docu.getIva() == null ? 0.0 : docu.getIva();
-		Double ivaProd = (d.getProductoId().getIva() == null ? 0.0 : d.getProductoId().getIva()) / 100;
-		ivaDocu = ivaDocu - (ivaProd * d.getParcial());
-		Double excentoB = docu.getExcento();
-		Double canti = docu.getTotal();
-		canti = canti - (d.getParcial());
-		double temp = d.getParcial() * ivaProd;
-		temp = d.getParcial() - temp;
-		excentoB = excentoB - temp;
-		docu.setExcento(excentoB);
-		docu.setIva(ivaDocu);
-		docu.setTotal(canti);
-		setTotal(canti);
-		setExecento(excentoB);
-		setIva(ivaDocu);
-		Producto productoEdit;	
-		Double cantidadactu = productoEmpresa.getCantidad() - d.getCantidad();
-		productoEmpresa.setCantidad(cantidadactu);
-		productoEmpresaService.update(productoEmpresa);
-		if (server == 2l) {
-			productoEdit = productoService.getById(d.getProductoId().getProductoId());
-			cantidad = productoEdit.getCantidad() + d.getCantidad2();
-			productoEdit.setCantidad(cantidadactu);
-			productoService.update(productoEdit, server);
-		}
-		documentoDetalleService.update(dd, server);
-		documentoService.update(docu, server);
+		Long server = 1l;
 		getProductos().remove(d);
+		try {
+			setDocumento(Calculos.calcularExcento(d.getDocumentoId(), getProductos()));
+			if (d.getDocumentoId().getProveedorId() != null && d.getDocumentoId().getProveedorId().getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l) {
+				setDocumento(Calculos.calcularRetefuente(getDocumento(), d.getDocumentoId().getProveedorId()));
+			}else {
+				setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
+			}
+			documentoService.update(getDocumento(), server);
+			setExecento(getDocumento().getExcento());
+			setGravado(getDocumento().getGravado());
+			setIva(getDocumento().getIva());
+			setTotal(getDocumento().getTotal());
+			setRetefuente(getDocumento().getRetefuente());
+			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
+			ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),
+					d.getProductoId().getProductoId());
+			Double cantidad1 = productoEmpresa.getCantidad() - d.getCantidad();
+			productoEmpresa.setCantidad(cantidad1);
+			productoEmpresaService.update(productoEmpresa);
+
+			if (server == 2l) {
+				productoEmpresa = productoEmpresaService.getById(d.getProductoId().getProductoId());
+				cantidad = productoEmpresa.getCantidad() - d.getCantidad2();
+				productoEmpresa.setCantidad(cantidad);
+				productoEmpresaService.update(productoEmpresa);
+			}
+
+		} catch (Exception e) {
+			log.error("!!error borrando el producto:" + d.getProductoId().getProductoId());
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error borrando Productos"));
+		}
+		
 		RequestContext.getCurrentInstance().update("borrarTablaMM:checkboxDT");
 		RequestContext.getCurrentInstance().update("execentoFact");
 		RequestContext.getCurrentInstance().update("gravado");
 		RequestContext.getCurrentInstance().update("ivaFact");
 		RequestContext.getCurrentInstance().update("totalFact");
 		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		
 		if (!getProductos().isEmpty()) {
 			RequestContext.getCurrentInstance()
 					.execute("document.getElementById('borrarTablaMM:checkboxDT:0:rowDelete_').focus();");
@@ -1251,36 +1348,22 @@ public class MovimientoMes implements Serializable {
 			actModFactura = Boolean.FALSE;
 		} else {
 			log.info("imprimir");
-			try {
-				imprimirFactura();	
-				RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
-				setTotal(null);
-				setIva(null);
-				setRetefuente(null);
-				setGravado(null);
-				setExecento(null);
-				limpiar();
-				RequestContext.getCurrentInstance().update("execentoFact");
-				RequestContext.getCurrentInstance().update("gravado");
-				RequestContext.getCurrentInstance().update("ivaFact");
-				RequestContext.getCurrentInstance().update("totalFact");
-				RequestContext.getCurrentInstance().update("gravadoFact");
-				RequestContext.getCurrentInstance().update("retefuentelFact");
-				
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Impresión Completa"));
-			} catch (IOException e) {
-				log.error("Probable error en impresion con la imagen de la factura: " + e.getMessage());
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
-			} catch (DocumentException e) {
-				log.error("Probable error en impresion con la creacion del documento: " + e.getMessage());
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
-			} catch (PrinterException e) {
-				log.error("Probable error en impresion : " + e.getMessage());
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error en impresión"));
-
-			} catch (PrintException e) {
-				log.error("Probable error en impresion PrintException : " + e.getMessage());
-			}
+			RequestContext.getCurrentInstance().execute("PF('imprimirMM').show();");
+			
+			setCartera("N");			
+			RequestContext.getCurrentInstance().execute("document.getElementById('imprimirFormMM:cartera').focus();");
+			RequestContext.getCurrentInstance().execute("document.getElementById('imprimirFormMM:cartera').select();");
+			RequestContext.getCurrentInstance().update("imprimirFormMM:cartera");
+			//imprimirFactura();	
+			RequestContext.getCurrentInstance().update("execentoFact");
+			RequestContext.getCurrentInstance().update("gravado");
+			RequestContext.getCurrentInstance().update("ivaFact");
+			RequestContext.getCurrentInstance().update("totalFact");
+			RequestContext.getCurrentInstance().update("gravadoFact");
+			RequestContext.getCurrentInstance().update("retefuentelFact");
+			
+			
+			
 
 		}
 	}
@@ -1998,4 +2081,19 @@ public class MovimientoMes implements Serializable {
 		this.retefuente = retefuente;
 	}
 
+	public String getBuscar() {
+		return buscar;
+	}
+
+	public void setBuscar(String buscar) {
+		this.buscar = buscar;
+	}
+
+	public String getCartera() {
+		return cartera;
+	}
+
+	public void setCartera(String cartera) {
+		this.cartera = cartera;
+	}
 }

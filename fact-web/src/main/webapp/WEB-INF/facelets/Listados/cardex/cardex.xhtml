@@ -25,6 +25,7 @@
 		<tr>
 			<td><p:outputLabel value="Producto:" /></td>
 			<td><p:selectOneMenu value="#{infoVentas.productoId}" panelStyle="font-size: 13px"
+						filter="true" filterMatchMode="startsWith"
 						id="cliente">
 						<f:selectItem itemLabel="Seleccione Producto" itemValue="0" />
 						<f:selectItems value="#{infoVentas.productoList}" var="usua"
@@ -48,10 +49,10 @@
     </p:column>
  
     <p:column headerText="Documento">
- 	
-    		<h:outputText value="#{car.documentoId.consecutivoDian}" />
-    	
-    	
+    		<h:outputText value="#{car.documentoId.consecutivoDian}" /> 	
+    </p:column>
+ 	<p:column headerText="Detalle Entrada">	
+    		<h:outputText value="#{car.documentoId.detalleEntrada}" /> 	
     </p:column>
  
     <p:column headerText="Fecha">

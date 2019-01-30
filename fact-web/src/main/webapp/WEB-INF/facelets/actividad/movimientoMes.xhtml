@@ -303,10 +303,10 @@ items {
 							value="Pri" id="Pri_movi_mes" /> <p:commandButton value="Ult"
 							id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
 							actionListener="#{movimientoMes.buscarUltimaFactura()}"
-							update="growl" /> <p:commandButton value="Bus" id="Bus_movi_mes" />
+							update="growl" /> <p:commandButton value="Bus" id="Bus_movi_mes" onclick="PF('buscarMM').show();" />
 						<p:commandButton value="..." id="P1_movi_mes" /> <p:commandButton
 							value="Mod" id="Mod_movi_mes"
-							onkeydown="controlTeclasMM(event,this)"
+							onkeydown="poput(event,this),controlTeclasMM(event,this)"
 							actionListener="#{movimientoMes.modificarUltimaFactura()}" /> <p:commandButton
 							value="Gat" id="Gat_movi_mes" /> <p:commandButton value="..."
 							id="P2_movi_mes" /> <p:commandButton value="New"
@@ -314,7 +314,7 @@ items {
 							onclick="newDocumentoMM()" /> <p:commandButton value="..."
 							id="P3_movi_mes" /> <p:commandButton value="Imp"
 							id="Imp_movi_mes"
-							actionListener="#{movimientoMes.popupImprimir()}" update="growl" />
+							actionListener="#{movimientoMes.popupImprimir()}" update="growl,imprimirFormMM:cartera" />
 						<p:commandButton value="..." id="P4_movi_mes" /> <p:splitButton
 							value="Opc" id="Opc_movi_mes" disabled="false"
 							icon="ui-icon-document">
@@ -405,7 +405,7 @@ items {
 							<p:commandButton id="rowDelete_#{rowIndex}" value="Borrar"
 								actionListener="#{movimientoMes.borrarFacturaSelect(prod11)}"
 								onkeyup="borradoMM(event,this)"
-								update="checkboxDT,excento,iva,total">
+								update="checkboxDT,excento,iva,total,retefuentelFact">
 								<p:focus for="borrarTablaMM:checkboxDT:0:rowDelete_" />
 							</p:commandButton>
 						</p:column>
@@ -470,7 +470,9 @@ items {
 				<td width="15%"><p:inputText value="#{movimientoMes.unidad}"
 						size="12" id="unidad_" disabled="true" /></td>
 				<td width="15%"><p:inputText value="#{movimientoMes.parcial}"
-						size="12" disabled="true" /></td>
+						size="12" disabled="true" >
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</p:inputText> </td>
 			</tr>
 		</table>
 	</p:panel>
@@ -540,6 +542,20 @@ items {
 		<div style="width: 300px;">
 			<ui:include
 				src="/WEB-INF/facelets/actividad/movimientoMes/cambioPrecio.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="buscarMM" id="buscarMM"
+		style="font-size: 16px" header="Cambio de precio">
+		<div style="width: 300px;">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/movimientoMes/BuscarMM.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="imprimirMM" id="imprimirMM"  onShow="document.getElementById('imprimirFormMM:cartera').className=' ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all state-focus';"
+		style="font-size: 16px" header="Valor a cacelar">
+		<div style="width: 350px; height: 400px">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/movimientoMes/imprimir.xhtml" />
 		</div>
 	</p:dialog>
 </ui:composition>

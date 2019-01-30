@@ -83,6 +83,11 @@
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
+			<p:column headerText="Retención">
+				<h:outputText value="#{docu.retefuente}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
 			<p:column headerText="Saldo">
 				<h:outputText value="#{docu.saldo}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
@@ -124,7 +129,7 @@
 			<ui:include src="/WEB-INF/facelets/clientes/abonos/crearAbono.xhtml" />
 		</div>
 	</p:dialog>
-	<p:dialog widgetVar="consultarAbono" header="Consultar Abonos"
+	<p:dialog widgetVar="consultarAbono" header="Consultar Abonos" width="70%"
 		closeOnEscape="true" showEffect="fade" resizable="false">
 		<div>
 			<ui:include

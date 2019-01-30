@@ -1,16 +1,19 @@
 package com.fact.vo;
 
 import com.fact.model.Cliente;
+import com.fact.model.Proveedor;
 
 public class ClienteVo {
 
-	Cliente clienteId;
-	Double totalCompras;
-	Double excento;
-	Double baseIva19;
-	Double baseIva5;
-	Double iva19;
-	Double iva5;
+	private Cliente clienteId;
+	private Proveedor proveedorId;
+	private String tipo;
+	private Double totalCompras;
+	private Double excento;
+	private Double baseIva19;
+	private Double baseIva5;
+	private Double iva19;
+	private Double iva5;
 	public Cliente getClienteId() {
 		return clienteId;
 	}
@@ -53,7 +56,17 @@ public class ClienteVo {
 	public void setIva5(Double iva5) {
 		this.iva5 = iva5;
 	}
-	
-	
+	public Proveedor getProveedorId() {
+		return proveedorId;
+	}
+	public void setProveedorId(Proveedor proveedorId) {
+		this.proveedorId = proveedorId;
+	}
+	public String getTipo() {
+		return tipo;
+	}
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
 	
 }

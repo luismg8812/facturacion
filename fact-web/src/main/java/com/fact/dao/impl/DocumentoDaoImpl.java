@@ -189,7 +189,8 @@ public class DocumentoDaoImpl implements DocumentoDao {
 		try {
 			String sql = "select d from Documento d where (d.impreso is null or d.impreso=0) and d.tipoDocumentoId.tipoDocumentoId in :tipoDocumentoId  and d.documentoId  "
 					+ "in (select dd.documentoId.documentoId from DocumentoDetalle dd where dd.documentoId.documentoId=d.documentoId and dd.estado=1) "
-					+ "and d.usuarioId.usuarioId =:usuarioId";
+					+ "and d.usuarioId.usuarioId =:usuarioId"
+					+ " order by d.documentoId desc ";
 			Query query = session.createQuery(sql);
 			query.setParameter("usuarioId", usuarioId);
 			query.setParameterList("tipoDocumentoId", tipoDocumentoId);
@@ -247,9 +248,9 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			String detalle) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Documento> documentoList = new ArrayList<>();
-		Long factura = 10l;
+		Long factura = 8l;
 		try {
-			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId not in :factura ";
+			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId in :factura ";
 			if (proveedorId != null && proveedorId != 0l) {
 				sql += " and (d.proveedorId.proveedorId =:proveedorId )";
 			}
@@ -262,6 +263,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			if (detalle != null && !detalle.isEmpty()) {
 				sql += " and (d.detalleEntrada =:detalle )";
 			}
+			sql+=" and d.detalleEntrada in ( select d2.consecutivoDian from Documento d2 where d2.tipoDocumentoId.tipoDocumentoId = 2)";
 			Query query = session.createQuery(sql);
 			query.setParameter("factura", factura);
 			if (proveedorId != null && proveedorId != 0l) {

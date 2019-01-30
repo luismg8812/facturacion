@@ -20,10 +20,12 @@ import com.fact.model.Ciudad;
 import com.fact.model.Cliente;
 import com.fact.model.Departamento;
 import com.fact.model.Documento;
+import com.fact.model.Proveedor;
 import com.fact.service.CiudadService;
 import com.fact.service.ClienteService;
 import com.fact.service.DepartamentoService;
 import com.fact.service.DocumentoService;
+import com.fact.service.ProveedorService;
 import com.fact.vo.ClienteVo;
 
 @ManagedBean
@@ -44,6 +46,9 @@ public class Clientes implements Serializable {
 
 	@EJB
 	private ClienteService clienteService;
+	
+	@EJB
+	private ProveedorService proveedorService;
 
 	@EJB
 	private DocumentoService documentoService;
@@ -112,6 +117,7 @@ public class Clientes implements Serializable {
 			return;
 		}
 		List<Cliente> clientesTemp = new ArrayList<>();
+		List<Proveedor> proveedorTemp ;
 		List<Long> tipoDocumentoId = new ArrayList<>();
 		setTerceros(new ArrayList<>());
 		tipoDocumentoId.add(10l);//se agrega tipo documento factura de venta
@@ -121,6 +127,37 @@ public class Clientes implements Serializable {
 			Cliente cli = clienteService.getById(getClienteId());
 			clientesTemp.add(cli);
 		}
+		proveedorTemp = proveedorService.getByAll();
+for (Proveedor c : proveedorTemp) {
+			
+			List<Documento> facturas = documentoService.getByProveedor(c.getProveedorId(),tipoDocumentoId,Calculos.fechaInicial(getFechaInicio()),Calculos.fechaFinal(getFechafin()));
+			Double total=0.0;
+			Double excento=0.0;
+			Double base19=0.0;
+			Double base5=0.0;
+			Double iva19=0.0;
+			Double iva5=0.0;
+			String tipo="Proveedor";
+			for(Documento d: facturas){
+				total=(d.getTotal()==null?0.0:d.getTotal())+total;
+				excento=(d.getExcento()==null?0.0:d.getExcento())+excento;
+				base19=(d.getBase19()==null?0.0:d.getBase19())+base19;
+				base5=(d.getBase5()==null?0.0:d.getBase5())+base5;
+				iva19=(d.getIva19()==null?0.0:d.getIva19())+iva19;
+				iva5=(d.getIva5()==null?0.0:d.getIva5())+iva5;
+			}
+			ClienteVo cl= new ClienteVo();
+			cl.setTipo(tipo);
+			cl.setProveedorId(c);
+			cl.setBaseIva19(base19);
+			cl.setBaseIva5(base5);
+			cl.setExcento(excento);
+			cl.setIva19(iva19);
+			cl.setIva5(iva5);
+			cl.setTotalCompras(total);
+			getTerceros().add(cl);
+	}
+
 		for (Cliente c : clientesTemp) {
 				
 				List<Documento> facturas = documentoService.getByCliente(c.getClienteId(),tipoDocumentoId,Calculos.fechaInicial(getFechaInicio()),Calculos.fechaFinal(getFechafin()));
@@ -130,6 +167,7 @@ public class Clientes implements Serializable {
 				Double base5=0.0;
 				Double iva19=0.0;
 				Double iva5=0.0;
+				
 				for(Documento d: facturas){
 					total=(d.getTotal()==null?0.0:d.getTotal())+total;
 					excento=(d.getExcento()==null?0.0:d.getExcento())+excento;
@@ -139,6 +177,7 @@ public class Clientes implements Serializable {
 					iva5=(d.getIva5()==null?0.0:d.getIva5())+iva5;
 				}
 				ClienteVo cl= new ClienteVo();
+				cl.setTipo("Cliente");
 				cl.setClienteId(c);
 				cl.setBaseIva19(base19);
 				cl.setBaseIva5(base5);
@@ -148,7 +187,7 @@ public class Clientes implements Serializable {
 				cl.setTotalCompras(total);
 				getTerceros().add(cl);
 		}
-	}
+			}
 
 	public String llenarCampos() {
 		log.info(getClienteId());

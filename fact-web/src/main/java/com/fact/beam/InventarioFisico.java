@@ -224,7 +224,7 @@ public class InventarioFisico implements Serializable {
 				Double utilidadSugerida = p.getProductoId().getUtilidadSugerida() == null ? 0.0 : p.getProductoId().getUtilidadSugerida();
 				Double costoSugerida = p.getProductoId().getCostoSugerida() == null ? 0.0 : p.getProductoId().getCostoSugerida();
 				Double costo = p.getProductoId().getCosto() == null ? 0.0 : p.getProductoId().getCosto();
-				Double publico = p.getProductoId().getCostoPublico() == null ? 0.0 : p.getProductoId().getCostoPublico();
+				Double publico = p.getPrecio() == null ? 0.0 : p.getPrecio();
 				Double publicoSugerido = costo + (costo * (utilidadSugerida / 100));
 				Double utilidadReal = ((publico - costo) * 100) / costo;
 				Double diferencia = publico - costo;
