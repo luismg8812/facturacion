@@ -1160,7 +1160,8 @@ public class MovimientoMes implements Serializable {
 		Usuario usuario = usuario();
 		long server = 1;
 		docu.setFechaRegistro(new Date());
-
+		docu.setProveedorId(getDocumento().getProveedorId());
+		docu.setRetefuente(getDocumento().getRetefuente());
 		docu.setClienteId(getDocumento().getClienteId());
 		docu.setSaldo(getDocumento().getTotal());
 		// se le envia tipo documento vale (Vale) por que zohan dijo

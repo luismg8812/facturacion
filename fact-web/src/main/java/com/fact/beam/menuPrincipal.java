@@ -44,6 +44,10 @@ public class menuPrincipal implements Serializable {
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 	
+	public void cerrarSesioin() throws FactException, IOException {
+		sessionMap.clear();
+		getMenus();
+	}
 
 	public List<Menu> getMenus() throws FactException, IOException{ 
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
@@ -60,9 +64,14 @@ public class menuPrincipal implements Serializable {
 		this.menus = menus;
 	}
 	
-	public List<OpcionUsuario> getOpcionUsuarios(String MenuId) {
+	public List<OpcionUsuario> getOpcionUsuarios(String menuId) {
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
-		opcionUsuarios= opcionUsuarioService.getByMenuId(MenuId,usuario.getUsuarioId());
+		//long TInicio, TFin, tiempo; //Variables para determinar el tiempo de ejecución
+		//  TInicio = System.currentTimeMillis(); //Tomamos la hora en que inicio el algoritmo y la almacenamos en la variable inicio
+		opcionUsuarios= opcionUsuarioService.getByMenuId(menuId,usuario.getUsuarioId());
+		//TFin = System.currentTimeMillis(); //Tomamos la hora en que finalizó el algoritmo y la almacenamos en la variable T
+		//  tiempo = TFin - TInicio; //Calculamos los milisegundos de diferencia
+		 // System.out.println("Tiempo occiones menu:"+menuId+":" + tiempo); //Mostramos en pantalla el tiempo de ejecución en milisegundos
 		return opcionUsuarios;
 	}
 

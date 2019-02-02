@@ -501,7 +501,10 @@ public class Abonos implements Serializable {
 	}
 
 	public List<Cliente> getClientes() {
-		clientes = clienteService.getByAll();
+		if(clientes==null){
+			clientes = clienteService.getByAll();
+		}
+		
 		return clientes;
 	}
 

@@ -1526,7 +1526,7 @@ public class Impresion {
 			bw.write(cant + " " + nombre + " " + unit + " " + total + " " + iva+"\n");				
 		}
 		bw.write(LINEA+"\n");	
-		bw.write("Valor Exento:          "+Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13)+"\n");	
+		bw.write("Valor Exento:          "+Calculos.cortarCantidades(documentoImp.getExcento()==null?0.0:documentoImp.getExcento(), 13)+"\n");	
 		bw.write("Valor Gravado:         "+Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 13)+"\n");	
 		bw.write("Retefuente:            "+Calculos.cortarCantidades(formatea.format(documentoImp.getRetefuente()==null?0.0:documentoImp.getRetefuente()), 13)+"\n");	
 		bw.write((e.getImpuesto().equals("IVA") ? "IVA" : "IPO") + ":                   "

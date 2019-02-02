@@ -296,7 +296,10 @@ public class InventarioFisico implements Serializable {
 	}
 
 	public List<Producto> getProductosList() {
-		productosList = productoService.getByAll();
+		if(productosList==null) {
+			productosList = productoService.getByAll();
+		}
+		
 		return productosList;
 	}
 
@@ -354,6 +357,9 @@ public class InventarioFisico implements Serializable {
 	}
 
 	public List<Proveedor> getProveedorList() {
+		if(proveedorList==null) {
+			
+		}
 		proveedorList = proveedorService.getByAll();
 		return proveedorList;
 	}

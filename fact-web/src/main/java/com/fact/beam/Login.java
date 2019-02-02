@@ -32,6 +32,7 @@ import com.fact.model.Configuracion;
 import com.fact.model.Empresa;
 import com.fact.model.Usuario;
 import com.fact.service.UsuarioService;
+import com.fact.utils.Constantes;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -67,7 +68,7 @@ public class Login implements Serializable {
 	
 
 	  public StreamedContent getGraphicImage() {  
-		  	String path = "C:\\facturacion\\logoEmpresa.jpg";
+		  	String path = Constantes.LOGO_EMPRESA;
 		  	try {
 				graphicImage=new DefaultStreamedContent(new FileInputStream(path), "image/png");
 			} catch (FileNotFoundException e) {
@@ -243,7 +244,7 @@ public class Login implements Serializable {
 	      ImpresorasInstaladas fromJson;
 	      try {
 	    	  HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-	         archivo = new File ("\\\\"+request.getRemoteAddr()+"\\facturacion\\impresora.txt");
+	         archivo = new File ("\\\\"+request.getRemoteAddr()+Constantes.ARCHIVO_IMPRESORA);
 	         fr = new FileReader (archivo);
 	         br = new BufferedReader(fr);
 	         String json = "";

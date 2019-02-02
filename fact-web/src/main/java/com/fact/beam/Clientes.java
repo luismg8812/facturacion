@@ -429,7 +429,10 @@ for (Proveedor c : proveedorTemp) {
 	}
 
 	public List<Cliente> getClientes() {
-		clientes = clienteService.getByAll();
+		if(clientes==null) {
+			clientes = clienteService.getByAll();
+		}
+		
 		return clientes;
 	}
 

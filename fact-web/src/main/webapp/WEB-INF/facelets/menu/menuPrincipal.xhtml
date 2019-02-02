@@ -390,6 +390,9 @@
 						value="SISTEMA DE INFORMACIÓN PARA INVENTARIOS" /></td>
 			</tr>
 			<tr>
+				<td align="center"><p:commandLink value="Cerrar Sesión (Limpiar caché)" action="#{menuPrincipal.cerrarSesioin()}"></p:commandLink></td>
+			</tr>
+			<tr>
 				<td align="center">
 				     <c:forEach items="#{menuPrincipal.menus}" var="menu">
 						<p:splitButton value="#{menu.nombre}" id="m_#{menu.menuId}"  onkeydown="cambioAbajo(event)">

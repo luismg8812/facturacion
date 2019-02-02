@@ -26,9 +26,9 @@
 			     }
 				 if(elec=='efectivo_input'){
 					 document.getElementById('campoImp').style.display='inline';
-			    	 document.getElementById('impresion_inp').focus();
-			    	 document.getElementById('impresion_inp').value='S';
-				     document.getElementById('impresion_inp').select();				     
+			    	 document.getElementById('impresion_in').focus();
+			    	 document.getElementById('impresion_in').value='S';
+				     document.getElementById('impresion_in').select();				     
 				 }		     
 			     if(elec=='valorTargeta_input'){
 			    	 document.getElementById('efectivo_input').focus();
@@ -176,9 +176,9 @@
 			<td><p:outputLabel value="Cambio:" /></td>
 			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{puntoVentaDia.cambio}" size="10" id="cambio" readonly="true" /> </td>
 		</tr>
-		<tr id="campoImp" style="display: none;">
+		<tr id="campoImp" style="display: ;">
 			<td><p:outputLabel value="Continúa con la Impresión: " /></td>
-			<td><p:inputText value="#{puntoVentaDia.impresion}" size="2" id="impresion_inp">
+			<td><p:inputText value="#{puntoVentaDia.impresion}" size="2" id="impresion_in">
 				<p:ajax event="keydown"  partialSubmit="true" listener="#{puntoVentaDia.imprimirFactura}" update="growl2" />
 				</p:inputText></td>
 		</tr>
