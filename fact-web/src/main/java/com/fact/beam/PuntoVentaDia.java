@@ -987,7 +987,10 @@ public class PuntoVentaDia implements Serializable {
 
 			}		
 			limpiar();
-			RequestContext.getCurrentInstance().execute("document.getElementById('remotoForm:imp_remoto').click();");
+			//se verifica si se esta trabajando con una impresora remota
+			if(activarImpresionRemota!=null) {
+				RequestContext.getCurrentInstance().execute("document.getElementById('remotoForm:imp_remoto').click();");
+			}	
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
