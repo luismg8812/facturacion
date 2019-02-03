@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -43,6 +44,8 @@ import org.apache.pdfbox.printing.PDFPageable;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import com.fact.api.Calculos;
 import com.fact.api.FactException;
@@ -209,6 +212,7 @@ public class PuntoVentaDia implements Serializable {
 	String modFactura;
 	Boolean actModFactura = Boolean.FALSE;
 	String enPantalla = "";
+	String pathFactura="";
 
 	// saber si el codigo de barras esta activo
 	public OpcionUsuario codBarrasActivo;
@@ -254,6 +258,9 @@ public class PuntoVentaDia implements Serializable {
 
 	// se activa impresion por varias impresoras en el sistem
 	OpcionUsuario activarMultiplesImpresoras;
+	
+	// se activa impresion para sucursales y ip fija
+	OpcionUsuario activarImpresionRemota;
 
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
@@ -948,28 +955,28 @@ public class PuntoVentaDia implements Serializable {
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+					pathFactura=Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,
 							enPantalla, e);
 					break;
 				case "BIG":
 					// quitar la dependencia del ireport
-					imprimirTemporal(tituloFactura);
+					pathFactura=imprimirTemporal(tituloFactura);
 					break;
 				case "PDF":
-					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+					pathFactura=Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
 							enPantalla, e);
 					log.info("sale de impresion pdf");
 					break;
 				case "PDF_PAGE":
-					Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+					pathFactura=Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,
 							enPantalla, e);
 					break;
 				case "BIG_PDF":
-					Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
+					pathFactura=Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
 							impresora, e);
 					break;
 				case "SMALL_PDF":
-					Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
+					pathFactura=Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
 					break;
 				default:
 					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
@@ -978,9 +985,9 @@ public class PuntoVentaDia implements Serializable {
 
 				}
 
-			}
-
+			}		
 			limpiar();
+			RequestContext.getCurrentInstance().execute("document.getElementById('remotoForm:imp_remoto').click();");
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
@@ -1019,6 +1026,16 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
+	public StreamedContent getFacturaRemota()
+			throws DocumentException, IOException, PrinterException, ParseException {
+		StreamedContent file = null;
+		File f = new File(pathFactura);
+		InputStream stream = new FileInputStream(f);
+		if (stream != null) {
+			file = new DefaultStreamedContent(stream, "application/pdf", pathFactura);
+		}
+		return file;
+	}
 	
 
 	private void verificarDescuento() {
@@ -1254,12 +1271,7 @@ public class PuntoVentaDia implements Serializable {
 				documentoService.update(consecutivoDian);
 				break;
 			case "4":
-				getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());// es
-																						// necesario
-																						// asignar
-																						// el
-																						// consecutivo
-																						// dian
+				getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());// es necesario asignar el consecutivo dian
 				log.info("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
 				tituloFactura = "No. DE COTIZACIÓN";
 				server = 1l;
@@ -1562,9 +1574,11 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("ACTIVAR_COMANDAS");
 			rutas.add("ACTIVAR_PROPORCION");
 			rutas.add("ACTIVAR_MULTIPLE_IMPRESORA");
+			rutas.add("IMPRESION_REMOTA");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarMultipesImpresoras(opcionesActivas);
+			activarImpresionRemota(opcionesActivas);
 			activarCodigoBarras(usuario, opcionesActivas);
 			activarCarteraCliente(usuario, opcionesActivas);
 			activarGuiFacturacion(usuario, opcionesActivas);
@@ -1790,6 +1804,19 @@ public class PuntoVentaDia implements Serializable {
 		} else {
 			activarMultiplesImpresoras = null;
 			RequestContext.getCurrentInstance().execute("activarMultiplesImpresoras=0;");
+		}
+	}
+	
+	public void activarImpresionRemota(Map<String, OpcionUsuario> opcionesActivas) {
+		String ruta = "IMPRESION_REMOTA";
+		if (opcionesActivas.containsKey(ruta)) {
+			getActivarMultiplesImpresoras();
+			log.info("tiene impresion remota activo");			
+			activarMultiplesImpresoras = opcionesActivas.get(ruta);
+			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");
+		} else {
+			activarMultiplesImpresoras = null;
+			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=0;");
 		}
 	}
 
@@ -3308,4 +3335,12 @@ public class PuntoVentaDia implements Serializable {
 		this.impresoras = impresoras;
 	}
 
+	public String getActivarImpresionRemota() {
+		return activarImpresionRemota== null ? "false" : "true";
+	}
+
+	public void setActivarImpresionRemota(OpcionUsuario activarImpresionRemota) {
+		this.activarImpresionRemota = activarImpresionRemota;
+	}
+	
 }
