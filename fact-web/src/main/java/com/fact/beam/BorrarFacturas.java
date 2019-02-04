@@ -443,7 +443,7 @@ public class BorrarFacturas implements Serializable {
 			break;
 		case "SMALL_PDF":
 			Impresion.imprimirPDFSmall(docu, Calculos.llenarDocumentoDetalleVoList(detalles), usuario(), configuracion,
-					impresora,e);
+					impresora, enPantalla,e);
 			break;
 		case "BIG_PDF":
 			List<DocumentoDetalle> detalles1 = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l);

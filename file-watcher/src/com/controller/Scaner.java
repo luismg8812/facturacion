@@ -35,10 +35,13 @@ public class Scaner {
 		carpeta.mkdirs();
 		for (final File ficheroEntrada : carpeta.listFiles()) {
 			try {
-				if (ficheroEntrada.getName().toLowerCase().contains(".txt")) {
-					imprimirTXT(ficheroEntrada);
-				} else {
-					printer(ficheroEntrada);
+				if (!ficheroEntrada.getName().toLowerCase().contains("pantalla")) {
+					if (ficheroEntrada.getName().toLowerCase().contains(".txt")) {
+						imprimirTXT(ficheroEntrada);
+					}
+					if (ficheroEntrada.getName().toLowerCase().contains(".pdf")) {
+						printer(ficheroEntrada);
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

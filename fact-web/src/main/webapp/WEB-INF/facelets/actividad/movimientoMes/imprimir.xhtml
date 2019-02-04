@@ -29,7 +29,7 @@
 	<table width="100%" align="center">
 		<tr>
 			<td><p:outputLabel value="Valor Excento:" /></td>
-			<td><p:inputNumber value="#{puntoVentaDia.excento}" readonly="true"  size="10" id="excento_tag" symbol="$" decimalPlaces="0"
+			<td><p:inputNumber value="#{movimientoMes.execento}" readonly="true"  size="10" id="excento_tag" symbol="$" decimalPlaces="0"
 			disabled="true"/> </td>
 		</tr>
 		<tr>
@@ -54,7 +54,7 @@
 		<tr id="campoImp" >
 			<td><p:outputLabel value="Continúa con la Impresión: " /></td>
 			<td><p:inputText value="#{movimientoMes.impresion}" size="2" id="impresion_inp">
-				<p:ajax event="keydown"  partialSubmit="true" listener="#{movimientoMes.imprimirFactura}" update="growl2" />
+				<p:ajax event="keyup"  partialSubmit="true" listener="#{movimientoMes.imprimirFactura}" update="growl2" />
 				</p:inputText></td>
 		</tr>		
 	</table>

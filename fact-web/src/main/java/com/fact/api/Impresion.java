@@ -521,7 +521,7 @@ public class Impresion {
 			throws DocumentException, IOException, PrinterException, PrintException {
 		log.info("todo el codigo de imprimir");
 		Empresa e = empresa;
-		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
+		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId()+(enPantalla.equals("true")?"_pantalla":"") + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		Document documento = new Document();
@@ -756,11 +756,11 @@ public class Impresion {
 	 * @throws PrintException
 	 */
 	public static String imprimirPDFSmall(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion config, String impresora, Empresa empresa)
+			Configuracion config, String impresora,String enPantalla, Empresa empresa)
 			throws DocumentException, IOException, PrinterException, PrintException {
 		log.info("todo el codigo de imprimir");
 		Empresa e = empresa;
-		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
+		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId()+(enPantalla.equals("true")?"_pantalla":"") + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		Document documento = new Document();
@@ -942,7 +942,11 @@ public class Impresion {
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
 		documento.close();
-		printer(impresora, pdf, config);
+		if (enPantalla.equals("false")) {
+			log.info("imprime en papel");
+			printer(impresora, pdf, config);
+		}
+		
 		return pdf;
 	}
 
@@ -1075,7 +1079,7 @@ public class Impresion {
 	public static String imprimirTxt(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
 			Configuracion config, String impresora, String enPantalla, Empresa e) throws IOException {
 		log.info("entra a imprimir txt");
-		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".txt";
+		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId()+(enPantalla.equals("true")?"_pantalla":"")+ ".txt";
 		File archivo = new File(pdf);
 		BufferedWriter bw;
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -1219,7 +1223,7 @@ public class Impresion {
 			Configuracion configuracion, String impresora, String enPantalla, Empresa e)
 			throws DocumentException, FileNotFoundException {
 		log.info("todo el codigo de imprimir");
-		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
+		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId()+(enPantalla.equals("true")?"_pantalla":"") + ".pdf";
 		FileOutputStream archivo = new FileOutputStream(pdf);
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		Document documento = new Document();
@@ -1437,7 +1441,7 @@ public class Impresion {
 																			// LEGAL
 		documento.close();
 		if (enPantalla.equals("false")) {
-			System.out.println("imprime en papel");
+			log.info("imprime en papel");
 			printer(impresora, pdf, configuracion);
 		}
 

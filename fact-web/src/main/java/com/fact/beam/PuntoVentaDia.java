@@ -976,7 +976,7 @@ public class PuntoVentaDia implements Serializable {
 							impresora, e);
 					break;
 				case "SMALL_PDF":
-					pathFactura=Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
+					pathFactura=Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla, e);
 					break;
 				default:
 					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
@@ -989,6 +989,7 @@ public class PuntoVentaDia implements Serializable {
 			limpiar();
 			//se verifica si se esta trabajando con una impresora remota
 			if(activarImpresionRemota!=null) {
+				log.info("impresion remota click");
 				RequestContext.getCurrentInstance().execute("document.getElementById('remotoForm:imp_remoto').click();");
 			}	
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
@@ -1813,9 +1814,9 @@ public class PuntoVentaDia implements Serializable {
 	public void activarImpresionRemota(Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "IMPRESION_REMOTA";
 		if (opcionesActivas.containsKey(ruta)) {
-			getActivarMultiplesImpresoras();
-			log.info("tiene impresion remota activo");			
-			activarMultiplesImpresoras = opcionesActivas.get(ruta);
+					
+			activarImpresionRemota = opcionesActivas.get(ruta);
+			log.info("tiene impresion remota: "+getActivarImpresionRemota());	
 			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");
 		} else {
 			activarMultiplesImpresoras = null;

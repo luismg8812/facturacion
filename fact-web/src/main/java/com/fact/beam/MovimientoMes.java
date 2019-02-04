@@ -1077,6 +1077,7 @@ public class MovimientoMes implements Serializable {
 
 	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null || getImpresion()==null ||getImpresion().equalsIgnoreCase("n")) {
+			RequestContext.getCurrentInstance().execute("PF('imprimirMM').hide();");
 			return "";
 		}
 		
@@ -1126,7 +1127,7 @@ public class MovimientoMes implements Serializable {
 				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora,e);
 				break;
 			case "SMALL_PDF":
-				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,e);
+				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,"false",e);
 				break;
 			default:
 				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
@@ -1356,16 +1357,10 @@ public class MovimientoMes implements Serializable {
 			RequestContext.getCurrentInstance().execute("document.getElementById('imprimirFormMM:cartera').select();");
 			RequestContext.getCurrentInstance().update("imprimirFormMM:cartera");
 			//imprimirFactura();	
-			RequestContext.getCurrentInstance().update("execentoFact");
-			RequestContext.getCurrentInstance().update("gravado");
-			RequestContext.getCurrentInstance().update("ivaFact");
-			RequestContext.getCurrentInstance().update("totalFact");
-			RequestContext.getCurrentInstance().update("gravadoFact");
-			RequestContext.getCurrentInstance().update("retefuentelFact");
-			
-			
-			
-
+			RequestContext.getCurrentInstance().update("imprimirFormMM:excento_tag");
+			RequestContext.getCurrentInstance().update("imprimirFormMM:gravado_tag");
+			RequestContext.getCurrentInstance().update("imprimirFormMM:iva_tag");
+			RequestContext.getCurrentInstance().update("imprimirFormMM:total1");
 		}
 	}
 
