@@ -488,6 +488,8 @@ public class MovimientoMes implements Serializable {
 				.execute("document.getElementById('op_mov_mes_content').style.display='none';");// opciones
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('detalleEntrada').style.display='inline';");
+		RequestContext.getCurrentInstance()
+		.execute("document.getElementById('detalleText').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('detalleEntrada').focus();");
 		
 		setArticulo(null);
@@ -503,6 +505,7 @@ public class MovimientoMes implements Serializable {
 		productoSelect = null;
 		actModFactura = Boolean.FALSE;
 		RequestContext.getCurrentInstance().update("detalleEntrada");
+		RequestContext.getCurrentInstance().update("detalleText");
 		RequestContext.getCurrentInstance().update("codig");
 		RequestContext.getCurrentInstance().update("nombcop_mov_mes");
 		RequestContext.getCurrentInstance().update(UPDATE_CAMPO_ARTICULO);
@@ -1477,6 +1480,8 @@ public class MovimientoMes implements Serializable {
 					ddVo.add(vo);
 				}
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+				setProveedor(getDocumentoActual().getProveedorId());
+				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setProductos(ddVo);
 				setTotal(getDocumentoActual().getTotal());
 				setExecento(getDocumentoActual().getExcento());
@@ -1520,6 +1525,8 @@ public class MovimientoMes implements Serializable {
 				}
 				setProductos(ddVo);
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+				setProveedor(getDocumentoActual().getProveedorId());
+				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setTotal(getDocumentoActual().getTotal());
 				setRetefuente(getDocumentoActual().getRetefuente());
 				setExecento(getDocumentoActual().getExcento());

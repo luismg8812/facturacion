@@ -252,7 +252,7 @@ items {
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Detalle: " /></td>
-				<td><p:inputText value="#{movimientoMes.detalle}"
+				<td><p:outputLabel value="#{movimientoMes.detalle}" id="detalleText" /><p:inputText value="#{movimientoMes.detalle}"
 						id="detalleEntrada" style="display: none"
 						onkeydown="ciclo(event,this)">
 						<p:ajax event="keydown" partialSubmit="true"
@@ -264,7 +264,7 @@ items {
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Nombre: " /></td>
-				<td><p:autoComplete id="nombreProveedor"
+				<td><p:autoComplete id="nombreProveedor" 
 						value="#{movimientoMes.proveedor}" style="display:none" size="20"
 						onkeydown="ciclo(event,this)"
 						completeMethod="#{movimientoMes.completeTextProveedor}"
@@ -294,11 +294,11 @@ items {
 					<td><p:commandButton value="Sig" id="Sig_movi_mes"
 							onkeydown="poput(event,this),controlTeclasMM(event,this)"
 							actionListener="#{movimientoMes.siguienteFactura()}"
-							update="growl, dataList,codig">
+							update="growl, dataList,codig,detalleText,nombreProveedor,nombc">
 							<p:hotkey bind="f" partialSubmit="true"
 								onstart="PF('movimiento_mes').hide();limpiarRuta;" />
 						</p:commandButton> <p:commandButton value="Ant" id="Ant_movi_mes"
-							update="growl, dataList,codig,retefuentelFact,totalFact"
+							update="growl, dataList,codig,retefuentelFact,totalFact,detalleText,nombreProveedor,nombc"
 							actionListener="#{movimientoMes.anteriorFactura()}" /> <p:commandButton
 							value="Pri" id="Pri_movi_mes" /> <p:commandButton value="Ult"
 							id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"

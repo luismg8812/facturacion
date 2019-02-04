@@ -24,7 +24,7 @@
 			<td><p:outputLabel value="Factura:" /></td>
 			<td><p:inputText value="#{movimientoMes.buscar}" id="cambioPrecioIn" size="10" onkeydown="setTimeout(Buscar1MM(event), 350)" onblur="PF('buscarMM').hide();" >
 				<p:ajax event="blur"  partialSubmit="true"  
-					        listener="#{movimientoMes.buscarByIdFactura}" update="growl, dataList,codig,retefuentelFact,totalFact"/> 
+					        listener="#{movimientoMes.buscarByIdFactura}" update="growl, dataList,codig,retefuentelFact,totalFact,detalleText,nombreProveedor,nombc"/> 
 			</p:inputText> </td>
 		</tr>		
 	</table>
