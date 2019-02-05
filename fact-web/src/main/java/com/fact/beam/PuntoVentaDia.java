@@ -1056,7 +1056,7 @@ public class PuntoVentaDia implements Serializable {
 				desTemp = getDescuento();
 				log.info("% descuento:" + desTemp);
 			}
-			if (desTemp < -15 || desTemp > 15) {
+			if (desTemp < -50 || desTemp > 50) {
 				FacesContext.getCurrentInstance().addMessage(null,
 						new FacesMessage("El descuento no puede ser mayor o menor al 15%"));
 				return;
@@ -1322,7 +1322,7 @@ public class PuntoVentaDia implements Serializable {
 			desTemp = getDescuento();
 			log.info("% descuento:" + desTemp);
 		}
-		if (desTemp < -15 || desTemp > 15) {
+		if (desTemp < -50 || desTemp > 50) {
 			return;
 		}
 		Double des = desTemp / 100;

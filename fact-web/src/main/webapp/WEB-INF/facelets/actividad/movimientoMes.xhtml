@@ -281,8 +281,8 @@ items {
 				<td><p:outputLabel
 						value="#{movimientoMes.identificacionProveedor}"
 						id="identProveedor" /></td>
-				<td><p:outputLabel value="Ven: " /></td>
-				<td><p:outputLabel value=" " /></td>
+				<td><p:outputLabel value="Sub: " /><h:outputText  value="#{movimientoMes.nombreProveedor}" id="nombreProveedor"/></td>
+				
 			</tr>
 		</table>
 	</p:panel>
@@ -294,11 +294,11 @@ items {
 					<td><p:commandButton value="Sig" id="Sig_movi_mes"
 							onkeydown="poput(event,this),controlTeclasMM(event,this)"
 							actionListener="#{movimientoMes.siguienteFactura()}"
-							update="growl, dataList,codig,detalleText,nombreProveedor,nombc">
+							update="growl, dataList,codig,detalleText,nombreProveedor,nombc,detalleText,identProveedor,nombreProveedor">
 							<p:hotkey bind="f" partialSubmit="true"
 								onstart="PF('movimiento_mes').hide();limpiarRuta;" />
 						</p:commandButton> <p:commandButton value="Ant" id="Ant_movi_mes"
-							update="growl, dataList,codig,retefuentelFact,totalFact,detalleText,nombreProveedor,nombc"
+							update="growl, dataList,codig,retefuentelFact,totalFact,detalleText,nombreProveedor,nombc,detalleText,identProveedor,nombreProveedor"
 							actionListener="#{movimientoMes.anteriorFactura()}" /> <p:commandButton
 							value="Pri" id="Pri_movi_mes" /> <p:commandButton value="Ult"
 							id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"

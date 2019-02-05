@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form>
+	<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Tipo documento: " /></td>
+				<td><p:selectOneMenu value="#{exportarDelta.tipoDocumento}">
+						<f:selectItem itemLabel="Seccionar Tipo Documento" itemValue="0" />
+						<f:selectItems value="#{exportarDelta.tipoDocumentos}"
+							noSelectionValue="Seleccione tipoDocumento" var="tipo"
+							itemLabel="#{tipo.nombre}" itemValue="#{tipo.tipoDocumentoId}" />
+					</p:selectOneMenu></td>
+					</tr>
+					<tr>
+				<td><p:outputLabel value="Prefijo Documento: " /></td>
+				<td><p:inputText value="#{exportarDelta.prefixTipoDoc}"
+						maxlength="12"></p:inputText></td>
+						<td><p:commandButton value="Agregar" action="#{exportarDelta.agregarPrefijo()}" update="growl1,prefijos"></p:commandButton></td>
+			</tr>
+		</table>
+		<p:dataTable var="tipo" value="#{exportarDelta.tipoDocumentos}" id="prefijos">
+			<p:column headerText="Tipo Documento">
+				<h:outputText value="#{tipo.nombre}" />
+			</p:column>
+
+			<p:column headerText="Prefijo">
+				<h:outputText value="#{tipo.prefijo}" />
+			</p:column>
+
+
+
+
+		</p:dataTable>
+	</h:form>
+
+</ui:composition>

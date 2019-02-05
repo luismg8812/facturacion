@@ -8,9 +8,11 @@ import javax.ejb.Stateless;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import com.fact.api.FactException;
 import com.fact.dao.TipoDocumentoDao;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.TipoDocumento;
 import com.fact.utils.HibernateUtil;
 
@@ -28,6 +30,25 @@ public class TipoDocumentoDaoImpl implements TipoDocumentoDao{
 			throw e;
 		}
 		return tipoDocumento;
+	}
+	
+	@Override
+	public void update(TipoDocumento tipoDocumento){
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction transaction= session.beginTransaction();
+		try {
+			session.update(tipoDocumento);
+			transaction.commit();
+		} catch (Exception e) {
+			if (transaction!=null) {
+				transaction.rollback();
+			}
+			throw e;
+		}finally{
+			if (session!=null) {
+				session.close();
+			}
+		}
 	}
 
 	@Override

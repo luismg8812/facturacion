@@ -54,7 +54,9 @@
  	<p:column headerText="Detalle Entrada">	
     		<h:outputText value="#{car.documentoId.detalleEntrada}" /> 	
     </p:column>
- 
+ 	<p:column headerText="Id">	
+    		<h:outputText value="#{car.documentoId.documentoId}" /> 	
+    </p:column>
     <p:column headerText="Fecha">
         <h:outputText value="#{car.fechaRegistro}" >
         	<f:convertDateTime type="date" pattern="dd-MM-yyyy"/>

@@ -17,5 +17,5 @@ public interface TipoDocumentoService {
 	List<TipoDocumento> getByAll() throws FactException;
 	//List<Documento> getByDocumento(Long tipoDocumentoId) throws FactException;
 	List<TipoDocumento> getById(List<Long> ids);
-	
+	void update(TipoDocumento tipoDocumento);
 }

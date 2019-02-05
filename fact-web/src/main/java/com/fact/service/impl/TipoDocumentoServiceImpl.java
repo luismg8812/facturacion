@@ -46,6 +46,12 @@ public class TipoDocumentoServiceImpl implements TipoDocumentoService{
 	public List<TipoDocumento> getById(List<Long> ids) {
 		return tipoDocumentoDao.getById(ids);
 	}
+
+	@Override
+	public void update(TipoDocumento tipoDocumento) {
+		 tipoDocumentoDao.update(tipoDocumento);
+		
+	}
 	
 	
 }

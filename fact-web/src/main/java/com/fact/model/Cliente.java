@@ -69,7 +69,8 @@ public class Cliente {
 	@Column(name="MAIL")
 	private String mail;
 	
-	
+	@Column(name="APELLIDOS")
+	private String apellidos;
 	
 	public String getMail() {
 		return mail;
@@ -189,6 +190,14 @@ public class Cliente {
 
 	public void setGuiaTransporte(Long guiaTransporte) {
 		this.guiaTransporte = guiaTransporte;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
 	}
 	
 	

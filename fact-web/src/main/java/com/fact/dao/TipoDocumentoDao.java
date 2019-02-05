@@ -17,6 +17,7 @@ public interface TipoDocumentoDao {
 	TipoDocumento getByName(String nombre) throws FactException;
 	List<TipoDocumento> getByAll() throws FactException;
 	List<TipoDocumento> getById(List<Long> ids)throws FactException;
+	void update(TipoDocumento tipoDocumento);
 	
 	
 }

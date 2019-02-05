@@ -72,9 +72,11 @@ public class ExportarDelta implements Serializable {
 	private Date fechafin;
 	private List<TipoDocumento> tipoDocumentos;
 	private Long tipoDocumento;
+	private Long tipoDocumentoEmp;
 	private List<TipoPago> tipoPagos;
 	private Long tipoPago;
 	private String cuenta;
+	private String prefixTipoDoc;
 	private List<ConvinacionDelta> convinacionDeltas = new ArrayList<>();
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
@@ -84,13 +86,24 @@ public class ExportarDelta implements Serializable {
 		return (Usuario) sessionMap.get("userLogin");
 	}
 	
+	public void agregarPrefijo() {
+		if(tipoDocumento==0l) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El tipo documento es obligatorio"));
+		}
+		TipoDocumento tipo= tipoDocumentoService.getById(getTipoDocumento());
+		tipo.setPrefijo(getPrefixTipoDoc());
+		tipoDocumentoService.update(tipo);
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Prefijo agregado exitosamente"));
+		setTipoDocumentos(null);
+	}
+	
 	public void agregar() {
 		log.info("agregar convinacion");
 		//TODO agregar validaciones de los campos para que quede bien evitar nulos
 		ConvinacionDelta convinacionDelta = new ConvinacionDelta();
 		convinacionDelta.setCuenta(getCuenta());
-		convinacionDelta.setTipodocumentoId(getTipoDocumento());
-		convinacionDelta.setTipoDocumentoNombre(tipoDocumentoService.getById(getTipoDocumento()).getNombre());
+		convinacionDelta.setTipodocumentoId(getTipoDocumentoEmp());
+		convinacionDelta.setTipoDocumentoNombre(tipoDocumentoService.getById(getTipoDocumentoEmp()).getNombre());
 		convinacionDelta.setTipoPagoId(getTipoPago());
 		convinacionDelta.setTipoPagoNombre(tipoDocumentoService.getById(getTipoPago()).getNombre());
 		getConvinacionDeltas().add(convinacionDelta);
@@ -130,6 +143,7 @@ public class ExportarDelta implements Serializable {
 		log.info("entra a exportar terceros delta");
 		String carpeta = "C:\\facturas\\documentosDELTA\\";
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
 		String fhoyIni = df.format(new Date());
 		String pdf = "DocumentosDELTA_" + fhoyIni + ".txt";
 		File folder = new File(carpeta);
@@ -151,14 +165,15 @@ public class ExportarDelta implements Serializable {
 			bw = new BufferedWriter(new FileWriter(folder));
 			bw.write(heder);
 			for(Documento d: documentos) {
+				String terc=d.getClienteId()==null?d.getProveedorId().getNombre():d.getClienteId().getNombre();
 				String codigoTercero="C"+d.getClienteId().getClienteId();
-				String lineaDocumento =d.getTipoDocumentoId().getNombre()+tab+
-						 d.getConsecutivoDian()+
+				String lineaDocumento =d.getTipoDocumentoId().getPrefijo()+tab+
+						 d.getDocumentoId()+
 						 " "+tab+
-						 d.getFechaRegistro()+tab+
+						 df2.format(d.getFechaRegistro())+tab+
 						 "0"+tab+
 						 ""+tab+
-						 d.getTipoDocumentoId().getNombre()+tab+
+						 d.getTipoDocumentoId().getNombre()+" N° "+ d.getConsecutivoDian()+" ("+terc+")"+tab+
 						 getCuenta()+tab+
 						 codigoTercero+tab+
 						 "0"+tab+
@@ -210,15 +225,15 @@ public class ExportarDelta implements Serializable {
 			bw.write(heder);		
 				for(Cliente c: cliente) {
 					String lineaCliente ="C"+c.getClienteId()+tab+
-										 c.getNombre()+
-										 " "+tab+
+										 c.getNombre()+tab+
+										 c.getApellidos()+tab+
 										 c.getDocumento()+tab+
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
-										 ""+tab+
+										 
 										 (c.getDireccion()==null?"":c.getDireccion())+tab+
 										 ""+tab+
 										 ""+tab+
@@ -234,15 +249,15 @@ public class ExportarDelta implements Serializable {
 				}
 				for(Proveedor c: proveedor) {
 					String lineaCliente ="P"+c.getProveedorId()+tab+
-										 c.getNombre()+
-										 " "+tab+
+										 c.getNombre()+tab+
+										 c.getApellidos()+tab+
 										 c.getDocumento()+tab+
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
-										 ""+tab+
+										 
 										 (c.getDireccion()==null?"":c.getDireccion())+tab+
 										 ""+tab+
 										 ""+tab+
@@ -345,8 +360,20 @@ public class ExportarDelta implements Serializable {
 	public void setCuenta(String cuenta) {
 		this.cuenta = cuenta;
 	}
-	
-	
-	
-	
+
+	public String getPrefixTipoDoc() {
+		return prefixTipoDoc;
+	}
+
+	public void setPrefixTipoDoc(String prefixTipoDoc) {
+		this.prefixTipoDoc = prefixTipoDoc;
+	}
+
+	public Long getTipoDocumentoEmp() {
+		return tipoDocumentoEmp;
+	}
+
+	public void setTipoDocumentoEmp(Long tipoDocumentoEmp) {
+		this.tipoDocumentoEmp = tipoDocumentoEmp;
+	}	
 }

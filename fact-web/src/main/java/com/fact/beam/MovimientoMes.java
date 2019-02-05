@@ -123,6 +123,7 @@ public class MovimientoMes implements Serializable {
 	Long codigoProveedor;
 	String tipoDocumentoEntrada;
 	String identificacionProveedor;
+	private String nombreProveedor;
 	Date fechaCreacion;
 	Proveedor proveedor;
 
@@ -810,6 +811,7 @@ public class MovimientoMes implements Serializable {
 //			return;
 //		}
 		setDocumentoActual(docu);
+		setDocumento(docu);
 		dd = documentoDetalleService.getByDocumento(getDocumentoActual().getDocumentoId(), 1l);
 		for (DocumentoDetalle d1 : dd) {
 			DocumentoDetalleVo vo = new DocumentoDetalleVo();
@@ -822,7 +824,11 @@ public class MovimientoMes implements Serializable {
 			vo.setProductoId(d1.getProductoId());
 			ddVo.add(vo);
 		}
+		setDetalle(docu.getDetalleEntrada());
+		setProveedor(docu.getProveedorId());
 		setProductos(ddVo);
+		setIdentificacionProveedor(docu.getProveedorId().getDocumento());
+		setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
 		setTotal(getDocumentoActual().getTotal());
 		setExecento(getDocumentoActual().getExcento());
 		setIva(getDocumentoActual().getIva());
@@ -879,6 +885,11 @@ public class MovimientoMes implements Serializable {
 		getProductos().set(pos, dCambio);
 
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		if (getDocumento().getProveedorId() != null && getDocumento().getProveedorId().getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l) {
+			setDocumento(Calculos.calcularRetefuente(getDocumento(), getDocumento().getProveedorId()));
+		}else {
+			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
+		}
 		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
 		Long server = configuracion().getServer();
 		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId().getDocumentoDetalleId());
@@ -1394,6 +1405,9 @@ public class MovimientoMes implements Serializable {
 				setIva(getDocumentoActual().getIva());
 				setRetefuente(getDocumentoActual().getRetefuente());
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+				setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
+				setIdentificacionProveedor(getDocumentoActual().getProveedorId().getDocumento());
+				setDetalle(getDocumentoActual().getDetalleEntrada());
 				RequestContext.getCurrentInstance()
 						.execute("document.getElementById('dataList_content').style.display='inline';");
 				RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
@@ -1431,6 +1445,9 @@ public class MovimientoMes implements Serializable {
 					ddVo.add(vo);
 				}
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+				setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
+				setIdentificacionProveedor(getDocumentoActual().getProveedorId().getDocumento());
+				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setProductos(ddVo);
 				setTotal(getDocumentoActual().getTotal());
 				setRetefuente(getDocumentoActual().getRetefuente());
@@ -1480,6 +1497,9 @@ public class MovimientoMes implements Serializable {
 					ddVo.add(vo);
 				}
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+				setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
+				setIdentificacionProveedor(getDocumentoActual().getProveedorId().getDocumento());
+				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setProveedor(getDocumentoActual().getProveedorId());
 				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setProductos(ddVo);
@@ -1525,6 +1545,9 @@ public class MovimientoMes implements Serializable {
 				}
 				setProductos(ddVo);
 				setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
+				setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
+				setIdentificacionProveedor(getDocumentoActual().getProveedorId().getDocumento());
+				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setProveedor(getDocumentoActual().getProveedorId());
 				setDetalle(getDocumentoActual().getDetalleEntrada());
 				setTotal(getDocumentoActual().getTotal());
@@ -2099,4 +2122,14 @@ public class MovimientoMes implements Serializable {
 	public void setCartera(String cartera) {
 		this.cartera = cartera;
 	}
+
+	public String getNombreProveedor() {
+		return nombreProveedor;
+	}
+
+	public void setNombreProveedor(String nombreProveedor) {
+		this.nombreProveedor = nombreProveedor;
+	}
+	
+	
 }

@@ -25,6 +25,9 @@ public class TipoDocumento {
 	@Column(name="NOMBRE")
 	private String nombre;
 	
+	@Column(name="PREFIJO")
+	private String prefijo;
+	
 	public Long getTipoDocumentoId() {
 		return tipoDocumentoId;
 	}
@@ -41,5 +44,12 @@ public class TipoDocumento {
 		this.nombre = nombre;
 	}
 
-	
+	public String getPrefijo() {
+		return prefijo;
+	}
+
+	public void setPrefijo(String prefijo) {
+		this.prefijo = prefijo;
+	}
+
 }

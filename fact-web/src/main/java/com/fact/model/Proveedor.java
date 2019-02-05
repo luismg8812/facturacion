@@ -52,6 +52,9 @@ public class Proveedor {
 	@Column(name="FECHA_REGISTRO")
 	private Date fechaRegistro;
 	
+	@Column(name="APELLIDOS")
+	private String apellidos;
+	
 	@Column(name="CUMPLEANOS")
 	private Date cumpleanos;
 	
@@ -167,4 +170,14 @@ public class Proveedor {
 	public void setRetencion(Double retencion) {
 		this.retencion = retencion;
 	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+	
+	
 }
