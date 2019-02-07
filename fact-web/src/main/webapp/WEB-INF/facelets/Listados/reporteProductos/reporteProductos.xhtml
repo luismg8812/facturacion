@@ -16,7 +16,7 @@
 					itemLabel="#{prov.nombre}" itemValue="#{prov.proveedorId}" />
 			</p:selectOneMenu>
 			<p:selectOneMenu value="#{inventarioFisico.grupo}" id="grupoId">
-				<f:selectItem itemLabel="Seccionar Grupo" itemValue="" />
+				<f:selectItem itemLabel="Seccionar Grupo" itemValue="0" />
 				<f:selectItems value="#{grupos.grupos}" var="gru"
 					itemLabel="#{gru.nombre}" itemValue="#{gru.grupoId}" />
 			</p:selectOneMenu>
@@ -31,7 +31,7 @@
 		</p:panelGrid>
 
 
-		<p:dataTable var="pro" value="#{movimientoMes.productos}"
+		<p:dataTable var="pro" value="#{inventarioFisico.productos}"
 			id="productos" rows="10"
 			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			paginator="true" rowsPerPageTemplate="10,20,30">

@@ -15,7 +15,9 @@ import org.hibernate.criterion.Restrictions;
 import com.fact.api.FactException;
 import com.fact.dao.ProductoEmpresaDao;
 import com.fact.model.Empresa;
+import com.fact.model.Grupo;
 import com.fact.model.ProductoEmpresa;
+import com.fact.model.Proveedor;
 import com.fact.utils.HibernateUtil;
 
 @Stateless()
@@ -142,10 +144,14 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
 			detached.add(Restrictions.eq("empresaId.empresaId", empresa));
 			if(grupo!=0l) {
-				detached.add(Restrictions.eq("productoId.grupoId.grupoId", grupo));
+				Grupo gru = new Grupo();
+				gru.setGrupoId(grupo);
+				detached.add(Restrictions.eq("productoId.grupoId", grupo));
 			}
 			if(proveedor!=0l) {
-				detached.add(Restrictions.eq("productoId.proveedorId.proveedorId", proveedor));
+				Proveedor prov= new Proveedor();
+				prov.setProveedorId(proveedor);
+				detached.add(Restrictions.eq("productoId.proveedorId", prov));
 			}		
 			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.nombre"));
 			Criteria criteria =  detached.getExecutableCriteria(session);
