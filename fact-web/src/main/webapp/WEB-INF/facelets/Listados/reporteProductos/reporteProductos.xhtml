@@ -9,17 +9,33 @@
 	</script>
 	<h:form>
 		<p:panelGrid columns="2" layout="grid">
-			<h:commandLink value="Exportar">
-						<p:dataExporter type="xls" target="productos" fileName="Productos" />
-					</h:commandLink>
-		 	<p:commandButton  value="Imprimir" action="#{inventarioFisico.imprimirInventario()}"/>
-		 </p:panelGrid>
-		 
-				
-		<p:dataTable var="pro" value="#{movimientoMes.productosAll}" id="productos" rows="10"
-					 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-					  paginator="true" rowsPerPageTemplate="10,20,30">
+			<p:selectOneMenu value="#{inventarioFisico.proveedor}"
+				id="proveedorEdictSelect">
+				<f:selectItem itemLabel="Seccionar Proveedor" itemValue="0" />
+				<f:selectItems value="#{proveedores.proveedores}" var="prov"
+					itemLabel="#{prov.nombre}" itemValue="#{prov.proveedorId}" />
+			</p:selectOneMenu>
+			<p:selectOneMenu value="#{inventarioFisico.grupo}" id="grupoId">
+				<f:selectItem itemLabel="Seccionar Grupo" itemValue="" />
+				<f:selectItems value="#{grupos.grupos}" var="gru"
+					itemLabel="#{gru.nombre}" itemValue="#{gru.grupoId}" />
+			</p:selectOneMenu>
 			
+			<p:commandButton value="Buscar" action="#{inventarioFisico.buscarReporteProductos()}" update="productos"></p:commandButton>
+			<p:spacer></p:spacer>
+			<h:commandLink value="Exportar">
+				<p:dataExporter type="xls" target="productos" fileName="Productos" />
+			</h:commandLink>
+			<p:commandButton value="Imprimir"
+				action="#{inventarioFisico.imprimirInventario()}" />
+		</p:panelGrid>
+
+
+		<p:dataTable var="pro" value="#{movimientoMes.productos}"
+			id="productos" rows="10"
+			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			paginator="true" rowsPerPageTemplate="10,20,30">
+
 			<p:column headerText="Nombre" width="40%">
 				<h:outputText value="#{pro.productoId.nombre}" />
 			</p:column>

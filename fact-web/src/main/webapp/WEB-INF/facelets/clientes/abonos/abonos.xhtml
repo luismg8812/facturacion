@@ -77,7 +77,9 @@
 			<p:column headerText="Detalle">
 				<h:outputText value="#{docu.detalleEntrada}" />
 			</p:column>
-
+			<p:column headerText="Id Relacionado">
+				<h:outputText value="#{docu.consecutivoDian}" />
+			</p:column>
 			<p:column headerText="Valor">
 				<h:outputText value="#{docu.total}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />

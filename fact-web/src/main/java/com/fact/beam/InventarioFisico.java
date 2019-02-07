@@ -83,6 +83,11 @@ public class InventarioFisico implements Serializable {
 	private List<Grupo> grupoList;
 	private List<Integer> productosSelect = new ArrayList<>();
 	List<ProductoVo> selected;
+	
+	//reporte de producto
+	private Long proveedor;
+	private Long grupo;
+	private List<ProductoEmpresa> productos;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -106,6 +111,10 @@ public class InventarioFisico implements Serializable {
 
 	public Usuario usuario() {	
 		return (Usuario) sessionMap.get("userLogin");
+	}
+	
+	public void buscarReporteProductos() {
+		setProductos(productoEmpresaService.getByProveedorYGrupo(getGrupo(),getProveedor(), getEmpresa().getEmpresaId()));
 	}
 
 	public void guardarInventarioFisico2() {
@@ -409,5 +418,31 @@ public class InventarioFisico implements Serializable {
 	public void setGrupoList(List<Grupo> grupoList) {
 		this.grupoList = grupoList;
 	}
+
+	public Long getProveedor() {
+		return proveedor;
+	}
+
+	public void setProveedor(Long proveedor) {
+		this.proveedor = proveedor;
+	}
+
+	public Long getGrupo() {
+		return grupo;
+	}
+
+	public void setGrupo(Long grupo) {
+		this.grupo = grupo;
+	}
+
+	public List<ProductoEmpresa> getProductos() {
+		return productos;
+	}
+
+	public void setProductos(List<ProductoEmpresa> productos) {
+		this.productos = productos;
+	}
+	
+	
 
 }

@@ -18,4 +18,5 @@ public interface ProductoEmpresaService {
 	ProductoEmpresa  getById(Long id)throws FactException;
 	List<ProductoEmpresa> getByEmpresa(Long empresaId)throws FactException;
 	ProductoEmpresa getByProductoAndEmpresa(Empresa ed, Long productoId)throws FactException;
+	List<ProductoEmpresa> getByProveedorYGrupo(Long grupo, Long proveedor, Long empresa);
 }

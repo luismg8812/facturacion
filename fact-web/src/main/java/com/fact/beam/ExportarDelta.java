@@ -105,7 +105,7 @@ public class ExportarDelta implements Serializable {
 		convinacionDelta.setTipodocumentoId(getTipoDocumentoEmp());
 		convinacionDelta.setTipoDocumentoNombre(tipoDocumentoService.getById(getTipoDocumentoEmp()).getNombre());
 		convinacionDelta.setTipoPagoId(getTipoPago());
-		convinacionDelta.setTipoPagoNombre(tipoDocumentoService.getById(getTipoPago()).getNombre());
+		convinacionDelta.setTipoPagoNombre(tipoPagoService.getById(getTipoPago()).getNombre());
 		getConvinacionDeltas().add(convinacionDelta);
 	}
 	
@@ -154,7 +154,7 @@ public class ExportarDelta implements Serializable {
 		List<Documento> documentos= new  ArrayList<>();
 		List<Documento> documentosTemp;
 		for(ConvinacionDelta c: getConvinacionDeltas()) {
-			documentosTemp=documentoService.getconvinacion(c.getTipodocumentoId(),getTipoPago(),getFechaInicio(),getFechafin());
+			documentosTemp=documentoService.getconvinacion(c.getTipodocumentoId(),c.getTipoPagoId(),getFechaInicio(),getFechafin());
 			documentos.addAll(documentosTemp);
 		}
 		log.info("totalDocumentos:"+documentos.size());
@@ -232,8 +232,7 @@ public class ExportarDelta implements Serializable {
 										 ""+tab+
 										 ""+tab+
 										 ""+tab+
-										 ""+tab+
-										 
+										 ""+tab+										 
 										 (c.getDireccion()==null?"":c.getDireccion())+tab+
 										 ""+tab+
 										 ""+tab+

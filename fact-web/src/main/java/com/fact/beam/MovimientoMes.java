@@ -893,18 +893,21 @@ public class MovimientoMes implements Serializable {
 		Long tipo = getDocumento().getTipoDocumentoId().getTipoDocumentoId();
 		Long server = configuracion().getServer();
 		DocumentoDetalle d = documentoDetalleService.getById(dCambio.getDocumentoDetalleId().getDocumentoDetalleId());
+		Producto prod= dCambio.getDocumentoDetalleId().getProductoId();
+		prod.setCosto(cambioTemp1);				
 		d.setParcial(cantidadtemp * cambioTemp1);
 		if (tipo == 9l && server == 2) {
-
+			productoService.update(prod, server);
 			documentoService.update(getDocumento(), server);
 			documentoDetalleService.update(d, server);
 		} else {
+			productoService.update(prod, 1l);
 			documentoService.update(getDocumento(), 1l);
 			documentoDetalleService.update(d, 1l);
 		}
 		setTotal(getDocumento().getTotal());
 		setIva(getDocumento().getIva());
-		//setExcento(getDocumento().getExcento());
+		setExecento(getDocumento().getExcento());
 		setGravado(getDocumento().getGravado());
 		setRetefuente(getDocumento().getRetefuente());
 		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
@@ -1187,9 +1190,10 @@ public class MovimientoMes implements Serializable {
 		docu.setTipoPagoId(pago);
 		docu.setTotal(getDocumento().getTotal());
 		docu.setUsuarioId(usuario);
-		docu.setDetalleEntrada(""+getDocumento().getDocumentoId());
+		docu.setDetalleEntrada(getDocumento().getDetalleEntrada());
+		docu.setConsecutivoDian(""+getDocumento().getDocumentoId());
 		documentoService.save(docu, server);
-		log.info("se crea el vale por factura venta a cretido:" + docu.getDocumentoId());
+		log.info("se crea el vale por factura venta a cretido: " + docu.getDocumentoId());
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Vale Creado exitosamente"));
 	}
 

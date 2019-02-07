@@ -57,4 +57,9 @@ public class ProductoEmpresaServiceImpl implements ProductoEmpresaService{
 	public ProductoEmpresa getByProductoAndEmpresa(Empresa ed, Long productoId) throws FactException {
 		return productoEmpresaDao.getByProductoAndEmpresa(ed,productoId);
 	}
+
+	@Override
+	public List<ProductoEmpresa> getByProveedorYGrupo(Long grupo, Long proveedor, Long empresa) {
+		return productoEmpresaDao.getByProveedorYGrupo(grupo,proveedor,empresa);
+	}
 }

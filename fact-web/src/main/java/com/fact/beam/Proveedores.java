@@ -189,17 +189,19 @@ public class Proveedores implements Serializable {
 				List<Documento> facturas = documentoService.getByProveedor(c.getProveedorId(),tipoDocumentoId,getFechaInicio(), getFechafin());
 				Double total=0.0;
 				Double retefuente=0.0;
-				
-				for(Documento d: facturas){
-					total+=(d.getTotal()==null?0.0:d.getTotal());
-					retefuente+=(d.getRetefuente()==null?0.0:d.getRetefuente());
-					
+				if(!facturas.isEmpty()) {
+					for(Documento d: facturas){
+						total+=(d.getTotal()==null?0.0:d.getTotal());
+						retefuente+=(d.getRetefuente()==null?0.0:d.getRetefuente());
+						
+					}
+					ProveedorVo cl= new ProveedorVo();
+					cl.setRetefuente(retefuente);
+					cl.setProveedorId(c);
+					cl.setTotalCompras(total);
+					getProveedoresVo().add(cl);
 				}
-				ProveedorVo cl= new ProveedorVo();
-				cl.setRetefuente(retefuente);
-				cl.setProveedorId(c);
-				cl.setTotalCompras(total);
-				getProveedoresVo().add(cl);
+				
 		}
 	}
 	
