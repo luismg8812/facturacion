@@ -121,7 +121,7 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
 			detached.add(Restrictions.eq("empresaId.empresaId", empresaId.getEmpresaId()));
 			detached.add(Restrictions.eq("productoId.productoId", productoId));
-			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.nombre"));
+			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.productoId.nombre"));
 			Criteria criteria =  detached.getExecutableCriteria(session);
 			documentoList =criteria.list(); 
 		} catch (FactException e) {
@@ -132,6 +132,32 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 			}
 		}
 		return documentoList.isEmpty()?null:documentoList.get(0);
+	}
+
+	@Override
+	public List<ProductoEmpresa> getByProveedorYGrupo(Long grupo, Long proveedor, Long empresa) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<ProductoEmpresa> documentoList = new ArrayList<>(); 
+		try {
+			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
+			detached.add(Restrictions.eq("empresaId.empresaId", empresa));
+			if(grupo!=0l) {
+				detached.add(Restrictions.eq("productoId.grupoId.grupoId", grupo));
+			}
+			if(proveedor!=0l) {
+				detached.add(Restrictions.eq("productoId.proveedorId.proveedorId", proveedor));
+			}		
+			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.nombre"));
+			Criteria criteria =  detached.getExecutableCriteria(session);
+			documentoList =criteria.list(); 
+		} catch (FactException e) {
+			throw e;
+		}finally{
+			if (session!=null) {
+				session.close();
+			}
+		}
+		return documentoList;
 	}
 		
 }
