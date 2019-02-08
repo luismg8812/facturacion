@@ -7,6 +7,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
@@ -141,27 +142,26 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<ProductoEmpresa> documentoList = new ArrayList<>(); 
 		try {
-			DetachedCriteria detached= DetachedCriteria.forClass(ProductoEmpresa.class);				
-			detached.add(Restrictions.eq("empresaId.empresaId", empresa));
+			String sql = " select pe from ProductoEmpresa pe where empresaId.empresaId =:empresaId ";
 			if(grupo!=0l) {
-				Grupo gru = new Grupo();
-				gru.setGrupoId(grupo);
-				detached.add(Restrictions.eq("productoId.grupoId", grupo));
+				sql+=" and pe.productoId.grupoId.grupoIdId = :grupoId";
 			}
 			if(proveedor!=0l) {
-				Proveedor prov= new Proveedor();
-				prov.setProveedorId(proveedor);
-				detached.add(Restrictions.eq("productoId.proveedorId", prov));
-			}		
-			//detached.addOrder(org.hibernate.criterion.Order.asc("productoId.nombre"));
-			Criteria criteria =  detached.getExecutableCriteria(session);
-			documentoList =criteria.list(); 
+				sql+=" and pe.productoId.proveedorId.proveedorId = :proveedor ";
+			}
+			sql+=" order by pe.productoId.nombre asc";
+			Query query = session.createQuery(sql);		
+			query.setParameter("empresaId", empresa);
+			if(proveedor!=0l) {
+				query.setParameter("proveedor", proveedor);
+			}
+			if(grupo!=0l) {
+				query.setParameter("grupoId", grupo);
+			}
+			
+			documentoList = query.list();
 		} catch (FactException e) {
 			throw e;
-		}finally{
-			if (session!=null) {
-				session.close();
-			}
 		}
 		return documentoList;
 	}
