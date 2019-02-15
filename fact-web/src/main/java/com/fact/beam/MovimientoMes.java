@@ -242,8 +242,8 @@ public class MovimientoMes implements Serializable {
 		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId().getNombre() != null) {
 				String articul = p.getProductoId().getNombre().toUpperCase().trim();
-				// if (articul.indexOf(query.toUpperCase()) != -1) {
-				if (articul.startsWith(query.toUpperCase().trim())) {
+				 if (articul.indexOf(query.toUpperCase()) != -1) {
+				//if (articul.startsWith(query.toUpperCase().trim())) {
 					 Producto producto = p.getProductoId();
 					 producto.setCantidad(p.getCantidad());
 					 producto.setCostoPublico(p.getPrecio());

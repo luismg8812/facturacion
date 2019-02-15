@@ -818,18 +818,20 @@ public class Reduccion implements Serializable {
 										+ base19t + " " + base5t + " " + execnto,
 								FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
 
-		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REAL: " + formatea.format(id.getTotalOriginal()),
+		//if (userPropietario.equals("true")) {
+			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL : " + formatea.format(id.getTotalOriginal()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-		}
-		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "IVA TOTAL REAL: " + formatea.format(id.getIvaOriginal()),
+		//}
+		//if (userPropietario.equals("true")) {
+			documento.add(new Paragraph(new Phrase(lineSpacing, "IVA TOTAL : " + formatea.format(id.getIvaOriginal()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-		}
-		if (userPropietario.equals("true")) {
-			documento.add(new Paragraph(new Phrase(lineSpacing, "COSTO REAL: " + formatea.format(id.getCostoOriginal()),
+		//}
+		//if (userPropietario.equals("true")) {
+			documento.add(new Paragraph(new Phrase(lineSpacing, "COSTO: " + formatea.format(id.getCostoOriginal()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
-		}
+			documento.add(new Paragraph(new Phrase(lineSpacing, "GANANCIA: " + formatea.format(id.getTotalOriginal()-id.getCostoOriginal()),
+					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan
+		//}
 		if (userPropietario.equals("true")) {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "TOTAL REMISIONES: " + formatea.format(id.getTotalRemisiones()),
 					FontFactory.getFont(FontFactory.COURIER, fntSize)))); // slogan

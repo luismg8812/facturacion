@@ -19,9 +19,35 @@
 	</script>
 	<h:form id="cambioPrecioForm">
 	<table width="100%" align="center">
+	<tr>
+		<td><p:outputLabel value="Precio 1:" /></td>
+		<td><p:outputLabel value="#{puntoVentaDia.lista.lista1}" id="p1"> 
+			<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+		</p:outputLabel>
+		</td>
+	</tr>
+	<tr>
+		<td><p:outputLabel value="Precio 2:" /></td>
+		<td><p:outputLabel value="#{puntoVentaDia.lista.lista2}" id="p2">
+			<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+		</p:outputLabel> </td>
+	</tr>
+	<tr>
+		<td><p:outputLabel value="Precio 3:" /></td>
+		<td><p:outputLabel value="#{puntoVentaDia.lista.lista3}" id="p3" >
+			<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+		</p:outputLabel> </td>
+	</tr>
+	<tr>
+		<td><p:outputLabel value="Precio 4:" /></td>
+		<td><p:outputLabel value="#{puntoVentaDia.lista.lista4}" id="p4" >
+			<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+		</p:outputLabel> </td>
+	</tr>
 		<tr>
 			<td><p:outputLabel value="Precio:" /></td>
 			<td><p:inputNumber value="#{puntoVentaDia.cambioTemp}"  size="10"  onkeydown="cambioPrecio1(event)" onblur="PF('cambioPrecio').hide();">
+				<p:ajax event="keyup"  partialSubmit="true" update="p1,p2,p3,p4" />
 				<p:ajax event="blur"  partialSubmit="true" 
 					        listener="#{puntoVentaDia.recalcularPrecio}" update="dataList1,excento,gravado,iva,total"/> 
 			</p:inputNumber> </td>

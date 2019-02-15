@@ -44,5 +44,6 @@
     	<mapping class="com.fact.model.Invoice" />
     	<mapping class="com.fact.model.Proporcion" />
     	<mapping class="com.fact.model.ConsecutivoDian" />
+    		<mapping class="com.fact.model.Lista" />
     </session-factory>
 </hibernate-configuration>

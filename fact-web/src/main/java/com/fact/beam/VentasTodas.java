@@ -43,10 +43,15 @@ public class VentasTodas implements Serializable {
 	    List<CuadrePorCajeroVo> cuadretemp= new ArrayList<>();
 	    for(Usuario u: usuarios){
 	    	CuadrePorCajeroVo cpc= new CuadrePorCajeroVo();
+	    	Double facturas = getTotalFaturasToDay(u);
+	    	Double remisiones = getTotalRemisionesToDay(u);
+	    	Double costos = getTotalCostosToDay(u);
 	    	cpc.setUsuarioId(u);
 	    	cpc.setUsuarioId2(u.getUsuarioId());
-	    	cpc.setTotalFacturas(getTotalFaturasToDay(u));
-	    	cpc.setTotalRemisiones(getTotalRemisionesToDay(u));
+	    	cpc.setTotalFacturas(facturas);
+	    	cpc.setTotalRemisiones(remisiones);
+	    	cpc.setBase(costos);
+	    	cpc.setRecargas(facturas-costos);
 	    	cuadretemp.add(cpc);
 	    }
 	    cuadrePorCajeroVos=cuadretemp;
@@ -67,6 +72,20 @@ public class VentasTodas implements Serializable {
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {
 				total = total + d.getTotal();
+			}
+		}
+		return total;
+	}
+	
+	public Double getTotalCostosToDay(Usuario usuario)  {
+		List<Long>tipoDocumentoId = new ArrayList<>();
+		tipoDocumentoId.add(10l); // tipo documento factura de salida
+		Boolean conCierre=true;		
+		List<Documento> factDia = documentoService.getByfacturasReales(tipoDocumentoId, usuario.getUsuarioId(), conCierre, 1l);
+		Double total = 0.0;
+		for (Documento d : factDia) {
+			if (d.getTotalCosto() != null) {
+				total = total + d.getTotalCosto();
 			}
 		}
 		return total;

@@ -15,6 +15,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,6 +62,7 @@ import com.fact.model.Evento;
 import com.fact.model.Grupo;
 import com.fact.model.InfoDiario;
 import com.fact.model.Invoice;
+import com.fact.model.Lista;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.ProductoEmpresa;
@@ -75,6 +77,7 @@ import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
 import com.fact.service.GrupoService;
+import com.fact.service.ListaService;
 import com.fact.service.OpcionUsuarioService;
 import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
@@ -137,6 +140,9 @@ public class PuntoVentaDia implements Serializable {
 
 	@EJB
 	private GrupoService grupoService;
+	
+	@EJB
+	private ListaService listaService;
 
 	String codigoBarras;
 	Map<String, Producto> productosAllCodigo;
@@ -270,6 +276,8 @@ public class PuntoVentaDia implements Serializable {
 	Double cambioTemp;// variable para almacednar el cambio dde precio temporal
 	DocumentoDetalleVo dCambio;// variable que contiene el detalle del producto
 								// que se le cambiara el precio
+	private Lista lista;
+	
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -313,6 +321,7 @@ public class PuntoVentaDia implements Serializable {
 		String completo = getCodigoBarras();
 		String codigoProducoString = "";
 		String codigoProducoUnidad = "";
+		String codigoProducoDigi = "";
 		if (completo == null || completo.isEmpty()) {
 			return;
 		}
@@ -320,16 +329,20 @@ public class PuntoVentaDia implements Serializable {
 		try {
 			codigoProducoString = completo.substring(0, 7);
 			codigoProducoUnidad = completo.substring(0, 6);
+			codigoProducoDigi = completo.substring(0, 6);
 			boolean codigo2 = false;
 			log.info("codigoP:" + codigoProducoString);
 			log.info("codigoPunidad:" + codigoProducoUnidad);
+			log.info("codigoProducoDigi:" + codigoProducoUnidad);
+			
+			
+			
 			p = getProductosAllCodigo().get(codigoProducoString);
 			if (p == null) {
 				p = getProductosAllCodigo().get("2" + codigoProducoUnidad);
 				completo = "2" + completo;
 				codigo2 = true;
 			}
-
 			if (p != null) {
 				log.info("producto carnes: " + p.getNombre());
 				String pesoProducoString = completo.substring(7, 12);
@@ -344,6 +357,22 @@ public class PuntoVentaDia implements Serializable {
 				productoSelect = p;
 				cantidadEnter(null);
 			} else {
+				p = getProductosAllCodigo().get(codigoProducoDigi);
+				if(p!=null) {
+					//000001007466
+					//000030000841
+					//000030123007
+					//000001----00-920-0
+					log.info("producto carnes: " + p.getNombre());
+					
+					String parte1 = completo.substring(7, 9);
+					String parte2 = completo.substring(9, 12);
+					Double peso = Double.valueOf(parte1 + "." + parte2);
+					log.info("Peso:" + peso);
+					setCantidad(peso);
+					productoSelect = p;
+					cantidadEnter(null);
+				}
 				productoFind(getCodigoBarras());
 			}
 		} catch (Exception e) {
@@ -424,14 +453,20 @@ public class PuntoVentaDia implements Serializable {
 		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId().getNombre() != null) {
 				String articul = p.getProductoId().getNombre().toUpperCase().trim();
-				// si en algun momento se necesita
-				if (articul.indexOf(query.toUpperCase()) != -1) {
-					// if (articul.startsWith(query.toUpperCase().trim())) {
-					Producto producto = p.getProductoId();
-					producto.setCantidad(p.getCantidad());
-					producto.setCostoPublico(p.getPrecio());
-					nombProductos.add(producto);
+				String[] parts = query.split(" ");
+				List<String> wordList = Arrays.asList(parts);  
+				// si en algun momento se necesita			
+				for(String a: wordList) {
+					if (articul.indexOf(a.toUpperCase()) != -1) {
+						// if (articul.startsWith(query.toUpperCase().trim())) {
+						Producto producto = p.getProductoId();
+						producto.setCantidad(p.getCantidad());
+						producto.setCostoPublico(p.getPrecio());
+						nombProductos.add(producto);
+						break;
+					}
 				}
+				
 			}
 		}
 		Configuracion configuracion = configuracion();
@@ -913,12 +948,9 @@ public class PuntoVentaDia implements Serializable {
 		enPantalla = (enPantalla.equals("") ? "false" : enPantalla);
 		log.info("en pantalla:" + enPantalla);
 		String impresora = impresora(getImpresoras() == null ? "1" : getImpresoras());
-		boolean impresoraGrande = (getImpresoras() == null ? "1" : getImpresoras()).equals("2")?true:false;
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = getEmpresa();
 			String tituloFactura = "";
-
-			
 			
 			// calcular tipo de documento
 			calcularTipoDocumento(e, server);
@@ -962,9 +994,14 @@ public class PuntoVentaDia implements Serializable {
 					// quitar la dependencia del ireport
 					pathFactura=imprimirTemporal(tituloFactura);
 					break;
-				case "PDF":
-					pathFactura=Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-							enPantalla, e);
+				case "PDF":			
+					if(getImpresoras().equals("2")) {
+						pathFactura=Impresion.imprimirBigMedia(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
+								impresora, e);
+					}else {
+						pathFactura=Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+								enPantalla, e);
+					}
 					log.info("sale de impresion pdf");
 					break;
 				case "PDF_PAGE":
@@ -972,8 +1009,7 @@ public class PuntoVentaDia implements Serializable {
 							enPantalla, e);
 					break;
 				case "BIG_PDF":
-					pathFactura=Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
-							impresora, e);
+					
 					break;
 				case "SMALL_PDF":
 					pathFactura=Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla, e);
@@ -2339,6 +2375,13 @@ public class PuntoVentaDia implements Serializable {
 	public void recalcularPrecio(DocumentoDetalleVo d) {
 		log.info("cambia de precio antes");
 		dCambio = d;
+		try {
+			setLista(listaService.getByProductoId(d.getProductoId().getProductoId()));
+		} catch (Exception e) {
+			log.error("error en lista");
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void recalcularPrecio() {
@@ -3347,4 +3390,22 @@ public class PuntoVentaDia implements Serializable {
 		this.activarImpresionRemota = activarImpresionRemota;
 	}
 	
+	public Lista getLista() {
+		lista=listaService.getByProductoId(productoSelect.getProductoId()==null?0l:productoSelect.getProductoId());
+		return lista;
+	}
+	
+	public String getLista2(String producto) {
+		
+		log.info("lista:"+producto);
+		lista=listaService.getByProductoId(Long.valueOf(producto.equals("")?"0":producto));
+		if(lista==null) {
+			return "no hay listas configuradas";
+		}
+		return "L1:"+lista.getLista1()+"| L2:"+lista.getLista2()+"| L3:"+lista.getLista3()+"| L4:"+lista.getLista4();
+	} 
+
+	public void setLista(Lista lista) {
+		this.lista = lista;
+	}
 }

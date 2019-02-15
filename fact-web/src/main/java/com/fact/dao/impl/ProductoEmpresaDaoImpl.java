@@ -137,6 +137,7 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 		return documentoList.isEmpty()?null:documentoList.get(0);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ProductoEmpresa> getByProveedorYGrupo(Long grupo, Long proveedor, Long empresa) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
@@ -144,7 +145,7 @@ public class ProductoEmpresaDaoImpl implements ProductoEmpresaDao{
 		try {
 			String sql = " select pe from ProductoEmpresa pe where empresaId.empresaId =:empresaId ";
 			if(grupo!=0l) {
-				sql+=" and pe.productoId.grupoId.grupoIdId = :grupoId";
+				sql+=" and pe.productoId.grupoId.grupoId = :grupoId";
 			}
 			if(proveedor!=0l) {
 				sql+=" and pe.productoId.proveedorId.proveedorId = :proveedor ";

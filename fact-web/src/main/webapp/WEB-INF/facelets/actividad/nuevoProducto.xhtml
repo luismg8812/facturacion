@@ -60,11 +60,11 @@
 				return "";
 			}
 			if(document.activeElement.name=="nuevoProductoForm:proveedorNew_input"){//cuendo esta seleccionando el tipo documento
-				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').focus();
-				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').select();
+				document.getElementById('nuevoProductoForm:codigoBarrasNew').focus();
+				document.getElementById('nuevoProductoForm:codigoBarrasNew').select();
 				return "";
 			}
-			if(document.activeElement.name=="nuevoProductoForm:codigoBarrasNew_input"){//cuendo esta seleccionando el tipo documento
+			if(document.activeElement.name=="nuevoProductoForm:codigoBarrasNew"){//cuendo esta seleccionando el tipo documento
 				document.getElementById('nuevoProductoForm:pesoKgNew_input').focus();
 				document.getElementById('nuevoProductoForm:pesoKgNew_input').select();
 				return "";
@@ -144,14 +144,14 @@
 				document.getElementById('nuevoProductoForm:marcaNew_input').select();
 				return "";
 			}
-			if(document.activeElement.name=="nuevoProductoForm:codigoBarrasNew_input"){//cuendo esta seleccionando el tipo documento
+			if(document.activeElement.name=="nuevoProductoForm:codigoBarrasNew"){//cuendo esta seleccionando el tipo documento
 				document.getElementById('nuevoProductoForm:proveedorNew_input').focus();
 				document.getElementById('nuevoProductoForm:proveedorNew_input').select();
 				return "";
 			}
 			if(document.activeElement.name=="nuevoProductoForm:pesoKgNew_input"){//cuendo esta seleccionando el tipo documento
-				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').focus();
-				document.getElementById('nuevoProductoForm:codigoBarrasNew_input').select();
+				document.getElementById('nuevoProductoForm:codigoBarrasNew').focus();
+				document.getElementById('nuevoProductoForm:codigoBarrasNew').select();
 				return "";
 			}
 			if(document.activeElement.name=="nuevoProductoForm:pesoEmpaqueKgNew_input"){//cuendo esta seleccionando el tipo documento
@@ -302,11 +302,11 @@
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Cod. Barras:" /></td>
-				<td><p:inputNumber value="#{movimientoMes.codigoBarrasNew}"
+				<td><p:inputText value="#{movimientoMes.codigoBarrasNew}"
 						size="15" onkeyup="teclasNewProducto(event,this)"
 						id="codigoBarrasNew">
 						<!-- 					<p:ajax event="keyup" partialSubmit="true" /> -->
-					</p:inputNumber></td>
+					</p:inputText></td>
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Peso Kg:" /></td>

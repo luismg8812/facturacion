@@ -341,6 +341,224 @@ public class Impresion {
 
 		return "";
 	}
+	
+	/**
+	 * Metodo que imprime la factura en formato a5 o media carta
+	 * 
+	 * @param documentoImp
+	 * @param productos
+	 * @param usuario
+	 * @param config
+	 * @param descuentoEnFactura
+	 * @return
+	 * @throws DocumentException
+	 * @throws IOException
+	 * @throws PrinterException
+	 * @throws PrintException
+	 */
+	public static String imprimirBigMedia(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
+			Configuracion config, OpcionUsuario descuentoEnFactura, String impresora, Empresa e)
+			throws DocumentException, IOException, PrinterException, PrintException {
+		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId() + ".pdf";
+		float fntSize, lineSpacing;
+		fntSize = 8f;
+		lineSpacing = 10f;
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String fhoyIni = df.format(documentoImp.getFechaRegistro());
+		String[] fechaHora = fhoyIni.split(" ");
+		DecimalFormat formatea = new DecimalFormat("###,###.##");
+		Double tope = 15.0;// esta variable controla el nuero de productos por
+							// pagina en la factura
+		Double numPaginas = (double) productos.size();
+		numPaginas = Math.ceil(numPaginas / tope);
+		String numeroPaginas = Calculos.cortarCantidades(numPaginas, 7);
+		int paginaActual = 1;
+		int inicio = 0;
+		Float yDetalle = 262f;
+		int fin = productos.size();
+		PdfReader pdfReader = new PdfReader("C://facturacion/factura_big.pdf");
+		PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileOutputStream(pdf));
+		PdfContentByte canvas = pdfStamper.getOverContent(1);
+		log.info("productos: " + fin);
+		String fuente = "arial";
+		float resta = 0;// se utiliza esta variable si si se necesita bajar o
+						// subir todo el texto
+		// si hay mas de dos paginas se crean las paginas faltantes
+		if (numPaginas >= 2) {
+			int pagina = 3;
+			for (int i = 1; i < numPaginas; i++) {
+				pdfStamper.insertPage(pagina, pdfReader.getPageSize(1));
+				log.info("se crea la pagina.:" + pagina);
+				pdfStamper.replacePage(pdfReader, 1, pagina);
+				pdfStamper.insertPage(pagina + 1, pdfReader.getPageSize(1));
+				log.info("se crea la pagina:" + (pagina + 1));
+				pdfStamper.replacePage(pdfReader, 2, pagina + 1);
+				pagina++;
+			}
+		}
+		String TituloFactura = "";
+		
+		switch ("" + documentoImp.getTipoDocumentoId().getTipoDocumentoId()) {
+		case "10":
+			TituloFactura = "FACTURA DE VENTA";
+			break;
+		case "9":
+			TituloFactura = "GUÍA DE REMISIÓN";
+			break;
+		case "4":
+			TituloFactura = "COTIZACIÓN";
+			break;
+		default:
+			break;
+		}
+		String execto = "";
+		String gravado = "";
+		String iva = "";
+		String total = "";
+		// si valida si se desea que el descuento se refleje en la factura
+		if (descuentoEnFactura != null) {
+			execto = Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13);
+			gravado = Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 21);
+			iva = Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13);
+			// total = Calculos.cortarCantidades(formatea.format(documentoImp.getTotal() +
+			// descuento), 16);
+			total = Calculos.cortarCantidades(formatea.format(documentoImp.getTotal()), 16);
+		} else {
+			execto = Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13);
+			gravado = Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 21);
+			iva = Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13);
+			total = Calculos.cortarCantidades(formatea.format(documentoImp.getTotal()), 16);
+		}
+		String peso = Calculos.cortarCantidades(formatea.format(documentoImp.getPesoTotal()), 16);
+		String resolucion = Calculos.cortarCantidades(e.getResolucionDian(), 23);
+		String fechaResolucion = Calculos.cortarDescripcion(e.getFechaResolucion(), 10);
+		String desde = Calculos.cortarCantidades(e.getAutorizacionDesde(), 12);
+		String hasta = Calculos.cortarCantidades(e.getAutorizacionHasta(), 10);
+
+		Image imagen = null;
+		try {
+			imagen = Image.getInstance("C://facturacion/logoEmpresa.jpg");
+			imagen.scaleAbsoluteWidth(180f);
+			imagen.scaleAbsoluteHeight(50f);
+			imagen.setAbsolutePosition(35f, 345);
+		} catch (Exception e2) {
+			// TODO: handle exception
+		}
+
+		
+		for (int i = 1; i < numPaginas * 2; i += 2) {
+			// encabezado factura principal
+			canvas = pdfStamper.getOverContent(i);
+			
+			pdfStamper.getOverContent(1).addImage(imagen);
+			
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, TituloFactura, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize+2)),
+					430f, 375, 0);// tituo
+			
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, e.getRepresentante()+" "+e.getNit()+" "+e.getRegimen(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize-1)),
+					30f, 340, 0);// tituo
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, e.getDireccion()+" TEL: "+e.getCel(), FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize-1 )),
+					30f, 330, 0);// tituo
+			
+			// factura
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, e.getLetraConsecutivo() + documentoImp.getConsecutivoDian(),
+							FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize + 2)),
+					510f, 360, 0);// # DOCUMENTO
+			
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, "" + fechaHora[0]+" "+fechaHora[1], FontFactory.getFont(fuente, fntSize)), 450f, 330 - resta,
+					0);// fecha
+			
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing,
+							"" + documentoImp.getClienteId().getNombre() + " "
+									,
+							FontFactory.getFont(fuente, fntSize)),
+					80f, 312 - resta, 0);
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing,
+							"" + documentoImp.getClienteId().getDireccion(),
+							FontFactory.getFont(fuente, fntSize)),
+					85f, 302 - resta, 0);
+			
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, "Hoja "+i+" de "+numeroPaginas, FontFactory.getFont(fuente, fntSize)), 280f, 325, 0);// numero
+																												// de
+																												// paginas
+
+					// fin encabezado factura principal
+
+			// pie de pagina factura principal
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, total, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize + 2)), 463f,
+					68, 0);// total
+			ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+					new Phrase(lineSpacing, total, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize + 2)), 463f,
+					48, 0);// total
+			
+				}
+
+		try {
+			int pagina = 1;
+			for (int j = inicio; j < fin; j++) {
+				canvas = pdfStamper.getOverContent(paginaActual);
+				String cantidadProducto = Calculos.cortarCantidades(productos.get(j).getCantidad(), 11);
+				String codigoProducto = Calculos.cortarCantidades(""+productos.get(j).getProductoId().getProductoId(), 11);
+				String nombreProducto = Calculos.cortarDescripcion(productos.get(j).getProductoId().getNombre(), 34);
+				String iva1 = Calculos.cortarCantidades(formatea.format(productos.get(j).getProductoId().getIva()), 6);
+				String unidadProducto = "";
+				String totalProducto = "";
+				// si valida si se desea que el descuento se refleje en la
+				// factura
+				if (descuentoEnFactura == null) {
+					unidadProducto = Calculos
+							.cortarCantidades(formatea.format(productos.get(j).getProductoId().getCostoPublico()), 13);
+					totalProducto = Calculos.cortarCantidades(formatea.format(
+							productos.get(j).getProductoId().getCostoPublico() * productos.get(j).getCantidad()), 11);
+				} else {
+					unidadProducto = Calculos.cortarCantidades(formatea.format(productos.get(j).getUnitario()), 13);
+					totalProducto = Calculos.cortarCantidades(
+							formatea.format(productos.get(j).getUnitario() * productos.get(j).getCantidad()), 11);
+				}
+				// productos factura
+				ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+						new Phrase(lineSpacing, codigoProducto, FontFactory.getFont(fuente, fntSize )), 35f,
+						yDetalle, 0);// cantidad
+				ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+						new Phrase(lineSpacing, cantidadProducto, FontFactory.getFont(fuente, fntSize )), 80f,
+						yDetalle, 0);// cantidad
+				ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+						new Phrase(lineSpacing, nombreProducto, FontFactory.getFont(fuente, fntSize )), 110f,
+						yDetalle, 0);// nombre producto
+				ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing, unidadProducto,
+						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize )), 325f, yDetalle, 0);// precio
+																										// unitario
+				ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase(lineSpacing, totalProducto,
+						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize )), 506f, yDetalle, 0);// parcial
+				yDetalle -= 12;
+				if (j >= tope * pagina) {
+					yDetalle = 262f;
+					paginaActual += 2;
+					pagina++;
+					// break;
+				}	
+			}
+			// Image imar=
+			// Calculos.generarCodBaras(documentoImp.getDocumentoId());
+			pdfStamper.close();
+			pdfReader.close();
+			printer(impresora, pdf, config);
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+
+		return pdf;
+	}
+	
 
 	public static String imprimirEntadaAlmacenPDF(Documento documentoImp, List<DocumentoDetalleVo> productos,
 			Usuario usuario, Configuracion config, String impresora, Empresa e)
@@ -1163,7 +1381,7 @@ public class Impresion {
 
 		bw.write("\n  *****GRACIAS POR SU COMPRA*****   \n");
 		bw.write("          Software NICESOFT      \n");
-		bw.write(" LUIS MIGUEL GONZALEZ CEL: 3184222474  \n");
+		bw.write(" LUIS MIGUEL GONZALEZ CEL: 3185222474  \n");
 		bw.write(" JOHAN ANDRES ORDOÑES CEL: 3112864974  ");
 		bw.write("\n");
 		bw.write("\n");
@@ -1448,6 +1666,8 @@ public class Impresion {
 		return pdf;
 
 	}
+	
+	
 
 	public static void imprimirEntadaAlmacenTXT(Documento documentoImp, List<DocumentoDetalleVo> productos,
 			 Configuracion config, String impresora, Empresa e) throws IOException {

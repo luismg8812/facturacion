@@ -280,7 +280,8 @@ public class ProductoDaoImpl implements ProductoDao{
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Producto> menuList = new ArrayList<>(); 
 		try {
-			String sql = "select m from Producto m where m.estado=1 and m.codigoBarras =:codigoBarrasNew";
+			String sql = "select m from Producto m where m.estado=1 and m.codigoBarras =:codigoBarrasNew "
+					+ " and m.estado=1 ";
 			Query query = session.createQuery(sql);
 			query.setParameter("codigoBarrasNew",codigoBarrasNew);
 			menuList=  query.list(); 

@@ -34,8 +34,11 @@
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Cod. Cajero">
-				<h:outputText value="#{ventas.usuarioId2}" />
+			<p:column headerText="Total Costo">
+				<h:outputText value="#{ventas.base}" />
+			</p:column>
+			<p:column headerText="Ganancia">
+				<h:outputText value="#{ventas.recargas}" />
 			</p:column>
 		</p:dataTable>
 		<table width="100%" align="center">

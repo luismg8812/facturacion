@@ -419,7 +419,7 @@
 			 document.getElementById('grupoEdit').value='';
 			 document.getElementById('marcaEdit').value='';
 			 document.getElementById('proveedorEdit').value='';
-			 document.getElementById('codigoBarrasEdit_input').value='';
+			 document.getElementById('codigoBarrasEdit').value='';
 			 document.getElementById('pesoEdit_input').value='';
 			 document.getElementById('unidadEdit').value='';
 			 document.getElementById('ivaEdit_input').value=16;
@@ -581,11 +581,14 @@ panel1 {
 	width: 75%;
 	font-weight: bold
 }
-#excento_input,#gravado_input,#iva_input,#total_input,#cuadreDiario:totalfact_input{
+
+#excento_input, #gravado_input, #iva_input, #total_input, #cuadreDiario:totalfact_input
+	{
 	text-align: right !important;
 }
-.rojo{
-	color:red !important;
+
+.rojo {
+	color: red !important;
 }
 </style>
 	<p:growl id="growl1" life="7000" />
@@ -627,14 +630,15 @@ panel1 {
 						<p:ajax event="keyup"
 							listener="#{puntoVentaDia.tipoFacturaSelect}"
 							partialSubmit="true" onstart="revisarCodBarras2()"
-							process="@this" update="art_11,codBarras_input1,growl1,nombreEmpleado" />
+							process="@this"
+							update="art_11,codBarras_input1,growl1,nombreEmpleado" />
 					</p:inputText> <p:outputLabel value="#{puntoVentaDia.tipoDocumentoFacturaNombre}"
 						id="tipoNombre" /></td>
 
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Empleado: " style="font-weight:bold" /></td>
-				<td> <p:autoComplete id="nombreEmpleado"
+				<td><p:autoComplete id="nombreEmpleado"
 						value="#{puntoVentaDia.empleado}" style="display:none" size="20"
 						onkeyup="ciclo1(event,this)"
 						completeMethod="#{puntoVentaDia.completeTextEmpleado}"
@@ -643,10 +647,8 @@ panel1 {
 						converter="#{empleadoConverter}">
 						<p:ajax event="itemSelect"
 							listener="#{puntoVentaDia.buscarEmpleado}" process="@this"
-							update="art_11,idCliente"
-						/>
-					</p:autoComplete> <p:outputLabel 
-						id="nombreEmpleado2" /></td>
+							update="art_11,idCliente" />
+					</p:autoComplete> <p:outputLabel id="nombreEmpleado2" /></td>
 			</tr>
 		</table>
 	</p:panel>
@@ -719,7 +721,8 @@ panel1 {
 						onfocus="setTimeout(limpiarCod(), 3000)" id="codBarras_input1"
 						onblur="ocultarCodBarras1()" onkeyup="ciclo1(event,this)">
 						<p:ajax event="keyup" partialSubmit="true"
-							listener="#{puntoVentaDia.buscarProductoCodBarras}" delay="30" update="excento,gravado,iva,total,pesoTotal" />
+							listener="#{puntoVentaDia.buscarProductoCodBarras}" delay="30"
+							update="excento,gravado,iva,total,pesoTotal" />
 					</p:inputText></td>
 			</tr>
 		</table>
@@ -741,18 +744,18 @@ panel1 {
 		<table width="90%" style="display: none;" id="prod1">
 			<tr>
 				<td width="10%"><p:autoComplete
-						value="#{puntoVentaDia.codigoInterno}" id="cod_1" size="10" maxResults="5"
-						onkeyup="ciclo1(event,this)"
+						value="#{puntoVentaDia.codigoInterno}" id="cod_1" size="10"
+						maxResults="5" onkeyup="ciclo1(event,this)"
 						completeMethod="#{puntoVentaDia.completeCodigo}" effect="fade">
 						<p:ajax event="itemSelect"
 							listener="#{puntoVentaDia.buscarProductoCodigo}"
 							oncomplete="focoCantidad1()" />
 					</p:autoComplete></td>
-				<td width="40%"><p:autoComplete id="art_11"
+				<td width="40%"><p:autoComplete id="art_11" scrollHeight="300"
 						value="#{puntoVentaDia.articulo}"
 						emptyMessage="No se encontró el producto" size="38"
 						onkeyup="ciclo1(event,this)" minQueryLength="2"
-						completeMethod="#{puntoVentaDia.completeText}" maxResults="14"
+						completeMethod="#{puntoVentaDia.completeText}" maxResults="100"
 						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
 						converter="#{productoConverter}">
 						<p:ajax event="itemSelect"
@@ -764,13 +767,18 @@ panel1 {
 							<p:outputLabel value="#{name.nombre}." />
 						</p:column>
 						<p:column>
-							<p:outputLabel value="Cod. Producto: #{name.productoId}" />
-						</p:column>
-						<p:column>
 							<p:outputLabel value="Existencia: #{name.cantidad}" />
 						</p:column>
 						<p:column style="text-align: right">
+							<p:outputLabel value="Publico: " />
 							<p:outputLabel value="#{name.costoPublico}"
+								style="text-align: right">
+								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+							</p:outputLabel>
+						</p:column>
+						<p:column style="text-align: right">
+							<p:outputLabel value="Costo: " />
+							<p:outputLabel value="#{name.costo}"
 								style="text-align: right">
 								<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 							</p:outputLabel>
@@ -781,12 +789,12 @@ panel1 {
 						onkeyup="enterCantidad1(event)">
 						<p:ajax event="blur" partialSubmit="true"
 							listener="#{puntoVentaDia.cantidadEnter}"
-							update="art_11,cod_1,dataList1,excento,gravado,iva,total,pesoTotal,codig1,unidad_1" />
+							update="art_11,cod_1,dataList1,excento,gravado,iva,total,pesoTotal,codig1,unidad_1,costoPromedio,lista1,lista2,lista3" />
 					</p:inputText></td>
 				<td width="12%"><p:inputText value="#{puntoVentaDia.unidad}"
 						style="width:90%; text-align: center" id="unidad_1"
 						disabled="true" /></td>
-				<td width="28%"><p:inputText value="#{puntoVentaDia.parcial}" 
+				<td width="28%"><p:inputText value="#{puntoVentaDia.parcial}"
 						style="width:90%; text-align: center" disabled="true" /></td>
 			</tr>
 		</table>
@@ -799,19 +807,25 @@ panel1 {
 						<tr>
 							<td width="7%"><p:outputLabel
 									value="#{prod1.productoId.productoId}" /></td>
-							<td width="30%" style="text-align: left"><p:outputLabel style="text-align: left"
-									value="#{prod1.productoId.nombre}" /></td>
-							<td width="7%" style="text-align: right"><p:outputLabel value="#{prod1.cantidad}" style="text-align: right" >
-												<f:convertNumber pattern="#000.000" currencySymbol=" " />
-											</p:outputLabel> </td>
-							<td width="9%" style="text-align: right" ><p:outputLabel id="unitarioLabel" style="text-align: right"
-									value="#{prod1.unitario}" 
+							<td width="30%" style="text-align: left"><p:outputLabel
+									style="text-align: left" value="#{prod1.productoId.nombre}" id="content" />
+								<p:tooltip id="toolTipContent" for="content" position="bottom">
+									<p:outputLabel value="#{puntoVentaDia.getLista2(prod1.productoId.productoId)}"></p:outputLabel>
+								</p:tooltip></td>
+							<td width="7%" style="text-align: right"><p:outputLabel
+									value="#{prod1.cantidad}" style="text-align: right">
+									<f:convertNumber pattern="#000.000" currencySymbol=" " />
+								</p:outputLabel></td>
+							<td width="9%" style="text-align: right"><p:outputLabel
+									id="unitarioLabel" style="text-align: right"
+									value="#{prod1.unitario}"
 									rendered="#{!puntoVentaDia.cambioPrecio}">
 									<f:convertNumber pattern="#000.000" currencySymbol=" " />
 								</p:outputLabel> <p:inputNumber value="#{prod1.unitario}"
 									rendered="#{puntoVentaDia.cambioPrecio}" symbol="$"
 									decimalPlaces="0" id="precioVariable" minValue="0"
 									onfocus="PF('cambioPrecio').show();">
+
 									<p:ajax event="focus"
 										listener="#{puntoVentaDia.recalcularPrecio(prod1)}"></p:ajax>
 								</p:inputNumber></td>
@@ -836,15 +850,15 @@ panel1 {
 								<p:focus for="borrarTabla:checkboxDT:0:rowDelete_" />
 							</p:commandButton>
 						</p:column>
-<!-- 						<p:column width="10%"> -->
-<!-- 							<p:commandButton id="rowC_#{rowIndex}" value="Cambiar"> -->
-<!-- 								onstart="PF('bui').show()" oncomplete="PF('bui').hide()" -->
-<!-- 								actionListener="#{puntoVentaDia.cambiarDetalle(prod1)}" -->
-<!-- 								onkeyup="cCambia(event,this)" -->
-<!-- 								update="checkboxDT,excento,iva,total,pesoTotal,gravado,cantidad_in1"> -->
-<!-- 								<p:focus for="borrarTabla:checkboxDT:0:rowC_" /> -->
-<!-- 							</p:commandButton> -->
-<!-- 						</p:column> -->
+						<!-- 						<p:column width="10%"> -->
+						<!-- 							<p:commandButton id="rowC_#{rowIndex}" value="Cambiar"> -->
+						<!-- 								onstart="PF('bui').show()" oncomplete="PF('bui').hide()" -->
+						<!-- 								actionListener="#{puntoVentaDia.cambiarDetalle(prod1)}" -->
+						<!-- 								onkeyup="cCambia(event,this)" -->
+						<!-- 								update="checkboxDT,excento,iva,total,pesoTotal,gravado,cantidad_in1"> -->
+						<!-- 								<p:focus for="borrarTabla:checkboxDT:0:rowC_" /> -->
+						<!-- 							</p:commandButton> -->
+						<!-- 						</p:column> -->
 
 						<p:column width="45%">
 							<p:outputLabel value="#{prod1.productoId.nombre}" />
@@ -864,7 +878,7 @@ panel1 {
 				</h:form>
 			</p:scrollPanel>
 		</div>
-	
+
 	</p:panel>
 
 	<p:layout style="font-size: 12px;width:100% ">
@@ -882,54 +896,77 @@ panel1 {
 					</td>
 				</tr>
 				<tr>
-					<td></td>
+				<td><p:outputLabel  value="Costo: " style="font-size: 13px" /></td>
+					<td><p:outputLabel id="costoPromedio" value="#{puntoVentaDia.productoSelect.costo}" style="font-size: 13px" >
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel> </td>
+				</tr>
+				<tr>
+				<td><p:outputLabel  value="L1: " style="font-size: 13px" /></td>
+					<td><p:outputLabel id="lista1" value="#{puntoVentaDia.lista.lista1}" style="font-size: 13px" >
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel> </td>
+				</tr>
+				<tr>
+				<td><p:outputLabel  value="L2: " style="font-size: 13px" /></td>
+					<td><p:outputLabel id="lista2" value="#{puntoVentaDia.lista.lista2}" style="font-size: 13px" >
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel> </td>
+				</tr>
+				<tr>
+				<td><p:outputLabel  value="L3: " style="font-size: 13px" /></td>
+					<td><p:outputLabel id="lista3" value="#{puntoVentaDia.lista.lista3}" style="font-size: 13px" >
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel> </td>
 				</tr>
 			</table>
 			<table width="100%" align="center" id="confir" style="display: none">
 				<tr>
-					<td><p:commandButton value="[C] Cambia"/>
-<!-- 							actionListener="#{puntoVentaDia.cCambia()}" -->
-<!-- 							 id="punto_venta_cam" style="font-size: 13px;" -->
-<!-- 							onstart="verificarBorrado()" update="borrarTabla:checkboxDT"  -->
-							
-						</td>
-					<td><p:commandButton value="[B] Borra" style="font-size: 13px;"
+					<td><p:commandButton value="[C] Cambia" /> <!-- 							actionListener="#{puntoVentaDia.cCambia()}" -->
+						<!-- 							 id="punto_venta_cam" style="font-size: 13px;" --> <!-- 							onstart="verificarBorrado()" update="borrarTabla:checkboxDT"  -->
+
+					</td>
+					<td><p:commandButton value="[B] Borra"
+							style="font-size: 13px;"
 							actionListener="#{puntoVentaDia.borrarFactura()}"
 							id="punto_venta_bor" onstart="verificarBorrado()"
 							update="borrarTabla:checkboxDT" /></td>
-					<td><p:commandButton value="[I] Inserta" style="font-size: 13px;"
+					<td><p:commandButton value="[I] Inserta"
+							style="font-size: 13px;"
 							actionListener="#{puntoVentaDia.valoresDefectoImp()}" /></td>
 				</tr>
 
 			</table>
 		</p:layoutUnit>
 
-		<p:layoutUnit position="center" style="width:65%;font-size: 30px"   >
+		<p:layoutUnit position="center" style="width:65%;font-size: 30px">
 			<table width="100%" align="right">
 				<tr>
-					<td><p:outputLabel value="Vr. Exento: " style="font-size: 16px;"/></td>
-					<td style="text-align: right;background-color: #e00404;"><p:inputNumber
+					<td><p:outputLabel value="Vr. Exento: "
+							style="font-size: 16px;" /></td>
+					<td style="text-align: right; background-color: #e00404;"><p:inputNumber
 							value="#{puntoVentaDia.excento}" placeholder="$" symbol="$"
 							decimalPlaces="0" id="excento" readonly="true"
 							onfocus="focusSiguiente()" size="10" /></td>
-				
+
 					<td><p:outputLabel value="Vr. Gravado" style="font-size: 16px" /></td>
-					<td style="text-align: right;background-color: #e00404;"><p:inputNumber
+					<td style="text-align: right; background-color: #e00404;"><p:inputNumber
 							value="#{puntoVentaDia.gravado}" placeholder="$" symbol="$"
 							style="text-align: right" decimalPlaces="0" id="gravado"
 							readonly="true" size="10" /></td>
 				</tr>
 				<tr>
-					<td><p:outputLabel value="Vr. Iva"  style="font-size: 16px"/></td>
-					<td style="text-align: right;background-color: #e00404;"><p:inputNumber
+					<td><p:outputLabel value="Vr. Iva" style="font-size: 16px" /></td>
+					<td style="text-align: right; background-color: #e00404;"><p:inputNumber
 							value="#{puntoVentaDia.iva}" id="iva" placeholder="$" symbol="$"
 							style="text-align: right" decimalPlaces="0" readonly="true"
 							size="10" /></td>
-				
+
 					<td><p:outputLabel value="Total" style="font-size: 16px" /></td>
-					<td style="text-align: right;background-color: #e00404;"><p:inputNumber styleClass="rojo"
-							value="#{puntoVentaDia.total}" symbol="$" decimalPlaces="0"
-							id="total" placeholder="$" readonly="true" size="10" /></td>
+					<td style="text-align: right; background-color: #e00404;"><p:inputNumber
+							styleClass="rojo" value="#{puntoVentaDia.total}" symbol="$"
+							decimalPlaces="0" id="total" placeholder="$" readonly="true"
+							size="10" /></td>
 				</tr>
 			</table>
 		</p:layoutUnit>

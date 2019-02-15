@@ -229,14 +229,17 @@ public class Calculos {
 		Double iva19 = 0.0;
 		Double base5 = 0.0;
 		Double base19 = 0.0;
+		Double costoTotal =0.0;
 		// aqui voy toca poner a sumar las variables nuebas para que se reflejen
 		// en el info diario
 		for (DocumentoDetalleVo dDV : productos) {
 			Double costoPublico = dDV.getParcial();
+			Double costo = (dDV.getProductoId().getCosto()==null?0.0:dDV.getProductoId().getCosto())*dDV.getCantidad();
 			Double iva1 = dDV.getProductoId().getIva().doubleValue() / 100;
 			Double peso1 = dDV.getProductoId().getPeso() == null ? 0.0 : dDV.getProductoId().getPeso();//
 			peso1 = peso1 * dDV.getCantidad();
 			totalReal += costoPublico;
+			costoTotal+=costo;
 			double temp;
 			ivatotal = ivatotal + ((costoPublico / (1 + iva1)) * iva1);
 			peso = peso + peso1;
@@ -269,6 +272,7 @@ public class Calculos {
 		doc.setIva19(iva19);
 		doc.setBase5(base5);
 		doc.setBase19(base19);
+		doc.setTotalCosto(costoTotal);
 		return doc;
 	}
 
