@@ -141,16 +141,16 @@ public class Calculos {
 	 * @return
 	 */
 	public static String cortarDescripcion(String nombre, int maxTamañoNombre) {
-		int tamañoNombre = 0;
+		int tamanoNombre = 0;
 		nombre = nombre == null ? " " : nombre;
 		try {
 			nombre = nombre.trim().substring(0, maxTamañoNombre);
 		} catch (Exception e2) {
 			nombre = nombre.trim();
-			tamañoNombre = nombre.length();
+			tamanoNombre = nombre.length();
 		}
-		if (tamañoNombre != 0) {
-			for (int j = tamañoNombre; j < maxTamañoNombre; j++) {
+		if (tamanoNombre != 0) {
+			for (int j = tamanoNombre; j < maxTamañoNombre; j++) {
 				nombre += " ";
 			}
 		}
@@ -564,5 +564,13 @@ public class Calculos {
 			}		
 		}
 		return info;
+	}
+
+	public static String agregarEspacio(String descripcion,int espacios) {
+		String acun="";
+		for (int j = 0; j < espacios; j++) {
+			acun+=" ";
+		}	
+		return acun+descripcion;
 	}
 }

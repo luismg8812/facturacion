@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -453,20 +452,14 @@ public class PuntoVentaDia implements Serializable {
 		for (ProductoEmpresa p : getProductosAll()) {
 			if (p.getProductoId().getNombre() != null) {
 				String articul = p.getProductoId().getNombre().toUpperCase().trim();
-				String[] parts = query.split(" ");
-				List<String> wordList = Arrays.asList(parts);  
-				// si en algun momento se necesita			
-				for(String a: wordList) {
-					if (articul.indexOf(a.toUpperCase()) != -1) {
-						// if (articul.startsWith(query.toUpperCase().trim())) {
-						Producto producto = p.getProductoId();
-						producto.setCantidad(p.getCantidad());
-						producto.setCostoPublico(p.getPrecio());
-						nombProductos.add(producto);
-						break;
-					}
+				// si en algun momento se necesita
+				if (articul.indexOf(query.toUpperCase()) != -1) {
+					// if (articul.startsWith(query.toUpperCase().trim())) {
+					Producto producto = p.getProductoId();
+					producto.setCantidad(p.getCantidad());
+					producto.setCostoPublico(p.getPrecio());
+					nombProductos.add(producto);
 				}
-				
 			}
 		}
 		Configuracion configuracion = configuracion();
@@ -987,8 +980,14 @@ public class PuntoVentaDia implements Serializable {
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					pathFactura=Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-							enPantalla, e);
+					if(getImpresoras().equals("2")) {
+						pathFactura=Impresion.imprimirTxtBigMedia(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+								enPantalla, e);
+					}else {
+						pathFactura=Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,
+								enPantalla, e);
+					}
+					
 					break;
 				case "BIG":
 					// quitar la dependencia del ireport
@@ -996,7 +995,7 @@ public class PuntoVentaDia implements Serializable {
 					break;
 				case "PDF":			
 					if(getImpresoras().equals("2")) {
-						pathFactura=Impresion.imprimirBigMedia(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
+						pathFactura=Impresion.imprimirPDFBigMedia(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
 								impresora, e);
 					}else {
 						pathFactura=Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
@@ -1855,7 +1854,7 @@ public class PuntoVentaDia implements Serializable {
 			log.info("tiene impresion remota: "+getActivarImpresionRemota());	
 			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");
 		} else {
-			activarMultiplesImpresoras = null;
+			activarImpresionRemota = null;
 			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=0;");
 		}
 	}
@@ -3391,13 +3390,14 @@ public class PuntoVentaDia implements Serializable {
 	}
 	
 	public Lista getLista() {
+		if(productoSelect==null) {
+			return null;
+		}
 		lista=listaService.getByProductoId(productoSelect.getProductoId()==null?0l:productoSelect.getProductoId());
 		return lista;
 	}
 	
 	public String getLista2(String producto) {
-		
-		log.info("lista:"+producto);
 		lista=listaService.getByProductoId(Long.valueOf(producto.equals("")?"0":producto));
 		if(lista==null) {
 			return "no hay listas configuradas";
