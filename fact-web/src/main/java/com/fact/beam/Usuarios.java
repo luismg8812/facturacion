@@ -292,7 +292,7 @@ public class Usuarios implements Serializable {
 		emp.setCorreo(getCorreoEmpleado());
 		emp.setApellido(getAplellidoEmpleado());
 		emp.setIdentificacion(getIdentificacionEmpleado());
-		emp.setEstado("S");
+		emp.setEstado(1l);
 		emp.setFechaRegistro(new Date());
 		usuarioService.save(emp);
 		RequestContext.getCurrentInstance().execute("PF('crearEmpleado').hide();");	

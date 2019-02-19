@@ -41,7 +41,7 @@ public class Empleado {
 	private String identificacion;
 	
 	@Column(name="ESTADO")
-	private String estado;
+	private Long estado;
 	
 	
 	public Empleado()
@@ -97,11 +97,11 @@ public class Empleado {
 		this.identificacion = identificacion;
 	}
 
-	public String getEstado() {
+	public Long getEstado() {
 		return estado;
 	}
 
-	public void setEstado(String estado) {
+	public void setEstado(Long estado) {
 		this.estado = estado;
 	}
 }

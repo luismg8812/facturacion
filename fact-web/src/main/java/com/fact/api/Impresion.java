@@ -1756,7 +1756,7 @@ public class Impresion {
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
 		documento.add(
-				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con cheque:    " + Calculos.cortarCantidades(0.0, 13),
+				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con consignación:    " + Calculos.cortarCantidades(0.0, 13),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing,

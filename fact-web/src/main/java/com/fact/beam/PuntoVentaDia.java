@@ -677,9 +677,10 @@ public class PuntoVentaDia implements Serializable {
 			if (getCantidad() == 0 || getCantidad() < 0) {
 				return "";
 			}
-			// se agrega un tope maximo de cantidad de 1500
-			if (getCantidad() > 1500) {
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La cantidad maxima es de 1500"));
+			// se agrega un tope maximo de cantidad de 12000
+			if (getCantidad() > 12000) {
+				log.info("la cantidad max es de 12000");
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("La cantidad maxima es de 12000"));
 				return "";
 			}
 			// si stock esta activo se valida que la cantidad en existencia es
@@ -980,7 +981,7 @@ public class PuntoVentaDia implements Serializable {
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					if(getImpresoras().equals("2")) {
+					if(getImpresoras()!=null && getImpresoras().equals("2")) {
 						pathFactura=Impresion.imprimirTxtBigMedia(getDocumento(), getProductos(), usuario(), configuracion, impresora,
 								enPantalla, e);
 					}else {
@@ -994,7 +995,7 @@ public class PuntoVentaDia implements Serializable {
 					pathFactura=imprimirTemporal(tituloFactura);
 					break;
 				case "PDF":			
-					if(getImpresoras().equals("2")) {
+					if(getImpresoras()!=null && getImpresoras().equals("2")) {
 						pathFactura=Impresion.imprimirPDFBigMedia(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
 								impresora, e);
 					}else {
@@ -3390,11 +3391,12 @@ public class PuntoVentaDia implements Serializable {
 	}
 	
 	public Lista getLista() {
-		if(productoSelect==null) {
-			return null;
-		}
-		lista=listaService.getByProductoId(productoSelect.getProductoId()==null?0l:productoSelect.getProductoId());
-		return lista;
+		try {
+			lista=listaService.getByProductoId(productoSelect.getProductoId()==null?0l:productoSelect.getProductoId());
+			return lista;
+		} catch (Exception e) {
+			return new Lista();
+		}		
 	}
 	
 	public String getLista2(String producto) {

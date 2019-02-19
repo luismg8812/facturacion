@@ -686,7 +686,7 @@ public class MovimientoMes implements Serializable {
 			return;
 		}
 
-		if (getCodigoBarrasNew() != null) {
+		if (getCodigoBarrasNew() != null != !getCodigoBarrasNew().equals("")) {
 			Producto p = productoService.getByCodigoBarras(getCodigoBarrasNew());
 			if (p != null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(
@@ -821,6 +821,7 @@ public class MovimientoMes implements Serializable {
 			vo.setFechaRegistro(d1.getFechaRegistro());
 			vo.setParcial(d1.getParcial());
 			d1.getProductoId().setCostoPublico(vo.getParcial() / vo.getCantidad());
+			vo.setUnitario(vo.getParcial() / vo.getCantidad());
 			vo.setProductoId(d1.getProductoId());
 			ddVo.add(vo);
 		}
