@@ -78,6 +78,9 @@
 				<p:commandButton icon="ui-icon-print"
 					style="display:#{puntoVentaDia.copiaFacuta}"
 					action="#{borrarFacturas.imprimirFactura(docu)}" />
+				<p:commandButton icon="pi pi-times" title="Anular factura"
+					style="display:#{puntoVentaDia.anularFacuta}" update="growl1"
+					action="#{borrarFacturas.anularFactura(docu)}" />	
 			</p:column>
 			<p:column headerText="No. Documento">
 				<h:outputText value="#{docu.consecutivoDian}" />
@@ -92,10 +95,7 @@
 				<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</p:outputLabel>
 			</p:column>
-			<p:column headerText="No. Abonos" style="width:10%;text-align: center">
-				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
-			</p:column>
-
+			
 		</p:dataTable>
 	</h:form>
 	<p:blockUI block="facturasFechaForm" trigger="facturasFechaForm:buscar">

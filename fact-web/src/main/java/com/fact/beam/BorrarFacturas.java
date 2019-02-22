@@ -37,6 +37,7 @@ import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 
 import com.fact.api.Calculos;
+import com.fact.api.FactException;
 import com.fact.api.Impresion;
 import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
@@ -44,7 +45,9 @@ import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.Empresa;
 import com.fact.model.Evento;
+import com.fact.model.InfoDiario;
 import com.fact.model.OpcionUsuario;
+import com.fact.model.ProductoEmpresa;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoEvento;
 import com.fact.model.Usuario;
@@ -52,8 +55,10 @@ import com.fact.service.ClienteService;
 import com.fact.service.DocumentoDetalleService;
 import com.fact.service.DocumentoService;
 import com.fact.service.EventoService;
+import com.fact.service.ProductoEmpresaService;
 import com.fact.service.TipoDocumentoService;
 import com.fact.service.UsuarioService;
+import com.fact.vo.DocumentoDetalleVo;
 import com.fact.vo.DocumentoVo;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -86,6 +91,9 @@ public class BorrarFacturas implements Serializable {
 
 	@EJB
 	private EventoService eventoService;
+	
+	@EJB
+	private ProductoEmpresaService productoEmpresaService;
 	
 	@EJB
 	private TipoDocumentoService tipoDocumentoService;
@@ -122,6 +130,8 @@ public class BorrarFacturas implements Serializable {
 		imprimirFactura();
 
 	}
+	
+
 
 	public String imprimirFactura() throws DocumentException, IOException, PrinterException {
 		log.info("entra a imprimir");
@@ -379,6 +389,61 @@ public class BorrarFacturas implements Serializable {
 		setDocuConsulta(docu);
 		RequestContext.getCurrentInstance().execute("PF('consultarDetalle').show();");
 
+	}
+	
+	public String anularFactura(Documento docu) {
+		if(docu.getAnulado()!=null && docu.getAnulado()==1) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("Factura "+docu.getConsecutivoDian()+"ya ha sido anulada anteriormente"));
+			return "";
+		}
+		log.info("entra a anular factura");
+		log.info("Documento:" + docu.getDocumentoId());
+		List<DocumentoDetalle> productos = documentoDetalleService.getByDocumento(docu.getDocumentoId(), 1l); 
+		anularDetalles(productos);
+		calcularInfoDiario(docu);
+		docu.setAnulado(1l);
+		documentoService.update(docu, 1l);
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage("Factura "+docu.getConsecutivoDian()+" anulada exitosamente"));
+		return "";
+	}
+	
+	private void anularDetalles(List<DocumentoDetalle> productos) {	
+			for(DocumentoDetalle d:productos) {
+				try {				
+					ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),
+							d.getProductoId().getProductoId());
+					Double cantidad1 = productoEmpresa.getCantidad() + d.getCantidad();
+					productoEmpresa.setCantidad(cantidad1);
+					productoEmpresaService.update(productoEmpresa);
+
+				} catch (Exception e) {
+					log.error("!!error anulando el producto:" + d.getProductoId().getProductoId());
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error anulando Productos"));
+				}				
+				log.info("documentoDetalle anulado:" + d.getDocumentoDetalleId());
+			}
+	}
+	
+	private void calcularInfoDiario(Documento documento) {
+		Date fechaDocumento = documento.getFechaRegistro();
+		Date fechaInicio = Calculos.fechaInicial(fechaDocumento);
+		Date fechaFinal = Calculos.fechaFinal(fechaDocumento);
+		List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(fechaInicio, fechaFinal);
+		boolean anulado = true;
+		try {
+			InfoDiario infoDiario = Calculos.calcularInfoDiario(documento, infoList, getEmpresa(), anulado);
+
+			if (infoDiario.getInfoDiarioId() == null) {
+				documentoService.save(infoDiario);
+			} else {
+				documentoService.update(infoDiario);
+			}
+
+		} catch (FactException e1) {
+			log.error("Error calculando registro de informe diario" + e1.getMessage());
+		}
 	}
 
 	public String imprimirFactura(Documento docu)

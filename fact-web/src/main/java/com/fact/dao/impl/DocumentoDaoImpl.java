@@ -558,6 +558,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 				sql += " and d.cierreDiario is null ";
 			}
 			sql += " and d.impreso = 1";
+			sql += " and  (d.anulado is null or d.anulado!= 1)";
 			sql += " and d.consecutivoDian is not null ";
 			sql += " and d.usuarioId.usuarioId =:usuarioId order by d.consecutivoDian asc";
 			Query query = session.createQuery(sql);

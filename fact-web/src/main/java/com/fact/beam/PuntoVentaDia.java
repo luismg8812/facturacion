@@ -224,6 +224,8 @@ public class PuntoVentaDia implements Serializable {
 	public OpcionUsuario codBarrasActivo;
 	// saber si copia de factura esta activa esta activo
 	OpcionUsuario copiaFacuta;
+	// saber si anular de factura esta activa esta activo
+	OpcionUsuario anularFacuta;
 	// saber si STOCK max y min esta activo
 	OpcionUsuario stock;
 	// saber si aparecen los campos de precio sugerido en el inventario f
@@ -1331,8 +1333,9 @@ public class PuntoVentaDia implements Serializable {
 		Date fechaInicio = Calculos.fechaInicial(fechaDocumento);
 		Date fechaFinal = Calculos.fechaFinal(fechaDocumento);
 		List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(fechaInicio, fechaFinal);
+		boolean anulado= false;
 		try {
-			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList, e);
+			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList, e,anulado);
 
 			if (infoDiario.getInfoDiarioId() == null) {
 				documentoService.save(infoDiario);
@@ -1618,6 +1621,7 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("ACTIVAR_PROPORCION");
 			rutas.add("ACTIVAR_MULTIPLE_IMPRESORA");
 			rutas.add("IMPRESION_REMOTA");
+			rutas.add("ANULAR_FACTURA");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarMultipesImpresoras(opcionesActivas);
@@ -1637,16 +1641,19 @@ public class PuntoVentaDia implements Serializable {
 			activarComandas(usuario, opcionesActivas);
 			activarImpresionPantalla(usuario, opcionesActivas);
 			activarProporcion(opcionesActivas);
+			activarAnularFactura(opcionesActivas);
 		}
 		if (op.equals("movimiento_mes")) {
 			rutas.add("CLAVE_BORRADO");
 			rutas.add("STOCK");
 			rutas.add("CAMBIO_PRECIO");
+			rutas.add("COPIA_FACTURA");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarClaveBorrado(usuario, opcionesActivas);
 			activarStock(opcionesActivas);
 			activarCambioPrecio(usuario, opcionesActivas);
+			activarCopiaFactura(usuario, opcionesActivas);
 		}
 	}
 
@@ -1741,6 +1748,19 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute("copiaFactura=0;");
 		}
 		sessionMap.put("copiaFacuta", copiaFacuta);
+	}
+	
+	public void activarAnularFactura( Map<String, OpcionUsuario> opcionesActivas) {
+		String ruta = "ANULAR_FACTURA";
+		if (opcionesActivas.containsKey(ruta)) {
+			RequestContext.getCurrentInstance().execute("anularFactura=1;");
+			anularFacuta = opcionesActivas.get(ruta);
+			log.info("anular factura activo");
+		} else {
+			anularFacuta = null;
+			RequestContext.getCurrentInstance().execute("anularFactura=0;");
+		}
+		sessionMap.put("anularFacuta", anularFacuta);
 	}
 
 	public void activarbloqCuadreCaja(Usuario usuario, Map<String, OpcionUsuario> opcionesActivas) {
@@ -3262,6 +3282,16 @@ public class PuntoVentaDia implements Serializable {
 
 	public void setCopiaFacuta(OpcionUsuario copiaFacuta) {
 		this.copiaFacuta = copiaFacuta;
+	}
+	
+	
+
+	public String getAnularFacuta() {
+		return anularFacuta == null ? "none" : "inline";
+	}
+
+	public void setAnularFacuta(OpcionUsuario anularFacuta) {
+		this.anularFacuta = anularFacuta;
 	}
 
 	public String getPreciosSugeridos() {

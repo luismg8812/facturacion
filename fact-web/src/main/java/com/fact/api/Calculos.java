@@ -507,29 +507,40 @@ public class Calculos {
 	 * Metodo que calcula dependiendo del tipo de docuemnto una suma parcial al informe diario
 	 * @param documento
 	 */
-	public static InfoDiario calcularInfoDiario(Documento documento,List<InfoDiario> infoDiarioList,Empresa e) {
+	public static InfoDiario calcularInfoDiario(Documento documento,List<InfoDiario> infoDiarioList,Empresa e, boolean anulado) {
 		InfoDiario info;
-		String tipoDocumento=documento.getTipoDocumentoId().getTipoDocumentoId().toString();
-		if(infoDiarioList==null || infoDiarioList.isEmpty()){
-			 info = new InfoDiario();
-			 info.setFechaInforme(new Date());
-			 info.setFechaIngreso(new Date());
-			 
-		}else{
-			info=infoDiarioList.get(0);
-		}
+        String tipoDocumento=documento.getTipoDocumentoId().getTipoDocumentoId().toString();
+        if(infoDiarioList==null || infoDiarioList.isEmpty()){
+             info = new InfoDiario();
+             info.setFechaInforme(new Date());
+             info.setFechaIngreso(new Date());
+             
+        }else{
+            info=infoDiarioList.get(0);
+        }
+
 		switch (tipoDocumento) {
 		case "10":
-			info=asignarValorInfoDiario(documento,info,e);
+			info=asignarValorInfoDiario(documento,info,e,anulado);
 			break;
 		case "5":
 			//avances efectivo
-			Double totalAvanceEfectivo =  (info.getAvanceEfectivo()==null?0.0:info.getAvanceEfectivo())+(documento.getTotal()==null?0.0:documento.getTotal());
+			Double totalAvanceEfectivo;
+			if(anulado) {
+				totalAvanceEfectivo =  (info.getAvanceEfectivo()==null?0.0:info.getAvanceEfectivo())-(documento.getTotal()==null?0.0:documento.getTotal());
+			}else {
+				totalAvanceEfectivo =  (info.getAvanceEfectivo()==null?0.0:info.getAvanceEfectivo())+(documento.getTotal()==null?0.0:documento.getTotal());
+			}			
 			info.setAvanceEfectivo(totalAvanceEfectivo);
 			break;
 		case "9":
-			//remisiones
-			Double totalRemisiones=(info.getTotalRemisiones()==null?0.0:info.getTotalRemisiones())+(documento.getTotal()==null?0.0:documento.getTotal());
+			Double totalRemisiones;
+			if(anulado) {
+				 totalRemisiones=(info.getTotalRemisiones()==null?0.0:info.getTotalRemisiones())-(documento.getTotal()==null?0.0:documento.getTotal());
+			}else {
+				 totalRemisiones=(info.getTotalRemisiones()==null?0.0:info.getTotalRemisiones())+(documento.getTotal()==null?0.0:documento.getTotal());
+			}
+			//remisiones		
 			info.setTotalRemisiones(totalRemisiones);
 			break;	
 
@@ -540,17 +551,38 @@ public class Calculos {
 		return info;
 	}
 
-	private static InfoDiario asignarValorInfoDiario(Documento documento, InfoDiario info, Empresa e) {
+	private static InfoDiario asignarValorInfoDiario(Documento documento, InfoDiario info, Empresa e,boolean anulado) {
 		//facturas
-		Double base19 = (info.getBase19()==null?0.0:info.getBase19())+(documento.getBase19()==null?0.0:documento.getBase19());
-		Double base5 = (info.getBase5()==null?0.0:info.getBase5())+(documento.getBase5()==null?0.0:documento.getBase5());
-		Double iva5 =(info.getIva5()==null?0.0:info.getIva5())+(documento.getIva5()==null?0.0:documento.getIva5());
-		Double iva19 =(info.getIva19()==null?0.0:info.getIva19())+(documento.getIva19()==null?0.0:documento.getIva19());
-		Double cantidadOriginal =(info.getTotalOriginal()==null?0.0:info.getTotalOriginal())+(documento.getTotal()==null?0.0:documento.getTotal());
-		Double ivaTootalOriginal =(info.getIvaOriginal()==null?0.0:info.getIvaOriginal())+(documento.getIva()==null?0.0:documento.getIva());
-		Double excento = (info.getExcento()==null?0.0:info.getExcento())+(documento.getExcento()==null?0.0:documento.getExcento());
-		Double totalCosto=(info.getCostoOriginal()==null?0.0:info.getCostoOriginal())+(documento.getTotalCosto()==null?0.0:documento.getTotalCosto());
+		Double base19 ;
+		Double base5 ;
+		Double iva5 ;
+		Double iva19 ;
+		Double cantidadOriginal ;
+		Double ivaTootalOriginal ;
+		Double excento ;
+		Double totalCosto;
 		Double totalDocumentos = (info.getCantidadDocumentos()==null?0:info.getCantidadDocumentos())+1;
+		if(anulado) {
+			base19 = (info.getBase19()==null?0.0:info.getBase19())-(documento.getBase19()==null?0.0:documento.getBase19());
+			 base5 = (info.getBase5()==null?0.0:info.getBase5())-(documento.getBase5()==null?0.0:documento.getBase5());
+			 iva5 =(info.getIva5()==null?0.0:info.getIva5())-(documento.getIva5()==null?0.0:documento.getIva5());
+			 iva19 =(info.getIva19()==null?0.0:info.getIva19())-(documento.getIva19()==null?0.0:documento.getIva19());
+			 cantidadOriginal =(info.getTotalOriginal()==null?0.0:info.getTotalOriginal())-(documento.getTotal()==null?0.0:documento.getTotal());
+			 ivaTootalOriginal =(info.getIvaOriginal()==null?0.0:info.getIvaOriginal())-(documento.getIva()==null?0.0:documento.getIva());
+			 excento = (info.getExcento()==null?0.0:info.getExcento())-(documento.getExcento()==null?0.0:documento.getExcento());
+			 totalCosto=(info.getCostoOriginal()==null?0.0:info.getCostoOriginal())-(documento.getTotalCosto()==null?0.0:documento.getTotalCosto());
+		}else {
+			 base19 = (info.getBase19()==null?0.0:info.getBase19())+(documento.getBase19()==null?0.0:documento.getBase19());
+			 base5 = (info.getBase5()==null?0.0:info.getBase5())+(documento.getBase5()==null?0.0:documento.getBase5());
+			 iva5 =(info.getIva5()==null?0.0:info.getIva5())+(documento.getIva5()==null?0.0:documento.getIva5());
+			 iva19 =(info.getIva19()==null?0.0:info.getIva19())+(documento.getIva19()==null?0.0:documento.getIva19());
+			 cantidadOriginal =(info.getTotalOriginal()==null?0.0:info.getTotalOriginal())+(documento.getTotal()==null?0.0:documento.getTotal());
+			 ivaTootalOriginal =(info.getIvaOriginal()==null?0.0:info.getIvaOriginal())+(documento.getIva()==null?0.0:documento.getIva());
+			 excento = (info.getExcento()==null?0.0:info.getExcento())+(documento.getExcento()==null?0.0:documento.getExcento());
+			 totalCosto=(info.getCostoOriginal()==null?0.0:info.getCostoOriginal())+(documento.getTotalCosto()==null?0.0:documento.getTotalCosto());
+			
+		}
+		
 		//Double
 		info.setBase19(base19);
 		info.setBase5(base5);
@@ -561,18 +593,21 @@ public class Calculos {
 		info.setCostoOriginal(totalCosto);
 		info.setCantidadDocumentos(totalDocumentos);
 		info.setIvaOriginal(ivaTootalOriginal);
-		if(info.getInfoDiarioId()==null){
-			info.setDocumentoInicio(""+documento.getConsecutivoDian()) ;
-			info.setDocumentoFin(e.getLetraConsecutivo()+documento.getConsecutivoDian()) ;
-		}else{
-			String documentoE=documento.getConsecutivoDian().replace(" ","");
-			documentoE=documentoE.replace(e.getLetraConsecutivo(),"");
-			String infoE=info.getDocumentoFin()==null?"1":info.getDocumentoFin().replace(" ","");
-			infoE=infoE.replace(e.getLetraConsecutivo(),"");
-			if(Long.valueOf(documentoE)>Long.valueOf(infoE)){
-				info.setDocumentoFin(documento.getConsecutivoDian()) ;
-			}		
+		if(!anulado) {
+			if(info.getInfoDiarioId()==null){
+				info.setDocumentoInicio(""+documento.getConsecutivoDian()) ;
+				info.setDocumentoFin(e.getLetraConsecutivo()+documento.getConsecutivoDian()) ;
+			}else{
+				String documentoE=documento.getConsecutivoDian().replace(" ","");
+				documentoE=documentoE.replace(e.getLetraConsecutivo(),"");
+				String infoE=info.getDocumentoFin()==null?"1":info.getDocumentoFin().replace(" ","");
+				infoE=infoE.replace(e.getLetraConsecutivo(),"");
+				if(Long.valueOf(documentoE)>Long.valueOf(infoE)){
+					info.setDocumentoFin(documento.getConsecutivoDian()) ;
+				}		
+			}
 		}
+		
 		return info;
 	}
 

@@ -1765,8 +1765,8 @@ public class Impresion {
 								: documentoImp.getClienteId().getCelular()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"CIUDAD: " + (documentoImp.getClienteId().getCiudadId().getNombre() == null ? ""
-						: documentoImp.getClienteId().getCiudadId().getNombre())+" MAIL: "+ (documentoImp.getClienteId().getMail() == null ? ""
+				"CIUDAD: " + (documentoImp.getClienteId().getCiudadId() == null ? ""
+						: documentoImp.getClienteId().getCiudadId().getNombre())+" MAIL: "+ (documentoImp.getClienteId() == null ? ""
 								: documentoImp.getClienteId().getMail()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 		documento.add(new Paragraph(new Phrase(lineSpacing,

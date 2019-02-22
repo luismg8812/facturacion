@@ -90,6 +90,9 @@ public class Documento {
 	@Column(name="REDUCCION")
 	private Long reduccion;
 	
+	@Column(name="ANULADO")
+	private Long anulado;
+	
 	@Column(name="PESO_TOTAL")
 	private Double pesoTotal;
 	
@@ -417,4 +420,13 @@ public class Documento {
 		this.invoiceId = invoiceId;
 	}
 
+	public Long getAnulado() {
+		return anulado;
+	}
+
+	public void setAnulado(Long anulado) {
+		this.anulado = anulado;
+	}
+
+	
 }
