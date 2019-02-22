@@ -196,6 +196,7 @@ public class PuntoVentaDia implements Serializable {
 	private String retencionClienteNew;
 	private String guiaTransporteClienteNew;
 	private String crearNew;
+	private String empresaNew;
 	//
 
 	Double excento;
@@ -418,8 +419,9 @@ public class PuntoVentaDia implements Serializable {
 
 	public void buscarProducto(SelectEvent event) throws IOException {
 		productoSelect = (Producto) event.getObject();
+		//producto id =6 es para retencion del hotel
 		if (productoSelect != null && (productoSelect.getProductoId() == 0l || productoSelect.getProductoId() == 1l
-				|| productoSelect.getProductoId() == 2l)) {
+				|| productoSelect.getProductoId() == 2l || productoSelect.getProductoId() == 6l)) {
 			RequestContext.getCurrentInstance().execute("PF('px01').show();");
 			setUnidad(0.0);
 			RequestContext.getCurrentInstance().execute("document.getElementById('px01_input_input').focus();");
@@ -567,6 +569,7 @@ public class PuntoVentaDia implements Serializable {
 			pnew.setIva(0.0);
 			pnew.setNombre(productoSelect.getNombre());
 			pnew.setCodigoInterno(productoSelect.getProductoId().toString());
+			pnew.setProductoId(productoSelect.getProductoId());
 			docDetalle.setCantidad(1.0);
 			docDetalle.setProductoId(productoSelect);
 			docDetalle.setDocumentoId(getDocumento());
@@ -1178,8 +1181,8 @@ public class PuntoVentaDia implements Serializable {
 					rangoA = proporcion.getRangoImparA();
 					rangoB = proporcion.getRangoImparB();
 				}
-
-				if ((getDocumento().getTotal() >= rangoA && getDocumento().getTotal() <= rangoB)) {
+				Double totaldocu = (getDocumento().getTotal()==null? 0.0:getDocumento().getTotal());
+				if (( totaldocu>= rangoA && totaldocu <= rangoB)) {
 					tipo.setTipoDocumentoId(9l);// se asigna factura
 					getDocumento().setTipoDocumentoId(tipo);
 				} else {
@@ -1992,18 +1995,23 @@ public class PuntoVentaDia implements Serializable {
 		}
 		Configuracion configuracion = configuracion();
 		String impresora = impresora(getImpresoras());
-		Empresa e = Login.getEmpresaLogin();
+		Empresa e = getEmpresa();
 		String imp = e.getImpresion().toUpperCase();
 		List<Long> gruposId = new ArrayList<>();
 		for (DocumentoDetalleVo ddvo : getProductos()) {
-			Boolean contieneGrupo = !gruposId.contains(ddvo.getProductoId().getGrupoId().getGrupoId());
+			Boolean contieneGrupo = ddvo.getProductoId().getGrupoId()!=null && !gruposId.contains(ddvo.getProductoId().getGrupoId().getGrupoId());
 			Integer productoImpreso = ddvo.getDocumentoDetalleId().getImpresoComanda() == null ? 0
 					: ddvo.getDocumentoDetalleId().getImpresoComanda();
 			if (contieneGrupo && productoImpreso == 0) {
 				gruposId.add(ddvo.getProductoId().getGrupoId().getGrupoId());
 			}
 		}
+		if(gruposId.isEmpty()) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("los productos no tienen grupos definidos"));
+			//return;
+		}
 		for (Long g : gruposId) {
+			Grupo g2 = grupoService.getById(g);
 			switch (imp) {
 			case "TXT":
 				log.info("no se imprime comandas en txt");
@@ -2011,96 +2019,25 @@ public class PuntoVentaDia implements Serializable {
 			case "BIG":
 				log.info("no se imprime comandas en big");
 				break;
-			case "PDF":
-				Grupo g2 = grupoService.getById(g);
-				SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-				Date hoy = new Date();
-				String pdf = "C:\\facturas\\comandas\\comanda_" + getDocumento().getDocumentoId() + "_" + g2.getNombre()
-						+ df.format(hoy).replace(":", "_") + ".pdf";
-				FileOutputStream archivo = new FileOutputStream(pdf);
-				Document documento = new Document();
-				float fntSize, lineSpacing;
-				fntSize = 11f;
-				lineSpacing = 10f;
-				PdfWriter.getInstance(documento, archivo);
-				documento.setMargins(10, 1, 1, 1);
-				documento.open();
-				documento.add(
-						new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
-				documento.add(new Paragraph(new Phrase(lineSpacing, "Comanda para: " + g2.getNombre(),
-						FontFactory.getFont(FontFactory.COURIER_BOLD, 14f))));
-				documento.add(new Paragraph(new Phrase(lineSpacing, "Documento: " + getDocumento().getDocumentoId(),
-						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
-				documento.add(
-						new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
-				documento.add(new Paragraph(new Phrase(lineSpacing, "Producto               Cantidad     ",
-						FontFactory.getFont(FontFactory.COURIER_BOLD, 14f)))); //
+			case "PDF":				
+				setProductos(Impresion.comandaPDF(getDocumento(),g2,g, getProductos(),impresora, configuracion));
 				for (DocumentoDetalleVo ddvo2 : getProductos()) {
-					Integer productoImpreso = ddvo2.getDocumentoDetalleId().getImpresoComanda() == null ? 0
-							: ddvo2.getDocumentoDetalleId().getImpresoComanda();
-					if (g == ddvo2.getProductoId().getGrupoId().getGrupoId() && productoImpreso == 0) {
-						// descripcion
-						String nombre = "";
-						int maxTamanoNombre = 24;
-						nombre = Calculos.cortarDescripcion(ddvo2.getProductoId().getNombre(), maxTamanoNombre);
-
-						// Cantidad
-						String cant = "";
-						int maxTamañoCant = 3;
-						cant = Calculos.cortarCantidades(ddvo2.getCantidad(), maxTamañoCant);
-						documento.add(new Paragraph(new Phrase(lineSpacing, nombre + " " + cant,
-								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
-						DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
-						edict.setImpresoComanda(1);
-						documentoDetalleService.update(edict, 1l);
-					}
+					DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
+					documentoDetalleService.update(edict, 1l);
 				}
-				documento.close();
-				PrinterJob job = PrinterJob.getPrinterJob();
-				PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-				log.info("Number of printers configured1: " + printServices.length);
-				for (PrintService printer : printServices) {
-					log.info("Printer: " + printer.getName());
-					log.info("comparacion:" + impresora + ":" + printer.getName());
-					if (printer.getName().equals(impresora)) {
-						try {
-							job.setPrintService(printer);
-							log.info(impresora + " : " + printer.getName());
-							break;
-						} catch (PrinterException ex) {
-							ex.printStackTrace();
-						}
-					}
-				}
-				PDDocument document = null;
-				try {
-					document = PDDocument.load(new File(pdf));
-					job.setPageable(new PDFPageable(document));
-					try {
-						job.print();
-					} catch (PrinterException er) {
-						er.printStackTrace();
-					}
-					document.close();
-				} catch (IOException ef) {
-					ef.printStackTrace();
-				}
-				if (configuracion.getGuardarFacturas() == 0l) {
-					File borrar = new File(pdf);
-					if (!borrar.delete()) {
-						log.error("Error borrando facturas");
-					} else {
-						log.info("Documento borrado");
-					}
-				}
-
 				break;
 			case "BIG_PDF":
 				log.info("no se imprime comandas en big_pdf");
 
 				break;
 			case "SMALL_PDF":
-				log.info("no se imprime comandas en small_pdf");
+				log.info("inicio imprime comandas en small_pdf");
+				setProductos(Impresion.comandaPDFSmall(getDocumento(),g2,g, getProductos(),impresora, configuracion));
+				for (DocumentoDetalleVo ddvo2 : getProductos()) {
+					DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
+					documentoDetalleService.update(edict, 1l);
+				}
+			    log.info("fin imprime comandas en small_pdf");
 
 				break;
 			default:
@@ -2757,6 +2694,7 @@ public class PuntoVentaDia implements Serializable {
 			cNew.setDocumento(getDocumentoClienteNew() == null ? "" : getDocumentoClienteNew());
 			cNew.setFechaRegistro(new Date());
 			cNew.setFijo(getFijoClienteNew() == null ? "0" : getFijoClienteNew());
+			cNew.setEmpresa(getEmpresaNew() == null ? "" : getEmpresaNew());
 			if (getGuiaTransporteClienteNew() != null) {
 				cNew.setGuiaTransporte(getGuiaTransporteClienteNew().equalsIgnoreCase("S") ? 1l : 0l);
 			} else {
@@ -3410,4 +3348,13 @@ public class PuntoVentaDia implements Serializable {
 	public void setLista(Lista lista) {
 		this.lista = lista;
 	}
+
+	public String getEmpresaNew() {
+		return empresaNew;
+	}
+
+	public void setEmpresaNew(String empresaNew) {
+		this.empresaNew = empresaNew;
+	}
+		
 }

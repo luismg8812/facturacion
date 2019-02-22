@@ -63,6 +63,7 @@ public class Clientes implements Serializable {
 	private String fijo;
 	private Date Cumpleaños;
 	private String mail;
+	private String empresa;
 	private Boolean creditoActivo = Boolean.FALSE;
 	private Long cupoCredito;
 	private double retencion;
@@ -288,6 +289,7 @@ for (Proveedor c : proveedorTemp) {
 			cliente.setCumpleanos(getCumpleaños());
 			cliente.setCupoCredito(getCupoCredito());
 			cliente.setDocumento(getDocumento() == null ? "" : getDocumento());
+			cliente.setEmpresa(getEmpresa() == null ? "" : getEmpresa());
 			cliente.setDireccion(getDireccion());
 			cliente.setFechaRegistro(new Date());
 			cliente.setFijo(getFijo());
@@ -491,5 +493,15 @@ for (Proveedor c : proveedorTemp) {
 	public void setTerceros(List<ClienteVo> terceros) {
 		this.terceros = terceros;
 	}
+
+	public String getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(String empresa) {
+		this.empresa = empresa;
+	}
+	
+	
 
 }

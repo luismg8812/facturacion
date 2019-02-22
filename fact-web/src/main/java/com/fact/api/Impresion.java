@@ -32,7 +32,9 @@ import org.jboss.logging.Logger;
 import com.fact.beam.Login;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
+import com.fact.model.DocumentoDetalle;
 import com.fact.model.Empresa;
+import com.fact.model.Grupo;
 import com.fact.model.OpcionUsuario;
 import com.fact.model.Producto;
 import com.fact.model.Usuario;
@@ -1034,7 +1036,10 @@ public class Impresion {
 				"CC/NIT: " + documentoImp.getClienteId().getDocumento() == null ? ""
 						: documentoImp.getClienteId().getDocumento(),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
-		// LEGAL
+		if (documentoImp.getEmpleadoId() != null) {
+			documento.add(new Paragraph(new Phrase(lineSpacing, "MESERO: " + documentoImp.getEmpleadoId().getNombre(),
+					FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // fecha
+		}
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
 		// lineSpacing, "Descripción CANT UNIDAD TOTAL" LEGAL
 		String impuesto = e.getImpuesto().equals("IVA") ? "IVA" : "IPO";
@@ -1487,7 +1492,7 @@ public class Impresion {
 			for (int p=temp; p<productos.size(); p++) {
 				String idProducto =Calculos.cortarDescripcion(productos.get(p).getProductoId().getProductoId()+"", 7);
 				String nombreProducto = Calculos.cortarDescripcion(productos.get(p).getProductoId().getNombre(), 35);
-				String cantidadProducto = Calculos.cortarCantidades(formatea.format(productos.get(p).getCantidad()), 4);
+				String cantidadProducto = Calculos.cortarCantidades(productos.get(p).getCantidad(), 4);
 				String unidadProducto = Calculos.cortarCantidades(formatea.format(productos.get(p).getUnitario()), 12);
 				String ivaProducto = Calculos.cortarCantidades(formatea.format(productos.get(p).getProductoId().getIva()), 6);
 				String totalProducto = Calculos.cortarCantidades(formatea.format(productos.get(p).getParcial()), 10);
@@ -1520,7 +1525,7 @@ public class Impresion {
 			//bw.write("La presente factura cambiaria de compraventa se asimila a la letra de cambio, de acuerdo al artículo 619 y 774 del "+" \n");
 			//bw.write("A partir de 30 dias de la fecha de esta factura o sea el vencimiento se cobran intereses de mora a la tasa maxima."+" \n");
 			bw.write("Cajero: "+usuario.getNombre()+" "+usuario.getApellido()+"  Aceptada:_____________________CC_____________"+" FACTURA IMPRESA POR COMPUTADOR"+ "\n");
-			bw.write("software realizado por Niceso: www.effectivesoftware.com.co"+" \n");
+			bw.write("software realizado por Nicesoft: www.effectivesoftware.com.co"+" \n");
 			bw.write(" \n");
 			espacio=tope;
 		}
@@ -1569,6 +1574,104 @@ public class Impresion {
 			}
 		}
 		return pdf;
+	}
+	
+	public static List<DocumentoDetalleVo> comandaPDF(Documento documentoImp,Grupo g2,Long g,List<DocumentoDetalleVo> productos,String impresora ,Configuracion configuracion) throws DocumentException, FileNotFoundException {
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+		Date hoy = new Date();
+		String pdf = "C:\\facturas\\comandas\\comanda_" + documentoImp.getDocumentoId() + "_" + g2.getNombre()
+				+ df.format(hoy).replace(":", "_") + ".pdf";
+		FileOutputStream archivo = new FileOutputStream(pdf);
+		Document documento = new Document();
+		float fntSize, lineSpacing;
+		fntSize = 11f;
+		lineSpacing = 10f;
+		PdfWriter.getInstance(documento, archivo);
+		documento.setMargins(10, 1, 1, 1);
+		documento.open();
+		documento.add(
+				new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Comanda para: " + g2.getNombre(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, 14f))));
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Documento: " + documentoImp.getDocumentoId(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
+		documento.add(
+				new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Producto               Cantidad     ",
+				FontFactory.getFont(FontFactory.COURIER_BOLD, 14f)))); //
+		for (DocumentoDetalleVo ddvo2 : productos) {
+			Integer productoImpreso = ddvo2.getDocumentoDetalleId().getImpresoComanda() == null ? 0
+					: ddvo2.getDocumentoDetalleId().getImpresoComanda();
+			if (g == ddvo2.getProductoId().getGrupoId().getGrupoId() && productoImpreso == 0) {
+				// descripcion
+				String nombre = "";
+				int maxTamanoNombre = 24;
+				nombre = Calculos.cortarDescripcion(ddvo2.getProductoId().getNombre(), maxTamanoNombre);
+
+				// Cantidad
+				String cant = "";
+				int maxTamañoCant = 3;
+				cant = Calculos.cortarCantidades(ddvo2.getCantidad(), maxTamañoCant);
+				documento.add(new Paragraph(new Phrase(lineSpacing, nombre + " " + cant,
+						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
+				DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
+				edict.setImpresoComanda(1);
+				
+			}
+		}
+		documento.close();
+		log.info("imprime en papel");
+		printer(impresora, pdf, configuracion);
+		return productos;
+	}
+	
+	public static List<DocumentoDetalleVo> comandaPDFSmall(Documento documentoImp,Grupo g2,Long g,List<DocumentoDetalleVo> productos,String impresora ,Configuracion configuracion) throws DocumentException, FileNotFoundException {
+		SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+		Date hoy = new Date();
+		String pdf = "C:\\facturas\\comandas\\comanda_" + documentoImp.getDocumentoId() + "_" + g2.getNombre()
+				+ df.format(hoy).replace(":", "_") + ".pdf";
+		FileOutputStream archivo = new FileOutputStream(pdf);
+		Document documento = new Document();
+		float fntSize, lineSpacing;
+		fntSize = 6f;
+		lineSpacing = 10f;
+		PdfWriter.getInstance(documento, archivo);
+		documento.setMargins(9, 1, 1, 1);
+		documento.open();
+		documento.add(
+				new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Comanda para: " + g2.getNombre(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, 14f))));
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Documento: " + documentoImp.getDocumentoId(),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
+		documento.add(
+				new Paragraph(new Phrase(lineSpacing, "-------------------------------------------------"))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing, "Producto               Cantidad     ",
+				FontFactory.getFont(FontFactory.COURIER_BOLD, 14f)))); //
+		for (DocumentoDetalleVo ddvo2 : productos) {
+			Integer productoImpreso = ddvo2.getDocumentoDetalleId().getImpresoComanda() == null ? 0
+					: ddvo2.getDocumentoDetalleId().getImpresoComanda();
+			if (g == ddvo2.getProductoId().getGrupoId().getGrupoId() && productoImpreso == 0) {
+				// descripcion
+				String nombre = "";
+				int maxTamanoNombre = 24;
+				nombre = Calculos.cortarDescripcion(ddvo2.getProductoId().getNombre(), maxTamanoNombre);
+
+				// Cantidad
+				String cant = "";
+				int maxTamañoCant = 3;
+				cant = Calculos.cortarCantidades(ddvo2.getCantidad(), maxTamañoCant);
+				documento.add(new Paragraph(new Phrase(lineSpacing, nombre + " " + cant,
+						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); //
+				DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
+				edict.setImpresoComanda(1);
+				
+			}
+		}
+		documento.close();
+		log.info("imprime en papel");
+		printer(impresora, pdf, configuracion);
+		return productos;
 	}
 
 	public static String imprimirPDFPage(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
@@ -1650,11 +1753,24 @@ public class Impresion {
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // fecha
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				"CLIENTE: "
-						+ (documentoImp.getClienteId() == null ? "VARIOS" : documentoImp.getClienteId().getNombre()),
+						+ (documentoImp.getClienteId() == null ? "VARIOS" : documentoImp.getClienteId().getEmpresa()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"CC/NIT: " + documentoImp.getClienteId().getDocumento() == null ? ""
-						: documentoImp.getClienteId().getDocumento(),
+				"CC/NIT: " + (documentoImp.getClienteId().getDocumento() == null ? ""
+						: documentoImp.getClienteId().getDocumento()),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"DIRECCIÓN: " + (documentoImp.getClienteId().getDireccion() == null ? ""
+						: documentoImp.getClienteId().getDireccion())+" TELEFONO: "+(documentoImp.getClienteId().getCelular() == null ? ""
+								: documentoImp.getClienteId().getCelular()),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"CIUDAD: " + (documentoImp.getClienteId().getCiudadId().getNombre() == null ? ""
+						: documentoImp.getClienteId().getCiudadId().getNombre())+" MAIL: "+ (documentoImp.getClienteId().getMail() == null ? ""
+								: documentoImp.getClienteId().getMail()),
+				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
+		documento.add(new Paragraph(new Phrase(lineSpacing,
+				"NOMBRE HUÉSPED: " + (documentoImp.getClienteId() == null ? "VARIOS" : documentoImp.getClienteId().getNombre()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 		if (documentoImp.getEmpleadoId() != null) {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "MESERO: " + documentoImp.getEmpleadoId().getNombre(),
@@ -1683,7 +1799,7 @@ public class Impresion {
 
 			// Unitario
 			String unit = "";
-			int maxTamañoUnit = 5;
+			int maxTamañoUnit = 6;
 			unit = Calculos.cortarCantidades(ddV.getUnitario(), maxTamañoUnit);
 
 			// total
@@ -1709,7 +1825,7 @@ public class Impresion {
 								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 			} else {
 				documento.add(new Paragraph(new Phrase(lineSpacing,
-						cant + "     " + nombre + "   " + unit + "        " + total + "    " + iva,
+						cant + "     " + nombre + "   " + unit + "       " + total + "    " + iva,
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // CANTIDAD
 																					// NOMBRE
 			}
@@ -1719,21 +1835,21 @@ public class Impresion {
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"Valor Exento:          " + Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()), 13),
+				"Valor Exento:          " + Calculos.cortarCantidades(formatea.format(documentoImp.getExcento()==null?0.0:documentoImp.getExcento()), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"Valor Gravado:         " + Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()), 13),
+				"Valor Gravado:         " + Calculos.cortarCantidades(formatea.format(documentoImp.getGravado()==null?0.0:documentoImp.getGravado()), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																			// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				(e.getImpuesto().equals("IVA") ? "IVA" : "IPO") + ":                   "
-						+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()), 13),
+						+ Calculos.cortarCantidades(formatea.format(documentoImp.getIva()==null?0.0:documentoImp.getIva()), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
-		double porcRetencion = documentoImp.getClienteId().getRetencion() == null ? 0.0
-				: documentoImp.getClienteId().getRetencion();
+		double porcRetencion = documentoImp.getRetefuente() == null ? 0.0
+				: documentoImp.getRetefuente();
 		porcRetencion = porcRetencion / 100;
-		Double rete = ((documentoImp.getTotal() / (1 + porcRetencion)) * porcRetencion);
+		Double rete = ((documentoImp.getTotal()==null?0.0:documentoImp.getTotal() / (1 + porcRetencion)) * porcRetencion);
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				"Retención:             " + Calculos.cortarCantidades(formatea.format(rete), 13),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
@@ -1742,7 +1858,7 @@ public class Impresion {
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE
 		// LEGAL
 		documento
-				.add(new Paragraph(new Phrase(lineSpacing, "TOTAL A PAGAR: " + formatea.format(documentoImp.getTotal()),
+				.add(new Paragraph(new Phrase(lineSpacing, "TOTAL A PAGAR: " + formatea.format(documentoImp.getTotal()==null?0.0:documentoImp.getTotal()),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, 14f)))); // REPRESENTANTE
 																				// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA_GRANDE))); // REPRESENTANTE

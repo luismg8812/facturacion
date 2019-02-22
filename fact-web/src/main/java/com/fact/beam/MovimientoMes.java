@@ -686,7 +686,7 @@ public class MovimientoMes implements Serializable {
 			return;
 		}
 
-		if (getCodigoBarrasNew() != null != !getCodigoBarrasNew().equals("")) {
+		if (getCodigoBarrasNew() != null && !getCodigoBarrasNew().equals("")) {
 			Producto p = productoService.getByCodigoBarras(getCodigoBarrasNew());
 			if (p != null) {
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(

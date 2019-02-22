@@ -73,6 +73,10 @@
  						</td>
 						<td><p:outputLabel value="Mail: " /></td>
 						<td><p:inputText value="#{clientes.mail}"></p:inputText></td>
+						<td><p:outputLabel value="Empresa: " /></td>
+						<td><p:inputText value="#{clientes.empresa}"></p:inputText></td>
+					</tr>
+					<tr>				
 						<td></td>
 						<td><p:commandButton value="Guardar" id="guardarBotton"  process="@form" 
 						update="@form,growl1,clientesForm:acord:guardarForm:clienteEdictSelect" 
@@ -80,6 +84,7 @@
 							</p:commandButton>
 							<p:commandButton value="Salir" onclick="salirUsuarios" /></td>
 					</tr>
+					
 <!-- 					guardarForm:usuarioEdictSelect, guardarForm:usuarioSelect -->
 				</table>
 			</h:form>
@@ -159,6 +164,10 @@
 						 onLabel="Si" offLabel="No"  /></td>
 						<td><p:outputLabel value="Mail: " /></td>
 						<td><p:inputText value="#{clientes.mail}"></p:inputText></td>
+						<td><p:outputLabel value="Empresa: " /></td>
+						<td><p:inputText value="#{clientes.empresa}"></p:inputText></td>
+					</tr>
+					<tr>
 						<td></td>
 						<td><p:commandButton value="Guardar" id="editarUsuaririoButon"  process="@form" 
 						update="@form,growl1" 

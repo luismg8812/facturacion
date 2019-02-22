@@ -75,7 +75,14 @@ public class Usuarios implements Serializable {
 	private String aplellidoEmpleado;
 	private String correoEmpleado;
 	private String identificacionEmpleado;
+	
+	private String nombreEmpleadoBuscar;
+	private String aplellidoEmpleadoBuscar;
+	private String correoEmpleadoBuscar;
+	private String identificacionEmpleadoBuscar;
 	private List<Empleado> empleadoList;
+	
+	
 	
 	public boolean validar(){
     	FacesContext context = FacesContext.getCurrentInstance();
@@ -247,7 +254,7 @@ public class Usuarios implements Serializable {
 	}
 	
 	public void buscarEmpleados(){
-		setEmpleadoList(usuarioService.getByFiltrosEmpleados(getNombreEmpleado(),getAplellidoEmpleado(),getCorreoEmpleado(),getIdentificacionEmpleado()));
+		setEmpleadoList(usuarioService.getByFiltrosEmpleados(getNombreEmpleadoBuscar(),getAplellidoEmpleadoBuscar(),getCorreoEmpleadoBuscar(),getIdentificacionEmpleadoBuscar()));
 	}
 
 	public List<SubMenu> getSubMenuSource() {
@@ -287,8 +294,16 @@ public class Usuarios implements Serializable {
 	}
 	
 	public void crearEmpreado(){
+		if(getAplellidoEmpleado()==null || getAplellidoEmpleado().isEmpty() ) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El nombre es obligatorio"));
+			return;
+		}
+		if(getAplellidoEmpleado()==null || getAplellidoEmpleado().isEmpty() ) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El apellido es obligatorio"));
+			return;
+		}
 		Empleado emp= new Empleado();
-		emp.setNombre(getAplellidoEmpleado());
+		emp.setNombre(getNombreEmpleado());
 		emp.setCorreo(getCorreoEmpleado());
 		emp.setApellido(getAplellidoEmpleado());
 		emp.setIdentificacion(getIdentificacionEmpleado());
@@ -296,8 +311,7 @@ public class Usuarios implements Serializable {
 		emp.setFechaRegistro(new Date());
 		usuarioService.save(emp);
 		RequestContext.getCurrentInstance().execute("PF('crearEmpleado').hide();");	
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Opciones Editadas exitosamente"));
-		
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Opciones Editadas exitosamente"));	
 	}
 
 	public void setRoles(List<Rol> roles) {
@@ -444,6 +458,38 @@ public class Usuarios implements Serializable {
 
 	public void setSucursales(List<Empresa> sucursales) {
 		this.sucursales = sucursales;
+	}
+
+	public String getNombreEmpleadoBuscar() {
+		return nombreEmpleadoBuscar;
+	}
+
+	public void setNombreEmpleadoBuscar(String nombreEmpleadoBuscar) {
+		this.nombreEmpleadoBuscar = nombreEmpleadoBuscar;
+	}
+
+	public String getAplellidoEmpleadoBuscar() {
+		return aplellidoEmpleadoBuscar;
+	}
+
+	public void setAplellidoEmpleadoBuscar(String aplellidoEmpleadoBuscar) {
+		this.aplellidoEmpleadoBuscar = aplellidoEmpleadoBuscar;
+	}
+
+	public String getCorreoEmpleadoBuscar() {
+		return correoEmpleadoBuscar;
+	}
+
+	public void setCorreoEmpleadoBuscar(String correoEmpleadoBuscar) {
+		this.correoEmpleadoBuscar = correoEmpleadoBuscar;
+	}
+
+	public String getIdentificacionEmpleadoBuscar() {
+		return identificacionEmpleadoBuscar;
+	}
+
+	public void setIdentificacionEmpleadoBuscar(String identificacionEmpleadoBuscar) {
+		this.identificacionEmpleadoBuscar = identificacionEmpleadoBuscar;
 	}
 	
 	

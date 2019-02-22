@@ -624,6 +624,11 @@ public class CuadreCaja implements Serializable {
 						new Paragraph(new Phrase(lineSpacing, "DESCUENTOS.....: " + formatea.format(getDescuentos()),
 								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 			}
+			if (getPropinas() != null) {
+				documento.add(new Paragraph(
+						new Phrase(lineSpacing, "PROPINAS:..............: " + formatea.format(getPropinas()),
+								FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
+			}
 			documento.add(new Paragraph(new Phrase(lineSpacing, "VENTAS CRÉDITO.: " + formatea.format(getCartera()),
 					FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // DIRECCION
 			documento.add(new Paragraph(new Phrase(lineSpacing, "BONOS..........: " + "0",

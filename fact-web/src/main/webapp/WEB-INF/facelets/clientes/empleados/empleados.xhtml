@@ -17,16 +17,17 @@
 		<table align="center">
 			<tr>
 				<td><p:outputLabel value="Nombre: "></p:outputLabel></td>
-				<td><p:inputText value="#{usuarios.nombreEmpleado}" /></td>
+				<td><p:inputText value="#{usuarios.nombreEmpleadoBuscar}" /></td>
 				<td><p:outputLabel value="Apellido: "></p:outputLabel></td>
-				<td><p:inputText value="#{usuarios.aplellidoEmpleado}" /></td>
+				<td><p:inputText value="#{usuarios.aplellidoEmpleadoBuscar}" /></td>
 
 			</tr>
 			<tr>
 				<td><p:outputLabel value="Correo: "></p:outputLabel></td>
-				<td><p:inputText value="#{usuarios.correoEmpleado}" /></td>
+				<td><p:inputText value="#{usuarios.correoEmpleadoBuscar}" /></td>
 				<td><p:outputLabel value="Identificacion:  "></p:outputLabel></td>
-				<td><p:inputText value="#{usuarios.identificacionEmpleado}" /></td>
+				<td><p:inputText
+						value="#{usuarios.identificacionEmpleadoBuscar}" /></td>
 			</tr>
 			<tr>
 				<td><p:commandButton value="Buscar"
@@ -35,7 +36,8 @@
 						value="Crear" onclick="PF('crearEmpleado').show();"></p:commandButton></td>
 			</tr>
 		</table>
-		<p:dataTable var="car" value="#{usuarios.empleadoList}" id="empleados">
+		<p:dataTable var="car" value="#{usuarios.empleadoList}" id="empleados"
+			emptyMessage="No se encontraron empleados">
 			<p:column headerText="Opciones">
 				<p:commandButton value="Editar" />
 				<p:commandButton value="Borrar" />
@@ -47,14 +49,13 @@
 			<p:column headerText="Apellido">
 				<h:outputText value="#{car.apellido}" />
 			</p:column>
-
-
 		</p:dataTable>
-		<p:dialog widgetVar="crearEmpleado" header="Crear Empleado"  closeOnEscape="true" showEffect="fade" resizable="false">
-		<div >
-			<ui:include
-				src="/WEB-INF/facelets/clientes/empleados/crearEmpleado.xhtml" />
-		</div>
-	</p:dialog>
+		<p:dialog widgetVar="crearEmpleado" header="Crear Empleado"
+			closeOnEscape="true" showEffect="fade" resizable="false">
+			<div>
+				<ui:include
+					src="/WEB-INF/facelets/clientes/empleados/crearEmpleado.xhtml" />
+			</div>
+		</p:dialog>
 	</h:form>
 </ui:composition>

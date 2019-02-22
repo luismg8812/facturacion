@@ -185,6 +185,12 @@
 					</p:inputNumber> </td>
 		</tr>
 		<tr>
+			<td><p:outputLabel value="Empresa:" /></td>
+			<td><p:inputText  size="15" maxlength="100" value="#{puntoVentaDia.empresaNew}"
+					onkeyup="teclasNewCliente(event,this)" id="empresaNew" >
+					</p:inputText> </td>
+		</tr>
+		<tr>
 			<td><p:outputLabel value="Credito Activo:" /></td>
 			<td><p:inputText value="#{puntoVentaDia.creditoActivoClienteNew}" size="1" maxlength="1"
 					onkeyup="teclasNewCliente(event,this)" id="creditoActivoNew">

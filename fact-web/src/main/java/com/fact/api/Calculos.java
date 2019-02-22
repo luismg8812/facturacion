@@ -230,9 +230,12 @@ public class Calculos {
 		Double base5 = 0.0;
 		Double base19 = 0.0;
 		Double costoTotal =0.0;
+		//este campo es para retencion del hotel
+		Double retencion =0.0;
 		// aqui voy toca poner a sumar las variables nuebas para que se reflejen
 		// en el info diario
 		for (DocumentoDetalleVo dDV : productos) {
+			Long productoId = dDV.getProductoId().getProductoId();
 			Double costoPublico = dDV.getParcial();
 			Double costo = (dDV.getProductoId().getCosto()==null?0.0:dDV.getProductoId().getCosto())*dDV.getCantidad();
 			Double iva1 = dDV.getProductoId().getIva().doubleValue() / 100;
@@ -259,7 +262,13 @@ public class Calculos {
 
 			} else {
 				temp = costoPublico;
-				exectoReal += temp;
+				//no suma el excento si es producto retencion
+				if( productoId!=6l) {
+					exectoReal += temp;
+				}else {
+					retencion+= temp;
+				}
+				
 			}
 		}
 		doc.setTotal(totalReal);
@@ -273,6 +282,7 @@ public class Calculos {
 		doc.setBase5(base5);
 		doc.setBase19(base19);
 		doc.setTotalCosto(costoTotal);
+		doc.setRetefuente(retencion);
 		return doc;
 	}
 
@@ -532,8 +542,8 @@ public class Calculos {
 
 	private static InfoDiario asignarValorInfoDiario(Documento documento, InfoDiario info, Empresa e) {
 		//facturas
-		Double base19 = (info.getBase19()==null?0.0:info.getBase19())+documento.getBase19();
-		Double base5 = (info.getBase5()==null?0.0:info.getBase5())+documento.getBase5();
+		Double base19 = (info.getBase19()==null?0.0:info.getBase19())+(documento.getBase19()==null?0.0:documento.getBase19());
+		Double base5 = (info.getBase5()==null?0.0:info.getBase5())+(documento.getBase5()==null?0.0:documento.getBase5());
 		Double iva5 =(info.getIva5()==null?0.0:info.getIva5())+(documento.getIva5()==null?0.0:documento.getIva5());
 		Double iva19 =(info.getIva19()==null?0.0:info.getIva19())+(documento.getIva19()==null?0.0:documento.getIva19());
 		Double cantidadOriginal =(info.getTotalOriginal()==null?0.0:info.getTotalOriginal())+(documento.getTotal()==null?0.0:documento.getTotal());

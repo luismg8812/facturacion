@@ -29,6 +29,9 @@ public class Cliente {
 	@Column(name="NOMBRE")
 	private String nombre;
 	
+	@Column(name="EMPRESA")
+	private String empresa;
+	
 	@Column(name="DOCUMENTO")
 	private String documento;
 	
@@ -90,6 +93,14 @@ public class Cliente {
 
 	public String getNombre() {
 		return nombre;
+	}
+
+	public String getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(String empresa) {
+		this.empresa = empresa;
 	}
 
 	public void setNombre(String nombre) {

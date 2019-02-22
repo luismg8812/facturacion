@@ -451,6 +451,11 @@ public class BorrarFacturas implements Serializable {
 			Impresion.imprimirBig(docu, Calculos.llenarDocumentoDetalleVoList(detalles1), docu.getUsuarioId(),
 					configuracion, descuentoEnFactura, impresora,e);
 			break;
+		case "PDF_PAGE":
+			pdf = Impresion.imprimirPDFPage(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
+					configuracion, impresora,enPantalla,e);
+			break;
+			
 		default:
 			log.info("imprime por defecto en pdf");
 			pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
