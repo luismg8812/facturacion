@@ -1675,7 +1675,7 @@ public class Impresion {
 	}
 
 	public static String imprimirPDFPage(Documento documentoImp, List<DocumentoDetalleVo> productos, Usuario usuario,
-			Configuracion configuracion, String impresora, String enPantalla, Empresa e)
+			Configuracion configuracion, String impresora, String enPantalla, Empresa e, Date checkin, Date cheout)
 			throws DocumentException, FileNotFoundException {
 		log.info("todo el codigo de imprimir");
 		String pdf = "C:\\facturas\\factura_" + documentoImp.getDocumentoId()+(enPantalla.equals("true")?"_pantalla":"") + ".pdf";
@@ -1683,6 +1683,7 @@ public class Impresion {
 		DecimalFormat formatea = new DecimalFormat("###,###.##");
 		Document documento = new Document();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd");
 		Image imagen = null;
 		try {
 			imagen = Image.getInstance("C://facturacion/logoEmpresa.jpg");
@@ -1742,8 +1743,10 @@ public class Impresion {
 																		// de
 																		// factura
 		String fhoyIni = df.format(documentoImp.getFechaRegistro());
+		String checkup = df1.format(cheout==null?new Date():cheout);
+		String checkin1 = df1.format(checkin==null?new Date():checkin);
 		documento.add(new Paragraph(
-				new Phrase(lineSpacing, "FECHA: " + fhoyIni, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // fecha
+				new Phrase(lineSpacing, "FECHA: " + fhoyIni+ "         CHECKIN: "+checkin1+"   CHECKOUT: "+ checkup, FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // fecha
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				"CAJERO: " + documentoImp.getUsuarioId().getUsuarioId() + " " + documentoImp.getUsuarioId().getNombre()
 						+ " " + documentoImp.getUsuarioId().getApellido(),

@@ -381,6 +381,8 @@
 		//alert("nuevo");
 		document.getElementById('opciones:op_mov_mes1_content').style.display='none';
 		document.getElementById('prod1').style.display='inline';
+		document.getElementById('checkin').style.display='inline';
+		document.getElementById('checkout').style.display='inline';
         pagina='creando_factura';
         if(codigoBarras==1){
         	document.getElementById('busquedaCodBarras1').style.display='inline';	     	
@@ -909,7 +911,7 @@ panel1 {
 				<tr>
 				<td><p:outputLabel  value="L2: " style="font-size: 13px" /></td>
 					<td><p:outputLabel id="lista2" value="#{puntoVentaDia.lista.lista2}" style="font-size: 13px" >
-						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						<f:convertNumber  pattern="¤#,##0" currencySymbol="$" />
 					</p:outputLabel> </td>
 				</tr>
 				<tr>
@@ -918,6 +920,19 @@ panel1 {
 						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 					</p:outputLabel> </td>
 				</tr>
+				<tr>
+				<td><p:outputLabel  value="check in: " style="font-size: 13px" /></td>
+					<td><p:calendar id="checkin" style="font-size: 13px;display:none" 
+						value="#{puntoVentaDia.checkin}"  size="10" pattern="dd-MM-yyyy"
+						mask="true" /></td>
+			
+				</tr>
+				<tr>
+				<td><p:outputLabel  value="check out: " style="font-size: 13px" /></td>
+					<td><p:calendar id="checkout" style="font-size: 13px;display:none" 
+						value="#{puntoVentaDia.checkout}" size="10" pattern="dd-MM-yyyy"
+						mask="true" /></td>
+							</tr>
 			</table>
 			<table width="100%" align="center" id="confir" style="display: none">
 				<tr>

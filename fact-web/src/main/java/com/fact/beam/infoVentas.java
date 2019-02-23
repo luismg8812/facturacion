@@ -19,7 +19,6 @@ import com.fact.api.Calculos;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.Empresa;
-import com.fact.model.Producto;
 import com.fact.model.ProductoEmpresa;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoDetalleService;

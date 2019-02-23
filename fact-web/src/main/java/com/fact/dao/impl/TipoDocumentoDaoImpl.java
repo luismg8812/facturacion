@@ -12,7 +12,6 @@ import org.hibernate.Transaction;
 
 import com.fact.api.FactException;
 import com.fact.dao.TipoDocumentoDao;
-import com.fact.model.ProductoEmpresa;
 import com.fact.model.TipoDocumento;
 import com.fact.utils.HibernateUtil;
 

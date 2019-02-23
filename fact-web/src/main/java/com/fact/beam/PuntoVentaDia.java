@@ -1,12 +1,10 @@
 package com.fact.beam;
 
 import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +37,6 @@ import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.printing.PDFPageable;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -83,12 +79,7 @@ import com.fact.service.ProductoService;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
-import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfWriter;
 
 /**
  * @author luismg
@@ -154,6 +145,8 @@ public class PuntoVentaDia implements Serializable {
 	Double unidad;
 	Double cantidad;
 	Double parcial;
+	Date checkin;
+	Date checkout;
 	Documento documento;
 	Producto productoSelect = new Producto();
 	Producto productoSelect2 = new Producto();
@@ -1011,7 +1004,7 @@ public class PuntoVentaDia implements Serializable {
 					break;
 				case "PDF_PAGE":
 					pathFactura=Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-							enPantalla, e);
+							enPantalla, e,getCheckin(),getCheckin());
 					break;
 				case "BIG_PDF":
 					
@@ -1033,6 +1026,10 @@ public class PuntoVentaDia implements Serializable {
 				log.info("impresion remota click");
 				RequestContext.getCurrentInstance().execute("document.getElementById('remotoForm:imp_remoto').click();");
 			}	
+			RequestContext.getCurrentInstance()
+			.execute("document.getElementById('checkin').style.display='none';");
+	RequestContext.getCurrentInstance()
+	.execute("document.getElementById('checkout').style.display='none';");
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
@@ -1918,8 +1915,10 @@ public class PuntoVentaDia implements Serializable {
 		setUnidad(null);
 		setProductosAllCodigo(null);
 		setClientesAll(null);
+		
+		
 		RequestContext.getCurrentInstance()
-				.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
+		.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('nombreCliente_input').value='';");
 		RequestContext.getCurrentInstance().update("cod_1");
@@ -3385,6 +3384,22 @@ public class PuntoVentaDia implements Serializable {
 
 	public void setEmpresaNew(String empresaNew) {
 		this.empresaNew = empresaNew;
+	}
+
+	public Date getCheckin() {
+		return checkin;
+	}
+
+	public void setCheckin(Date checkin) {
+		this.checkin = checkin;
+	}
+
+	public Date getCheckout() {
+		return checkout;
+	}
+
+	public void setCheckout(Date checkout) {
+		this.checkout = checkout;
 	}
 		
 }

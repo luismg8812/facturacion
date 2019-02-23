@@ -67,6 +67,9 @@ public class Proveedor {
 	@Column(name="RETENCION")
 	private Double retencion;
 	
+	@Column(name="BASE_RETENCION")
+	private Double baseRetencion;
+	
 	public Long getProveedorId() {
 		return proveedorId;
 	}
@@ -178,6 +181,13 @@ public class Proveedor {
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-	
+
+	public Double getBaseRetencion() {
+		return baseRetencion;
+	}
+
+	public void setBaseRetencion(Double baseRetencion) {
+		this.baseRetencion = baseRetencion;
+	}
 	
 }

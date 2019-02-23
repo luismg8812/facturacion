@@ -1,10 +1,6 @@
 package com.fact.dao.impl;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import javax.ejb.Stateless;
 
 import org.hibernate.Query;
@@ -12,12 +8,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import com.fact.api.FactException;
-import com.fact.dao.AbonoDao;
 import com.fact.dao.ListaDao;
-import com.fact.model.Abono;
-import com.fact.model.Departamento;
 import com.fact.model.Lista;
-import com.fact.model.Usuario;
 import com.fact.utils.HibernateUtil;
 
 @Stateless()

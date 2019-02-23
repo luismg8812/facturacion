@@ -8,6 +8,13 @@
 	<script type="text/javascript">
 	
 	</script>
+	<style type="text/css">
+    .old {
+        background-color: #c9302c !important;
+        background-image: none !important;
+        color: #000000 !important;
+    }
+</style>
 	<h:form id="facturasFechaForm">
 		<table width="100%" align="center">
 			<tr>
@@ -64,7 +71,7 @@
 						value="Salir" /></td>
 			</tr>
 		</table>
-		<p:dataTable id="documentosCliente" var="docu"
+		<p:dataTable id="documentosCliente" var="docu" rowStyleClass="#{docu.anulado eq 1 ? 'old' : null}"
 			value="#{borrarFacturas.documentosCliente}" scrollable="true"
 			scrollHeight="290"
 			emptyMessage="No hay facturas disponibles para El rango seleccionado">
@@ -78,7 +85,7 @@
 				<p:commandButton icon="ui-icon-print"
 					style="display:#{puntoVentaDia.copiaFacuta}"
 					action="#{borrarFacturas.imprimirFactura(docu)}" />
-				<p:commandButton icon="pi pi-times" title="Anular factura"
+				<p:commandButton icon="ui-icon-trash" title="Anular factura"
 					style="display:#{puntoVentaDia.anularFacuta}" update="growl1"
 					action="#{borrarFacturas.anularFactura(docu)}" />	
 			</p:column>

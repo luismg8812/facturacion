@@ -56,6 +56,7 @@ public class Proveedores implements Serializable {
 	private Boolean creditoActivo=Boolean.FALSE;
 	private Long cupoCredito;
 	private double retencion;
+	private double baseRetencion;
 	private Long proveedorId;
 	
 	private List<Departamento> departamentos;
@@ -78,6 +79,7 @@ public class Proveedores implements Serializable {
 		}
 		setBarrio(p.getBarrio());
 		setCelular(p.getCelular());
+		setDepartamento(p.getCiudadId()!=null?p.getCiudadId().getDepartamentoId().getDepartamentoId():0l);
 		setCiudad(p.getCiudadId()!=null?p.getCiudadId().getCiudadId():0l);
 		setCreditoActivo(p.getCreditoActivo()==0?Boolean.FALSE:Boolean.TRUE);
 		setCumpleanos(p.getCumpleanos());
@@ -86,7 +88,8 @@ public class Proveedores implements Serializable {
 		setDocumento(p.getDocumento());
 		setFijo(p.getFijo());
 		setNombre(p.getNombre());
-		setRetencion(p.getRetencion());		
+		setRetencion(p.getRetencion()==null?0.0:p.getRetencion());		
+		setBaseRetencion(p.getBaseRetencion()==null?0.0:p.getBaseRetencion());
 		return "";
 	}
 	
@@ -119,6 +122,7 @@ public class Proveedores implements Serializable {
 			proveedor.setRetencion(getRetencion());
 			proveedor.setDireccion(getDireccion());
 			proveedor.setProveedorId(getProveedorId());
+			proveedor.setBaseRetencion(getRetencion());
 			proveedorService.update(proveedor);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Proveedor Editado exitosamente"));
 		}
@@ -160,6 +164,7 @@ public class Proveedores implements Serializable {
 			proveedor.setFijo(getFijo());
 			proveedor.setNombre(getNombre().toUpperCase());
 			proveedor.setRetencion(getRetencion());
+			proveedor.setBaseRetencion(getBaseRetencion());
 			proveedorService.save(proveedor);
 			getProveedores().add(proveedor);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Proveedor creado exitosamente"));
@@ -189,16 +194,30 @@ public class Proveedores implements Serializable {
 				List<Documento> facturas = documentoService.getByProveedor(c.getProveedorId(),tipoDocumentoId,getFechaInicio(), getFechafin());
 				Double total=0.0;
 				Double retefuente=0.0;
+				Double base5=0.0;
+				Double base19=0.0;
+				Double iva19=0.0;
+				Double iva5=0.0;
+				Double exento=0.0;
 				if(!facturas.isEmpty()) {
 					for(Documento d: facturas){
 						total+=(d.getTotal()==null?0.0:d.getTotal());
 						retefuente+=(d.getRetefuente()==null?0.0:d.getRetefuente());
-						
+						base5+=(d.getBase5()==null?0.0:d.getBase5());
+						base19+=(d.getBase19()==null?0.0:d.getBase19());
+						iva19+=(d.getIva19()==null?0.0:d.getIva19());
+						iva5+=(d.getIva5()==null?0.0:d.getIva5());
+						exento+=(d.getExcento()==null?0.0:d.getExcento());
 					}
 					ProveedorVo cl= new ProveedorVo();
 					cl.setRetefuente(retefuente);
 					cl.setProveedorId(c);
 					cl.setTotalCompras(total);
+					cl.setIva19(iva19);
+					cl.setIva5(iva5);
+					cl.setBase19(base19);
+					cl.setBase5(base5);
+					cl.setExento(exento);
 					getProveedoresVo().add(cl);
 				}
 				
@@ -377,6 +396,14 @@ public class Proveedores implements Serializable {
 
 	public void setProveedoresVo(List<ProveedorVo> proveedoresVo) {
 		this.proveedoresVo = proveedoresVo;
+	}
+
+	public double getBaseRetencion() {
+		return baseRetencion;
+	}
+
+	public void setBaseRetencion(double baseRetencion) {
+		this.baseRetencion = baseRetencion;
 	}
 
 	

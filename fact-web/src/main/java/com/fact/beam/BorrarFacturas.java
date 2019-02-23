@@ -58,7 +58,6 @@ import com.fact.service.EventoService;
 import com.fact.service.ProductoEmpresaService;
 import com.fact.service.TipoDocumentoService;
 import com.fact.service.UsuarioService;
-import com.fact.vo.DocumentoDetalleVo;
 import com.fact.vo.DocumentoVo;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -518,7 +517,7 @@ public class BorrarFacturas implements Serializable {
 			break;
 		case "PDF_PAGE":
 			pdf = Impresion.imprimirPDFPage(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora,enPantalla,e);
+					configuracion, impresora,enPantalla,e,new Date(),new Date());
 			break;
 			
 		default:

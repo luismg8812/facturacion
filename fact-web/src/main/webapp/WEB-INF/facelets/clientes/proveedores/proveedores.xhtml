@@ -67,8 +67,9 @@
 							</td>
 					</tr>
 					<tr>
-						<td></td>
-						<td></td>
+						<td><p:outputLabel value=" base retención" /></td>
+						<td><p:inputNumber value="#{proveedores.baseRetencion}" />
+							</td>
 						<td></td>
 						<td></td>
 						<td></td>
@@ -98,7 +99,7 @@
 								<p:ajax event="change" partialSubmit="true"
 									listener="#{proveedores.llenarCampos()}"
 									update="growl1,nombreEdit,documentoEdit,departamentoEdit,ciudadEdit,barrioEdit,
-									celularIdit,fijoEdit,mask,creditoActivoEdit,cupoCreditoEdit,retencionEdit,direccionEdit" />
+									celularIdit,fijoEdit,mask,creditoActivoEdit,cupoCreditoEdit,retencionEdit,direccionEdit,baseRetencionEdit" />
 							</p:selectOneMenu></td>
 					</tr>
 				</table>
@@ -152,8 +153,8 @@
 							</td>
 					</tr>
 					<tr>
-						<td></td>
-						<td></td>
+						<td><p:outputLabel value=" base retención" /></td>
+						<td><p:inputNumber value="#{proveedores.baseRetencion}" id="baseRetencionEdit"/></td>
 						<td></td>
 						<td></td>
 						<td></td>

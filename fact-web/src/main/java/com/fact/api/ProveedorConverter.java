@@ -42,7 +42,8 @@ public class ProveedorConverter  implements Converter{
 	        	p.setCupoCredito((Long.valueOf(parts1[10].trim().equals("")?"0":parts1[10].trim())));
 	        	p.setFijo(Long.valueOf(parts1[11].trim().equals("")?"0":parts1[11].trim()));
 	        	p.setProveedorId(Long.valueOf(parts1[12].trim()));
-	        	p.setRetencion(Double.valueOf(parts1[13].replace("]", "").trim().equals("")?"0":parts1[13].replace("]", "").trim()));
+	        	p.setBaseRetencion(Double.valueOf(parts1[13].trim().equals("")?"0":parts1[13].trim()));
+	        	p.setRetencion(Double.valueOf(parts1[14].replace("]", "").trim().equals("")?"0":parts1[14].replace("]", "").trim()));
 	        	return p;
 	        }	       
 	        return null;
@@ -65,6 +66,7 @@ public class ProveedorConverter  implements Converter{
 	        	pNew.add(p.getCupoCredito()==null?"":p.getCupoCredito().toString());
 	        	pNew.add(p.getFijo()==null?"":p.getFijo().toString());
 	        	pNew.add(p.getProveedorId()==null?"":p.getProveedorId().toString());
+	        	pNew.add(p.getBaseRetencion()==null?"":p.getBaseRetencion().toString());
 	        	pNew.add(p.getRetencion()==null?"":p.getRetencion().toString());       	
 	        	return pNew.toString();
 	        }

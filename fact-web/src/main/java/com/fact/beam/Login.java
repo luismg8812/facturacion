@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,7 +33,6 @@ import com.fact.model.Usuario;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Constantes;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 @ManagedBean
 @SessionScoped

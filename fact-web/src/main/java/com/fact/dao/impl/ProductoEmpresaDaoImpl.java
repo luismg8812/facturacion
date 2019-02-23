@@ -16,9 +16,7 @@ import org.hibernate.criterion.Restrictions;
 import com.fact.api.FactException;
 import com.fact.dao.ProductoEmpresaDao;
 import com.fact.model.Empresa;
-import com.fact.model.Grupo;
 import com.fact.model.ProductoEmpresa;
-import com.fact.model.Proveedor;
 import com.fact.utils.HibernateUtil;
 
 @Stateless()

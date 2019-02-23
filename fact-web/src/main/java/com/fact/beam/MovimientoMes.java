@@ -448,11 +448,7 @@ public class MovimientoMes implements Serializable {
 		Usuario usuario = (Usuario) sessionMap.get("userLogin");
 		Configuracion configuracion = configuracion();
 		Long server = configuracion.getServer();
-		if (td.getTipoDocumentoId() == 1l && server == 2l) { // si es una
-																// entrada de
-																// almacen se
-																// guarda el en
-																// el server 2
+		if (td.getTipoDocumentoId() == 1l && server == 2l) { 
 			server = 2l;
 		} else {
 			server = 1l;
@@ -619,7 +615,8 @@ public class MovimientoMes implements Serializable {
 		// en esta funcion de calcula el excento, iva, total
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		// se agrega re
-		if (proveedorSelect != null && proveedorSelect.getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l) {
+		if (proveedorSelect != null && proveedorSelect.getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l && getDocumento()!=null && getDocumento().getTotal()>proveedorSelect.getBaseRetencion()) {
+			log.info("proveedor aplica retención");
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorSelect));
 		}else {
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
@@ -831,6 +828,7 @@ public class MovimientoMes implements Serializable {
 		setIdentificacionProveedor(docu.getProveedorId().getDocumento());
 		setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
 		setTotal(getDocumentoActual().getTotal());
+		setGravado(getDocumentoActual().getGravado());
 		setExecento(getDocumentoActual().getExcento());
 		setIva(getDocumentoActual().getIva());
 		setRetefuente(getDocumentoActual().getRetefuente());
