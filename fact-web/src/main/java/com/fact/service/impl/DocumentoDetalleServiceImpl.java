@@ -90,5 +90,10 @@ public class DocumentoDetalleServiceImpl implements DocumentoDetalleService{
 	public List<DocumentoDetalle> getCardex(Empresa empresa, Long productoId, Date fechaIni, Date fechaFin) {
 		return documentoDetalleDao.getCardex(empresa,productoId, fechaIni,fechaFin);
 	}
+
+	@Override
+	public List<DocumentoDetalle> getByTipoAndFecha(Long tipoDocumento, Date fechaInicial, Date fechaFinal) {
+		return documentoDetalleDao.getByTipoAndFecha(tipoDocumento, fechaInicial,fechaFinal);
+	}
 	
 }

@@ -11,6 +11,7 @@ import com.fact.model.ConsecutivoDian;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
+import com.fact.model.Usuario;
 
 @Local
 public interface DocumentoDao {
@@ -20,7 +21,7 @@ public interface DocumentoDao {
 	void update(Documento documento, Long server);
 	void delete(Documento documento);
 	Documento getById(Long documento);
-	List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre);
+	List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,List<Usuario> usuarioId,Boolean conCierre);
 	List<Documento> getDocNoImp(Long usuarioId,List<Long> tipoDocumentoId,Long server);
 	Documento getByLastAndTipo(Long idFactura, Long usuarioId);
 	List<Documento> getByTipoSinUsuario(List<Long> tipoDocumentoId, Date hoy, Date hoyfin);

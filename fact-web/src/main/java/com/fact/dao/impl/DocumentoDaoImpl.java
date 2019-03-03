@@ -22,6 +22,7 @@ import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
 import com.fact.model.Invoice;
+import com.fact.model.Usuario;
 import com.fact.utils.HibernateUtil;
 
 @Stateless()
@@ -153,7 +154,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Documento> getByTipo(Long tipoDocumentoId, Date hoy, Date hoyFin, Long usuarioId,Boolean conCierre) {
+	public List<Documento> getByTipo(Long tipoDocumentoId, Date hoy, Date hoyFin, List<Usuario> usuarioId,Boolean conCierre) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Documento> documentoList = new ArrayList<>();
 		try {
@@ -162,12 +163,12 @@ public class DocumentoDaoImpl implements DocumentoDao {
 					if (conCierre) {
 						sql += " and d.cierreDiario is null ";
 					}
-					sql+= " and d.usuarioId.usuarioId =:usuarioId order by d.documentoId asc";
+					sql+= " and d.usuarioId  in :usuarioId order by d.documentoId asc";
 			Query query = session.createQuery(sql);
 			query.setParameter("tipoDocumentoId", Long.valueOf(tipoDocumentoId));
 			query.setParameter("hoy", hoy);
 			query.setParameter("hoyFin", hoyFin);
-			query.setParameter("usuarioId", usuarioId);
+			query.setParameterList("usuarioId", usuarioId);
 			documentoList = query.list();
 			session.close();
 		} catch (FactException e) {
@@ -384,10 +385,14 @@ public class DocumentoDaoImpl implements DocumentoDao {
 		List<Documento> documentoList = new ArrayList<>();
 		Long factura = tipoDocumento==0?10l:tipoDocumento;
 		try {
+			
 			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId = :factura "
-					+ "and d.impreso = 1 " + " and consecutivoDian is not null";
+					 + " and consecutivoDian is not null";
 			if (usuarioSelect != null && usuarioSelect != 0l) {
 				sql += " and d.usuarioId.usuarioId =:usuarioId ";
+			}
+			if(factura==10l) {
+				sql+= " and d.impreso = 1 ";
 			}
 			if (clienteId != null && clienteId != 0l) {
 				sql += " and d.clienteId.clienteId = :clienteId ";
@@ -428,7 +433,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			if (conDian != null && !conDian.isEmpty()) {
 				query.setParameter("conDian", conDian);
 			}
-			query.setMaxResults(200);
+			//query.setMaxResults(200);
 			documentoList = query.list();
 			session.close();
 		} catch (FactException e) {

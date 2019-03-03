@@ -26,4 +26,6 @@ public interface DocumentoDetalleDao {
 	List<DocumentoDetalle> getbyEmpleado(Long empleadoId, Date hoy, Date hoyfin)throws FactException;
 	List<DocumentoDetalle> getByProductoId(long productoId,Date hoy, Date hoyfin)throws FactException;
 	List<DocumentoDetalle> getCardex(Empresa empresa, Long productoId, Date fechaIni, Date fechaFin);
+	List<DocumentoDetalle> getByTipoAndFecha(Long tipoDocumento, Date fechaInicial, Date fechaFinal);
+	
 }

@@ -7,8 +7,8 @@
 	xmlns:c="http://java.sun.com/jstl/core">
 	<script type="text/javascript">	
 	</script>
-	<h:form>
-		<p:panelGrid columns="2" layout="grid">
+	<h:form >
+		<p:panelGrid columns="3" layout="grid" >
 			<p:selectOneMenu value="#{inventarioFisico.proveedor}"
 				id="proveedorEdictSelect">
 				<f:selectItem itemLabel="Seccionar Proveedor" itemValue="0" />
@@ -21,8 +21,9 @@
 					itemLabel="#{gru.nombre}" itemValue="#{gru.grupoId}" />
 			</p:selectOneMenu>
 			
+			<p:selectBooleanCheckbox value="#{inventarioFisico.negativos}" itemLabel="Cantidades negativas"/> 
+			
 			<p:commandButton value="Buscar" action="#{inventarioFisico.buscarReporteProductos()}" update="productos"></p:commandButton>
-			<p:spacer></p:spacer>
 			<h:commandLink value="Exportar">
 				<p:dataExporter type="xls" target="productos" fileName="Productos" />
 			</h:commandLink>
@@ -52,6 +53,9 @@
 			</p:column>
 			<p:column headerText="Iva">
 				<h:outputText value="#{pro.productoId.iva}" />
+			</p:column>
+			<p:column headerText="Cod. barras">
+				<h:outputText value="#{pro.productoId.codigoBarras}" />
 			</p:column>
 		</p:dataTable>
 	</h:form>

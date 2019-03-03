@@ -58,7 +58,7 @@ public class Calculos {
 	 * @return retorna fecha de inicio de busqueda
 	 */
 	public static Date fechaInicial(Date hoy) {
-		//
+		hoy=(hoy==null?new Date():hoy);
 		Long fechaCombinada = configuracion().getFechaCombinada();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Calendar calendar = Calendar.getInstance();
@@ -85,6 +85,7 @@ public class Calculos {
 	}
 
 	public static Date fechaFinal(Date fin) {
+		fin=(fin==null?new Date():fin);
 		Long fechaCombinada = configuracion().getFechaCombinada();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String fhoyFin = df.format(fin);
@@ -618,4 +619,5 @@ public class Calculos {
 		}	
 		return acun+descripcion;
 	}
+
 }

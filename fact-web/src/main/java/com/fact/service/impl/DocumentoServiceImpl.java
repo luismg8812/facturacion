@@ -14,6 +14,7 @@ import com.fact.model.ConsecutivoDian;
 import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
+import com.fact.model.Usuario;
 import com.fact.service.DocumentoService;
 
 @Stateless
@@ -55,7 +56,7 @@ public class DocumentoServiceImpl implements DocumentoService{
 	}
 	
 	@Override
-	public List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,Long usuarioId,Boolean conCierre)   {		
+	public List<Documento> getByTipo(Long tipoDocumentoId,Date hoy,Date hoyFin,List<Usuario> usuarioId,Boolean conCierre)   {		
 		return documentoDao.getByTipo(tipoDocumentoId,hoy,hoyFin,usuarioId,conCierre);
 	}
 

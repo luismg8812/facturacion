@@ -13,6 +13,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
+import com.fact.api.Calculos;
 import com.fact.model.Ciudad;
 import com.fact.model.Departamento;
 import com.fact.model.Documento;
@@ -191,7 +192,7 @@ public class Proveedores implements Serializable {
 		}
 		for (Proveedor c : clientesTemp) {
 				
-				List<Documento> facturas = documentoService.getByProveedor(c.getProveedorId(),tipoDocumentoId,getFechaInicio(), getFechafin());
+				List<Documento> facturas = documentoService.getByProveedor(c.getProveedorId(),tipoDocumentoId,Calculos.fechaInicial(getFechaInicio()), Calculos.fechaFinal((getFechafin())));
 				Double total=0.0;
 				Double retefuente=0.0;
 				Double base5=0.0;

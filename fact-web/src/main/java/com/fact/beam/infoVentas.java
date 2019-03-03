@@ -69,11 +69,22 @@ public class infoVentas  implements Serializable{
 	private Double totalSalidas;
 	private Double totalEntradas;
 	
+	//movimiento documento
+	private Date fechaIniMovimiento;
+	private Date fechaFinMovimiento;
+	private Long tipoDocumento;
+	private List<DocumentoDetalle> documentosMovimiento;
+	
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
 	
 	private Empresa getEmpresa() {
 		return (Empresa) sessionMap.get("empresa");
+	}
+	
+	public void buscarMovimiento() {
+		setDocumentosMovimiento(documentoDetalleService.getByTipoAndFecha(getTipoDocumento(),
+				Calculos.fechaInicial(getFechaIniMovimiento()), Calculos.fechaInicial(getFechaFinMovimiento())));
 	}
 	
 	public void buscarCardex() {
@@ -168,7 +179,9 @@ public class infoVentas  implements Serializable{
 		Date hoy = Calculos.fechaInicial(dia);   
 		Date hoyfin = Calculos.fechaFinal(dia);
 		Boolean conCierre=Boolean.FALSE;
-		List<Documento> factDia = documentoService.getByTipo(tipoDocumentoId, hoy, hoyfin,usuario.getUsuarioId(),conCierre);
+		List<Usuario> usus = new ArrayList<>();
+		usus.add(usuario);
+		List<Documento> factDia = documentoService.getByTipo(tipoDocumentoId, hoy, hoyfin,usus,conCierre);
 		Double total = 0.0;
 		for (Documento d : factDia) {
 			if (d.getTotal() != null) {
@@ -274,7 +287,38 @@ public class infoVentas  implements Serializable{
 	public void setTotalEntradas(Double totalEntradas) {
 		this.totalEntradas = totalEntradas;
 	}
+
+	public Date getFechaIniMovimiento() {
+		return fechaIniMovimiento;
+	}
+
+	public void setFechaIniMovimiento(Date fechaIniMovimiento) {
+		this.fechaIniMovimiento = fechaIniMovimiento;
+	}
+
+	public Date getFechaFinMovimiento() {
+		return fechaFinMovimiento;
+	}
+
+	public void setFechaFinMovimiento(Date fechaFinMovimiento) {
+		this.fechaFinMovimiento = fechaFinMovimiento;
+	}
+
+	public Long getTipoDocumento() {
+		return tipoDocumento;
+	}
+
+	public void setTipoDocumento(Long tipoDocumento) {
+		this.tipoDocumento = tipoDocumento;
+	}
+
+	public List<DocumentoDetalle> getDocumentosMovimiento() {
+		return documentosMovimiento;
+	}
+
+	public void setDocumentosMovimiento(List<DocumentoDetalle> documentosMovimiento) {
+		this.documentosMovimiento = documentosMovimiento;
+	}
 	
-	
-	
+		
 }

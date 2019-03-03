@@ -1004,7 +1004,7 @@ public class PuntoVentaDia implements Serializable {
 					break;
 				case "PDF_PAGE":
 					pathFactura=Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-							enPantalla, e,getCheckin(),getCheckin());
+							enPantalla, e,getCheckin(),getCheckout());
 					break;
 				case "BIG_PDF":
 					
@@ -1284,6 +1284,7 @@ public class PuntoVentaDia implements Serializable {
 				getDocumento().setReduccion(1l);
 				break;
 			case "10":
+			   // log
 				consecutivoDian = documentoService.getConsecutivoDian();
 				if (consecutivoDian.getSecuencia() == 0l) {
 					con = Long.valueOf(e.getAutorizacionDesde());
@@ -1645,12 +1646,14 @@ public class PuntoVentaDia implements Serializable {
 			rutas.add("STOCK");
 			rutas.add("CAMBIO_PRECIO");
 			rutas.add("COPIA_FACTURA");
+			rutas.add("IMPRESION_REMOTA");
 			ou = opcionUsuarioService.getByRutas(rutas, usuario.getUsuarioId());
 			opcionesActivas = agregarRutas(ou);
 			activarClaveBorrado(usuario, opcionesActivas);
 			activarStock(opcionesActivas);
 			activarCambioPrecio(usuario, opcionesActivas);
 			activarCopiaFactura(usuario, opcionesActivas);
+			activarImpresionRemota(opcionesActivas);
 		}
 	}
 
@@ -1869,15 +1872,15 @@ public class PuntoVentaDia implements Serializable {
 	
 	public void activarImpresionRemota(Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "IMPRESION_REMOTA";
-		if (opcionesActivas.containsKey(ruta)) {
-					
+		if (opcionesActivas.containsKey(ruta)) {				
 			activarImpresionRemota = opcionesActivas.get(ruta);
 			log.info("tiene impresion remota: "+getActivarImpresionRemota());	
-			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");
+			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");		
 		} else {
 			activarImpresionRemota = null;
 			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=0;");
 		}
+		sessionMap.put("activarImpresionRemota", activarImpresionRemota);
 	}
 
 	public void limpiar() {
@@ -2693,7 +2696,7 @@ public class PuntoVentaDia implements Serializable {
 						new FacesMessage("El cliente con el documento " + getDocumentoClienteNew() + " ya existe"));
 				return;
 			}
-
+			
 			RequestContext.getCurrentInstance().execute("revisar3();");
 			log.info("crear cliente desde punto de venta");
 			RequestContext.getCurrentInstance().execute("PF('nuevoCliente').hide();");
@@ -2764,8 +2767,24 @@ public class PuntoVentaDia implements Serializable {
 			setNombreCliente2("VARIOS");
 		}
 		setCrearNew("N");
+		RequestContext.getCurrentInstance().update("nuevoClienteForm");
+		limpiarNuevoCliente();
 		RequestContext.getCurrentInstance()
 				.execute("document.getElementById('deseaGuardarCliente').style.display='none';");
+	}
+
+	private void limpiarNuevoCliente() {
+		setBarrioClienteNew(null);
+		setMail(null);
+		setCelularClienteNew(null);
+		setCupoCreditoClienteNew(null);
+		setDirecionClienteNew(null);
+		setDocumento(null);
+		setFijoClienteNew(null);
+		setEmpresaNew(null);
+		setNombreClienteNew(null);
+		setRetencionClienteNew(null);
+		
 	}
 
 	public String getCodigoBarras() {

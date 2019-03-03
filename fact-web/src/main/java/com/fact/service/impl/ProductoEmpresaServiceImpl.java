@@ -59,7 +59,7 @@ public class ProductoEmpresaServiceImpl implements ProductoEmpresaService{
 	}
 
 	@Override
-	public List<ProductoEmpresa> getByProveedorYGrupo(Long grupo, Long proveedor, Long empresa) {
-		return productoEmpresaDao.getByProveedorYGrupo(grupo,proveedor,empresa);
+	public List<ProductoEmpresa> getByProveedorYGrupo(Long grupo, Long proveedor, Long empresa,Boolean negativos) {
+		return productoEmpresaDao.getByProveedorYGrupo(grupo,proveedor,empresa,negativos);
 	}
 }

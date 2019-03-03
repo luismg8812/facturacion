@@ -26,37 +26,55 @@
 	</script>
 	<h:form id="imprimirFormMM">
 		<p:growl id="growl2" life="7000" />
-	<table width="100%" align="center">
-		<tr>
-			<td><p:outputLabel value="Valor Excento:" /></td>
-			<td><p:inputNumber value="#{movimientoMes.execento}" readonly="true"  size="10" id="excento_tag" symbol="$" decimalPlaces="0"
-			disabled="true"/> </td>
-		</tr>
-		<tr>
-			<td><p:outputLabel value="Valor Gravado:" /></td>
-			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{movimientoMes.gravado}" readonly="true" disabled="true" size="10" id="gravado_tag"/> </td>
-		</tr>
-		<tr>
-			<td><p:outputLabel value="Iva:" /></td>
-			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{movimientoMes.iva}" readonly="true" disabled="true" size="10" id="iva_tag"/> </td>
-		</tr>
-		<tr>
-			<td><p:outputLabel value="Total a Pagar:" /></td>
-			<td><p:inputNumber symbol="$" decimalPlaces="0" value="#{movimientoMes.total}" readonly="true" id="total1" disabled="true" size="10"/> </td>
-		</tr>	
-		<tr>
-			<td><p:outputLabel value="Cartera:" /></td>
-			<td><p:inputText value="#{movimientoMes.cartera}" id="cartera" size="2" onkeyup="controlTeclasImpMM(event,this)">
-				 <p:focus for="cartera" />
-				 <p:ajax  event="keyup" partialSubmit="true" />
-			</p:inputText> </td>
-		</tr>
-		<tr id="campoImp" >
-			<td><p:outputLabel value="Continúa con la Impresión: " /></td>
-			<td><p:inputText value="#{movimientoMes.impresion}" size="2" id="impresion_inp">
-				<p:ajax event="keyup"  partialSubmit="true" listener="#{movimientoMes.imprimirFactura}" update="growl2" />
-				</p:inputText></td>
-		</tr>		
-	</table>
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Valor Excento:" /></td>
+				<td><p:inputNumber value="#{movimientoMes.execento}"
+						readonly="true" size="10" id="excento_tag" symbol="$"
+						decimalPlaces="0" disabled="true" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Valor Gravado:" /></td>
+				<td><p:inputNumber symbol="$" decimalPlaces="0"
+						value="#{movimientoMes.gravado}" readonly="true" disabled="true"
+						size="10" id="gravado_tag" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Iva:" /></td>
+				<td><p:inputNumber symbol="$" decimalPlaces="0"
+						value="#{movimientoMes.iva}" readonly="true" disabled="true"
+						size="10" id="iva_tag" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Total a Pagar:" /></td>
+				<td><p:inputNumber symbol="$" decimalPlaces="0"
+						value="#{movimientoMes.total}" readonly="true" id="total1"
+						disabled="true" size="10" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Cartera:" /></td>
+				<td><p:inputText value="#{movimientoMes.cartera}" id="cartera"
+						size="2" onkeyup="controlTeclasImpMM(event,this)">
+						<p:focus for="cartera" />
+						<p:ajax event="keyup" partialSubmit="true" />
+					</p:inputText></td>
+			</tr>
+			<tr id="campoImp">
+				<td><p:outputLabel value="Continúa con la Impresión: " /></td>
+				<td><p:inputText value="#{movimientoMes.impresion}" size="2"
+						id="impresion_inp">
+						<p:ajax event="keyup" partialSubmit="true"
+							listener="#{movimientoMes.imprimirFactura}" update="growl2" />
+					</p:inputText></td>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<td><p:commandButton value="." title="Imprimir_remoto"
+						ajax="false" id="imp_remoto">
+						<p:fileDownload value="#{movimientoMes.facturaRemota}" />
+					</p:commandButton></td>
+			</tr>
+		</table>
 	</h:form>
 </ui:composition>

@@ -1,4 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
@@ -607,9 +606,9 @@ panel1 {
 						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
 					</p:outputLabel></td>
 				<td><p:outputLabel value="Cliente: " style="font-weight:bold" /></td>
-				<td><p:autoComplete id="nombreCliente"
+				<td><p:autoComplete id="nombreCliente" 
 						value="#{puntoVentaDia.cliente}" style="display:none" size="20"
-						onkeyup="ciclo1(event,this),crearCliente(event)"
+						onkeyup="ciclo1(event,this),crearCliente(event)" 
 						completeMethod="#{puntoVentaDia.completeTextCliente}"
 						maxResults="10" forceSelection="true" minQueryLength="3"
 						var="name" itemValue="#{name}" itemLabel="#{name.nombre}"
@@ -924,14 +923,18 @@ panel1 {
 				<td><p:outputLabel  value="check in: " style="font-size: 13px" /></td>
 					<td><p:calendar id="checkin" style="font-size: 13px;display:none" 
 						value="#{puntoVentaDia.checkin}"  size="10" pattern="dd-MM-yyyy"
-						mask="true" /></td>
+						mask="true" >
+						<p:ajax event="dateSelect" partialSubmit="true"></p:ajax>
+						</p:calendar> </td>
 			
 				</tr>
 				<tr>
 				<td><p:outputLabel  value="check out: " style="font-size: 13px" /></td>
 					<td><p:calendar id="checkout" style="font-size: 13px;display:none" 
 						value="#{puntoVentaDia.checkout}" size="10" pattern="dd-MM-yyyy"
-						mask="true" /></td>
+						mask="true" >
+							<p:ajax event="dateSelect" partialSubmit="true"></p:ajax>
+						</p:calendar> </td>
 							</tr>
 			</table>
 			<table width="100%" align="center" id="confir" style="display: none">

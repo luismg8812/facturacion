@@ -1108,7 +1108,23 @@ public class CuadreCaja implements Serializable {
 	}
 
 	public Double getTotalTargetas() {
-		return totalTargetas;
+		List<Documento> documentos = new ArrayList<>();
+		List<Long> tipoPago = new ArrayList<>();
+		tipoPago.add(5l);// busqueda de documentos con tarjeta
+		Date hoy = Calculos.fechaInicial(new Date());
+		Date hoyfin = Calculos.fechaFinal(new Date());
+		Boolean conCierre = Boolean.TRUE;
+		Long server = 1l;
+		Usuario usuario = (Usuario) sessionMap.get("userLogin");
+		documentos = documentoService.getByTipoPago(tipoPago, hoy, hoyfin, usuario.getUsuarioId(), conCierre, server);
+		Double total = 0.0;
+		for (Documento a : documentos) {
+			if (a.getTotal() != null) {
+				total = total + a.getTotal();
+			}
+		}
+		return total;
+		//return totalTargetas;
 	}
 
 	public void setTotalTargetas(Double totalTargetas) {

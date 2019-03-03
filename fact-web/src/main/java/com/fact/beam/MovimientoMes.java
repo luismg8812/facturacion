@@ -1,7 +1,10 @@
 package com.fact.beam;
 
 import java.awt.print.PrinterException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,6 +26,8 @@ import javax.print.PrintException;
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import com.fact.api.Calculos;
 import com.fact.api.FactException;
@@ -210,6 +215,8 @@ public class MovimientoMes implements Serializable {
 	String modFactura;
 	Boolean actModFactura = Boolean.FALSE;
 
+	String pathFactura="";
+	
 	// saber si el codigo de barras esta activo
 	OpcionUsuario codBarrasActivo;
 	// saber si la cartera de clientes esta activa
@@ -221,6 +228,9 @@ public class MovimientoMes implements Serializable {
 	OpcionUsuario claveBorradoActivo;
 	// actvar el cambio de precio en los producto durante la facturacion
 	OpcionUsuario cambioPrecio;
+	
+	// se activa impresion para sucursales y ip fija
+	OpcionUsuario activarImpresionRemota;
 
 	// factura siguiente y anterior
 	List<Documento> listaDocumento;
@@ -519,7 +529,7 @@ public class MovimientoMes implements Serializable {
 
 	public String cantidadEnter(AjaxBehaviorEvent event) {
 		log.info("entra a cantidad enter");
-		if (getCantidad() == null) {
+		if (getCantidad() == null || getCantidad()<=0) {
 			RequestContext.getCurrentInstance().execute(FOCUS_CANTIDAD);
 			RequestContext.getCurrentInstance().execute(SELECT_CANTIDAD);
 			RequestContext.getCurrentInstance().execute(
@@ -615,7 +625,7 @@ public class MovimientoMes implements Serializable {
 		// en esta funcion de calcula el excento, iva, total
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
 		// se agrega re
-		if (proveedorSelect != null && proveedorSelect.getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l && getDocumento()!=null && getDocumento().getTotal()>proveedorSelect.getBaseRetencion()) {
+		if (proveedorSelect != null  && proveedorSelect.getBaseRetencion() != null  && proveedorSelect.getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l && getDocumento()!=null && getDocumento().getTotal()>proveedorSelect.getBaseRetencion()) {
 			log.info("proveedor aplica retención");
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorSelect));
 		}else {
@@ -825,7 +835,7 @@ public class MovimientoMes implements Serializable {
 		setDetalle(docu.getDetalleEntrada());
 		setProveedor(docu.getProveedorId());
 		setProductos(ddVo);
-		setIdentificacionProveedor(docu.getProveedorId().getDocumento());
+		setIdentificacionProveedor(docu.getProveedorId().getDocumento()==null?"":docu.getProveedorId().getDocumento());
 		setNombreProveedor(getDocumentoActual().getProveedorId().getNombre());
 		setTotal(getDocumentoActual().getTotal());
 		setGravado(getDocumentoActual().getGravado());
@@ -884,7 +894,7 @@ public class MovimientoMes implements Serializable {
 		getProductos().set(pos, dCambio);
 
 		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
-		if (getDocumento().getProveedorId() != null && getDocumento().getProveedorId().getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l) {
+		if (getDocumento().getProveedorId() != null && getDocumento().getProveedorId().getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l && getDocumento().getTotal()>proveedorSelect.getBaseRetencion()) {
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), getDocumento().getProveedorId()));
 		}else {
 			setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
@@ -1129,7 +1139,7 @@ public class MovimientoMes implements Serializable {
 			setProductos(Calculos.ordenar(getProductos()));
 			switch (imp) {
 			case "TXT":
-				Impresion.imprimirEntadaAlmacenTXT(getDocumento(), getProductos(), configuracion, impresora, e);
+				pathFactura=Impresion.imprimirEntadaAlmacenTXT(getDocumento(), getProductos(), configuracion, impresora, e);
 				break;
 			case "BIG":
 				// quitar la dependencia del ireport
@@ -1137,20 +1147,27 @@ public class MovimientoMes implements Serializable {
 				// pdf = imprimirBig(tituloFactura);
 				break;
 			case "PDF":
-				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
+				pathFactura=Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
+				break;
+			case "PERSONALISADO_PDF":
+				pathFactura=Impresion.imprimirEntadaAlmacenPersonalizadoPDF(getDocumento(), getProductos(),  configuracion, impresora, e);
 				break;
 			case "BIG_PDF":
-				Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora,e);
+				pathFactura=Impresion.imprimirBig(getDocumento(), getProductos(), usuario(), configuracion, null, impresora,e);
 				break;
 			case "SMALL_PDF":
-				Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,"false",e);
+				pathFactura=Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,"false",e);
 				break;
 			default:
-				Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
+				pathFactura=Impresion.imprimirEntadaAlmacenPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora, e);
 				break;
 
 			}
-
+		}
+		//se verifica si se esta trabajando con una impresora remota
+		if(getActivarImpresionRemota()!=null) {
+			log.info("impresion remota click");
+			RequestContext.getCurrentInstance().execute("document.getElementById('imprimirFormMM:imp_remoto').click();");
 		}
 		RequestContext.getCurrentInstance().execute("pagina='opcNuevo';");
 		setTotal(null);
@@ -1295,7 +1312,8 @@ public class MovimientoMes implements Serializable {
 		getProductos().remove(d);
 		try {
 			setDocumento(Calculos.calcularExcento(d.getDocumentoId(), getProductos()));
-			if (d.getDocumentoId().getProveedorId() != null && d.getDocumentoId().getProveedorId().getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l) {
+			Proveedor prove= d.getDocumentoId().getProveedorId();
+			if (prove != null && d.getDocumentoId().getProveedorId().getRetencion() != null && getDocumento().getTipoDocumentoId().getTipoDocumentoId()==2l  && getDocumento().getTotal()>prove.getBaseRetencion()) {
 				setDocumento(Calculos.calcularRetefuente(getDocumento(), d.getDocumentoId().getProveedorId()));
 			}else {
 				setDocumento(Calculos.calcularRetefuente(getDocumento(), proveedorService.getById(1l)));
@@ -1321,6 +1339,7 @@ public class MovimientoMes implements Serializable {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("!!error borrando el producto:" + d.getProductoId().getProductoId());
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Error borrando Productos"));
 		}
@@ -1612,6 +1631,20 @@ public class MovimientoMes implements Serializable {
 			listaDocumento = documentoService.getDocNoImp(usuario.getUsuarioId(), tipoDocumentoId, 1l);
 		}
 		return listaDocumento;
+	}
+	
+	public StreamedContent getFacturaRemota()
+			throws  IOException {
+		StreamedContent file = null;
+		if(pathFactura.equals("")) {
+			pathFactura="C://facturacion/logoEmpresa.jpg";
+		}
+		File f = new File(pathFactura);
+		InputStream stream = new FileInputStream(f);
+		if (stream != null) {
+			file = new DefaultStreamedContent(stream, "application/pdf", pathFactura);
+		}
+		return file;
 	}
 
 	public void setListaDocumento(List<Documento> listaDocumento) {
@@ -2132,6 +2165,15 @@ public class MovimientoMes implements Serializable {
 
 	public void setNombreProveedor(String nombreProveedor) {
 		this.nombreProveedor = nombreProveedor;
+	}
+	
+	public String getActivarImpresionRemota() {
+		activarImpresionRemota = (OpcionUsuario) sessionMap.get("activarImpresionRemota");
+		return activarImpresionRemota== null ? "false" : "true";
+	}
+
+	public void setActivarImpresionRemota(OpcionUsuario activarImpresionRemota) {
+		this.activarImpresionRemota = activarImpresionRemota;
 	}
 	
 	

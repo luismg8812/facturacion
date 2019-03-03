@@ -253,11 +253,34 @@ public class DocumentoDetalleDaoImpl implements DocumentoDetalleDao {
 					+ " where dd.productoId.productoId= :productoId "
 				    + " and (dd.documentoId.fechaRegistro >= :fechaIni) AND (dd.documentoId.fechaRegistro <= :fechaFin) "
 					//falta ver como sacamos el filtro de la empresa
-					+ "and dd.estado = 1 ";
+				    +" and dd.documentoId.tipoDocumentoId.tipoDocumentoId!=4 "
+					+ " and dd.estado = 1 ";
 			Query query = session.createQuery(sql);
 			query.setParameter("fechaIni", fechaIni);
 			query.setParameter("fechaFin", fechaFin);
 			query.setParameter("productoId", productoId);
+			DocumentoDetalleList = query.list();
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return DocumentoDetalleList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<DocumentoDetalle> getByTipoAndFecha(Long tipoDocumento, Date fechaInicial, Date fechaFinal) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<DocumentoDetalle> DocumentoDetalleList = new ArrayList<>();
+		try {
+			String sql = "select dd from DocumentoDetalle dd "
+					+ " where dd.documentoId.tipoDocumentoId.tipoDocumentoId= :tipoDocumento "
+				    + " and (dd.documentoId.fechaRegistro >= :hoy) AND (dd.documentoId.fechaRegistro <= :hoyfin) "
+					+ "and dd.estado = 1 ";
+			Query query = session.createQuery(sql);
+			query.setParameter("hoy", fechaInicial);
+			query.setParameter("hoyfin", fechaFinal);
+			query.setParameter("tipoDocumento", tipoDocumento);
 			DocumentoDetalleList = query.list();
 			session.close();
 		} catch (FactException e) {

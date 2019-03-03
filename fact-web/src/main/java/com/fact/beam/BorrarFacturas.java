@@ -102,7 +102,7 @@ public class BorrarFacturas implements Serializable {
 
 	// busqueda de facturas
 	Long usuarioSelect;
-	List<Usuario> usuarioList;
+	private List<Usuario> usuarioList;
 	List<Documento> documentosCliente;
 	List<DocumentoDetalle> documentoDetallesList;
 	List<Cliente> clienteList;
@@ -114,7 +114,14 @@ public class BorrarFacturas implements Serializable {
 	Long cliente;
 	Long tipoDocumento;
 	List<TipoDocumento> tipoDocumentoList;
-
+	
+	private Double total;
+	private Double exento;
+	private Double base5;
+	private Double base19;
+	private Double iva5;
+	private Double iva19
+	;
 	private DocumentoVo documentoSelect;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
@@ -381,6 +388,39 @@ public class BorrarFacturas implements Serializable {
 		setDocumentosCliente(new ArrayList<>());
 		setDocumentosCliente(documentoService.buscarPorFechaAndCajero(getUsuarioSelect(), getDocumentoId(), hoy, hoyfin,
 				getConDian(), getCliente(),getTipoDocumento()));
+		Double totaltem=0.0;
+		Double exentotem=0.0;
+		Double base5tem=0.0;
+		Double base19tem=0.0;
+		Double iva5tem=0.0;
+		Double iva19tem=0.0;
+		for(Documento d: getDocumentosCliente()) {
+			
+			if(d.getTotal()!=null) {
+				totaltem+=d.getTotal();
+			}
+			if(d.getExcento()!=null) {
+				exentotem+=d.getExcento();
+			}
+			if(d.getBase5()!=null) {
+				base5tem+=d.getBase5();
+			}
+			if(d.getBase19()!=null) {
+				base19tem+=d.getBase19();
+			}
+			if(d.getIva19()!=null) {
+				iva19tem+=d.getIva();
+			}
+			if(d.getIva5()!=null) {
+				iva5tem+=d.getIva5();
+			}
+		}
+		setTotal(totaltem);
+		setExento(exentotem);
+		setBase19(base19tem);
+		setBase5(base5tem);
+		setIva19(iva19tem);
+		setIva5(iva5tem);
 	}
 
 	public void consultarDetalle(Documento docu) {
@@ -839,6 +879,56 @@ public class BorrarFacturas implements Serializable {
 
 	public void setTipoDocumento(Long tipoDocumento) {
 		this.tipoDocumento = tipoDocumento;
+	}
+	
+	
+
+	public Double getTotal() {
+		return total;
+	}
+
+	public void setTotal(Double total) {
+		this.total = total;
+	}
+
+	public Double getExento() {
+		return exento;
+	}
+
+	public void setExento(Double exento) {
+		this.exento = exento;
+	}
+
+	public Double getBase5() {
+		return base5;
+	}
+
+	public void setBase5(Double base5) {
+		this.base5 = base5;
+	}
+
+	public Double getBase19() {
+		return base19;
+	}
+
+	public void setBase19(Double base19) {
+		this.base19 = base19;
+	}
+
+	public Double getIva5() {
+		return iva5;
+	}
+
+	public void setIva5(Double iva5) {
+		this.iva5 = iva5;
+	}
+
+	public Double getIva19() {
+		return iva19;
+	}
+
+	public void setIva19(Double iva19) {
+		this.iva19 = iva19;
 	}
 
 	public List<TipoDocumento> getTipoDocumentoList() {

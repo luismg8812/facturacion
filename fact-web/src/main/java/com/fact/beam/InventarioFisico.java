@@ -88,6 +88,7 @@ public class InventarioFisico implements Serializable {
 	private Long proveedor;
 	private Long grupo;
 	private List<ProductoEmpresa> productos;
+	private Boolean negativos;
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -114,7 +115,7 @@ public class InventarioFisico implements Serializable {
 	}
 	
 	public void buscarReporteProductos() {
-		setProductos(productoEmpresaService.getByProveedorYGrupo(getGrupo(),getProveedor(), getEmpresa().getEmpresaId()));
+		setProductos(productoEmpresaService.getByProveedorYGrupo(getGrupo(),getProveedor(), getEmpresa().getEmpresaId(),getNegativos()));
 	}
 
 	public void guardarInventarioFisico2() {
@@ -442,7 +443,14 @@ public class InventarioFisico implements Serializable {
 	public void setProductos(List<ProductoEmpresa> productos) {
 		this.productos = productos;
 	}
-	
+
+	public Boolean getNegativos() {
+		return negativos;
+	}
+
+	public void setNegativos(Boolean negativos) {
+		this.negativos = negativos;
+	}
 	
 
 }

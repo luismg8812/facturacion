@@ -9,11 +9,11 @@
 	
 	</script>
 	<style type="text/css">
-    .old {
-        background-color: #c9302c !important;
-        background-image: none !important;
-        color: #000000 !important;
-    }
+.old {
+	background-color: #c9302c !important;
+	background-image: none !important;
+	color: #000000 !important;
+}
 </style>
 	<h:form id="facturasFechaForm">
 		<table width="100%" align="center">
@@ -43,42 +43,72 @@
 				<td><p:outputLabel value="Cvo. Dian: " /></td>
 				<td><p:inputText value="#{borrarFacturas.conDian}" size="16" /></td>
 				<td><p:outputLabel value="Cliente: " /></td>
-				<td><p:selectOneMenu value="#{borrarFacturas.cliente}" panelStyle="font-size: 11px"
-						id="cliente">
+				<td><p:selectOneMenu value="#{borrarFacturas.cliente}"
+						panelStyle="font-size: 11px" id="cliente">
 						<f:selectItem itemLabel="Cliente" itemValue="0" />
 						<f:selectItems value="#{borrarFacturas.clienteList}" var="usua"
 							itemLabel="#{usua.nombre}" itemValue="#{usua.clienteId}" />
 					</p:selectOneMenu></td>
 			</tr>
 			<tr>
-			<td></td>
-			<td></td>
-			<td><p:outputLabel value="Tipo Documento: " /></td>
-			<td><p:selectOneMenu value="#{borrarFacturas.tipoDocumento}" panelStyle="font-size: 11px"
-						id="tipoDocu">
+				<td><h:commandLink value="Exportar">
+						<p:dataExporter type="xls" target="documentosCliente" fileName="Documentos" />
+					</h:commandLink></td>
+				<td><p:commandButton value="Buscar" process="@form"
+						update="documentosCliente,total,exento,base5,iva5,base19,iva19"
+						id="buscar" actionListener="#{borrarFacturas.buscarFacturas}" />
+					<p:commandButton value="Salir" /></td>
+
+				<td><p:outputLabel value="Tipo Documento: " /></td>
+				<td><p:selectOneMenu value="#{borrarFacturas.tipoDocumento}"
+						panelStyle="font-size: 11px" id="tipoDocu">
 						<f:selectItem itemLabel="Tipo Documento" itemValue="0" />
-						<f:selectItems value="#{borrarFacturas.tipoDocumentoList}" var="usua"
-							itemLabel="#{usua.nombre}" itemValue="#{usua.tipoDocumentoId}" />
+						<f:selectItems value="#{borrarFacturas.tipoDocumentoList}"
+							var="usua" itemLabel="#{usua.nombre}"
+							itemValue="#{usua.tipoDocumentoId}" />
 					</p:selectOneMenu></td>
-			
+
 			</tr>
 		</table>
 		<table width="100%" align="center">
 			<tr>
-				<td><p:commandButton value="Buscar" process="@form"
-						update="documentosCliente" id="buscar"
-						actionListener="#{borrarFacturas.buscarFacturas}" /> <p:commandButton
-						value="Salir" /></td>
+				<td><p:outputLabel value="Total: "></p:outputLabel> <p:outputLabel
+						value="#{borrarFacturas.total}" id="total">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="Exento: "></p:outputLabel> <p:outputLabel
+						value="#{borrarFacturas.exento}" id="exento">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="Base 5: "></p:outputLabel> <p:outputLabel
+						value="#{borrarFacturas.base5}" id="base5">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="Iva 5: "></p:outputLabel> <p:outputLabel
+						value="#{borrarFacturas.iva5}" id="iva5">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="Base 19: "></p:outputLabel> <p:outputLabel
+						value="#{borrarFacturas.base19}" id="base19">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+				<td><p:outputLabel value="Iva 19: "></p:outputLabel> <p:outputLabel
+						value="#{borrarFacturas.iva19}" id="iva19">
+						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+					</p:outputLabel></td>
+
 			</tr>
 		</table>
-		<p:dataTable id="documentosCliente" var="docu" rowStyleClass="#{docu.anulado eq 1 ? 'old' : null}"
+		<p:dataTable id="documentosCliente" var="docu"
+			rowStyleClass="#{docu.anulado eq 1 ? 'old' : null}"
 			value="#{borrarFacturas.documentosCliente}" scrollable="true"
 			scrollHeight="290"
 			emptyMessage="No hay facturas disponibles para El rango seleccionado">
 			<f:facet name="header">
             Facturas
         </f:facet>
-			<p:column style="width:25%;text-align: center" headerText="Opción">
+			<p:column style="width:25%;text-align: center" headerText="Opción"
+				exportable="false">
 				<p:commandButton icon="ui-icon-search" title="View"
 					action="#{borrarFacturas.consultarDetalle(docu)}"
 					update="consultarDetalle" />
@@ -87,22 +117,65 @@
 					action="#{borrarFacturas.imprimirFactura(docu)}" />
 				<p:commandButton icon="ui-icon-trash" title="Anular factura"
 					style="display:#{puntoVentaDia.anularFacuta}" update="growl1"
-					action="#{borrarFacturas.anularFactura(docu)}" />	
+					action="#{borrarFacturas.anularFactura(docu)}" />
 			</p:column>
 			<p:column headerText="No. Documento">
 				<h:outputText value="#{docu.consecutivoDian}" />
 			</p:column>
-			<p:column headerText="Valor Total">
-				<p:outputLabel value="#{docu.total}"  > 
-						<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+			<p:column headerText="Valor Total" exportable="true">
+				<p:outputLabel value="#{docu.total}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</p:outputLabel>
 			</p:column>
-			<p:column headerText="Saldo ">
-				<p:outputLabel value="#{docu.saldo}" >
-				<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+			<p:column headerText="Saldo " exportable="true">
+				<p:outputLabel value="#{docu.saldo}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</p:outputLabel>
 			</p:column>
-			
+			<p:column headerText="Cliente" exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.clienteId.nombre}">
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Proveedor" exportable="true"
+				style="display:none">
+				<p:outputLabel value="#{docu.proveedorId.nombre}">
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Iva 5 " exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.iva5}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Iva 19 " exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.iva19}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Base 5" exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.base5}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Base 19" exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.base19}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Exento" exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.excento}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Retención" exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.retefuente}">
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
+			</p:column>
+			<p:column headerText="Fecha" exportable="true" style="display:none">
+				<p:outputLabel value="#{docu.fechaRegistro}">
+					<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
+				</p:outputLabel>
+			</p:column>
 		</p:dataTable>
 	</h:form>
 	<p:blockUI block="facturasFechaForm" trigger="facturasFechaForm:buscar">

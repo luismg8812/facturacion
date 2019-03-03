@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">	
+	</script>
+	<h:form>
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial"
+						value="#{infoVentas.fechaIniMovimiento}" size="16"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal"
+						value="#{infoVentas.fechaFinMovimiento}" size="16"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+			</tr>
+			<tr>
+				<td><p:outputLabel value="Tipo documento: " /></td>
+				<td><p:selectOneMenu value="#{infoVentas.tipoDocumento}">
+						<f:selectItem itemLabel="Seccionar Tipo Documento" itemValue="0" />
+						<f:selectItems value="#{exportarDelta.tipoDocumentos}"
+							noSelectionValue="Seleccione tipoDocumento" var="tipo"
+							itemLabel="#{tipo.nombre}" itemValue="#{tipo.tipoDocumentoId}" />
+					</p:selectOneMenu></td>
+				<td><p:commandButton value="Buscar"
+						action="#{infoVentas.buscarMovimiento()}" update="documentos"></p:commandButton></td>
+				<td><h:commandLink value="Exportar">
+						<p:dataExporter type="xls" target="documentos" fileName="DocumentosSalida" />
+					</h:commandLink></td>
+
+			</tr>
+
+		</table>
+		<p:dataTable var="car" value="#{infoVentas.documentosMovimiento}"
+			id="documentos">
+			<p:column headerText="N° Documento">
+				<h:outputText value="#{car.documentoId.documentoId}" />
+			</p:column>
+
+			<p:column headerText="cod. Item">
+				<h:outputText value="#{car.productoId.codigoBarras}" />
+			</p:column>
+
+			<p:column headerText="Artículo">
+				<h:outputText value="#{car.productoId.nombre}" />
+			</p:column>
+
+			<p:column headerText="DETALLE (OT)">
+				<h:outputText value="#{car.documentoId.detalleEntrada}" />
+			</p:column>
+			<p:column headerText="Fecha">
+				<h:outputText value="#{car.fechaRegistro}" />
+			</p:column>
+			<p:column headerText="Ing. retira">
+				<h:outputText value="#{car.documentoId.proveedorId.nombre}" />
+			</p:column>
+			<p:column headerText="Cantidad">
+				<h:outputText value="#{car.cantidad}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>
