@@ -38,6 +38,10 @@
 			if(e.keyCode==78){
 				document.getElementById('opciones:New_movi_mes1').click();	
 				}
+			//alert("tecla t")	tipo pago
+			if(e.keyCode==84){
+				document.getElementById('opciones:P1_movi_mes1').click();	
+				}
 
 			if(e.keyCode==73){
 				document.getElementById('opciones:Imp_movi_mes1').click();
@@ -674,8 +678,9 @@ panel1 {
 							action="#{puntoVentaDia.buscarUltimaFactura()}"
 							update="growl1, dataList1,codig1" /> <p:commandButton
 							value="Bus" onkeydown="controlTeclas(event,this)"
-							id="Bus_movi_mes1" /> <p:commandButton value="..."
-							onkeydown="controlTeclas(event,this)" id="P1_movi_mes1" /> <p:commandButton
+							id="Bus_movi_mes1" /> <p:commandButton value="Tip"
+							onkeydown="controlTeclas(event,this)" id="P1_movi_mes1" 
+							actionListener="#{puntoVentaDia.popupTipoPago()}" update="growl1"/> <p:commandButton
 							value="Mod" onkeydown="controlTeclas(event,this)"
 							id="Mod_movi_mes1"
 							actionListener="#{puntoVentaDia.modificarUltimaFactura()}" /> <p:commandButton

@@ -29,13 +29,17 @@
 			<tr>
 			<td><p:outputLabel value="Total Factura: "/>
 				</td>
-				<td><p:outputLabel value="#{abonos.abonoNew.documentoId.total}" />
+				<td><p:outputLabel value="#{abonos.abonoNew.documentoId.total}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
 				</td>
 			</tr>
 			<tr>
 			<td><p:outputLabel value="Saldo: " />
 				</td>
-				<td><p:outputLabel value="#{abonos.abonoNew.documentoId.saldo}" />
+				<td><p:outputLabel value="#{abonos.abonoNew.documentoId.saldo}" >
+					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+				</p:outputLabel>
 				</td>
 			</tr>
 			<tr>

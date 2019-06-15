@@ -512,5 +512,13 @@
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/cambioPrecio.xhtml" />
 		</div>
 	</p:dialog>
+	<p:dialog widgetVar="popupTipoPago" id="popuptipo"  onShow="document.getElementById('tipoPagoForm:tipo_pago_input_input').focus()" 
+		style="font-size: 12px" header="Seleccionar tipo de pago" onHide="document.getElementById('movMesForm:Sig_movi_mes').focus();" closeOnEscape="true">
+		<div style="width: 300px; ">
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/modalTipoPago.xhtml" />
+		</div>
+	</p:dialog>
 	
 </ui:composition>
+

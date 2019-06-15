@@ -224,8 +224,21 @@ public class Login implements Serializable {
 		case "7":
 			ruta = "https://www.youtube.com/watch?v=kYxHPQc9nC4&feature=youtu.be";
 			break;	
-			
-			
+		case "8":
+			ruta = "https://www.youtube.com/watch?v=LJIbgMakGfE&feature=youtu.be";
+			break;	
+		case "9":
+			ruta = "https://www.youtube.com/watch?v=6DHsHMbMMYk&feature=youtu.be";
+			break;	
+		case "10":
+			ruta = "https://www.youtube.com/watch?v=Op0JH7vlW0k&feature=youtu.be";
+			break;		
+		case "11":
+			ruta = "https://www.youtube.com/watch?v=YxaN21YL2BQ&feature=youtu.be";
+			break;	
+		case "12":
+			ruta = "https://www.youtube.com/watch?v=Jxoq1y_Ooc4&feature=youtu.be";
+			break;	
 		default:
 			break;
 		}

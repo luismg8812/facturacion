@@ -76,6 +76,7 @@ import com.fact.service.ListaService;
 import com.fact.service.OpcionUsuarioService;
 import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
+import com.fact.service.TipoPagoService;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
@@ -130,9 +131,12 @@ public class PuntoVentaDia implements Serializable {
 
 	@EJB
 	private GrupoService grupoService;
-	
+
 	@EJB
 	private ListaService listaService;
+
+	@EJB
+	private TipoPagoService tipoPagoService;
 
 	String codigoBarras;
 	Map<String, Producto> productosAllCodigo;
@@ -206,12 +210,13 @@ public class PuntoVentaDia implements Serializable {
 	String parciaPopup;
 	Double descuento;
 	String impresoras;
+	private String tipoPago;
 
 	// modificar factura
 	String modFactura;
 	Boolean actModFactura = Boolean.FALSE;
 	String enPantalla = "";
-	String pathFactura="";
+	String pathFactura = "";
 
 	// saber si el codigo de barras esta activo
 	public OpcionUsuario codBarrasActivo;
@@ -259,7 +264,7 @@ public class PuntoVentaDia implements Serializable {
 
 	// se activa impresion por varias impresoras en el sistem
 	OpcionUsuario activarMultiplesImpresoras;
-	
+
 	// se activa impresion para sucursales y ip fija
 	OpcionUsuario activarImpresionRemota;
 
@@ -272,7 +277,6 @@ public class PuntoVentaDia implements Serializable {
 	DocumentoDetalleVo dCambio;// variable que contiene el detalle del producto
 								// que se le cambiara el precio
 	private Lista lista;
-	
 
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -329,9 +333,7 @@ public class PuntoVentaDia implements Serializable {
 			log.info("codigoP:" + codigoProducoString);
 			log.info("codigoPunidad:" + codigoProducoUnidad);
 			log.info("codigoProducoDigi:" + codigoProducoUnidad);
-			
-			
-			
+
 			p = getProductosAllCodigo().get(codigoProducoString);
 			if (p == null) {
 				p = getProductosAllCodigo().get("2" + codigoProducoUnidad);
@@ -353,13 +355,13 @@ public class PuntoVentaDia implements Serializable {
 				cantidadEnter(null);
 			} else {
 				p = getProductosAllCodigo().get(codigoProducoDigi);
-				if(p!=null) {
-					//000001007466
-					//000030000841
-					//000030123007
-					//000001----00-920-0
+				if (p != null) {
+					// 000001007466
+					// 000030000841
+					// 000030123007
+					// 000001----00-920-0
 					log.info("producto carnes: " + p.getNombre());
-					
+
 					String parte1 = completo.substring(7, 9);
 					String parte2 = completo.substring(9, 12);
 					Double peso = Double.valueOf(parte1 + "." + parte2);
@@ -414,9 +416,10 @@ public class PuntoVentaDia implements Serializable {
 
 	public void buscarProducto(SelectEvent event) throws IOException {
 		productoSelect = (Producto) event.getObject();
-		//producto id =6 es para retencion del hotel
+		// producto id =6 es para retencion del hotel
 		if (productoSelect != null && (productoSelect.getProductoId() == 0l || productoSelect.getProductoId() == 1l
-				|| productoSelect.getProductoId() == 2l || productoSelect.getProductoId() == 6l)) {
+				|| productoSelect.getProductoId() == 2l || productoSelect.getProductoId() == 6l
+				|| productoSelect.getProductoId() == 7l)) {
 			RequestContext.getCurrentInstance().execute("PF('px01').show();");
 			setUnidad(0.0);
 			RequestContext.getCurrentInstance().execute("document.getElementById('px01_input_input').focus();");
@@ -929,6 +932,44 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
+	public void popupTipoPago() {
+		if (getDocumento().getDocumentoId() == null) {
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"Para asignar un tipo de pago Debe ingresar productos primero", ""));
+			return;
+		}
+		RequestContext.getCurrentInstance().execute("PF('popupTipoPago').show();");
+	}
+
+	public void limpiarTipoPago() {
+		setTipoPago(null);
+	}
+
+	public void asignarTipoPago() {
+
+		if (getTipoPago() == null || getTipoPago().isEmpty()) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Ingrese nuevamente el valor", ""));
+			setTipoPago("");
+			return;
+
+		}
+		try {
+			TipoPago tipoPago = tipoPagoService.getById(Long.valueOf(getTipoPago()));
+			getDocumento().setTipoPagoId(tipoPago);
+			documentoService.update(getDocumento(), 1l);
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Tipo de pago asignado correctamente", ""));
+			log.info("se asignó tipo de pago" + getTipoPago());
+			RequestContext.getCurrentInstance().execute("PF('popupTipoPago').hide();");
+
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Tipo de pago no valido", ""));
+		}
+
+	}
+
 	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null) {
 			return "";
@@ -942,11 +983,12 @@ public class PuntoVentaDia implements Serializable {
 		String impresora = impresora(getImpresoras() == null ? "1" : getImpresoras());
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = getEmpresa();
-			String tituloFactura = "";
-			
+
 			// calcular tipo de documento
 			calcularTipoDocumento(e, server);
-
+			if(getDocumento().getConsecutivoDian()==null) {
+				getDocumento().setConsecutivoDian("1");
+			}
 			getDocumento().setImpreso(1l);
 			getDocumento().setEntregado(0l);
 
@@ -979,38 +1021,35 @@ public class PuntoVentaDia implements Serializable {
 				setProductos(Calculos.ordenar(getProductos()));
 				switch (imp) {
 				case "TXT":
-					if(getImpresoras()!=null && getImpresoras().equals("2")) {
-						pathFactura=Impresion.imprimirTxtBigMedia(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-								enPantalla, e);
-					}else {
-						pathFactura=Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-								enPantalla, e);
+					if (getImpresoras() != null && getImpresoras().equals("2")) {
+						pathFactura = Impresion.imprimirTxtBigMedia(getDocumento(), getProductos(), usuario(),
+								configuracion, impresora, enPantalla, e);
+					} else {
+						pathFactura = Impresion.imprimirTxt(getDocumento(), getProductos(), usuario(), configuracion,
+								impresora, enPantalla, e);
 					}
-					
+
 					break;
-				case "BIG":
-					// quitar la dependencia del ireport
-					pathFactura=imprimirTemporal(tituloFactura);
-					break;
-				case "PDF":			
-					if(getImpresoras()!=null && getImpresoras().equals("2")) {
-						pathFactura=Impresion.imprimirPDFBigMedia(getDocumento(), getProductos(), usuario(), configuracion, descuentoEnFactura,
-								impresora, e);
-					}else {
-						pathFactura=Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-								enPantalla, e);
+				case "PDF":
+					if (getImpresoras() != null && getImpresoras().equals("2")) {
+						pathFactura = Impresion.imprimirPDFBigMedia(getDocumento(), getProductos(), usuario(),
+								configuracion, descuentoEnFactura, impresora, e);
+					} else {
+						pathFactura = Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion,
+								impresora, enPantalla, e);
 					}
 					log.info("sale de impresion pdf");
 					break;
 				case "PDF_PAGE":
-					pathFactura=Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion, impresora,
-							enPantalla, e,getCheckin(),getCheckout());
+					pathFactura = Impresion.imprimirPDFPage(getDocumento(), getProductos(), usuario(), configuracion,
+							impresora, enPantalla, e, getCheckin(), getCheckout());
 					break;
 				case "BIG_PDF":
-					
+
 					break;
 				case "SMALL_PDF":
-					pathFactura=Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion, impresora,enPantalla, e);
+					pathFactura = Impresion.imprimirPDFSmall(getDocumento(), getProductos(), usuario(), configuracion,
+							impresora, enPantalla, e);
 					break;
 				default:
 					Impresion.imprimirPDF(getDocumento(), getProductos(), usuario(), configuracion, impresora,
@@ -1019,17 +1058,16 @@ public class PuntoVentaDia implements Serializable {
 
 				}
 
-			}		
+			}
 			limpiar();
-			//se verifica si se esta trabajando con una impresora remota
-			if(activarImpresionRemota!=null) {
+			// se verifica si se esta trabajando con una impresora remota
+			if (activarImpresionRemota != null) {
 				log.info("impresion remota click");
-				RequestContext.getCurrentInstance().execute("document.getElementById('remotoForm:imp_remoto').click();");
-			}	
-			RequestContext.getCurrentInstance()
-			.execute("document.getElementById('checkin').style.display='none';");
-	RequestContext.getCurrentInstance()
-	.execute("document.getElementById('checkout').style.display='none';");
+				RequestContext.getCurrentInstance()
+						.execute("document.getElementById('remotoForm:imp_remoto').click();");
+			}
+			RequestContext.getCurrentInstance().execute("document.getElementById('checkin').style.display='none';");
+			RequestContext.getCurrentInstance().execute("document.getElementById('checkout').style.display='none';");
 			RequestContext.getCurrentInstance().execute("PF('imprimir').hide();");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prod1').style.display='none';");
 			RequestContext.getCurrentInstance().execute("document.getElementById('prodList1').style.display='none';");
@@ -1068,8 +1106,7 @@ public class PuntoVentaDia implements Serializable {
 		return "";
 	}
 
-	public StreamedContent getFacturaRemota()
-			throws DocumentException, IOException, PrinterException, ParseException {
+	public StreamedContent getFacturaRemota() throws DocumentException, IOException, PrinterException, ParseException {
 		StreamedContent file = null;
 		File f = new File(pathFactura);
 		InputStream stream = new FileInputStream(f);
@@ -1078,7 +1115,6 @@ public class PuntoVentaDia implements Serializable {
 		}
 		return file;
 	}
-	
 
 	private void verificarDescuento() {
 		Double des1 = getDescuento() == null ? 0.0 : getDescuento();
@@ -1105,6 +1141,14 @@ public class PuntoVentaDia implements Serializable {
 
 	private int asignartipoPago(int numeroImpresiones) {
 		TipoPago tipa = new TipoPago();
+		// si ya tiene asignado tipo de pago no hace nada y retorna
+		// 1 como numero de impresiones
+		if (getDocumento().getTipoPagoId() == null || getDocumento().getTipoPagoId().getTipoPagoId() == null) {
+			numeroImpresiones=1;
+			tipa.setTipoPagoId(1l);
+			getDocumento().setTipoPagoId(tipa);
+		}
+		
 		// si el documento es un vale se agrega sus tipos de pago
 		if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == 8l) {
 			log.info("se asigna tipo de pago al vale");
@@ -1180,8 +1224,8 @@ public class PuntoVentaDia implements Serializable {
 					rangoA = proporcion.getRangoImparA();
 					rangoB = proporcion.getRangoImparB();
 				}
-				Double totaldocu = (getDocumento().getTotal()==null? 0.0:getDocumento().getTotal());
-				if (( totaldocu>= rangoA && totaldocu <= rangoB)) {
+				Double totaldocu = (getDocumento().getTotal() == null ? 0.0 : getDocumento().getTotal());
+				if ((totaldocu >= rangoA && totaldocu <= rangoB)) {
 					tipo.setTipoDocumentoId(9l);// se asigna factura
 					getDocumento().setTipoDocumentoId(tipo);
 				} else {
@@ -1204,126 +1248,69 @@ public class PuntoVentaDia implements Serializable {
 		String tituloFactura = "";
 		// este if controla el titulo de la factura para quia de remi si no tiene
 		// activado proporcion
-		ConsecutivoDian consecutivoDian;
+		ConsecutivoDian consecutivoDian=documentoService.getConsecutivoDian();
 		Long con;
-		String consecutivo ;
-		if (getDocumento().getTipoDocumentoId() == null) {
-			if (getDocumento() != null && getDocumento().getClienteId().getGuiaTransporte() == 1l) {
-				consecutivoDian = documentoService.getConsecutivoDian();
-				if (consecutivoDian.getSecuencia() == 0l) {
-					con = Long.valueOf(e.getAutorizacionDesde());
-				} else {
-					con = consecutivoDian.getSecuencia() + 1;
-				}
-				// dentro de try se valida si faltan 500 facturas para
-				// llegar hasta el tope
-				try {
-					Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
-					Long consegutivo = con;
-					if (consegutivo + 500 > topeConsecutivo) {
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage(" se esta agotando el consegutivo DIAN "));
-					}
+		String consecutivo;
 
-				} catch (Exception e2) {
-					e2.printStackTrace();
-				}
-				consecutivo = e.getLetraConsecutivo() + con;
-				log.info("consecutivo Dian: " + consecutivo);
-				getDocumento().setConsecutivoDian(consecutivo);
-				tituloFactura = "FACTURA DE VENTA";
-				getDocumento().setReduccion(0l);
-				server = 1l;
-				consecutivoDian.setSecuencia(con);
-				documentoService.update(consecutivoDian);
-			} else {
-				consecutivoDian = documentoService.getConsecutivoDian();
-				if (consecutivoDian.getSecuencia() == 0l) {
-					con = Long.valueOf(e.getAutorizacionDesde());
-				} else {
-					con = consecutivoDian.getSecuencia() + 1;
-				}
-				// dentro de try se valida si faltan 500 facturas para
-				// llegar hasta el tope
-				try {
-					Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
-					Long consegutivo = con;
-					if (consegutivo + 500 > topeConsecutivo) {
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage(" se esta agotando el consegutivo DIAN "));
-					}
-
-				} catch (Exception e2) {
-					e2.printStackTrace();
-				}
-				consecutivo = e.getLetraConsecutivo() + con;
-				log.info("consecutivo Dian: " + consecutivo);
-				getDocumento().setConsecutivoDian(consecutivo);
-				tituloFactura = "FACTURA DE VENTA";
-				getDocumento().setReduccion(0l);
-				server = 1l;
-				consecutivoDian.setSecuencia(con);
-				documentoService.update(consecutivoDian);
-			}
-		} else {
-			if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == null) {
-				TipoDocumento ti = new TipoDocumento();
-				ti.setTipoDocumentoId(10l);
-				getDocumento().setTipoDocumentoId(ti);
-			}
-			
-			switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == null ? "10"
-					: getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
-			case "9":
-				consecutivoDian = documentoService.getConsecutivoDian();
-				con = consecutivoDian.getSecuencia();
-				 consecutivo = e.getLetraConsecutivo() + con;
-				getDocumento().setConsecutivoDian(consecutivo);
-				log.info("consecutivo documentoId: " + consecutivo);
-				tituloFactura = "FACTURA DE VENTA.";
-				getDocumento().setReduccion(1l);
-				break;
-			case "10":
-			   // log
-				consecutivoDian = documentoService.getConsecutivoDian();
-				if (consecutivoDian.getSecuencia() == 0l) {
-					con = Long.valueOf(e.getAutorizacionDesde());
-				} else {
-					con = consecutivoDian.getSecuencia() + 1;
-				}
-				// dentro de try se valida si faltan 500 facturas para
-				// llegar hasta el tope
-				try {
-					Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
-					Long consegutivo = con;
-					if (consegutivo + 500 > topeConsecutivo) {
-						FacesContext.getCurrentInstance().addMessage(null,
-								new FacesMessage(" se esta agotando el consegutivo DIAN "));
-					}
-
-				} catch (Exception e2) {
-					e2.printStackTrace();
-				}
-				consecutivo = e.getLetraConsecutivo() + con;
-				log.info("consecutivo Dian: " + consecutivo);
-				getDocumento().setConsecutivoDian(consecutivo);
-				tituloFactura = "FACTURA DE VENTA";
-				getDocumento().setReduccion(0l);
-				server = 1l;
-				consecutivoDian.setSecuencia(con);
-				documentoService.update(consecutivoDian);
-				break;
-			case "4":
-				getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());// es necesario asignar el consecutivo dian
-				log.info("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
-				tituloFactura = "No. DE COTIZACIÓN";
-				server = 1l;
-				break;
-			default:
-				break;
-			}
+		if (getDocumento().getTipoDocumentoId().getTipoDocumentoId() == null) {
+			TipoDocumento ti = new TipoDocumento();
+			ti.setTipoDocumentoId(10l);
+			getDocumento().setTipoDocumentoId(ti);
 		}
 
+		switch (getDocumento().getTipoDocumentoId().getTipoDocumentoId().toString()) {
+		case "9":		
+			con = consecutivoDian.getSecuencia();
+			consecutivo = e.getLetraConsecutivo() + con;
+			getDocumento().setConsecutivoDian(consecutivo);
+			log.info("consecutivo documentoId: " + consecutivo);
+			tituloFactura = "FACTURA DE VENTA.";
+			getDocumento().setReduccion(1l);
+			break;
+
+		case "4":
+			getDocumento().setConsecutivoDian("" + getDocumento().getDocumentoId());// es necesario asignar el
+																					// consecutivo dian
+			log.info("consecutivo Cotizacion: " + getDocumento().getDocumentoId());
+			tituloFactura = "No. DE COTIZACIÓN";
+			server = 1l;
+			break;
+		default:
+			// log
+			consecutivoDian = documentoService.getConsecutivoDian();
+			if (consecutivoDian.getSecuencia() == 0l) {
+				con = Long.valueOf(e.getAutorizacionDesde());
+			} else {
+				con = consecutivoDian.getSecuencia() + 1;
+			}
+			// dentro de try se valida si faltan 500 facturas para
+			// llegar hasta el tope
+			try {
+				Long topeConsecutivo = Long.valueOf(e.getAutorizacionHasta());
+				Long consegutivo = con;
+				if (consegutivo + 500 > topeConsecutivo) {
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage(FacesMessage.SEVERITY_WARN, " se esta agotando el consegutivo DIAN ", ""));
+				}
+				if (consegutivo > topeConsecutivo) {
+					FacesContext.getCurrentInstance().addMessage(null,
+							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Se agotó el consecutivo DIAN", ""));
+					return;
+
+				}
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			consecutivo = e.getLetraConsecutivo() + con;
+			log.info("consecutivo Dian: " + consecutivo);
+			getDocumento().setConsecutivoDian(consecutivo);
+			tituloFactura = "FACTURA DE VENTA";
+			getDocumento().setReduccion(0l);
+			server = 1l;
+			consecutivoDian.setSecuencia(con);
+			documentoService.update(consecutivoDian);
+			break;
+		}
 	}
 
 	private void calcularInfoDiario(Empresa e) {
@@ -1331,9 +1318,9 @@ public class PuntoVentaDia implements Serializable {
 		Date fechaInicio = Calculos.fechaInicial(fechaDocumento);
 		Date fechaFinal = Calculos.fechaFinal(fechaDocumento);
 		List<InfoDiario> infoList = documentoService.buscarInfodiarioByFecha(fechaInicio, fechaFinal);
-		boolean anulado= false;
+		boolean anulado = false;
 		try {
-			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList, e,anulado);
+			InfoDiario infoDiario = Calculos.calcularInfoDiario(getDocumento(), infoList, e, anulado);
 
 			if (infoDiario.getInfoDiarioId() == null) {
 				documentoService.save(infoDiario);
@@ -1398,178 +1385,6 @@ public class PuntoVentaDia implements Serializable {
 			evento.setValorAnterior("" + getDescuento());
 			eventoService.save(evento);
 		}
-	}
-
-	private String imprimirTemporal(String tituloFactura) throws IOException {
-		DecimalFormat formatea = new DecimalFormat("###,###.##");
-		// log.info("entra a imprimir");
-		Empresa e = Login.getEmpresaLogin();
-		String pdf = "C:\\facturas\\factura_" + getDocumento().getDocumentoId() + ".txt";
-		File archivo = new File(pdf);
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String fhoyIni = df.format(getDocumento().getFechaRegistro());
-		BufferedWriter bw;
-		String dirCliente = "";
-		try {
-			dirCliente = getDocumento().getClienteId().getDireccion();
-		} catch (Exception e2) {
-			log.info("cliente sin direccion");
-			dirCliente = "";
-		}
-
-		try {
-			dirCliente = dirCliente.trim().substring(0, 20);
-		} catch (Exception e7) {
-			// dirCliente= "";
-
-		}
-		bw = new BufferedWriter(new FileWriter(archivo));
-		bw.write("                                        \n");
-		bw.write("                                        \n");
-		bw.write("                                                                    "
-				+ getDocumento().getConsecutivoDian() + "\n");
-		bw.write("                                        \n");
-		bw.write("      " + Calculos.cortarDescripcion(getDocumento().getClienteId().getNombre().toUpperCase(), 22)
-				+ " " + Calculos.cortarDescripcion(dirCliente, 12) + "  "
-				+ Calculos.cortarDescripcion(e.getResolucionDian(), 12) + " " + Calculos.cortarDescripcion(fhoyIni, 19)
-				+ "\n");
-		bw.write("      " + getDocumento().getClienteId().getDocumento() + "                            "
-				+ e.getAutorizacionDesde() + "  " + e.getAutorizacionHasta() + e.getFechaResolucion() + "\n");
-		bw.write("      " + getDocumento().getUsuarioId().getUsuarioId() + " "
-				+ getDocumento().getUsuarioId().getNombre().toUpperCase() + " "
-				+ getDocumento().getUsuarioId().getApellido().toUpperCase());
-		bw.write("\n");
-		bw.write("\n");
-		int tope = 16;
-		int pagina = 0;
-		int numProductos = tope;
-		setProductos(Calculos.ordenar(getProductos()));
-		for (DocumentoDetalleVo ddV : getProductos()) {
-			String nombreProducto = "";
-			String cantidadProducto = "";
-			String unidadProducto = "";
-			Double total = 0.0;
-			String iva = "";
-			String totalProducto = "";
-			Double des = getDescuento() == null ? 0.0 : getDescuento();
-			des = des / 100;
-			Double ivaTem = ddV.getProductoId().getIva() == null ? 0.0 : ddV.getProductoId().getIva();
-
-			nombreProducto = Calculos.cortarDescripcion(ddV.getProductoId().getNombre(), 34);
-			cantidadProducto = Calculos.cortarCantidades(ddV.getCantidad(), 6);
-			Double uniProductoTemp = ddV.getProductoId().getCostoPublico()
-					+ (ddV.getProductoId().getCostoPublico() * des);
-			unidadProducto = Calculos.cortarCantidades(formatea.format(uniProductoTemp), 13);
-			String totalTep = "";
-			total = (uniProductoTemp * ddV.getCantidad());
-			try {
-				totalTep = formatea.format(total);
-			} catch (Exception e2) {
-				log.info("error tratando de dar formato a valor parcial");
-			}
-			totalProducto = Calculos.cortarCantidades(totalTep, 12);
-			iva = Calculos.cortarCantidades(ivaTem, 2);
-			if (numProductos > 0) {
-				bw.write("\n");
-				String varios = ddV.getProductoId().getVarios() == 1l ? "V" : " ";
-				bw.write(" (" + varios + ") " + cantidadProducto + "  " + nombreProducto + " " + unidadProducto + "  "
-						+ totalProducto + " " + iva);
-			} else {
-				pagina++;
-				String totalpuntos = Calculos.cortarCantidades(formatea.format(totalXpagina(pagina, tope)), 13);
-				bw.write("\n        " + Calculos.cortarCantidades(formatea.format(getDocumento().getExcento()), 13)
-						+ "         " + Calculos.cortarCantidades(formatea.format(getDocumento().getGravado()), 11)
-						+ "       " + Calculos.cortarCantidades(formatea.format(getDocumento().getIva()), 10) + "    "
-						+ totalpuntos);
-				bw.write("\n");
-				bw.write(" \n      " + formatea.format(getDocumento().getPesoTotal()) + " Kgs");
-				bw.write("\nCONTINUA....\n ");
-				bw.write("\n ");
-				bw.write("\n ");
-				bw.write("\n ");
-				bw.write("\n .");
-				bw.write("                                        \n");
-				bw.write("                                        \n");
-				bw.write("                                                                    "
-						+ getDocumento().getConsecutivoDian() + "\n");
-				bw.write("                                        \n");
-				bw.write("      "
-						+ Calculos.cortarDescripcion(getDocumento().getClienteId().getNombre().toUpperCase(), 22) + " "
-						+ Calculos.cortarDescripcion(dirCliente, 12) + "  "
-						+ Calculos.cortarDescripcion(e.getResolucionDian(), 12) + " "
-						+ Calculos.cortarDescripcion(fhoyIni, 19) + "\n");
-				bw.write("      " + getDocumento().getClienteId().getDocumento() + "                            "
-						+ e.getAutorizacionDesde() + "  " + e.getAutorizacionHasta() + e.getFechaResolucion() + "\n");
-				bw.write("      " + getDocumento().getUsuarioId().getUsuarioId() + " "
-						+ getDocumento().getUsuarioId().getNombre().toUpperCase() + " "
-						+ getDocumento().getUsuarioId().getApellido().toUpperCase());
-				bw.write("\n");
-				bw.write("\n");
-				bw.write("\n");
-				String varios = ddV.getProductoId().getVarios() == 1l ? "V" : " ";
-				bw.write(" (" + varios + ") " + cantidadProducto + "  " + nombreProducto + " " + unidadProducto + "  "
-						+ totalProducto + " " + iva);
-				numProductos = tope;
-			}
-
-			numProductos--;
-		}
-		for (int i = 1; i < numProductos; i++) {
-			bw.write("\n");
-		}
-
-		String totalpuntos = Calculos.cortarCantidades(formatea.format(getDocumento().getTotal()), 13);
-		bw.write("\n\n        " + Calculos.cortarCantidades(formatea.format(getDocumento().getExcento()), 13)
-				+ "         " + Calculos.cortarCantidades(formatea.format(getDocumento().getGravado()), 11) + "       "
-				+ Calculos.cortarCantidades(formatea.format(getDocumento().getIva()), 10) + "   " + totalpuntos);
-		bw.write("\n");
-		bw.write(" \n      " + formatea.format(getDocumento().getPesoTotal()) + " Kgs");
-		bw.write("\n ");
-		bw.write("\n ");
-		bw.write("\n ");
-		bw.write("\n ");
-		bw.write("\n ");
-		bw.write("\n .");
-		bw.close();
-
-		FileInputStream inputStream = null;
-		try {
-			inputStream = new FileInputStream(pdf);
-			log.info(pdf);
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();
-		}
-		if (inputStream == null) {
-			// return;
-		}
-		DocFlavor docFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-		Doc document = new SimpleDoc(inputStream, docFormat, null);
-		PrintRequestAttributeSet attributeSet = new HashPrintRequestAttributeSet();
-		PrintService defaultPrintService = PrintServiceLookup.lookupDefaultPrintService();
-
-		String impresara = impresora(getImpresoras());
-		log.info("impresoraUsuario: " + impresara);
-		PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-		log.info("Number of printers configured: " + printServices.length);
-		for (PrintService printer : printServices) {
-			log.info("Printer:" + printer.getName());
-			if (printer.getName().equals(impresara)) {
-				log.info("Comparacion:" + printer.getName() + ":" + impresara);
-				defaultPrintService = printer;
-			}
-		}
-		if (defaultPrintService != null) {
-			DocPrintJob printJob = defaultPrintService.createPrintJob();
-			try {
-				printJob.print(document, attributeSet);
-
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		} else {
-			log.error("No existen impresoras instaladas");
-		}
-		return pdf;
 	}
 
 	private Double totalXpagina(int pagina, int tope) {
@@ -1749,8 +1564,8 @@ public class PuntoVentaDia implements Serializable {
 		}
 		sessionMap.put("copiaFacuta", copiaFacuta);
 	}
-	
-	public void activarAnularFactura( Map<String, OpcionUsuario> opcionesActivas) {
+
+	public void activarAnularFactura(Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "ANULAR_FACTURA";
 		if (opcionesActivas.containsKey(ruta)) {
 			RequestContext.getCurrentInstance().execute("anularFactura=1;");
@@ -1869,13 +1684,13 @@ public class PuntoVentaDia implements Serializable {
 			RequestContext.getCurrentInstance().execute("activarMultiplesImpresoras=0;");
 		}
 	}
-	
+
 	public void activarImpresionRemota(Map<String, OpcionUsuario> opcionesActivas) {
 		String ruta = "IMPRESION_REMOTA";
-		if (opcionesActivas.containsKey(ruta)) {				
+		if (opcionesActivas.containsKey(ruta)) {
 			activarImpresionRemota = opcionesActivas.get(ruta);
-			log.info("tiene impresion remota: "+getActivarImpresionRemota());	
-			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");		
+			log.info("tiene impresion remota: " + getActivarImpresionRemota());
+			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=1;");
 		} else {
 			activarImpresionRemota = null;
 			RequestContext.getCurrentInstance().execute("activarImpresoraRemota=0;");
@@ -1918,10 +1733,9 @@ public class PuntoVentaDia implements Serializable {
 		setUnidad(null);
 		setProductosAllCodigo(null);
 		setClientesAll(null);
-		
-		
+
 		RequestContext.getCurrentInstance()
-		.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
+				.execute("document.getElementById('borrarTabla:checkboxDT').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('confir').style.display='none';");
 		RequestContext.getCurrentInstance().execute("document.getElementById('nombreCliente_input').value='';");
 		RequestContext.getCurrentInstance().update("cod_1");
@@ -2021,16 +1835,18 @@ public class PuntoVentaDia implements Serializable {
 		String imp = e.getImpresion().toUpperCase();
 		List<Long> gruposId = new ArrayList<>();
 		for (DocumentoDetalleVo ddvo : getProductos()) {
-			Boolean contieneGrupo = ddvo.getProductoId().getGrupoId()!=null && !gruposId.contains(ddvo.getProductoId().getGrupoId().getGrupoId());
+			Boolean contieneGrupo = ddvo.getProductoId().getGrupoId() != null
+					&& !gruposId.contains(ddvo.getProductoId().getGrupoId().getGrupoId());
 			Integer productoImpreso = ddvo.getDocumentoDetalleId().getImpresoComanda() == null ? 0
 					: ddvo.getDocumentoDetalleId().getImpresoComanda();
 			if (contieneGrupo && productoImpreso == 0) {
 				gruposId.add(ddvo.getProductoId().getGrupoId().getGrupoId());
 			}
 		}
-		if(gruposId.isEmpty()) {
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("los productos no tienen grupos definidos"));
-			//return;
+		if (gruposId.isEmpty()) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage("los productos no tienen grupos definidos"));
+			// return;
 		}
 		for (Long g : gruposId) {
 			Grupo g2 = grupoService.getById(g);
@@ -2041,8 +1857,8 @@ public class PuntoVentaDia implements Serializable {
 			case "BIG":
 				log.info("no se imprime comandas en big");
 				break;
-			case "PDF":				
-				setProductos(Impresion.comandaPDF(getDocumento(),g2,g, getProductos(),impresora, configuracion));
+			case "PDF":
+				setProductos(Impresion.comandaPDF(getDocumento(), g2, g, getProductos(), impresora, configuracion));
 				for (DocumentoDetalleVo ddvo2 : getProductos()) {
 					DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
 					documentoDetalleService.update(edict, 1l);
@@ -2054,12 +1870,13 @@ public class PuntoVentaDia implements Serializable {
 				break;
 			case "SMALL_PDF":
 				log.info("inicio imprime comandas en small_pdf");
-				setProductos(Impresion.comandaPDFSmall(getDocumento(),g2,g, getProductos(),impresora, configuracion));
+				setProductos(
+						Impresion.comandaPDFSmall(getDocumento(), g2, g, getProductos(), impresora, configuracion));
 				for (DocumentoDetalleVo ddvo2 : getProductos()) {
 					DocumentoDetalle edict = ddvo2.getDocumentoDetalleId();
 					documentoDetalleService.update(edict, 1l);
 				}
-			    log.info("fin imprime comandas en small_pdf");
+				log.info("fin imprime comandas en small_pdf");
 
 				break;
 			default:
@@ -2340,7 +2157,7 @@ public class PuntoVentaDia implements Serializable {
 			log.error("error en lista");
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public void recalcularPrecio() {
@@ -2493,6 +2310,7 @@ public class PuntoVentaDia implements Serializable {
 		TipoDocumento td = new TipoDocumento();
 		Invoice invoice = new Invoice();
 		Long server = 1l;
+		invoice.setInvoiceId(1l);
 		if (getTipoDocumentoFactura() != null && !getTipoDocumentoFactura().equals("")) {
 			switch (getTipoDocumentoFactura().toUpperCase()) {
 			case "F":
@@ -2502,7 +2320,7 @@ public class PuntoVentaDia implements Serializable {
 				setTipoDocumentoFacturaNombre("Factura de venta");
 				server = 1l;
 				// se deja factura sin enviar por defecto para facturacion electronica
-				invoice.setInvoiceId(1l);
+				
 				break;
 			case "R":
 				log.info("tipo documento igual a factura de venta con remision");
@@ -2696,7 +2514,7 @@ public class PuntoVentaDia implements Serializable {
 						new FacesMessage("El cliente con el documento " + getDocumentoClienteNew() + " ya existe"));
 				return;
 			}
-			
+
 			RequestContext.getCurrentInstance().execute("revisar3();");
 			log.info("crear cliente desde punto de venta");
 			RequestContext.getCurrentInstance().execute("PF('nuevoCliente').hide();");
@@ -2784,7 +2602,7 @@ public class PuntoVentaDia implements Serializable {
 		setEmpresaNew(null);
 		setNombreClienteNew(null);
 		setRetencionClienteNew(null);
-		
+
 	}
 
 	public String getCodigoBarras() {
@@ -3301,8 +3119,6 @@ public class PuntoVentaDia implements Serializable {
 	public void setCopiaFacuta(OpcionUsuario copiaFacuta) {
 		this.copiaFacuta = copiaFacuta;
 	}
-	
-	
 
 	public String getAnularFacuta() {
 		return anularFacuta == null ? "none" : "inline";
@@ -3369,29 +3185,31 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public String getActivarImpresionRemota() {
-		return activarImpresionRemota== null ? "false" : "true";
+		return activarImpresionRemota == null ? "false" : "true";
 	}
 
 	public void setActivarImpresionRemota(OpcionUsuario activarImpresionRemota) {
 		this.activarImpresionRemota = activarImpresionRemota;
 	}
-	
+
 	public Lista getLista() {
 		try {
-			lista=listaService.getByProductoId(productoSelect.getProductoId()==null?0l:productoSelect.getProductoId());
+			lista = listaService
+					.getByProductoId(productoSelect.getProductoId() == null ? 0l : productoSelect.getProductoId());
 			return lista;
 		} catch (Exception e) {
 			return new Lista();
-		}		
+		}
 	}
-	
+
 	public String getLista2(String producto) {
-		lista=listaService.getByProductoId(Long.valueOf(producto.equals("")?"0":producto));
-		if(lista==null) {
+		lista = listaService.getByProductoId(Long.valueOf(producto.equals("") ? "0" : producto));
+		if (lista == null) {
 			return "no hay listas configuradas";
 		}
-		return "L1:"+lista.getLista1()+"| L2:"+lista.getLista2()+"| L3:"+lista.getLista3()+"| L4:"+lista.getLista4();
-	} 
+		return "L1:" + lista.getLista1() + "| L2:" + lista.getLista2() + "| L3:" + lista.getLista3() + "| L4:"
+				+ lista.getLista4();
+	}
 
 	public void setLista(Lista lista) {
 		this.lista = lista;
@@ -3420,5 +3238,12 @@ public class PuntoVentaDia implements Serializable {
 	public void setCheckout(Date checkout) {
 		this.checkout = checkout;
 	}
-		
+
+	public String getTipoPago() {
+		return tipoPago;
+	}
+
+	public void setTipoPago(String tipoPago) {
+		this.tipoPago = tipoPago;
+	}
 }

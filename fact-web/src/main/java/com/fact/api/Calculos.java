@@ -264,7 +264,7 @@ public class Calculos {
 			} else {
 				temp = costoPublico;
 				//no suma el excento si es producto retencion
-				if( productoId!=6l) {
+				if( productoId!=6l && productoId!=7l) {
 					exectoReal += temp;
 				}else {
 					retencion+= temp;

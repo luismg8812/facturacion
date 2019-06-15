@@ -1102,7 +1102,7 @@ public class Impresion {
 		fntSize = 6f;
 		lineSpacing = 10f;
 		PdfWriter.getInstance(documento, archivo);
-		documento.setMargins(9, 1, 1, 1);
+		documento.setMargins(3, 1, 1, 1);
 		documento.open();
 		documento.add(new Paragraph(new Phrase(lineSpacing, LINEA))); // REPRESENTANTE
 		documento.add(imagen); // LEGAL
@@ -1909,16 +1909,21 @@ public class Impresion {
 		documento.add(new Paragraph(new Phrase(lineSpacing, "TELEFONO: "
 				+ (documentoImp.getClienteId().getCelular() == null ? "" : documentoImp.getClienteId().getCelular()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize))));
+		String ciudad ;
+		if(documentoImp.getClienteId()==null || documentoImp.getClienteId().getCiudadId()==null || documentoImp.getClienteId().getCiudadId().getNombre()==null) {
+			ciudad="";
+		}else {
+			ciudad = documentoImp.getClienteId().getCiudadId().getNombre();
+		}
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"CIUDAD: " + (documentoImp.getClienteId().getCiudadId() == null ? ""
-						: documentoImp.getClienteId().getCiudadId().getNombre()),
+				"CIUDAD: " + ciudad,
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize))));
 		documento.add(new Paragraph(new Phrase(lineSpacing,
-				"MAIL: " + (documentoImp.getClienteId() == null ? "" : documentoImp.getClienteId().getMail()),
+				"MAIL: " + (documentoImp.getClienteId().getMail() == null ? "" : documentoImp.getClienteId().getMail()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 		documento.add(new Paragraph(new Phrase(lineSpacing,
 				"NOMBRE HUÉSPED: "
-						+ (documentoImp.getClienteId() == null ? "VARIOS" : documentoImp.getClienteId().getNombre()),
+						+ (documentoImp.getClienteId().getNombre() == null ? "VARIOS" : documentoImp.getClienteId().getNombre()),
 				FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 		if (documentoImp.getEmpleadoId() != null) {
 			documento.add(new Paragraph(new Phrase(lineSpacing, "MESERO: " + documentoImp.getEmpleadoId().getNombre(),
@@ -2022,8 +2027,9 @@ public class Impresion {
 				new Paragraph(new Phrase(lineSpacing, "Vr. Pago con Tarjeta:   " + Calculos.cortarCantidades(pago, 13),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
+		
 		documento.add(new Paragraph(
-				new Phrase(lineSpacing, "Vr. Pago con consignación:    " + Calculos.cortarCantidades(0.0, 13),
+				new Phrase(lineSpacing, "Vr. Pago con "+documentoImp.getTipoPagoId().getNombre()+": " + Calculos.cortarCantidades(documentoImp.getTotal(), 13),
 						FontFactory.getFont(FontFactory.COURIER_BOLD, fntSize)))); // REPRESENTANTE
 																					// LEGAL
 		documento.add(new Paragraph(new Phrase(lineSpacing,

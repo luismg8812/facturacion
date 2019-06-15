@@ -27,6 +27,7 @@ public class Producto {
 	private Long productoId;
 	
 	@ManyToOne
+	
 	@JoinColumn(name="GRUPO_ID")
 	private Grupo grupoId;
 	

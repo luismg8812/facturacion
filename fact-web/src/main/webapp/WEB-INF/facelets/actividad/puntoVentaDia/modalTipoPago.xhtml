@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	function limpiarTipopago(){
+		document.getElementById('tipoPagoForm:tipo_pago_input_input').value='';
+	}
+	</script>
+	<h:form id="tipoPagoForm">
+	<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Digite el número del tipo de pago deseado." /></td>
+			</tr>
+			<c:forEach items="#{exportarDelta.tipoPagos}" var="tipo">
+				<tr>
+					<td><p:outputLabel value="#{tipo.tipoPagoId}. #{tipo.nombre}" /></td>
+				</tr>
+			</c:forEach>
+			<tr>
+				<td>
+				
+				<p:inputNumber value="#{puntoVentaDia.tipoPago}" size="10" onfocus="limpiarTipopago" 
+						id="tipo_pago_input">
+						<p:focus  />
+						<p:ajax event="click" partialSubmit="true" 
+							listener="#{puntoVentaDia.limpiarTipoPago}" update="growl1" />
+						<p:ajax event="keyup" partialSubmit="true" 
+							listener="#{puntoVentaDia.asignarTipoPago}" update="growl1" />
+					</p:inputNumber></td>
+			</tr>
+		</table>
+	</h:form>
+
+
+</ui:composition>

@@ -277,6 +277,7 @@ public class Abonos implements Serializable {
 	}
 
 	public void consultarAbonos(Documento docu) {
+		setDocumentoSelect(docu);
 		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()));
 		RequestContext.getCurrentInstance().execute("PF('consultarAbono').show();");
 

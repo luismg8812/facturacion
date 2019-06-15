@@ -409,7 +409,7 @@ public class BorrarFacturas implements Serializable {
 				base19tem+=d.getBase19();
 			}
 			if(d.getIva19()!=null) {
-				iva19tem+=d.getIva();
+				iva19tem+=d.getIva19();
 			}
 			if(d.getIva5()!=null) {
 				iva5tem+=d.getIva5();

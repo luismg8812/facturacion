@@ -844,7 +844,9 @@ public class MovimientoMes implements Serializable {
 		setRetefuente(getDocumentoActual().getRetefuente());
 		setTipoDocumentoEntrada(getDocumentoActual().getTipoDocumentoId().getNombre());
 		RequestContext.getCurrentInstance()
-				.execute("document.getElementById('dataList_content').style.display='inline';");
+				.execute("document.getElementById('fechaDoc').style.display='inline';");
+		RequestContext.getCurrentInstance()
+		.execute("document.getElementById('dataList_content').style.display='inline';");
 		RequestContext.getCurrentInstance().execute(MOSTRAR_LA_LISTA);
 		RequestContext.getCurrentInstance().update("cod_");
 		RequestContext.getCurrentInstance().update("nombc");
@@ -858,6 +860,8 @@ public class MovimientoMes implements Serializable {
 		RequestContext.getCurrentInstance().update("gravadoFact");
 		RequestContext.getCurrentInstance().update("retefuentelFact");
 		RequestContext.getCurrentInstance().update("unidad_");
+		RequestContext.getCurrentInstance().update("fechaDoc");
+		
 	}
 	
 	public void recalcularPrecio(DocumentoDetalleVo d) {
@@ -1100,13 +1104,25 @@ public class MovimientoMes implements Serializable {
 		setProductosAll(null);
 		setVariosNew(null);
 	}
+	
+	public void enviarCartera() {
+		if (getDocumento()==null ||getDocumento().getDocumentoId() == null ) {		
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Deve seleccionar un documento"));
+			return ;
+		}
+	   Documento docu = documentoService.getByConsecutivoDian(""+getDocumento().getDocumentoId());
+	   if(docu!=null && docu.getTipoDocumentoId().getTipoDocumentoId()==8l) {
+		   FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("El documento ya se encuentra en cartera"));
+	   }else {
+		   crearVale();
+	   }
+	}
 
 	public String imprimirFactura() throws IOException, DocumentException, PrinterException, PrintException {
 		if (getDocumento().getDocumentoId() == null || getImpresion()==null ||getImpresion().equalsIgnoreCase("n")) {
 			RequestContext.getCurrentInstance().execute("PF('imprimirMM').hide();");
 			return "";
-		}
-		
+		}		
 		log.info("entra a imprimir entrada almacen");
 		Configuracion configuracion = configuracion();
 		int numeroImpresiones = configuracion.getNumImpresion();
@@ -1137,6 +1153,7 @@ public class MovimientoMes implements Serializable {
 														// a// credito se//
 														// imprime dos veces
 			setProductos(Calculos.ordenar(getProductos()));
+			log.info(imp);
 			switch (imp) {
 			case "TXT":
 				pathFactura=Impresion.imprimirEntadaAlmacenTXT(getDocumento(), getProductos(), configuracion, impresora, e);
@@ -1193,7 +1210,7 @@ public class MovimientoMes implements Serializable {
 		TipoPago pago = new TipoPago();
 		Usuario usuario = usuario();
 		long server = 1;
-		docu.setFechaRegistro(new Date());
+		docu.setFechaRegistro(getDocumento().getFechaRegistro());
 		docu.setProveedorId(getDocumento().getProveedorId());
 		docu.setRetefuente(getDocumento().getRetefuente());
 		docu.setClienteId(getDocumento().getClienteId());
@@ -1275,6 +1292,21 @@ public class MovimientoMes implements Serializable {
 		}
 		// colocar una variable para saber si esta modificando factura,
 	}
+	
+	public void signarFechaDocumento() {
+		if(getDocumento() != null) {
+			try {
+				getDocumento().setFechaRegistro(getFechaCreacion());
+				log.info("se asigna fecha "+getFechaCreacion()+" al documento: "+getDocumento().getDocumentoId());
+				documentoService.update(getDocumento(), 1l);
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Fecha editada exitosamente"));
+			} catch (Exception e) {
+				e.printStackTrace();
+				log.error("error cambiando fecha a la entrada");
+			}
+			
+		}
+	}
 
 	public void borrarFactura() {
 		claveBorradoActivo = (OpcionUsuario) sessionMap.get("claveBorradoActivo");
@@ -1327,7 +1359,13 @@ public class MovimientoMes implements Serializable {
 			documentoDetalleService.borrar(d.getDocumentoDetalleId().getDocumentoDetalleId(), 0l, server);
 			ProductoEmpresa productoEmpresa = productoEmpresaService.getByProductoAndEmpresa(getEmpresa(),
 					d.getProductoId().getProductoId());
-			Double cantidad1 = productoEmpresa.getCantidad() - d.getCantidad();
+			Double cantidad1;
+			if(getDocumento().getTipoDocumentoId().getTipoDocumentoId()==6) {
+				cantidad1 = productoEmpresa.getCantidad() + d.getCantidad();
+			}else {
+				cantidad1 = productoEmpresa.getCantidad() - d.getCantidad();
+			}
+			 
 			productoEmpresa.setCantidad(cantidad1);
 			productoEmpresaService.update(productoEmpresa);
 

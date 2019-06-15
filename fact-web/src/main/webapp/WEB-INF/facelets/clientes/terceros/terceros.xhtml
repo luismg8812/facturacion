@@ -47,7 +47,13 @@
 			<p:column headerText="Proveedor">
 				<h:outputText value="#{docu.proveedorId.nombre}" />
 			</p:column>
-
+			<p:column headerText="Nit/CC proveedor">
+				<h:outputText value="#{docu.proveedorId.documento}" />
+			</p:column>
+			<p:column headerText="Nit/CC cliente">
+				<h:outputText value="#{docu.clienteId.documento}" />
+			</p:column>
+			
 			<p:column headerText="Total compras">
 				<h:outputText value="#{docu.totalCompras}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />

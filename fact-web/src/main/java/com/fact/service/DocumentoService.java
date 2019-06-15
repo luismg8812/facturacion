@@ -55,4 +55,5 @@ public interface DocumentoService {
 	ConsecutivoDian getConsecutivoDian();
 	void update(ConsecutivoDian consecutivoDian);
 	List<Documento> getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin);
+	Documento getByDetalleEntrada(String detalleEntrada);
 }

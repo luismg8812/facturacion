@@ -126,6 +126,7 @@ public class Proveedores implements Serializable {
 			proveedor.setBaseRetencion(getRetencion());
 			proveedorService.update(proveedor);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Proveedor Editado exitosamente"));
+			setProveedores(null);
 		}
 		return "";		
 	}

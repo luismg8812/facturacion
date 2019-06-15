@@ -253,14 +253,16 @@
 					</f:facet>
 				</p:cellEditor>
 			</p:column>
-			<p:column headerText="Activo" style="text-align: center" >
+			<p:column headerText="Por mayor" style="text-align: center">
 				<p:cellEditor>
 					<f:facet name="output">
-						<h:outputText value="#{inv.activo}" style="width:100%" />
+						<h:outputText value="#{inv.porMayor}" style="width:100%" >
+							<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
+						</h:outputText>
 					</f:facet>
 					<f:facet name="input">
-						<p:inputText value="#{inv.activo}" style="width:96%"
-							label="Nombre producto" maxlength="1" />
+						<p:inputText value="#{inv.porMayor}" style="width:96%"
+							label="Por mayor" maxlength="15" />
 					</f:facet>
 				</p:cellEditor>
 			</p:column>

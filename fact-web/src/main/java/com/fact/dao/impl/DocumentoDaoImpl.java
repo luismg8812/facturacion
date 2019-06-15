@@ -264,7 +264,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			if (detalle != null && !detalle.isEmpty()) {
 				sql += " and (d.detalleEntrada =:detalle )";
 			}
-			sql+=" and d.detalleEntrada in ( select d2.consecutivoDian from Documento d2 where d2.tipoDocumentoId.tipoDocumentoId = 2)";
+			sql+=" and to_number(d.consecutivoDian,'99G999D9S') in ( select d2.documentoId from Documento d2 where d2.tipoDocumentoId.tipoDocumentoId = 2)";
 			Query query = session.createQuery(sql);
 			query.setParameter("factura", factura);
 			if (proveedorId != null && proveedorId != 0l) {
@@ -946,6 +946,22 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			}
 		}
 		return documentoList;
+	}
+
+	@Override
+	public Documento getByDetalleEntrada(String detalleEntrada) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<Documento> documentoList = new ArrayList<>();
+		try {
+			String sql = "select d from Documento d where d.detalleEntrada = :detalleEntrada ";
+			Query query = session.createQuery(sql);
+			query.setParameter("detalleEntrada", detalleEntrada);
+			documentoList = query.list();
+			session.close();
+		} catch (FactException e) {
+			throw e;
+		}
+		return documentoList.isEmpty() ? null : documentoList.get(0);
 	}
 
 }

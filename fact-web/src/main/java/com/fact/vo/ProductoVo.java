@@ -22,7 +22,16 @@ public class ProductoVo {
 	Double PublicoSugerida;
 	Double utilidadReal;
 	Double diferencia;
+	Double porMayor;
 	
+	
+	
+	public Double getPorMayor() {
+		return porMayor;
+	}
+	public void setPorMayor(Double porMayor) {
+		this.porMayor = porMayor;
+	}
 	public Double getCosto() {
 		return costo;
 	}

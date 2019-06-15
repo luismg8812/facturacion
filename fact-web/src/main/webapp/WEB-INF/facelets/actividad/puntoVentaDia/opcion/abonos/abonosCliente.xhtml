@@ -5,7 +5,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:c="http://java.sun.com/jstl/core">
-	
+
 	<script type="text/javascript">
 	function showDialogoVale(){
 		console.log("showDialogoVale");
@@ -45,64 +45,67 @@
 				<td><p:commandButton value="Buscar" process="@form"
 						update="@form" id="buscar"
 						actionListener="#{abonos.buscarAbonosCliente}" /> <p:commandButton
-						value="Salir" onclick="PF('bonos').hide();" /> </td>
+						value="Salir" onclick="PF('bonos').hide();" /> <h:commandLink
+						value="Exportar">
+						<p:dataExporter type="xls" target="documentosCliente"
+							fileName="CarteraClientes" />
+					</h:commandLink></td>
 			</tr>
 		</table>
-		<p:dataTable id="documentosCliente" var="docu"
-			 selectionMode="single"  rowKey="#{docu.documentoId}"
-			value="#{abonos.documentosCliente}" style="font-size: 9px"
-			scrollable="true" scrollHeight="220"
+		<p:dataTable id="documentosCliente" var="docu" selectionMode="single"
+			rowKey="#{docu.documentoId}" value="#{abonos.documentosCliente}"
+			style="font-size: 9px" scrollable="true" scrollHeight="220"
 			emptyMessage="No hay facturas disponibles para El Cliente seleccionado">
 			<f:facet name="header">
             Facturas
         </f:facet>
-        <p:ajax event="rowSelect" listener="#{abonos.abrirPopupAbonoCliente}" update="@form" />
-			<p:column headerText="Opción">
+			<p:ajax event="rowSelect" listener="#{abonos.abrirPopupAbonoCliente}"
+				update="@form" />
+			<p:column headerText="Opción" exportable="false">
 				<p:commandButton value="Detalle"
-					action="#{abonos.consultarAbonosCliente(docu)}" />			
+					action="#{abonos.consultarAbonosCliente(docu)}" />
 				<br />
-				
+
 
 			</p:column>
-			<p:column headerText="No. Documento">
-				<h:outputText value="#{docu.detalleEntrada}" />
+			<p:column headerText="No. Documento" exportable="true">
+				<h:outputText value="#{docu.consecutivoDian}" />
 			</p:column>
-			<p:column headerText="Valor">
-				<h:outputText value="#{docu.total}" >
+			<p:column headerText="Valor" exportable="true">
+				<h:outputText value="#{docu.total}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Saldo">
-				<h:outputText value="#{docu.saldo}" > 
+			<p:column headerText="Saldo" exportable="true">
+				<h:outputText value="#{docu.saldo}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="No. Abonos">
+			<p:column headerText="No. Abonos" exportable="true">
 				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
 			</p:column>
 
 		</p:dataTable>
-		<p:blockUI block="abonos123"
-			trigger="abonos123:buscar">
+		<p:blockUI block="abonos123" trigger="abonos123:buscar">
 					CARGANDO<br />
 			<p:graphicImage url="/images/bloqBar.gif" />
 		</p:blockUI>
 
 		<p:panelGrid columns="1" layout="grid" id="crearAbonoCliente">
-			
-				<ui:include
-					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
-			
+
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/crearAbono.xhtml" />
+
 		</p:panelGrid>
-		
+
 	</h:form>
-	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos" width="400px"
-			closeOnEscape="true" showEffect="fade" resizable="false">
-			<div>
-				<ui:include
-					src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
-			</div>
-		</p:dialog>
+	<p:dialog widgetVar="consultarAbonoCliente" header="Consultar Abonos"
+		width="400px" closeOnEscape="true" showEffect="fade" resizable="false">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/abonos/consultarAbonos.xhtml" />
+		</div>
+	</p:dialog>
 
 
 </ui:composition>

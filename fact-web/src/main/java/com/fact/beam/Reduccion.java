@@ -187,7 +187,7 @@ public class Reduccion implements Serializable {
 				break;
 
 			default:
-				imprimirInfoPDF(id, exportar);
+				ruta =imprimirInfoPDF(id, exportar);
 				break;
 			}
 		}
@@ -985,7 +985,7 @@ public class Reduccion implements Serializable {
 			document.close();
 		}
 
-		return carpeta + pdf + ";pdf";
+		return carpeta + pdf ;
 	}
 
 	public void guardar() {
@@ -1370,10 +1370,7 @@ public class Reduccion implements Serializable {
 	public StreamedContent getFileXls(InfoDiario info)
 			throws DocumentException, IOException, PrinterException, ParseException {
 		StreamedContent file = null;
-		String ruta = imprimirinforme(info, "true");
-		String[] parts = ruta.split(";");
-		ruta = parts[0];
-		String estencion = parts[1];
+		String ruta = imprimirinforme(info, "true");	
 		File f = new File(ruta);
 		InputStream stream = new FileInputStream(f);
 		if (stream != null) {

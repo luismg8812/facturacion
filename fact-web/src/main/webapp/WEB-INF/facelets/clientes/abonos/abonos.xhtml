@@ -52,18 +52,22 @@
 						onclick="PF('abonos2').hide();" value="Salir" /> <p:commandButton
 						value="Crear Documento" title="Crear Documento"
 						update="crearDocument" onclick="PF('crearDocumento').show();" />
-				</td>
+				
+				<h:commandLink value="Exportar">
+						<p:dataExporter type="xls" target="documentos" fileName="CarteraProveedores" />
+					</h:commandLink></td>
+
 			</tr>
 		</table>
 		<p:dataTable id="documentos" var="docu" value="#{abonos.documentos}"
 			rows="5" paginator="true"
 			paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			rowsPerPageTemplate="5,10,15"
+			rowsPerPageTemplate="10,50,100"
 			emptyMessage="No hay facturas disponibles para El proveedor seleccionado">
 			<f:facet name="header">
             Documentos
         </f:facet>
-			<p:column style="width:10%;text-align: center">
+			<p:column style="width:10%;text-align: center" exportable="false">
 
 				<p:commandButton icon="ui-icon-search" title="View"
 					action="#{abonos.consultarAbonos(docu)}" update="consultar">
@@ -74,34 +78,34 @@
 
 				</p:commandButton>
 			</p:column>
-			<p:column headerText="Detalle">
+			<p:column headerText="Detalle" exportable="true" >
 				<h:outputText value="#{docu.detalleEntrada}" />
 			</p:column>
-			<p:column headerText="Id Relacionado">
+			<p:column headerText="Id Relacionado" exportable="true">
 				<h:outputText value="#{docu.consecutivoDian}" />
 			</p:column>
-			<p:column headerText="Valor">
+			<p:column headerText="Valor" exportable="true">
 				<h:outputText value="#{docu.total}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Retención">
+			<p:column headerText="Retención" exportable="true">
 				<h:outputText value="#{docu.retefuente}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="Saldo">
+			<p:column headerText="Saldo" exportable="true">
 				<h:outputText value="#{docu.saldo}">
 					<f:convertNumber pattern="¤#,##0" currencySymbol="$" />
 				</h:outputText>
 			</p:column>
-			<p:column headerText="No. Abonos">
+			<p:column headerText="No. Abonos" exportable="true">
 				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
 			</p:column>
-			<p:column headerText="Proveedor">
+			<p:column headerText="Proveedor" exportable="true">
 				<h:outputText value="#{docu.proveedorId.nombre}" />
 			</p:column>
-			<p:column headerText="Fecha">
+			<p:column headerText="Fecha" exportable="true">
 				<h:outputText value="#{docu.fechaRegistro}" />
 			</p:column>
 		</p:dataTable>
@@ -131,8 +135,8 @@
 			<ui:include src="/WEB-INF/facelets/clientes/abonos/crearAbono.xhtml" />
 		</div>
 	</p:dialog>
-	<p:dialog widgetVar="consultarAbono" header="Consultar Abonos" width="70%"
-		closeOnEscape="true" showEffect="fade" resizable="false">
+	<p:dialog widgetVar="consultarAbono" header="Consultar Abonos"
+		width="70%" closeOnEscape="true" showEffect="fade" resizable="false">
 		<div>
 			<ui:include
 				src="/WEB-INF/facelets/clientes/abonos/consultarAbonos.xhtml" />

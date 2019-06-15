@@ -43,7 +43,9 @@ public class ClienteConverter  implements Converter{
 	        	p.setFijo(parts1[11].trim().equals("")?"0":parts1[11].trim());
 	        	p.setClienteId(Long.valueOf(parts1[12].trim()));
 	        	p.setGuiaTransporte(Long.valueOf(parts1[13].trim().equals("")?"0":parts1[13].trim()));
-	        	p.setRetencion(Double.valueOf(parts1[14].replace("]", "").trim().equals("")?"0":parts1[14].replace("]", "").trim()));
+	        	p.setMail(parts1[14].trim());
+	        	p.setEmpresa(parts1[15].trim());
+	        	p.setRetencion(Double.valueOf(parts1[16].replace("]", "").trim().equals("")?"0":parts1[16].replace("]", "").trim()));
 	        	return p;
 	        }	       
 	        return null;
@@ -67,6 +69,8 @@ public class ClienteConverter  implements Converter{
 	        	pNew.add(p.getFijo()==null?"":p.getFijo().toString());
 	        	pNew.add(p.getClienteId()==null?"":p.getClienteId().toString());
 	        	pNew.add(p.getGuiaTransporte()==null?"":p.getGuiaTransporte().toString());
+	        	pNew.add(p.getMail()==null?"":p.getMail());
+	        	pNew.add(p.getEmpresa()==null?"":p.getEmpresa());
 	        	pNew.add(p.getRetencion()==null?"":p.getRetencion().toString());       	
 	        	
 	        	return pNew.toString();

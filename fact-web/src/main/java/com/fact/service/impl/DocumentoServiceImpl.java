@@ -234,4 +234,9 @@ public class DocumentoServiceImpl implements DocumentoService{
 		return documentoDao.getconvinacion(tipodocumentoId,tipoPago,fechaInicio,fechafin) ;
 	}
 
+	@Override
+	public Documento getByDetalleEntrada(String detalleEntrada) {
+		return documentoDao.getByDetalleEntrada(detalleEntrada) ;
+	}
+
 }

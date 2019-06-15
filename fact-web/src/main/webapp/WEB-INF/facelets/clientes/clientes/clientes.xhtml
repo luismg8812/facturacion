@@ -22,7 +22,7 @@
 						<td><p:outputLabel value="Nombre:" /></td>
 						<td><p:inputText value="#{clientes.nombre}"/></td>
 						<td><p:outputLabel value="Documento: " /></td>
-						<td><p:inputNumber value="#{clientes.documento}" /></td>
+						<td><p:inputText value="#{clientes.documento}" /></td>
 						<td><p:outputLabel value="Departamento " /></td>
 						<td><p:selectOneMenu value="#{clientes.departamento}"  >
 								<p:ajax event="change" listener="#{clientes.ciudadByDepartamento}" update="ciudad"/> 

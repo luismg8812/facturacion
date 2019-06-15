@@ -50,6 +50,9 @@
 			document.getElementById('movMesForm:Sig_movi_mes').click();
 			//alert("tecla s")		movimiento mes		
 		}
+		if(e.keyCode==84){
+			document.getElementById('movMesForm:Sig_movi_mes').click();	
+			}
 	}	
 	
 	   function selectTipoDoc(e){
@@ -237,10 +240,12 @@ items {
 						value="#{movimientoMes.documento.documentoId}" id="codig" /></td>
 
 				<td><p:outputLabel value="Fecha: " /></td>
-				<td><p:outputLabel value=" #{movimientoMes.fechaCreacion}"
-						id="fechaDoc">
-						<f:convertDateTime type="date" pattern="dd-MM-yyyy" />
-					</p:outputLabel></td>
+				<td><p:calendar id="fechaDoc" style="font-size: 13px;display:none" 
+						value="#{movimientoMes.fechaCreacion}"  size="10" pattern="dd-MM-yyyy"
+						mask="true" >
+						<p:ajax event="dateSelect" partialSubmit="true" listener="#{movimientoMes.signarFechaDocumento}" update="growl"></p:ajax>
+						</p:calendar>
+				</td>
 
 				<td><p:outputLabel value="Codigo: " /></td>
 				<td><p:outputLabel value="#{movimientoMes.codigoProveedor}"
@@ -304,7 +309,8 @@ items {
 							id="Ult_movi_mes" onkeydown="controlTeclasMM(event,this)"
 							actionListener="#{movimientoMes.buscarUltimaFactura()}"
 							update="growl" /> <p:commandButton value="Bus" id="Bus_movi_mes" onclick="PF('buscarMM').show();" />
-						<p:commandButton value="..." id="P1_movi_mes" /> <p:commandButton
+						<p:commandButton value="Car" id="P1_movi_mes" actionListener="#{movimientoMes.enviarCartera()}" 
+							update="growl"/> <p:commandButton
 							value="Mod" id="Mod_movi_mes"
 							onkeydown="poput(event,this),controlTeclasMM(event,this)"
 							actionListener="#{movimientoMes.modificarUltimaFactura()}" /> <p:commandButton

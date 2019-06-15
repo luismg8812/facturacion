@@ -90,7 +90,7 @@ public class ProductoConverter  implements Converter{
 	        	List<String> pNew = new ArrayList<>();
 	        	pNew.add(p.getCodigoInterno()==null?"":p.getCodigoInterno());
 	        	pNew.add(p.getMarcaId()==null?"":p.getMarcaId().getMarcaId().toString());
-	        	pNew.add(p.getNombre()==null?"":p.getNombre().trim());
+	        	pNew.add(p.getNombre()==null?"":p.getNombre().trim().replace(",", ""));
 	        	pNew.add(p.getUnidad()==null?"":p.getUnidad());
 	        	pNew.add(p.getBalanza()==null?"":p.getBalanza().toString());
 	        	pNew.add(p.getCantidad()==null?"":p.getCantidad().toString());
