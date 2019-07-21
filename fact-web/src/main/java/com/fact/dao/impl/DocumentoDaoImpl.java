@@ -386,13 +386,13 @@ public class DocumentoDaoImpl implements DocumentoDao {
 		Long factura = tipoDocumento==0?10l:tipoDocumento;
 		try {
 			
-			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId = :factura "
-					 + " and consecutivoDian is not null";
+			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId = :factura ";
+					 //+ " and consecutivoDian is not null";
 			if (usuarioSelect != null && usuarioSelect != 0l) {
 				sql += " and d.usuarioId.usuarioId =:usuarioId ";
 			}
 			if(factura==10l) {
-				sql+= " and d.impreso = 1 ";
+				sql+= " and d.impreso = 1  and consecutivoDian is not null";
 			}
 			if (clienteId != null && clienteId != 0l) {
 				sql += " and d.clienteId.clienteId = :clienteId ";
