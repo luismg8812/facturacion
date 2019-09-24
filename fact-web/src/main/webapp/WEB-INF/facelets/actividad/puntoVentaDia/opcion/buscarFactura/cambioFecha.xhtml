@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+		</script>
+
+	<h:form>
+		<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Nueva Fecha: " /></td>
+				<td><p:calendar id="fechaInicial"
+						value="#{borrarFacturas.fechaNew}" pattern="dd-MM-yyyy" mask="true" /></td>
+						<td><p:commandButton value=" Guardar"
+					action="#{borrarFacturas.guardarCambioFecha}"
+					update="consultarDetalle" /></td>
+			</tr>
+		</table>
+	</h:form>
+
+</ui:composition>

@@ -138,6 +138,9 @@ public class Documento {
 	@Column(name="TOTAL_COSTO")
 	private Double totalCosto;
 	
+	@Column(name="IMPRESORA")
+	private Long impresora;
+	
 	public Long getDocumentoId() {
 		return documentoId;
 	}
@@ -427,6 +430,16 @@ public class Documento {
 	public void setAnulado(Long anulado) {
 		this.anulado = anulado;
 	}
+
+	public Long getImpresora() {
+		return impresora;
+	}
+
+	public void setImpresora(Long impresora) {
+		this.impresora = impresora;
+	}
+	
+	
 
 	
 }

@@ -118,6 +118,9 @@
 				<p:commandButton icon="ui-icon-trash" title="Anular factura"
 					style="display:#{puntoVentaDia.anularFacuta}" update="growl1"
 					action="#{borrarFacturas.anularFactura(docu)}" />
+				<p:commandButton icon="ui-icon-trash1" title="Cambiar fecha"
+					style="display:#{puntoVentaDia.anularFacuta}" update="growl1"
+					action="#{borrarFacturas.cambiarfechaPopup(docu)}" />
 			</p:column>
 			<p:column headerText="No. Documento">
 				<h:outputText value="#{docu.consecutivoDian}" />
@@ -187,6 +190,13 @@
 		<div>
 			<ui:include
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/buscarFactura/consultarDetalle.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="cambioFecha" header="Cambiar fecha documento"
+		width="350px" closeOnEscape="true" showEffect="fade" resizable="true">
+		<div>
+			<ui:include
+				src="/WEB-INF/facelets/actividad/puntoVentaDia/opcion/buscarFactura/cambioFecha.xhtml" />
 		</div>
 	</p:dialog>
 </ui:composition>

@@ -64,6 +64,8 @@
 			<p:column headerText="Opción" exportable="false">
 				<p:commandButton value="Detalle"
 					action="#{abonos.consultarAbonosCliente(docu)}" />
+					<p:commandButton icon="ui-icon-print"
+					action="#{abonos.imprimirAbono(docu)}" />
 				<br />
 
 
@@ -83,6 +85,12 @@
 			</p:column>
 			<p:column headerText="No. Abonos" exportable="true">
 				<h:outputText value="#{abonos.abonoByDocumento(docu)}" />
+			</p:column>
+			<p:column headerText="Cliente" exportable="true" style="display:none">
+				<h:outputText value="#{docu.clienteId.nombre}" />
+			</p:column>
+			<p:column headerText="Fecha" exportable="true" style="display:none">
+				<h:outputText value="#{docu.fechaRegistro}" />
 			</p:column>
 
 		</p:dataTable>

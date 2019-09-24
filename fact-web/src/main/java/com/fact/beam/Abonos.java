@@ -1,5 +1,6 @@
 package com.fact.beam;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,10 +18,12 @@ import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 
+import com.fact.api.Impresion;
 import com.fact.model.Abono;
 import com.fact.model.Cliente;
 import com.fact.model.Configuracion;
 import com.fact.model.Documento;
+import com.fact.model.Empresa;
 import com.fact.model.Proveedor;
 import com.fact.model.TipoDocumento;
 import com.fact.model.TipoPago;
@@ -31,6 +34,7 @@ import com.fact.service.DocumentoService;
 import com.fact.service.ProveedorService;
 import com.fact.service.TipoPagoService;
 import com.fact.service.UsuarioService;
+import com.itextpdf.text.DocumentException;
 
 @ManagedBean
 @SessionScoped
@@ -92,6 +96,18 @@ public class Abonos implements Serializable {
 
 	private Usuario usuario() {
 		return (Usuario) sessionMap.get("userLogin");
+	}
+	
+	private Empresa getEmpresa() {
+		return (Empresa) sessionMap.get("empresa");
+	}
+	
+	private Configuracion configuracion(){		
+		return  (Configuracion) sessionMap.get("configuracion");
+	}
+	
+	private String impresora(String impresora) {
+		return (String) sessionMap.get("impresora"+impresora);
 	}
 
 	public void crearAvance() {
@@ -289,6 +305,11 @@ public class Abonos implements Serializable {
 		setAbonosByDocumento(abonoService.getByDocumento(docu.getDocumentoId()));
 		RequestContext.getCurrentInstance().execute("PF('consultarAbonoCliente').show();");
 		RequestContext.getCurrentInstance().update("consultarAbono");
+	}
+	
+	public void imprimirAbono(Documento docu) throws FileNotFoundException, DocumentException {
+		String impresora=impresora("1");
+		Impresion.imprimirAbonos(docu, getEmpresa(),impresora, configuracion());
 	}
 
 	public void abrirPopupAbono(Documento docu) {

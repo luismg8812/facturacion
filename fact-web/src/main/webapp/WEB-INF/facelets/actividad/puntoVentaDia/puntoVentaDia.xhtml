@@ -768,7 +768,7 @@ panel1 {
 							listener="#{puntoVentaDia.buscarProducto}" process="@this,art_11"
 							immediate="true"
 							update="unidad_1,cantidad_in1,growl1,facturar,focoFact,valorParcial,nombrePro,cantidadPar"
-							onstart="focoCantidad1()" />
+							onstart=" setTimeout(focoCantidad1(), 50)" />
 						<p:column>
 							<p:outputLabel value="#{name.nombre}." />
 						</p:column>

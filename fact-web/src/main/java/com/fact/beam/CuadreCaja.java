@@ -139,9 +139,9 @@ public class CuadreCaja implements Serializable {
 	private Empresa empresa() {
 		return (Empresa) sessionMap.get("empresa");
 	}
-	
+
 	private String impresora(String impresora) {
-		return (String) sessionMap.get("impresora"+impresora);
+		return (String) sessionMap.get("impresora" + impresora);
 	}
 
 	public Double getTotalFaturasToDay() throws ParseException {
@@ -668,23 +668,26 @@ public class CuadreCaja implements Serializable {
 			return "";
 		}
 		// todo lo de imprimir cuadre
-		String pdf = "cuadre_" + usuario.getNombre() + "_" + Calendar.HOUR_OF_DAY + Calendar.MINUTE
-				+ Calendar.SECOND + ".txt";
+		String pdf = "cuadre_" + usuario.getNombre() + "_" + Calendar.HOUR_OF_DAY + Calendar.MINUTE + Calendar.SECOND
+				+ ".txt";
 		String carpeta = "C:\\facturas\\";
 		pdf = pdf.replace(" ", "_");
-		File archivo = new File( carpeta+ pdf);
+		File archivo = new File(carpeta + pdf);
 		int tamanoTxt = 40;
 		BufferedWriter bw;
 		bw = new BufferedWriter(new FileWriter(archivo));
 		bw.write("---------------------------------------\n");
-		bw.write( Calculos.centrarDescripcion(getEmpresa().getNombre(), tamanoTxt)  + "\n");
+		bw.write(Calculos.centrarDescripcion(getEmpresa().getNombre(), tamanoTxt) + "\n");
 		bw.write(Calculos.centrarDescripcion(getEmpresa().getRepresentante(), tamanoTxt) + "\n");
-		bw.write(Calculos.centrarDescripcion("NIT. " + getEmpresa().getNit() + "   " + getEmpresa().getRegimen(), tamanoTxt) + "\n");
-		bw.write(Calculos.centrarDescripcion( getEmpresa().getDireccion(), tamanoTxt) + "\n");
-		bw.write(Calculos.centrarDescripcion( getEmpresa().getBarrio(), tamanoTxt) + "\n");
-		bw.write(Calculos.centrarDescripcion( getEmpresa().getCiudad() + "-" + getEmpresa().getDepartamento(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("NIT. " + getEmpresa().getNit() + "   " + getEmpresa().getRegimen(),
+				tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion(getEmpresa().getDireccion(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion(getEmpresa().getBarrio(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion(getEmpresa().getCiudad() + "-" + getEmpresa().getDepartamento(), tamanoTxt)
+				+ "\n");
 		bw.write(Calculos.centrarDescripcion("TEL: " + getEmpresa().getCel(), tamanoTxt) + "\n");
-		bw.write(Calculos.centrarDescripcion("CAJERO: "+usuario.getNombre() + " " + usuario.getApellido(), tamanoTxt) + "\n");
+		bw.write(Calculos.centrarDescripcion("CAJERO: " + usuario.getNombre() + " " + usuario.getApellido(), tamanoTxt)
+				+ "\n");
 		bw.write(getFechaHoy() + "\n");
 		bw.write("ENTREGO:______________________________\n");
 		bw.write("Factura inicial:....: " + getEmpresa().getLetraConsecutivo() + getPrimeraFact() + "\n");
@@ -720,22 +723,21 @@ public class CuadreCaja implements Serializable {
 				+ Calculos.cortarCantidades(formatea.format(getCheques() == null ? 0.0 : getCheques()), maxTamaño)
 				+ "\n");
 		if (getDocumentosEspeciales() != null) {
-		bw.write("DOC. ESPECIALES:....: "
-				+ Calculos.cortarCantidades(
-						formatea.format(getDocumentosEspeciales() == null ? 0.0 : getDocumentosEspeciales()), maxTamaño)
-				+ "\n");
+			bw.write("DOC. ESPECIALES:....: " + Calculos.cortarCantidades(
+					formatea.format(getDocumentosEspeciales() == null ? 0.0 : getDocumentosEspeciales()), maxTamaño)
+					+ "\n");
 		}
 		if (getTotalTargetas() != null) {
-		bw.write(
-				"TARJET DÉBIT Y CRÉDIT: "
-						+ Calculos.cortarCantidades(
-								formatea.format(getTotalTargetas() == null ? 0.0 : getTotalTargetas()), maxTamaño)
-						+ "\n");
+			bw.write(
+					"TARJET DÉBIT Y CRÉDIT: "
+							+ Calculos.cortarCantidades(
+									formatea.format(getTotalTargetas() == null ? 0.0 : getTotalTargetas()), maxTamaño)
+							+ "\n");
 		}
 		if (getVarios() != null) {
-		bw.write("VARIOS:.............: "
-				+ Calculos.cortarCantidades(formatea.format(getVarios() == null ? 0.0 : getVarios()), maxTamaño)
-				+ "\n");
+			bw.write("VARIOS:.............: "
+					+ Calculos.cortarCantidades(formatea.format(getVarios() == null ? 0.0 : getVarios()), maxTamaño)
+					+ "\n");
 		}
 		bw.write("VALES:..............: " + Calculos.cortarCantidades(formatea.format(getVales()), maxTamaño) + "\n");
 		if (getNomina() != null) {
@@ -749,33 +751,39 @@ public class CuadreCaja implements Serializable {
 					+ "\n");
 		}
 		if (getDescuentos() != null) {
-			bw.write("DESCUENTOS:.........: "
+			bw.write(
+					"DESCUENTOS:.........: "
 							+ Calculos.cortarCantidades(
 									formatea.format(getDescuentos() == null ? 0.0 : getDescuentos()), maxTamaño)
 							+ "\n");
 		}
 		if (getPropinas() != null) {
 			bw.write("PROPIAS:............: "
-							+ Calculos.cortarCantidades(
-									formatea.format(getPropinas() == null ? 0.0 : getPropinas()), maxTamaño)
-							+ "\n");
+					+ Calculos.cortarCantidades(formatea.format(getPropinas() == null ? 0.0 : getPropinas()), maxTamaño)
+					+ "\n");
 		}
-		bw.write(
-				"VENTAS A CRÉDITO:...: "
-						+ Calculos.cortarCantidades(
-								formatea.format(getCartera() == null ? 0.0 : getCartera()), maxTamaño)
-						+ "\n");
+		bw.write("VENTAS A CRÉDITO:...: "
+				+ Calculos.cortarCantidades(formatea.format(getCartera() == null ? 0.0 : getCartera()), maxTamaño)
+				+ "\n");
 		bw.write("TOTAL INGRESOS:.....: " + Calculos.cortarCantidades(formatea.format(getTotalEnCaja()), maxTamaño)
 				+ "\n");
 		bw.write("---------------------------------------\n");
-		bw.write((getDiferencias() < 0.0 ? "SOBRANTE" : "FALTANTE")+"$...........: " + Calculos.cortarCantidades(formatea.format(getDiferencias()), maxTamaño)
-				+ "\n");
+		bw.write((getDiferencias() < 0.0 ? "SOBRANTE" : "FALTANTE") + "$...........: "
+				+ Calculos.cortarCantidades(formatea.format(getDiferencias()), maxTamaño) + "\n");
 		bw.write("---------------------------------------\n");
+		// logica de cuadre de caja por grupos
+		Map<String, Double> grupos = ventasPorGrupos(usuario);
+		if (!grupos.isEmpty()) {
+			bw.write("    VENTAS POR GRUPOS" + formatea.format(getCartera())+"\n");		
+		}
+		for (Entry<String, Double> g : grupos.entrySet()) {
+			bw.write("" + Calculos.cortarDescripcion(g.getKey(), 23) + ": " + formatea.format(g.getValue())+"\n");
+		}
 		bw.close();
 		FileInputStream inputStream = null;
 		try {
-			inputStream = new FileInputStream(carpeta+ pdf);
-			log.info(carpeta+ pdf);
+			inputStream = new FileInputStream(carpeta + pdf);
+			log.info(carpeta + pdf);
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
 		}
@@ -836,7 +844,7 @@ public class CuadreCaja implements Serializable {
 		tipoDocumentoId.add(5l); // tipo documento cotizacion
 		tipoDocumentoId.add(4l); // tipo documento remision
 		tipoDocumentoId.add(8l); // tipo vale
-		//tipoDocumentoId.add(2l); // tipo documento remision
+		// tipoDocumentoId.add(2l); // tipo documento remision
 		Date hoy = Calculos.fechaInicial(new Date());
 		Date hoyfin = Calculos.fechaFinal(new Date());
 		List<Documento> factDia = documentoService.getByFacturaSinCierre(tipoDocumentoId, hoy, hoyfin);
@@ -1124,7 +1132,7 @@ public class CuadreCaja implements Serializable {
 			}
 		}
 		return total;
-		//return totalTargetas;
+		// return totalTargetas;
 	}
 
 	public void setTotalTargetas(Double totalTargetas) {
@@ -1183,11 +1191,11 @@ public class CuadreCaja implements Serializable {
 		totalEnCaja = (getValorFajos() == null ? 0.0 : getValorFajos()) + (getMonedas() == null ? 0.0 : getMonedas())
 				+ (getEfectivo() == null ? 0.0 : getEfectivo()) + (getCheques() == null ? 0.0 : getCheques())
 				+ (getDocumentosEspeciales() == null ? 0.0 : getDocumentosEspeciales())
-				+ (getTotalTargetas() == null ? 0.0 : getTotalTargetas()) + (getVarios() == null ? 0.0 : getVarios())
-				+ (getVales() == null ? 0.0 : getVales()) + (getGastado() == null ? 0.0 : getGastado())
-				+ (getCartera() == null ? 0.0 : getCartera()) + (getNomina() == null ? 0.0 : getNomina()) +
-				// (getDescuentos()==null?0.0:getDescuentos())+
-				(getPropinas() == null ? 0.0 : getPropinas());
+				+ (getTotalTargetas() == null ? 0.0 : getTotalTargetas()) + (getVarios() == null ? 0.0 : getVarios()) +
+				// + (getVales() == null ? 0.0 : getVales()) +
+				(getGastado() == null ? 0.0 : getGastado()) + (getCartera() == null ? 0.0 : getCartera())
+				+ (getNomina() == null ? 0.0 : getNomina()) + (getDescuentos() == null ? 0.0 : getDescuentos())
+				+ (getPropinas() == null ? 0.0 : getPropinas());
 		return totalEnCaja;
 	}
 

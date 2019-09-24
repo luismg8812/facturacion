@@ -1,11 +1,13 @@
 package com.fact.dao.impl;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.faces.flow.builder.SwitchBuilder;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -24,6 +26,7 @@ import com.fact.model.InfoDiario;
 import com.fact.model.Invoice;
 import com.fact.model.Usuario;
 import com.fact.utils.HibernateUtil;
+import com.fact.vo.ExportarDetalleDeltaVo;
 
 @Stateless()
 public class DocumentoDaoImpl implements DocumentoDao {
@@ -249,7 +252,7 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			String detalle) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		List<Documento> documentoList = new ArrayList<>();
-		Long factura = 8l;
+		Long factura = 11l;
 		try {
 			String sql = "select d from Documento d where d.tipoDocumentoId.tipoDocumentoId in :factura ";
 			if (proveedorId != null && proveedorId != 0l) {
@@ -962,6 +965,92 @@ public class DocumentoDaoImpl implements DocumentoDao {
 			throw e;
 		}
 		return documentoList.isEmpty() ? null : documentoList.get(0);
+	}
+
+	@Override
+	public List<ExportarDetalleDeltaVo> getDocumentosSalidasDelta(Long tipodocumentoId, Date fechaInicial, Date fechaFinal,
+			String tipoDatos) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<ExportarDetalleDeltaVo> documentoList = new ArrayList<>();
+		String respuesta="";
+		switch (tipoDatos) {
+		case "iva":
+			respuesta="sum(documento.iva_5+documento.iva_19)  ";
+			break;
+		case "base":
+			respuesta="sum(documento.base_5+documento.base_19)  ";
+			break;
+		case "exento":
+			respuesta="sum(documento.excento)  ";
+			break;	
+		default:
+			break;
+		}
+			String sql = "select cliente.nombre nombretercero ,cliente.documento codigotercero, " + 
+					respuesta+"total from documento, cliente " + 
+					"where cliente.cliente_id= documento.cliente_id " + 
+					"and documento.fecha_registro BETWEEN :fechaInicial and  :fechaFinal " + 
+					"and  tipo_documento_id= "+ tipodocumentoId + 
+					" and impreso=1 and consecutivo_dian is not null " + 
+					"GROUP by cliente.nombre, cliente.documento ";
+			//List<Object[]> departments = session.createNativeQuery("SELECT * FROM department").list();
+			
+			Query query = session.createSQLQuery(sql);
+			query.setParameter("fechaInicial", fechaInicial);
+			query.setParameter("fechaFinal", fechaFinal);
+			List<Object[]> departments = query.list();
+			for (Object[] objects : departments) {
+				ExportarDetalleDeltaVo detalle = new ExportarDetalleDeltaVo();
+				detalle.setNombretercero((String)objects[0]);
+				detalle.setCodigotercero((String)objects[1]);
+	            detalle.setTotal(""+ (BigDecimal) objects[2]);
+	            documentoList.add(detalle);
+			}
+			session.close();
+		return documentoList;
+	}
+
+	@Override
+	public List<ExportarDetalleDeltaVo> getDocumentosEntradasDelta(Long tipodocumentoId, Date fechaInicial,
+			Date fechaFinal, String tipoDatos) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		List<ExportarDetalleDeltaVo> documentoList = new ArrayList<>();
+		String respuesta="";
+		switch (tipoDatos) {
+		case "iva":
+			respuesta="sum(documento.iva_5+documento.iva_19)  ";
+			break;
+		case "base":
+			respuesta="sum(documento.base_5+documento.base_19)  ";
+			break;
+		case "exento":
+			respuesta="sum(documento.excento)  ";
+			break;	
+		default:
+			break;
+		}
+			String sql = "select proveedor.nombre nombretercero ,proveedor.documento codigotercero, " + 
+					respuesta+"total from documento, proveedor " + 
+					"where proveedor.proveedor_id= documento.proveedor_id " + 
+					"and documento.fecha_registro BETWEEN :fechaInicial and  :fechaFinal " + 
+					"and  tipo_documento_id= "+ tipodocumentoId + 
+					" and impreso=1 and consecutivo_dian is not null " + 
+					"GROUP by proveedor.nombre, proveedor.documento ";
+			
+			
+			Query query = session.createSQLQuery(sql);
+			query.setParameter("fechaInicial", fechaInicial);
+			query.setParameter("fechaFinal", fechaFinal);
+			List<Object[]> departments = query.list();
+			for (Object[] objects : departments) {
+				ExportarDetalleDeltaVo detalle = new ExportarDetalleDeltaVo();
+				detalle.setNombretercero((String)objects[0]);
+				detalle.setCodigotercero((String)objects[1]);
+	            detalle.setTotal(""+ (BigDecimal) objects[2]);
+	            documentoList.add(detalle);
+			}
+			session.close();
+		return documentoList;
 	}
 
 }

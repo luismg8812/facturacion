@@ -109,6 +109,7 @@ public class BorrarFacturas implements Serializable {
 	String documentoId;
 	Date fechaIni;
 	Date fechaFin;
+	Date fechaNew;
 	String ConDian;
 	Documento docuConsulta;
 	Long cliente;
@@ -430,6 +431,23 @@ public class BorrarFacturas implements Serializable {
 
 	}
 	
+	public String cambiarfechaPopup(Documento docu) {
+		log.info("entra a cambiar fecha factura");
+		log.info("Documento:" + docu.getDocumentoId());
+		setDocuConsulta(docu);
+		RequestContext.getCurrentInstance().execute("PF('cambioFecha').show();");
+		return "";
+	}
+	
+	public void guardarCambioFecha() {
+		getDocuConsulta().setFechaRegistro(getFechaNew());
+		log.info("fecha new: "+getFechaNew());
+		documentoService.update(getDocuConsulta(),1l);
+		RequestContext.getCurrentInstance().execute("PF('cambioFecha').hide();");
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage("Documento "+getDocuConsulta().getConsecutivoDian()+" se le cambio la fecha exitosamente"));
+	}
+	
 	public String anularFactura(Documento docu) {
 		if(docu.getAnulado()!=null && docu.getAnulado()==1) {
 			FacesContext.getCurrentInstance().addMessage(null,
@@ -542,8 +560,14 @@ public class BorrarFacturas implements Serializable {
 			// pdf = imprimirBig(tituloFactura);
 			break;
 		case "PDF":
-			pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
-					configuracion, impresora,enPantalla,e);
+			if (docu.getImpresora() != null && docu.getImpresora()==2l) {
+				pdf = Impresion.imprimirPDFBigMedia(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
+						configuracion, null, impresora, e);
+			} else {
+				pdf = Impresion.imprimirPDF(docu, Calculos.llenarDocumentoDetalleVoList(detalles), docu.getUsuarioId(),
+						configuracion, impresora,enPantalla,e);
+			}
+			
 			break;
 		case "SMALL_PDF":
 			Impresion.imprimirPDFSmall(docu, Calculos.llenarDocumentoDetalleVoList(detalles), usuario(), configuracion,
@@ -949,6 +973,15 @@ public class BorrarFacturas implements Serializable {
 	public void setTipoDocumentoList(List<TipoDocumento> tipoDocumentoList) {
 		this.tipoDocumentoList = tipoDocumentoList;
 	}
+
+	public Date getFechaNew() {
+		return fechaNew;
+	}
+
+	public void setFechaNew(Date fechaNew) {
+		this.fechaNew = fechaNew;
+	}
+	
 	
 	
 

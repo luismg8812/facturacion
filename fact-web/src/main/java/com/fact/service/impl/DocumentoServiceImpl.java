@@ -16,6 +16,7 @@ import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
 import com.fact.model.Usuario;
 import com.fact.service.DocumentoService;
+import com.fact.vo.ExportarDetalleDeltaVo;
 
 @Stateless
 public class DocumentoServiceImpl implements DocumentoService{
@@ -237,6 +238,19 @@ public class DocumentoServiceImpl implements DocumentoService{
 	@Override
 	public Documento getByDetalleEntrada(String detalleEntrada) {
 		return documentoDao.getByDetalleEntrada(detalleEntrada) ;
+	}
+
+	@Override
+	public List<ExportarDetalleDeltaVo> getDocumentosSalidasDelta(Long tipodocumentoId, Date fechaInicial, Date fechaFinal,
+			String tipoDatos) {
+		return documentoDao.getDocumentosSalidasDelta(tipodocumentoId,fechaInicial,fechaFinal,tipoDatos) ;
+		
+	}
+
+	@Override
+	public List<ExportarDetalleDeltaVo> getDocumentosEntradasDelta(Long tipodocumentoId, Date fechaInicial,
+			Date fechaFinal, String tipoDatos) {
+		return documentoDao.getDocumentosEntradasDelta(tipodocumentoId,fechaInicial,fechaFinal,tipoDatos) ;
 	}
 
 }

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +24,16 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jboss.logging.Logger;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 import com.fact.api.ImpresorasInstaladas;
 import com.fact.model.Configuracion;
 import com.fact.model.Empresa;
+import com.fact.model.OpcionUsuario;
 import com.fact.model.Usuario;
+import com.fact.service.OpcionUsuarioService;
 import com.fact.service.UsuarioService;
 import com.fact.utils.Constantes;
 import com.google.gson.Gson;
@@ -63,6 +67,9 @@ public class Login implements Serializable {
 	@EJB
 	private UsuarioService usuarioService;
 	
+	@EJB
+	private OpcionUsuarioService opcionUsuarioService;
+	
 	
 
 	  public StreamedContent getGraphicImage() {  
@@ -84,6 +91,7 @@ public class Login implements Serializable {
     	FacesContext context = FacesContext.getCurrentInstance();
     	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, Object> sessionMap = externalContext.getSessionMap();
+		Map<String, Object> aplicationMap = externalContext.getApplicationMap();
     	boolean valido= true;
     	if (getUsuario() == null || getUsuario().equals("")) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!,El usuario es obligatorio",""));
@@ -140,6 +148,13 @@ public class Login implements Serializable {
     		sessionMap.put("userLogin",  usu);
     		sessionMap.put("configuracion",  configuracion); //manejo de los dos servidores uno para respaldo 
    		 	setUsuarioLogin(usu);
+   		 	List<String> rutas = new ArrayList<>();
+   		 	rutas.add("DESCUENTOS_ADMIN");
+   		    List<OpcionUsuario> descuentoAdmin = opcionUsuarioService.getByRutas(rutas, usu.getUsuarioId());
+   		 	if(!descuentoAdmin.isEmpty() && usu.getRolId().getRolId()==1l) {//igual a rol admin
+   		 		
+   		 		log.info("aqui se activa el hilo");	
+   		 	}
     	}
     	return valido;
     	
@@ -186,8 +201,10 @@ public class Login implements Serializable {
 			String contex=FacesContext.getCurrentInstance().getExternalContext().getContextName();
 			String url = "/"+contex+"/pages/administracion/menu/menuPrincipal.jsf"; //url donde se redirige la pantalla
 			log.info(url);
-			FacesContext fc = FacesContext.getCurrentInstance();
 			
+			FacesContext fc = FacesContext.getCurrentInstance();
+			sessionMap.put("contex",contex);
+			sessionMap.put("fc",fc);
 			fc.getExternalContext().redirect(url);// redirecciona la página
 		}
 	}

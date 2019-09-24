@@ -6,6 +6,8 @@ public class ConvinacionDelta {
 	private Long tipoPagoId;
 	private String tipoPagoNombre;
 	private String cuenta;
+	private String documentosIva;
+	
 	public Long getTipodocumentoId() {
 		return tipodocumentoId;
 	}
@@ -35,6 +37,12 @@ public class ConvinacionDelta {
 	}
 	public void setCuenta(String cuenta) {
 		this.cuenta = cuenta;
+	}
+	public String getDocumentosIva() {
+		return documentosIva;
+	}
+	public void setDocumentosIva(String documentosIva) {
+		this.documentosIva = documentosIva;
 	}
 	
 	

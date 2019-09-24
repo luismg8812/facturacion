@@ -43,6 +43,7 @@ public class menuPrincipal implements Serializable {
 	List<OpcionUsuario> opcionUsuarios;
 	ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 	Map<String, Object> sessionMap = externalContext.getSessionMap();
+
 	
 	public void cerrarSesioin() throws FactException, IOException {
 		sessionMap.clear();

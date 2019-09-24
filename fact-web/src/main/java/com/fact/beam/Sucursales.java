@@ -91,6 +91,11 @@ public class Sucursales implements Serializable {
 	}
 
 	public void confirmar(){
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Para activar el módulo de transferencia contacte a su proveedor"));
+		if(1==1) {
+			return;	
+		}
+		
 		if(getProductosList().isEmpty()){
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("No hay productos agregados para transferir"));
 			return;

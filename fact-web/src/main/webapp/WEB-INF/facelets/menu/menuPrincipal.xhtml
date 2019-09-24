@@ -422,7 +422,7 @@
 			 var="ou1" >
 			<p:dialog header="#{ou1.subMenuId.nombre}"   closeOnEscape="true" style="font-size: 12px" onHide="salirCuadreCaja()"
 				widgetVar="#{ou1.subMenuId.bar}" id="men_#{ou1.subMenuId.bar}"  onShow="focusOpcion(this,'#{ou1.subMenuId.bar}')">
-				<div style="width: 550px; height: 530px" >
+				<div style="width: 600px; height: 530px" >
 					<ui:include src="#{ou1.subMenuId.ruta}" />
 				</div>
 			</p:dialog>
@@ -510,6 +510,12 @@
 		<div style="width: 300px; ">
 			<ui:include
 				src="/WEB-INF/facelets/actividad/puntoVentaDia/cambioPrecio.xhtml" />
+		</div>
+	</p:dialog>
+	<p:dialog widgetVar="confirmarDescuento" id="confirmarDes"  
+		style="font-size: 16px" header="Confirmar Descuento">
+		<div style="width: 300px; ">
+			
 		</div>
 	</p:dialog>
 	<p:dialog widgetVar="popupTipoPago" id="popuptipo"  onShow="document.getElementById('tipoPagoForm:tipo_pago_input_input').focus()" 

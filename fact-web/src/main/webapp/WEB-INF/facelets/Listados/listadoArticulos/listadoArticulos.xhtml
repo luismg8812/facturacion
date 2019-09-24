@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<script type="text/javascript">
+	
+	</script>
+	<h:form>
+		<p:growl id="growl1" life="7000" />
+		<table width="100%" align="center">
+			<tr>
+				<td><p:outputLabel value="Desde: " /></td>
+				<td><p:calendar id="fechaInicial"
+						value="#{infoVentas.fechaInicio}" pattern="dd-MM-yyyy" mask="true" /></td>
+				<td><p:outputLabel value="Hasta: " /></td>
+				<td><p:calendar id="fechaFinal" value="#{infoVentas.fechafin}"
+						pattern="dd-MM-yyyy" mask="true" /></td>
+
+			</tr>
+
+		</table>
+		<br />
+		<table width="100%" align="center">
+			<tr>
+				<p:commandButton value="Exportar Listado de artículos" title="Exportar" ajax="false">
+					<p:fileDownload value="#{infoVentas.getFileListadoArticulos()}" />
+				</p:commandButton>
+				<p:commandButton value="Exportar Resumen movimiento Articulos" title="Exportar" ajax="false">
+					<p:fileDownload value="#{infoVentas.getFileResumenMovimientoArticulos()}" />
+				</p:commandButton>
+				<p:commandButton value="Salir" />
+			</tr>
+		</table>
+	</h:form>
+
+
+</ui:composition>

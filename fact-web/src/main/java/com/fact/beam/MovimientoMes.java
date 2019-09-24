@@ -172,6 +172,7 @@ public class MovimientoMes implements Serializable {
 	String cambioTemp;// variable para almacednar el cambio dde precio temporal
 	DocumentoDetalleVo dCambio;// variable que contiene el detalle del producto
 								// que se le cambiara el precio
+	Boolean activo;
 	
 	private String buscar;
 
@@ -869,6 +870,67 @@ public class MovimientoMes implements Serializable {
 		dCambio = d;
 	}
 	
+	public void confirmarCostoSinIva() {
+		//if(getActivo()) {
+			for(DocumentoDetalleVo p: getProductos()) {
+				Producto pObj=new Producto();
+			    DocumentoDetalle dd = new DocumentoDetalle();
+			    dd=p.getDocumentoDetalleId();
+			    dd.setParcial(p.getParcial());
+				pObj=p.getProductoId();
+				pObj.setCosto(p.getParcial()/p.getCantidad());
+				documentoDetalleService.update(dd, 1l);
+				productoService.update(pObj, 1l);
+			}
+		//}
+		documentoService.update(getDocumento(), 1l);
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Confirmado!"));
+	}
+	
+	public void costoSinIva() {
+		List<DocumentoDetalleVo> temp= new ArrayList<>();
+		if(getActivo()) {
+			for(DocumentoDetalleVo p: getProductos()) {
+				double iva=p.getProductoId().getIva()/100;
+				Double newPrecio =p.getProductoId().getCosto()+ (p.getProductoId().getCosto()*iva);
+				p.setUnitario(newPrecio);
+				newPrecio = newPrecio*p.getCantidad();
+				p.setParcial(newPrecio);
+				
+				//documentoDetalleService.update(p, 1l);
+				temp.add(p);
+			}
+		}else {
+			for(DocumentoDetalleVo p: getProductos()) {
+				p.setUnitario(p.getProductoId().getCosto());
+				p.setParcial(p.getProductoId().getCosto()*p.getCantidad());
+				//documentoDetalleService.update(p, 1l);
+				temp.add(p);
+			}
+		}
+		setProductos(temp);
+		setDocumento(Calculos.calcularExcento(getDocumento(), getProductos()));
+		
+		setTotal(getDocumento().getTotal());
+		setIva(getDocumento().getIva());
+		setExecento(getDocumento().getExcento());
+		setGravado(getDocumento().getGravado());
+		setRetefuente(getDocumento().getRetefuente());
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').focus();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').select();");
+		RequestContext.getCurrentInstance().execute("document.getElementById('art_1_input').value='';");
+		RequestContext.getCurrentInstance().execute("PF('cambioPrecioMM').hide();");
+		RequestContext.getCurrentInstance().update("dataList");
+		RequestContext.getCurrentInstance().update("execentoFact");
+		RequestContext.getCurrentInstance().update("gravado");
+		RequestContext.getCurrentInstance().update("ivaFact");
+		RequestContext.getCurrentInstance().update("totalFact");
+		RequestContext.getCurrentInstance().update("gravadoFact");
+		RequestContext.getCurrentInstance().update("retefuentelFact");
+		RequestContext.getCurrentInstance().update("art_1");
+		
+	}
+	
 	public String recalcularPrecio(AjaxBehaviorEvent event) {
 		log.info("cambio de precio MM:" + getCambioTemp());
 		if(getCambioTemp()==null  ){
@@ -1142,6 +1204,10 @@ public class MovimientoMes implements Serializable {
 		if(getCartera().equalsIgnoreCase("s")) {
 			log.info("documento para cartera");
 			crearVale();
+		}else {
+			TipoPago tipo = new TipoPago();
+			tipo.setTipoPagoId(1l);
+			getDocumento().setTipoPagoId(tipo);
 		}
 		
 		// se busca la mac del equipo y se le asigna a la factura
@@ -1216,10 +1282,11 @@ public class MovimientoMes implements Serializable {
 		docu.setClienteId(getDocumento().getClienteId());
 		docu.setSaldo(getDocumento().getTotal());
 		// se le envia tipo documento vale (Vale) por que zohan dijo
-		tido.setTipoDocumentoId(8l);
+		tido.setTipoDocumentoId(11l);
 		docu.setTipoDocumentoId(tido);
-		// se envia tipo pago con vale, debido a que el vale es un documento a credito
+		// se envia tipo pago con vale PROVEEDOR, debido a que el vale es un documento a credito
 		pago.setTipoPagoId(6l);
+		documento.setTipoPagoId(pago);
 		docu.setTipoPagoId(pago);
 		docu.setTotal(getDocumento().getTotal());
 		docu.setUsuarioId(usuario);
@@ -2212,6 +2279,14 @@ public class MovimientoMes implements Serializable {
 
 	public void setActivarImpresionRemota(OpcionUsuario activarImpresionRemota) {
 		this.activarImpresionRemota = activarImpresionRemota;
+	}
+	
+	public Boolean getActivo() {
+		return activo;
+	}
+
+	public void setActivo(Boolean activo) {
+		this.activo = activo;
 	}
 	
 	

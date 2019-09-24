@@ -496,7 +496,12 @@ items {
 					</td>
 				</tr>
 				<tr>
-					<td></td>
+						<td><p:outputLabel value="Costo sin iva: " /></td>
+						<td><p:selectBooleanCheckbox value="#{movimientoMes.activo}">
+						 <p:ajax update="art_1,cod_,dataList,totalFact,execentoFact,ivaFact" partialSubmit="true" listener="#{movimientoMes.costoSinIva()}" />
+							</p:selectBooleanCheckbox></td>
+							<td><p:commandButton value="Confirmar"
+							actionListener="#{movimientoMes.confirmarCostoSinIva()}" update="growl" /></td>
 				</tr>
 			</table>
 			<table width="100%" align="center" id="confir_mm"

@@ -486,6 +486,19 @@ public class Calculos {
 			canti = Double.parseDouble(cant);
 			log.info("canti:" + canti);
 			break;
+		case "7":
+			respuesta = (respuesta == null ? "" : respuesta);
+			canti = 0.0;
+			try {
+				canti = Double.parseDouble(respuesta);
+				canti=canti/1000;
+			} catch (Exception e) {
+				FacesContext.getCurrentInstance().addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!, por favor vuelva a pesar", ""));
+				RequestContext.getCurrentInstance().update("growl1");
+				break;
+			}
+			break;
 		default:
 			break;
 		}

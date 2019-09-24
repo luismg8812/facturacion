@@ -12,6 +12,7 @@ import com.fact.model.Documento;
 import com.fact.model.DocumentoDetalle;
 import com.fact.model.InfoDiario;
 import com.fact.model.Usuario;
+import com.fact.vo.ExportarDetalleDeltaVo;
 
 @Local
 public interface DocumentoService {
@@ -56,4 +57,8 @@ public interface DocumentoService {
 	void update(ConsecutivoDian consecutivoDian);
 	List<Documento> getconvinacion(Long tipodocumentoId, Long tipoPago, Date fechaInicio, Date fechafin);
 	Documento getByDetalleEntrada(String detalleEntrada);
+	List<ExportarDetalleDeltaVo> getDocumentosSalidasDelta(Long tipodocumentoId, Date fechaInicial, Date fechaFinal, String string);
+	List<ExportarDetalleDeltaVo> getDocumentosEntradasDelta(Long tipodocumentoId, Date fechaInicial, Date fechaFinal,
+			String string);
+	
 }

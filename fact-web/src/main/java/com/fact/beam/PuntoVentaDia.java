@@ -36,6 +36,7 @@ import javax.print.PrintServiceLookup;
 import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
+import javax.servlet.http.HttpServletRequest;
 
 import org.jboss.logging.Logger;
 import org.primefaces.context.RequestContext;
@@ -78,6 +79,7 @@ import com.fact.service.ProductoEmpresaService;
 import com.fact.service.ProductoService;
 import com.fact.service.TipoPagoService;
 import com.fact.service.UsuarioService;
+import com.fact.utils.ClienteDescuento;
 import com.fact.utils.Conector;
 import com.fact.vo.DocumentoDetalleVo;
 import com.itextpdf.text.DocumentException;
@@ -980,10 +982,12 @@ public class PuntoVentaDia implements Serializable {
 		enPantalla = (enPantalla == null ? "false" : enPantalla);
 		enPantalla = (enPantalla.equals("") ? "false" : enPantalla);
 		log.info("en pantalla:" + enPantalla);
-		String impresora = impresora(getImpresoras() == null ? "1" : getImpresoras());
+		String numImpresora = getImpresoras() == null ? "1" : getImpresoras();
+		String impresora = impresora(numImpresora);
 		if (getImpresion() != null && getImpresion().equalsIgnoreCase("S")) {
 			Empresa e = getEmpresa();
-
+			//se asigna numero de impresora
+			getDocumento().setImpresora(Long.valueOf(numImpresora));
 			// calcular tipo de documento
 			calcularTipoDocumento(e, server);
 			if(getDocumento().getConsecutivoDian()==null) {
@@ -1160,7 +1164,7 @@ public class PuntoVentaDia implements Serializable {
 				getDocumento().setTipoPagoId(tipa);
 				numeroImpresiones = 2;
 				// si la factura es acredito se hace un vale
-				crearVale();
+				crearVale(); //en una conversacion con zohan del dia 19/08/2019 me dijo que lo quitara no entiendo y no se porque... 
 			} else {
 				if (getTarjeta() != null && getTarjeta().equalsIgnoreCase("S")) {
 					tipa.setTipoPagoId(5l);// pago con targeta
@@ -1171,7 +1175,6 @@ public class PuntoVentaDia implements Serializable {
 				}
 			}
 		}
-
 		return numeroImpresiones;
 	}
 
@@ -2161,6 +2164,11 @@ public class PuntoVentaDia implements Serializable {
 	}
 
 	public void recalcularPrecio() {
+		if(!"S".equals(pedirPermiso(dCambio.getProductoId().getNombre(),dCambio.getCantidad(),dCambio.getUnitario(),getCambioTemp()).toUpperCase())) {
+			log.info("permiso de descuento denegado");
+			return;
+		}
+		
 		log.info("cambio de precio:" + getCambioTemp());
 		// se comenta el pedaso de codigo que hace que se pueda bajar el precio
 		int pos = getProductos().indexOf(dCambio);
@@ -2191,6 +2199,16 @@ public class PuntoVentaDia implements Serializable {
 		setIva(getDocumento().getIva());
 		setExcento(getDocumento().getExcento());
 		setGravado(getDocumento().getGravado());
+	}
+	
+	private String pedirPermiso(String nombreProducto, Double cantidad,Double valorUni, Double valorAnt) {
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext()
+				.getRequest();
+		log.info("ip:"+request.getLocalAddr());
+		ClienteDescuento cliente = new ClienteDescuento();
+		
+		return cliente.inicio(request.getLocalAddr(),usuario().getNombre(),nombreProducto,cantidad,valorUni,valorAnt);
+				
 	}
 
 	public void modificarUltimaFactura() {
@@ -2548,9 +2566,11 @@ public class PuntoVentaDia implements Serializable {
 				cNew.setRetencion(0.0);
 			}
 			clienteService.save(cNew);
-			setCliente(cNew);
-			getClientesAll().add(cNew);
-			clienteSelect = cNew;
+			clienteSelect = clienteService.getById(cNew.getClienteId());;
+			
+			setCliente(clienteSelect);
+			getClientesAll().add(clienteSelect);
+			
 			if (getDocumento().getDocumentoId() == null) {
 				Documento docOjb = new Documento();
 				TipoDocumento td = new TipoDocumento();
@@ -2578,6 +2598,7 @@ public class PuntoVentaDia implements Serializable {
 				}
 				docOjb.setClienteId(clienteSelect);
 				documentoService.update(docOjb, server);
+				setDocumento(docOjb);
 			}
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Cliente Creado exitosamente"));
 		} else {
@@ -2597,7 +2618,7 @@ public class PuntoVentaDia implements Serializable {
 		setCelularClienteNew(null);
 		setCupoCreditoClienteNew(null);
 		setDirecionClienteNew(null);
-		setDocumento(null);
+		//setDocumento(null);
 		setFijoClienteNew(null);
 		setEmpresaNew(null);
 		setNombreClienteNew(null);
